@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 ## Current Position
 
 Phase: 1 of 4 (Telemetry Foundation & Safety Rails)
-Plan: 0 of TBD in current phase
-Status: Ready to plan
-Last activity: 2026-05-09 — Roadmap created; 64 v0.1 requirements mapped across 4 phases
+Plan: 2 of 5 in current phase
+Status: Executing
+Last activity: 2026-05-09 — Completed 01-02-PLAN.md
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 2
+- Average duration: 32m
+- Total execution time: 1h 5m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | TBD | — | — |
+| 1. Foundation | 2/5 | 1h 5m | 32m |
 | 2. Metrics | TBD | — | — |
 | 3. SLO + Integrations | TBD | — | — |
 | 4. Artifacts + DX | TBD | — | — |
@@ -44,6 +44,8 @@ Key decisions affecting Phase 1 work:
 - Single `parapet` package for v0.1 — no premature boundary splits; admin/UI package boundary designed in but deferred
 - Telemetry-first in v0.1, no DB-backed evidence spine — establishes contract before committing to a schema
 - Generator for scaffolding, library for runtime — host-owned principle requires adopters to inspect and modify
+- Output a structured JSON manifest via stdout for downstream ingestion.
+- Moved Parapet.Application to Parapet.Internal.Application to avoid false positives in public API checks while maintaining internal functionality.
 
 ### Pending Todos
 
@@ -63,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Roadmap created — ready to run `/gsd-plan-phase 1`
-Resume file: None
+Stopped at: Completed 01-02-PLAN.md
+Resume file: .planning/phases/1-foundation/01-03-PLAN.md
