@@ -74,7 +74,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Telemetry Foundation & Safety Rails | 0/TBD | Not started | - |
+| 1. Telemetry Foundation & Safety Rails | 3/5 | Executing | - |
 | 2. HTTP, Ecto, and Oban Metrics | 0/TBD | Not started | - |
 | 3. SLO DSL, Login Journey, and Deploy Markers | 0/TBD | Not started | - |
 | 4. Artifact Generation, Doctor, and Launch Readiness | 0/TBD | Not started | - |

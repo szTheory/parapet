@@ -104,7 +104,7 @@ Requirements for the "Trustworthy spine" initial release.
 
 ### Error Handling and Observability
 
-- [ ] **ERR-01**: Telemetry handler exceptions are caught and logged at `:error` level with the event name, exception class, and stacktrace — a bad handler never crashes the calling process
+- [x] **ERR-01**: Telemetry handler exceptions are caught and logged at `:error` level with the event name, exception class, and stacktrace — a bad handler never crashes the calling process
 - [ ] **ERR-02**: Metric registration errors (duplicate metric name, incompatible label set) are reported at application start with a clear error message identifying the conflicting module — the application does not silently start with a partial metric set
 - [ ] **ERR-03**: All `Parapet.*` public functions that can fail return `{:ok, result}` / `{:error, reason}` tagged tuples — no public API function raises for expected error conditions
 - [ ] **ERR-04**: Parapet logs at `:debug` when attaching telemetry handlers and at `:warning` when a handler is skipped because its optional dependency is absent
