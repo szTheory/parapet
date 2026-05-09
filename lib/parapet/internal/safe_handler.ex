@@ -12,10 +12,8 @@ defmodule Parapet.Internal.SafeHandler do
         rescue
           e ->
             Logger.error(
-              "Parapet telemetry handler exception in #{inspect(handler_module)}.#{function_name}/4",
-              event: event,
-              exception: Exception.message(e),
-              stacktrace: inspect(__STACKTRACE__)
+              "Parapet telemetry handler exception in #{inspect(handler_module)}.#{function_name}/4: #{Exception.message(e)}\nStacktrace: #{inspect(__STACKTRACE__)}",
+              event: event
             )
         end
       end,
