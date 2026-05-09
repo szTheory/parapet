@@ -67,5 +67,7 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Completed 01-04-PLAN.md
-Resume file: .planning/phases/1-foundation/01-05-PLAN.md
+Stopped at: Phase 1 Complete
+Resume file: (Phase 2 Planning next)
+1-foundation/01-05-PLAN.md
+foundation/01-05-PLAN.md

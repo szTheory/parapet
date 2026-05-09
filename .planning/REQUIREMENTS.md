@@ -242,17 +242,17 @@ Deferred until product-market fit is established and the evidence model is prove
 | INST-04 | Phase 1 | Complete |
 | INST-05 | Phase 1 | Complete |
 | DOCS-01 | Phase 4 | Pending |
-| DOCS-02 | Phase 1 | Pending |
+| DOCS-02 | Phase 1 | Complete |
 | DOCS-03 | Phase 3 | Pending |
-| DOCS-04 | Phase 1 | Pending |
-| ERR-01 | Phase 1 | Pending |
+| DOCS-04 | Phase 1 | Complete |
+| ERR-01 | Phase 1 | Complete |
 | ERR-02 | Phase 2 | Pending |
-| ERR-03 | Phase 1 | Pending |
-| ERR-04 | Phase 1 | Pending |
-| OSS-01 | Phase 1 | Pending |
-| OSS-02 | Phase 1 | Pending |
-| OSS-03 | Phase 1 | Pending |
-| OSS-04 | Phase 1 | Pending |
+| ERR-03 | Phase 1 | Complete |
+| ERR-04 | Phase 1 | Complete |
+| OSS-01 | Phase 1 | Complete |
+| OSS-02 | Phase 1 | Complete |
+| OSS-03 | Phase 1 | Complete |
+| OSS-04 | Phase 1 | Complete |
 
 **Coverage:**
 - v0.1 requirements: 60 total
