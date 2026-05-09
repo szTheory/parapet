@@ -10,24 +10,24 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 ## Current Position
 
 Phase: 1 of 4 (Telemetry Foundation & Safety Rails)
-Plan: 3 of 5 in current phase
+Plan: 4 of 5 in current phase
 Status: Executing
-Last activity: 2026-05-09 — Completed 01-03-PLAN.md
+Last activity: 2026-05-09 — Completed 01-04-PLAN.md
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 25m
-- Total execution time: 1h 15m
+- Total plans completed: 4
+- Average duration: 23m
+- Total execution time: 1h 30m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 3/5 | 1h 15m | 25m |
+| 1. Foundation | 4/5 | 1h 30m | 23m |
 | 2. Metrics | TBD | — | — |
 | 3. SLO + Integrations | TBD | — | — |
 | 4. Artifacts + DX | TBD | — | — |
@@ -47,6 +47,7 @@ Key decisions affecting Phase 1 work:
 - Output a structured JSON manifest via stdout for downstream ingestion.
 - Moved Parapet.Application to Parapet.Internal.Application to avoid false positives in public API checks while maintaining internal functionality.
 - Implemented a hardcoded label policy regex to prevent high cardinality explosions rather than making it configurable, ensuring strict safety rails out of the box.
+- Used `Sourceror.to_string(zipper.node) =~ "Parapet.Plug.Metrics"` instead of verbose Igniter context-aware function matching to determine if the Endpoint was already patched, prioritizing simplicity and speed in the generator.
 
 ### Pending Todos
 
@@ -66,5 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Completed 01-03-PLAN.md
-Resume file: .planning/phases/1-foundation/01-04-PLAN.md
+Stopped at: Completed 01-04-PLAN.md
+Resume file: .planning/phases/1-foundation/01-05-PLAN.md

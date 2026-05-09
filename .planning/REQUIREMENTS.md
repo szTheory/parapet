@@ -89,11 +89,11 @@ Requirements for the "Trustworthy spine" initial release.
 
 ### Install Generator
 
-- [ ] **INST-01**: `mix parapet.install` generates a `Parapet.Instrumenter` module in the host app (e.g., `lib/my_app/parapet_instrumenter.ex`) that the adopter can inspect, modify, and own
-- [ ] **INST-02**: `mix parapet.install` appends the required `Parapet.Plug.Metrics` to the host app's Endpoint in `lib/my_app_web/endpoint.ex` and prints a diff of the change before applying it — requires `--yes` to apply without prompt
-- [ ] **INST-03**: `mix parapet.install` adds Parapet configuration to `config/config.exs` with inline comments explaining each option
-- [ ] **INST-04**: `mix parapet.install` is idempotent — running it twice on an already-configured app prints "already configured" for each step and makes no changes
-- [ ] **INST-05**: `mix parapet.install --dry-run` prints all proposed changes without writing any files
+- [x] **INST-01**: `mix parapet.install` generates a `Parapet.Instrumenter` module in the host app (e.g., `lib/my_app/parapet_instrumenter.ex`) that the adopter can inspect, modify, and own
+- [x] **INST-02**: `mix parapet.install` appends the required `Parapet.Plug.Metrics` to the host app's Endpoint in `lib/my_app_web/endpoint.ex` and prints a diff of the change before applying it — requires `--yes` to apply without prompt
+- [x] **INST-03**: `mix parapet.install` adds Parapet configuration to `config/config.exs` with inline comments explaining each option
+- [x] **INST-04**: `mix parapet.install` is idempotent — running it twice on an already-configured app prints "already configured" for each step and makes no changes
+- [x] **INST-05**: `mix parapet.install --dry-run` prints all proposed changes without writing any files
 
 ### Documentation
 
@@ -236,11 +236,11 @@ Deferred until product-market fit is established and the evidence model is prove
 | DOCT-03 | Phase 4 | Pending |
 | DOCT-04 | Phase 4 | Pending |
 | DOCT-05 | Phase 4 | Pending |
-| INST-01 | Phase 1 | Pending |
-| INST-02 | Phase 1 | Pending |
-| INST-03 | Phase 1 | Pending |
-| INST-04 | Phase 1 | Pending |
-| INST-05 | Phase 1 | Pending |
+| INST-01 | Phase 1 | Complete |
+| INST-02 | Phase 1 | Complete |
+| INST-03 | Phase 1 | Complete |
+| INST-04 | Phase 1 | Complete |
+| INST-05 | Phase 1 | Complete |
 | DOCS-01 | Phase 4 | Pending |
 | DOCS-02 | Phase 1 | Pending |
 | DOCS-03 | Phase 3 | Pending |
