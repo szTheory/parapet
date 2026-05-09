@@ -16,7 +16,7 @@ defmodule Parapet.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Parapet.Application, []}
+      mod: {Parapet.Internal.Application, []}
     ]
   end
 
