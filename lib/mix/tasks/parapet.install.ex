@@ -13,8 +13,8 @@ defmodule Mix.Tasks.Parapet.Install do
   @impl Igniter.Mix.Task
   def info(_argv, _composing_task) do
     %Igniter.Mix.Task.Info{
-      schema: [],
-      defaults: []
+      schema: [with_sigra: :boolean],
+      defaults: [with_sigra: false]
     }
   end
 
@@ -25,16 +25,34 @@ defmodule Mix.Tasks.Parapet.Install do
     web_module = Module.concat([inspect(app_module) <> "Web"])
     endpoint_module = Module.concat([web_module, Endpoint])
 
+    with_sigra? = igniter.args.options[:with_sigra] || false
+
+    setup_code =
+      if with_sigra? do
+        """
+        def setup do
+          if Code.ensure_loaded?(Parapet.Integrations.Sigra) do
+            Parapet.Integrations.Sigra.setup()
+          end
+          :ok
+        end
+        """
+      else
+        """
+        def setup do
+          # Attach handlers here
+          :ok
+        end
+        """
+      end
+
     igniter
     |> ProjectModule.create_module(
       instrumenter_module,
       """
       @moduledoc "Host-owned telemetry instrumentation for Parapet."
 
-      def setup do
-        # Attach handlers here
-        :ok
-      end
+      #{setup_code}
       """
     )
     |> Config.configure(
