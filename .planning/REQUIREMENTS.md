@@ -99,7 +99,7 @@ Requirements for the "Trustworthy spine" initial release.
 
 - [ ] **DOCS-01**: `README.md` covers the full path from `mix.exs` dependency addition through: Endpoint plug insertion, first SLO definition, `mix parapet.gen.prometheus`, `mix parapet.gen.grafana`, and verifying the first Grafana panel shows data
 - [ ] **DOCS-02**: `docs/telemetry.md` documents every telemetry event with its full name, measurements, metadata, cardinality guidance, and the semver guarantee
-- [ ] **DOCS-03**: `docs/slo-reference.md` documents the SLO DSL with a complete example SLO definition, the generated recording rule output, and the generated alerting rule output side-by-side
+- [x] **DOCS-03**: `docs/slo-reference.md` documents the SLO DSL with a complete example SLO definition, the generated recording rule output, and the generated alerting rule output side-by-side
 - [ ] **DOCS-04**: `CHANGELOG.md` is maintained by Release Please from Conventional Commits — no manual changelog edits required for patch/minor/major bumps
 
 ### Error Handling and Observability
@@ -243,7 +243,7 @@ Deferred until product-market fit is established and the evidence model is prove
 | INST-05 | Phase 1 | Complete |
 | DOCS-01 | Phase 4 | Pending |
 | DOCS-02 | Phase 1 | Complete |
-| DOCS-03 | Phase 3 | Pending |
+| DOCS-03 | Phase 3 | Complete |
 | DOCS-04 | Phase 1 | Complete |
 | ERR-01 | Phase 1 | Complete |
 | ERR-02 | Phase 2 | Pending |

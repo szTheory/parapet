@@ -54,10 +54,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   4. `mix parapet.doctor` exits with code 2 when any SLO definition is missing a `runbook:` field
   5. `Parapet.Deploy.mark/1` records a deploy event with a monotonic sequence number that Grafana can render as a vertical annotation on SLO time-series panels
 **Plans**: 4 plans
-- [ ] 03-01-PLAN.md — Implement SLO DSL and PromQL YAML Generator
-- [ ] 03-02-PLAN.md — Implement Sigra Integration
-- [ ] 03-03-PLAN.md — Implement Deploy Markers API
-- [ ] 03-04-PLAN.md — Implement Doctor CLI Task for Runbooks
+- [x] 03-01-PLAN.md — Implement SLO DSL and PromQL YAML Generator
+- [x] 03-02-PLAN.md — Implement Sigra Integration
+- [x] 03-03-PLAN.md — Implement Deploy Markers API
+- [x] 03-04-PLAN.md — Implement Doctor CLI Task for Runbooks
 
 ### Phase 4: Artifact Generation, Doctor, and Launch Readiness
 **Goal**: An adopter can generate importable Grafana dashboards and valid Prometheus rule files, run a CI safety gate that catches footguns, and follow a day-1 guide from zero to their first alert firing
@@ -80,5 +80,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Telemetry Foundation & Safety Rails | 5/5 | Complete | 2026-05-09 |
 | 2. HTTP, Ecto, and Oban Metrics | 2/2 | Complete | 2026-05-09 |
-| 3. SLO DSL, Login Journey, and Deploy Markers | 0/4 | Planned | - |
+| 3. SLO DSL, Login Journey, and Deploy Markers | 4/4 | Complete | 2024-05-10 |
 | 4. Artifact Generation, Doctor, and Launch Readiness | 0/TBD | Not started | - |
