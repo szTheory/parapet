@@ -6,6 +6,8 @@ defmodule Parapet.Plug.Metrics do
 
   import Plug.Conn
 
+  alias Parapet.Internal.LabelPolicy
+
   @impl true
   def init(opts), do: opts
 
@@ -21,7 +23,7 @@ defmodule Parapet.Plug.Metrics do
       status_class = "#{div(conn.status, 100)}xx"
 
       # Validate labels through Parapet.Internal.LabelPolicy
-      Parapet.Internal.LabelPolicy.assert_safe!([:route, :method, :status_class])
+      LabelPolicy.assert_safe!([:route, :method, :status_class])
 
       :telemetry.execute(
         [:parapet, :http, :request],

@@ -7,6 +7,8 @@ defmodule Parapet do
   """
   require Logger
 
+  alias Parapet.Internal.SafeHandler
+
   @doc """
   Attaches an exception-safe telemetry handler.
 
@@ -27,7 +29,7 @@ defmodule Parapet do
       Logger.warning("Telemetry is missing, Parapet handler #{handler_id} cannot be attached.")
     end
 
-    case Parapet.Internal.SafeHandler.attach(
+    case SafeHandler.attach(
            handler_id,
            event_name,
            handler_module,

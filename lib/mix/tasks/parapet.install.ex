@@ -1,5 +1,14 @@
 defmodule Mix.Tasks.Parapet.Install do
+  @moduledoc """
+  Installs Parapet into a Phoenix application by scaffolding the host-owned instrumenter
+  and wiring it into the endpoint.
+  """
   use Igniter.Mix.Task
+
+  alias Igniter.Code.Common
+  alias Igniter.Code.Module, as: CodeModule
+  alias Igniter.Project.Config
+  alias Igniter.Project.Module, as: ProjectModule
 
   @impl Igniter.Mix.Task
   def info(_argv, _composing_task) do
@@ -11,13 +20,13 @@ defmodule Mix.Tasks.Parapet.Install do
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    app_module = Igniter.Project.Module.module_name_prefix(igniter)
+    app_module = ProjectModule.module_name_prefix(igniter)
     instrumenter_module = Module.concat([app_module, ParapetInstrumenter])
     web_module = Module.concat([inspect(app_module) <> "Web"])
     endpoint_module = Module.concat([web_module, Endpoint])
 
     igniter
-    |> Igniter.Project.Module.create_module(
+    |> ProjectModule.create_module(
       instrumenter_module,
       """
       @moduledoc "Host-owned telemetry instrumentation for Parapet."
@@ -28,7 +37,7 @@ defmodule Mix.Tasks.Parapet.Install do
       end
       """
     )
-    |> Igniter.Project.Config.configure(
+    |> Config.configure(
       "config.exs",
       :parapet,
       [:instrumenter],
@@ -38,33 +47,32 @@ defmodule Mix.Tasks.Parapet.Install do
   end
 
   defp update_endpoint(igniter, endpoint_module, web_module) do
-    Igniter.Project.Module.find_and_update_module!(igniter, endpoint_module, fn zipper ->
+    ProjectModule.find_and_update_module!(igniter, endpoint_module, fn zipper ->
       # Check if plug is already there
       has_plug? = Sourceror.to_string(zipper.node) =~ "Parapet.Plug.Metrics"
 
       if has_plug? do
         {:ok, zipper}
       else
-        use_zipper_res =
-          case Igniter.Code.Module.move_to_use(zipper, Phoenix.Endpoint) do
-            {:ok, z} -> {:ok, z}
-            :error -> Igniter.Code.Module.move_to_use(zipper, web_module)
-          end
-
-        case use_zipper_res do
-          {:ok, use_zipper} ->
-            {:ok, Igniter.Code.Common.add_code(use_zipper, "plug Parapet.Plug.Metrics", placement: :after)}
-
-          :error ->
-            # Fallback to inserting at the top of the module block
-            case Igniter.Code.Module.move_to_defmodule(zipper) do
-              {:ok, def_zipper} ->
-                {:ok, Igniter.Code.Common.add_code(def_zipper, "plug Parapet.Plug.Metrics", placement: :after)}
-              :error ->
-                {:ok, zipper}
-            end
-        end
+        insert_plug(zipper, web_module)
       end
     end)
+  end
+
+  defp insert_plug(zipper, web_module) do
+    case find_insertion_point(zipper, web_module) do
+      {:ok, insert_zipper} ->
+        {:ok, Common.add_code(insert_zipper, "plug Parapet.Plug.Metrics", placement: :after)}
+
+      :error ->
+        {:ok, zipper}
+    end
+  end
+
+  defp find_insertion_point(zipper, web_module) do
+    with :error <- CodeModule.move_to_use(zipper, Phoenix.Endpoint),
+         :error <- CodeModule.move_to_use(zipper, web_module) do
+      CodeModule.move_to_defmodule(zipper)
+    end
   end
 end

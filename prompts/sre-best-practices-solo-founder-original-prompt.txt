@@ -1,0 +1,35 @@
+sre best practices research this deeply especially as of 2025/2026 so recent info but some of it is timeless
+
+i've read that it's important to focus on things like RED, and some people also say KPIs like maybe sales per minute or wahtever and then if it dips below or is out of usual range u investigate...
+
+
+shifting left...
+
+i want to focus yes best practices ing eneral but for my needs i'm more like a solo entrepreneur making my own saas b2b/b2c that i want to automate as much as possible so low friction is important to me ...
+
+and great observability. i am professionaly a SWE with backend/frontend/devops and also light SRE experience... with CS deg... 20 years prof experience in web dev... among other dev (like game dev really and light mobile)...
+
+that's just for background but i want to get great LLM context of SRE best practices with that focus lens in midn
+
+make it great for llm context but also for me to read b/c i will read it... so memorable readable a joy to read scannable visual with diagrams where helpful... important that i can highly scale our using lean practices so like avoiding alert fatigue... 
+
+also on my periphy is things like KPIs for business stuff but dont get too distracted i want to focus more on SRE but i think there is some overlap
+
+
+something also to take inspiration from... https://loggingsucks.com/ research that page its main points etc all the important info there and take it to heart b/c when i read it i agreed... https://github.com/boristane/agent-skills/tree/main/skills/logging-best-practices and that one too... (and all the rules it links to like https://github.com/boristane/agent-skills/tree/main/skills/logging-best-practices https://github.com/boristane/agent-skills/blob/main/skills/logging-best-practices/rules/pitfalls.md https://github.com/boristane/agent-skills/blob/main/skills/logging-best-practices/rules/structure.md https://github.com/boristane/agent-skills/blob/main/skills/logging-best-practices/rules/wide-events.md)
+
+
+
+also i feel like p90 is not that useful as an SLO/SLA??? like even p99 is leaving every 1 out of 100 interactions (could be MANY microinteractions on a modern app... ) to be poor i mean maybe like as a histogram or something it's useful? but like probably you want a higher bar than that like p99.9 ?or whatever...
+
+i know alert fatigue is a big issue
+
+and incident response, retros etc idk how applicable for one person maybe they can be auto generated etc using AI so like prompts that do that using mcp context?
+
+MCPs seem very important nowadays, CLIs also but MCPs too especially i knwo the Datadog one is great (i personally can't afford datadog but use it at work and it's great for creating dashboards for u, investigating measures/traces/etc to get the context for investigating incidents and narrowing it down it's GREAT context for LLM...)
+
+so i think also a looking forward AI perspective is also important
+
+of course i dont want to overly bias on AI i think fundamentals very very important here (and AI is expensive right now and they will probably jack up token priuce in the future since AI/LLM comapneis are currently heavily subsidizing the prices kind of like early uber rights were very cheap... now as expensive or more than a taxi...)
+
+also random note but i feel like email deliverability rates / issues should be surfaced too in many cases ...  so that we know issues instead of finding out after user reports only....

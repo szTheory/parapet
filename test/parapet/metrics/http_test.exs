@@ -7,7 +7,10 @@ defmodule Parapet.Metrics.HTTPTest do
     metrics = HTTP.metrics()
 
     assert is_list(metrics)
-    assert Enum.all?(metrics, fn m -> m.__struct__ in [Telemetry.Metrics.Counter, Telemetry.Metrics.Distribution] end)
+
+    assert Enum.all?(metrics, fn m ->
+             m.__struct__ in [Telemetry.Metrics.Counter, Telemetry.Metrics.Distribution]
+           end)
   end
 
   test "setup/0 handles ArgumentError smoothly" do

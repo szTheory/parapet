@@ -5,30 +5,30 @@
 See: .planning/PROJECT.md (updated 2026-05-09)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 1 — Telemetry Foundation & Safety Rails
+**Current focus:** Phase 3 — SLO DSL, Login Journey, and Deploy Markers
 
 ## Current Position
 
-Phase: 1 of 4 (Telemetry Foundation & Safety Rails)
-Plan: 4 of 5 in current phase
-Status: Executing
-Last activity: 2026-05-09 — Completed 01-04-PLAN.md
+Phase: 2 of 4 (HTTP, Ecto & Oban)
+Plan: 2 of 2 in current phase
+Status: Complete
+Last activity: 2026-05-09 — Completed 02-02-PLAN.md
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 23m
-- Total execution time: 1h 30m
+- Total plans completed: 7
+- Average duration: 20m
+- Total execution time: 2h 10m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 4/5 | 1h 30m | 23m |
-| 2. Metrics | TBD | — | — |
+| 1. Foundation | 5/5 | 1h 45m | 21m |
+| 2. Metrics | 2/2 | 25m | 12m |
 | 3. SLO + Integrations | TBD | — | — |
 | 4. Artifacts + DX | TBD | — | — |
 
@@ -49,6 +49,10 @@ Key decisions affecting Phase 1 work:
 - Implemented a hardcoded label policy regex to prevent high cardinality explosions rather than making it configurable, ensuring strict safety rails out of the box.
 - Used `Sourceror.to_string(zipper.node) =~ "Parapet.Plug.Metrics"` instead of verbose Igniter context-aware function matching to determine if the Endpoint was already patched, prioritizing simplicity and speed in the generator.
 
+- Ecto timing converts native duration metrics to milliseconds for proper bucketing.
+- Oban explicitly tracks and aliases `worker`, `queue`, and `state` on both counter and distribution to support `rate()`-based metric reporting correctly.
+- Added Oban module conditionally mapped against `Code.ensure_loaded?(Oban)` enabling optional library deployment.
+
 ### Pending Todos
 
 None yet.
@@ -67,7 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-09
-Stopped at: Phase 1 Complete
-Resume file: (Phase 2 Planning next)
-1-foundation/01-05-PLAN.md
-foundation/01-05-PLAN.md
+Stopped at: Phase 2 Complete
+Resume file: (Phase 3 Planning next)

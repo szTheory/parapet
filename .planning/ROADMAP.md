@@ -13,7 +13,7 @@ Parapet ships in four phases. Phase 1 lays the safety rails — the telemetry co
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Telemetry Foundation & Safety Rails** - Core supervisor, label policy, optional dep seams, install generator, CI setup
-- [ ] **Phase 2: HTTP, Ecto, and Oban Metrics** - Instrumentation surfaces delivering the "is my app healthy?" signal
+- [x] **Phase 2: HTTP, Ecto, and Oban Metrics** - Instrumentation surfaces delivering the "is my app healthy?" signal
 - [ ] **Phase 3: SLO DSL, Login Journey, and Deploy Markers** - SLO engine, Sigra integration, deploy correlation
 - [ ] **Phase 4: Artifact Generation, Doctor, and Launch Readiness** - Prometheus/Grafana artifacts, CI gate, day-1 guide
 
@@ -75,6 +75,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Telemetry Foundation & Safety Rails | 5/5 | Complete | 2026-05-09 |
-| 2. HTTP, Ecto, and Oban Metrics | 0/TBD | Not started | - |
+| 2. HTTP, Ecto, and Oban Metrics | 2/2 | Complete | 2026-05-09 |
 | 3. SLO DSL, Login Journey, and Deploy Markers | 0/TBD | Not started | - |
 | 4. Artifact Generation, Doctor, and Launch Readiness | 0/TBD | Not started | - |

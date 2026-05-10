@@ -61,7 +61,9 @@ if Code.ensure_loaded?(Oban) do
     @doc false
     def handle_event(_event, measurements, metadata, _config) do
       duration = Map.get(measurements, :duration)
-      duration_ms = if duration, do: System.convert_time_unit(duration, :native, :millisecond), else: 0
+
+      duration_ms =
+        if duration, do: System.convert_time_unit(duration, :native, :millisecond), else: 0
 
       worker = to_string(Map.get(metadata, :worker, "unknown"))
       queue = to_string(Map.get(metadata, :queue, "unknown"))

@@ -16,7 +16,7 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
     manifest =
       modules
-      |> Enum.filter(&is_public_api_module?/1)
+      |> Enum.filter(&public_api_module?/1)
       |> Enum.map(&check_module_docs/1)
       |> Enum.sort_by(& &1.module)
 
@@ -36,7 +36,7 @@ defmodule Mix.Tasks.Verify.PublicApi do
     end
   end
 
-  defp is_public_api_module?(module) do
+  defp public_api_module?(module) do
     name = inspect(module)
 
     (String.starts_with?(name, "Parapet.") or name == "Parapet") and

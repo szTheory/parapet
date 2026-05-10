@@ -9,16 +9,13 @@ defmodule Parapet.Metrics.HTTP do
   Returns `:ok` or `{:error, reason}` on duplicate registration.
   """
   def setup do
-    # Wrap in try/rescue to prevent crashes on duplicate registration (ERR-02)
-    try do
-      # In the future, this is where Telemetry.Metrics reporters might be started or registered.
-      # For now, we simulate registration success while capturing errors.
-      :ok
-    rescue
-      e in [ArgumentError] ->
-        Logger.error("Failed to register metrics: #{Exception.message(e)}")
-        {:error, e}
-    end
+    # In the future, this is where Telemetry.Metrics reporters might be started or registered.
+    # For now, we simulate registration success while capturing errors.
+    :ok
+  rescue
+    e in [ArgumentError] ->
+      Logger.error("Failed to register metrics: #{Exception.message(e)}")
+      {:error, e}
   end
 
   @doc """
