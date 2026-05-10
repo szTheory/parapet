@@ -1,0 +1,33 @@
+defmodule Mix.Tasks.Parapet.Gen.GrafanaTest do
+  use ExUnit.Case, async: true
+  import Igniter.Test
+
+  alias Mix.Tasks.Parapet.Gen.Grafana
+
+  describe "mix parapet.gen.grafana" do
+    test "generates a grafana dashboard and provisioning file" do
+      igniter =
+        test_project(app_name: :test_app)
+        |> Grafana.igniter()
+
+      assert_creates(igniter, "priv/parapet/grafana/provisioning/dashboards.yml")
+      assert_creates(igniter, "priv/parapet/grafana/dashboards/main.json")
+
+      dashboard_json =
+        Rewrite.source!(igniter.rewrite, "priv/parapet/grafana/dashboards/main.json")
+        |> Rewrite.Source.get(:content)
+
+      assert dashboard_json =~ "TestApp Executive Health & SLOs"
+      assert dashboard_json =~ "parapet_deploy_info"
+      assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"http\\\"}"
+      assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"oban\\\"}"
+      assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"login_journey\\\"}"
+
+      provisioning_yml =
+        Rewrite.source!(igniter.rewrite, "priv/parapet/grafana/provisioning/dashboards.yml")
+        |> Rewrite.Source.get(:content)
+
+      assert provisioning_yml =~ "TestApp Dashboards"
+    end
+  end
+end
