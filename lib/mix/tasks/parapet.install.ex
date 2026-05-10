@@ -62,6 +62,7 @@ defmodule Mix.Tasks.Parapet.Install do
       instrumenter_module
     )
     |> update_endpoint(endpoint_module, web_module)
+    |> update_deploy_hook()
   end
 
   defp update_endpoint(igniter, endpoint_module, web_module) do
@@ -92,5 +93,35 @@ defmodule Mix.Tasks.Parapet.Install do
          :error <- CodeModule.move_to_use(zipper, web_module) do
       CodeModule.move_to_defmodule(zipper)
     end
+  end
+
+  defp update_deploy_hook(igniter) do
+    app_name = Igniter.Project.Application.app_name(igniter)
+    
+    initial_content = """
+    #!/bin/sh
+
+    # Emit deploy marker for Parapet
+    bin/#{app_name} rpc "Parapet.Deploy.mark(version: \\"$RELEASE_VERSION\\")"
+    """
+
+    updater = fn existing_content ->
+      if String.contains?(existing_content, "Parapet.Deploy.mark") do
+        existing_content
+      else
+        existing_content <> """
+
+        # Emit deploy marker for Parapet
+        bin/#{app_name} rpc "Parapet.Deploy.mark(version: \\"$RELEASE_VERSION\\")"
+        """
+      end
+    end
+
+    Igniter.create_or_update_file(
+      igniter,
+      "rel/hooks/post_start.sh",
+      initial_content,
+      updater
+    )
   end
 end
