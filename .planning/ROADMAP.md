@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A telemetry handler that raises an exception is re-attached by the supervisor and the exception is logged — the host process does not crash
   4. A metric label with a high-cardinality value (raw request path, UUID-format user ID) is rejected at compile time — not silently passed through to Prometheus
   5. `mix verify.public_api` exits non-zero when an undocumented public module exists in the library
-**Plans**: TBD
+**Plans**: 5 plans
 
 ### Phase 2: HTTP, Ecto, and Oban Metrics
 **Goal**: An adopter can see HTTP request rate, error rate, latency, DB pool health, and Oban job queue health in Prometheus after adding Parapet to their Phoenix app
@@ -41,7 +41,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `parapet_ecto_queue_time_ms` and `parapet_ecto_query_time_ms` appear as separate histograms, allowing operators to distinguish pool saturation from slow queries
   4. When `:oban` is present, `parapet_oban_jobs_total` metrics appear per worker and queue; when `:oban` is absent, the application compiles and starts without errors or warnings
   5. A duplicate metric registration (two modules claiming the same metric name) is reported at application start with a clear error — the app does not silently start with a partial metric set
-**Plans**: TBD
+**Plans**: 2 plans
 
 ### Phase 3: SLO DSL, Login Journey, and Deploy Markers
 **Goal**: An adopter can express a service-level objective in code, have it compile to correct Prometheus alerting rules, and correlate incidents with deploy events — making Parapet fundamentally different from "just use PromEx"
@@ -53,7 +53,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. When `:sigra` is present, `parapet.journey.login` telemetry events are emitted per auth attempt with `:outcome` of `:success` or `:failure`; when `:sigra` is absent, the app compiles and starts with no warnings
   4. `mix parapet.doctor` exits with code 2 when any SLO definition is missing a `runbook:` field
   5. `Parapet.Deploy.mark/1` records a deploy event with a monotonic sequence number that Grafana can render as a vertical annotation on SLO time-series panels
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 03-01-PLAN.md — Implement SLO DSL and PromQL YAML Generator
+- [ ] 03-02-PLAN.md — Implement Sigra Integration
+- [ ] 03-03-PLAN.md — Implement Deploy Markers API
+- [ ] 03-04-PLAN.md — Implement Doctor CLI Task for Runbooks
 
 ### Phase 4: Artifact Generation, Doctor, and Launch Readiness
 **Goal**: An adopter can generate importable Grafana dashboards and valid Prometheus rule files, run a CI safety gate that catches footguns, and follow a day-1 guide from zero to their first alert firing
@@ -76,5 +80,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 |-------|----------------|--------|-----------|
 | 1. Telemetry Foundation & Safety Rails | 5/5 | Complete | 2026-05-09 |
 | 2. HTTP, Ecto, and Oban Metrics | 2/2 | Complete | 2026-05-09 |
-| 3. SLO DSL, Login Journey, and Deploy Markers | 0/TBD | Not started | - |
+| 3. SLO DSL, Login Journey, and Deploy Markers | 0/4 | Planned | - |
 | 4. Artifact Generation, Doctor, and Launch Readiness | 0/TBD | Not started | - |
