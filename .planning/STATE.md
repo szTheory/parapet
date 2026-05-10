@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-05-09)
 
 ## Current Position
 
-Phase: 2 of 4 (HTTP, Ecto & Oban)
-Plan: 2 of 2 in current phase
+Phase: 3 of 4 (SLO, Login Journey, Deploy Markers)
+Plan: 2 of 4 in current phase
 Status: Complete
-Last activity: 2026-05-09 — Completed 02-02-PLAN.md
+Last activity: 2026-05-10 — Completed 03-02-PLAN.md
 
 Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
-- Average duration: 20m
-- Total execution time: 2h 10m
+- Total plans completed: 9
+- Average duration: 19m
+- Total execution time: 2h 45m
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████████] 100%
 |-------|-------|-------|----------|
 | 1. Foundation | 5/5 | 1h 45m | 21m |
 | 2. Metrics | 2/2 | 25m | 12m |
-| 3. SLO + Integrations | TBD | — | — |
+| 3. SLO + Integrations | 2/4 | 35m | 17.5m |
 | 4. Artifacts + DX | TBD | — | — |
 
-**Recent Trend:** No data yet
+**Recent Trend:** Steady
 
 ## Accumulated Context
 
@@ -53,13 +53,15 @@ Key decisions affecting Phase 1 work:
 - Oban explicitly tracks and aliases `worker`, `queue`, and `state` on both counter and distribution to support `rate()`-based metric reporting correctly.
 - Added Oban module conditionally mapped against `Code.ensure_loaded?(Oban)` enabling optional library deployment.
 
+- LoginJourney SLO defaults to standard prometheus _count suffix for distribution metrics.
+- PII is strictly omitted from the Sigra integration outcome payload.
+
 ### Pending Todos
 
 None yet.
 
 ### Blockers/Concerns
 
-- **Phase 3 research flag**: Multi-window burn-rate PromQL is nuanced; Sloth/Pyrra rule formats need direct study before Phase 3 planning. Run `/gsd-research-phase 3` before planning Phase 3.
 - **Phase 3/4 research flag**: Sigra telemetry event schema must be confirmed stable before Phase 3 integration work begins.
 
 ## Deferred Items
@@ -70,6 +72,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-05-09
-Stopped at: Phase 2 Complete
-Resume file: (Phase 3 Planning next)
+Last session: 2026-05-10
+Stopped at: Phase 3 Plan 2 Complete
+Resume file: 03-03-PLAN.md
