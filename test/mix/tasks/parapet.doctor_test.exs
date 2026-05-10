@@ -33,7 +33,6 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
 
     assert catch_exit(Mix.Tasks.Parapet.Doctor.run([])) == {:shutdown, 2}
 
-    assert_receive {:mix_shell, :error, [msg]}
-    assert msg =~ "SLO :bad_slo is missing a valid runbook"
+    assert_receive {:mix_shell, :error, ["  - SLO :bad_slo is missing a valid runbook"]}
   end
 end
