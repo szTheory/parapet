@@ -12,23 +12,21 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Validated
 
-<!-- Shipped and confirmed valuable. -->
-
-(None yet — ship to validate)
+- ✓ Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist — v0.1
+- ✓ Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default — v0.1
+- ✓ HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group — v0.1
+- ✓ Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker — v0.1
+- ✓ Login journey as the first business-critical SLO — auth success rate via `sigra` integration — v0.1
+- ✓ Deploy/change markers — correlated with SLO windows and error spikes — v0.1
+- ✓ Grafana dashboard and Prometheus alerting rule artifacts generated or documented as sane defaults — v0.1
+- ✓ Minimal `mix parapet.doctor` health check surface for adopter confidence — v0.1
+- ✓ Day-1 install guide and README that covers configuration through first alert — v0.1
 
 ### Active
 
-<!-- Current scope. Building toward these. v0.1 "Trustworthy spine" -->
+<!-- Current scope. Building toward these. -->
 
-- [ ] Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist
-- [ ] Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default
-- [ ] HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group
-- [ ] Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker
-- [ ] Login journey as the first business-critical SLO — auth success rate via `sigra` integration
-- [ ] Deploy/change markers — correlated with SLO windows and error spikes
-- [ ] Grafana dashboard and Prometheus alerting rule artifacts generated or documented as sane defaults
-- [ ] Minimal `mix parapet.doctor` health check surface for adopter confidence
-- [ ] Day-1 install guide and README that covers configuration through first alert
+(Planning next milestone)
 
 ### Out of Scope
 
@@ -76,3 +74,9 @@ Prior research is in `prompts/` — sre-observability, brand identity, elixir te
 
 ---
 *Last updated: 2026-05-09 after initial project definition*
+ format for ingestion and automation integrations | ✓ Good |
+| Implemented a hardcoded label policy regex | Prevents high cardinality explosions rather than making it configurable, ensuring strict safety rails out of the box | ✓ Good |
+| Ecto timing converts native duration metrics to milliseconds | Proper bucketing in metric systems like Prometheus requires uniform time scale | ✓ Good |
+
+---
+*Last updated: 2026-05-10 after v0.1 milestone*

@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-09)
+See: .planning/PROJECT.md (updated 2026-05-10)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 3 — SLO DSL, Login Journey, and Deploy Markers
+**Current focus:** Planning next milestone
 
 ## Current Position
 
-Phase: 4 of 4 (Artifacts + DX)
-Plan: 4 of 4 in current phase
-Status: Complete
-Last activity: 2026-05-10 — Completed Phase 4 (Generators, Doctor, dx).
+Phase: N/A
+Plan: N/A
+Status: Milestone v0.1 Complete
+Last activity: 2026-05-10 — Archived milestone v0.1
 
-Progress: [██████████] 100% (Phases 1-4)
+Progress: [██████████] 100% (v0.1)
 
 ## Performance Metrics
 
