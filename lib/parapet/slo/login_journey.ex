@@ -22,13 +22,13 @@ defmodule Parapet.SLO.LoginJourney do
     good_events = Keyword.get(
       opts,
       :good_events,
-      "sum(rate(parapet_journey_login_duration_milliseconds_count{outcome=\"success\"}[5m]))"
+      "parapet_journey_login_duration_milliseconds_count{outcome=\"success\"}"
     )
     
     total_events = Keyword.get(
       opts,
       :total_events,
-      "sum(rate(parapet_journey_login_duration_milliseconds_count[5m]))"
+      "parapet_journey_login_duration_milliseconds_count"
     )
     
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/login-journey")

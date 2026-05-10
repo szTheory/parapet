@@ -1,0 +1,55 @@
+groups:
+<%= for slo <- slos do %>
+  - name: parapet_slo_<%= slo.name %>
+    rules:
+<%= for window <- windows do %>
+      - record: slo:error_ratio:rate<%= window %>
+        expr: >
+          1 - (
+            sum(rate(<%= slo.good_events %>[<%= window %>]))
+            /
+            sum(rate(<%= slo.total_events %>[<%= window %>]))
+          )
+        labels:
+          slo: <%= slo.name %>
+<% end %>
+
+      # Alert: Page for rapid burn (14.4x over 1h/5m)
+      - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRatePage
+        expr: >
+          slo:error_ratio:rate1h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 14.4)
+          and
+          slo:error_ratio:rate5m{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 14.4)
+        labels:
+          severity: page
+          slo: <%= slo.name %>
+        annotations:
+          summary: "High SLO burn rate for <%= slo.name %>"
+          runbook: "<%= slo.runbook %>"
+
+      # Alert: Ticket for medium burn (6x over 6h/30m)
+      - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRateTicket
+        expr: >
+          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 6)
+          and
+          slo:error_ratio:rate30m{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 6)
+        labels:
+          severity: ticket
+          slo: <%= slo.name %>
+        annotations:
+          summary: "Medium SLO burn rate for <%= slo.name %>"
+          runbook: "<%= slo.runbook %>"
+
+      # Alert: Warning for slow burn (1x over 3d/6h)
+      - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRateWarning
+        expr: >
+          slo:error_ratio:rate3d{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 1)
+          and
+          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 1)
+        labels:
+          severity: warning
+          slo: <%= slo.name %>
+        annotations:
+          summary: "Slow SLO burn rate for <%= slo.name %>"
+          runbook: "<%= slo.runbook %>"
+<% end %>
