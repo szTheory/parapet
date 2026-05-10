@@ -1,0 +1,77 @@
+if Code.ensure_loaded?(Oban) do
+  defmodule Parapet.Metrics.Oban do
+    @moduledoc """
+    Defines Prometheus distributions and counters for Oban jobs conditionally.
+    """
+    require Logger
+
+    alias Parapet.Internal.LabelPolicy
+
+    @doc """
+    Sets up the Oban metrics by attaching telemetry handlers.
+    """
+    def setup do
+      Parapet.attach(%{
+        handler_id: "parapet-oban-job-stop",
+        event_name: [:oban, :job, :stop],
+        handler_module: __MODULE__,
+        function_name: :handle_event
+      })
+
+      Parapet.attach(%{
+        handler_id: "parapet-oban-job-exception",
+        event_name: [:oban, :job, :exception],
+        handler_module: __MODULE__,
+        function_name: :handle_event
+      })
+
+      :ok
+    rescue
+      e in [ArgumentError] ->
+        Logger.error("Failed to register Oban metrics: #{Exception.message(e)}")
+        {:error, e}
+    end
+
+    @doc """
+    Returns a list of Telemetry.Metrics definitions for Oban events.
+    """
+    def metrics do
+      import Telemetry.Metrics
+
+      LabelPolicy.assert_safe!([:worker, :queue, :state])
+
+      [
+        counter("parapet.oban.jobs.total",
+          event_name: [:parapet, :oban, :job],
+          tags: [:worker, :queue, :state],
+          description: "Total number of Oban jobs processed"
+        ),
+        distribution("parapet.oban.job.duration_ms",
+          event_name: [:parapet, :oban, :job],
+          measurement: :duration_ms,
+          tags: [:worker, :queue, :state],
+          description: "Duration of Oban jobs in milliseconds",
+          reporter_options: [
+            buckets: [10, 50, 100, 250, 500, 1000, 2500, 5000, 10_000]
+          ]
+        )
+      ]
+    end
+
+    @doc false
+    def handle_event(_event, measurements, metadata, _config) do
+      duration = Map.get(measurements, :duration)
+      duration_ms = if duration, do: System.convert_time_unit(duration, :native, :millisecond), else: 0
+
+      worker = to_string(Map.get(metadata, :worker, "unknown"))
+      queue = to_string(Map.get(metadata, :queue, "unknown"))
+      state = to_string(Map.get(metadata, :state, "unknown"))
+
+      :telemetry.execute(
+        [:parapet, :oban, :job],
+        %{duration_ms: duration_ms},
+        %{worker: worker, queue: queue, state: state}
+      )
+    end
+  end
+end
