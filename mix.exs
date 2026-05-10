@@ -25,6 +25,7 @@ defmodule Parapet.MixProject do
     [
       {:igniter, "~> 0.7.9"},
       {:telemetry, "~> 1.2"},
+      {:telemetry_metrics, "~> 1.0"},
       {:oban, ">= 0.0.0", optional: true},
       {:sigra, ">= 0.0.0", optional: true}
     ]
