@@ -7,8 +7,9 @@ defmodule Parapet.MixProject do
       version: "0.1.0",
       elixir: "~> 1.19",
       start_permanent: Mix.env() == :prod,
-      package: [files: ~w(lib .formatter.exs mix.exs README* docs), licenses: ["MIT"], links: %{}],
-      deps: deps()
+      package: [files: ~w(lib priv .formatter.exs mix.exs README* docs), licenses: ["MIT"], links: %{}],
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -28,7 +29,15 @@ defmodule Parapet.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:oban, ">= 0.0.0", optional: true},
       {:sigra, ">= 0.0.0", optional: true},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false}
+    ]
+  end
+
+  defp aliases do
+    [
+      "verify.public_api": ["docs --warnings-as-errors"]
     ]
   end
 end

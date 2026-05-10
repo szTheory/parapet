@@ -12,7 +12,7 @@ defmodule Parapet do
   @doc """
   Attaches an exception-safe telemetry handler.
 
-  Delegates to `Parapet.Internal.SafeHandler` to ensure errors in the callback
+  Delegates to Parapet.Internal.SafeHandler to ensure errors in the callback
   do not propagate back to the execution of the instrumented application code.
   """
   def attach(

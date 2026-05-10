@@ -69,7 +69,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. `mix parapet.doctor` exits with code 0 (all clear), 1 (warnings), or 2 (safety violation), runs in under 5 seconds, and is usable as a CI gate
   4. `mix parapet.doctor --ci` suppresses color and emits structured JSON to stdout that a CI system can parse programmatically
   5. The README covers the complete path from `mix.exs` dependency through first Grafana panel showing live data, with no gaps requiring source code reading
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 04-01-PLAN.md — Prometheus Artifact Generator
+- [ ] 04-02-PLAN.md — Grafana Artifact Generator
+- [ ] 04-03-PLAN.md — Doctor CLI Task
+- [ ] 04-04-PLAN.md — Day-1 Guide and Launch Readiness
 
 ## Progress
 
@@ -81,4 +85,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 | 1. Telemetry Foundation & Safety Rails | 5/5 | Complete | 2026-05-09 |
 | 2. HTTP, Ecto, and Oban Metrics | 2/2 | Complete | 2026-05-09 |
 | 3. SLO DSL, Login Journey, and Deploy Markers | 4/4 | Complete | 2024-05-10 |
-| 4. Artifact Generation, Doctor, and Launch Readiness | 0/TBD | Not started | - |
+| 4. Artifact Generation, Doctor, and Launch Readiness | 0/4 | Not started | - |
