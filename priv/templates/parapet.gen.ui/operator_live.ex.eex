@@ -5,8 +5,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   import <%= inspect(@web_module) %>.Parapet.OperatorComponents
 
   def mount(_params, _session, socket) do
-    # You would typically fetch queue here
-    # incidents = Parapet.Operator.list_incidents()
+    # You would typically fetch queue here using Parapet.Operator.queue_query
+    # and Repo.all/1. For example:
+    # incidents = Repo.all(Parapet.Operator.queue_query())
     incidents = []
     
     {:ok, assign(socket, incidents: incidents, selected_incident: nil)}
@@ -15,7 +16,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   def handle_params(params, _uri, socket) do
     selected = 
       if id = params["id"] do
-        # Parapet.Operator.get_incident(id)
+        # You would typically fetch detail here
+        # Parapet.Operator.incident_detail(id)
         %{id: id, state: "open", title: "Example Incident"}
       else
         nil
