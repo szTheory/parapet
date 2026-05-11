@@ -152,6 +152,13 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc """
+  Delegates dynamic capability queries (e.g., UI mitigations) to the capability registry.
+  """
+  def capabilities(type) do
+    Parapet.Capabilities.capabilities(type)
+  end
+
   defp valid_payload?(%ActionPayload{actor: actor, reason: reason, correlation_id: correlation_id, action_type: action_type}) do
     not is_nil(actor) and not is_nil(reason) and not is_nil(correlation_id) and not is_nil(action_type)
   end
