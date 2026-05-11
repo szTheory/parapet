@@ -29,9 +29,12 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :state, :string, default: "open", null: false
             add :title, :string, null: false
             add :description, :text
+            add :correlation_key, :string
 
             timestamps()
           end
+
+          create unique_index(:parapet_incidents, [:correlation_key], where: "state = 'open'")
 
           create table(:parapet_timeline_entries, primary_key: false) do
             add :id, :binary_id, primary_key: true
