@@ -30,17 +30,16 @@ if Code.ensure_loaded?(Sigra) do
     Handles Sigra telemetry events safely and emits Parapet login journey events.
     """
     def handle_event(event, measurements, metadata, _config) do
-      try do
-        process_event(event, measurements, metadata)
-      rescue
-        e ->
-          Logger.error(
-            "Parapet telemetry handler exception in #{__MODULE__}.handle_event/4 for event #{inspect(event)}: #{Exception.message(e)}\nStacktrace: #{inspect(__STACKTRACE__)}"
-          )
-      end
+      process_event(event, measurements, metadata)
+    rescue
+      e ->
+        Logger.error(
+          "Parapet telemetry handler exception in #{__MODULE__}.handle_event/4 for event #{inspect(event)}: #{Exception.message(e)}\nStacktrace: #{inspect(__STACKTRACE__)}"
+        )
     end
 
-    defp process_event([:sigra, :auth, :login, state], measurements, _metadata) when state in [:stop, :exception] do
+    defp process_event([:sigra, :auth, :login, state], measurements, _metadata)
+         when state in [:stop, :exception] do
       outcome = if state == :stop, do: :success, else: :failure
 
       # Strip PII from metadata, but you can pass relevant non-PII if needed.
@@ -53,7 +52,7 @@ if Code.ensure_loaded?(Sigra) do
         parapet_metadata
       )
     end
-    
+
     # Catch-all for events we didn't explicitly expect but were routed here
     defp process_event(_event, _measurements, _metadata), do: :ok
   end

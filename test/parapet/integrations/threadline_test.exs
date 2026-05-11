@@ -4,6 +4,11 @@ defmodule Parapet.Integrations.ThreadlineTest do
   defmodule DummyRepo do
     def insert(changeset) do
       send(self(), {:insert_called, changeset})
+      
+      if Ecto.Changeset.get_field(changeset, :tool_name) == "threadline:crash" do
+        raise "db connection failed"
+      end
+
       if changeset.valid? do
         {:ok, Ecto.Changeset.apply_changes(changeset)}
       else
@@ -47,11 +52,8 @@ defmodule Parapet.Integrations.ThreadlineTest do
   end
 
   test "safely rescues exceptions to prevent Ecto crash propagation" do
-    # Emit an invalid event that would crash Ecto or Parapet.Evidence
-    # For instance if repo insert raises because of connection issue, but here we can just pass something
-    # that raises an error when processing.
-    # To truly simulate a crash, we can pass something that causes an exception inside handle_event.
-    :telemetry.execute([:threadline, :audit, :event], :invalid_measurements_type, %{crash_me: true})
+    # Emit an event with action: "crash" to trigger the DummyRepo's raise
+    :telemetry.execute([:threadline, :audit, :event], %{duration_ms: 10}, %{action: "crash"})
     
     # We shouldn't crash the test process
     assert true
