@@ -1,5 +1,9 @@
 # Parapet
 
+[![Hex.pm Version](https://img.shields.io/hexpm/v/parapet.svg)](https://hex.pm/packages/parapet)
+[![HexDocs](https://img.shields.io/badge/hexdocs-online-blue)](https://hexdocs.pm/parapet/)
+[![CI](https://github.com/szTheory/parapet/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/szTheory/parapet/actions/workflows/ci.yml)
+
 **Parapet** is a zero-configuration Site Reliability Engineering (SRE) library for Elixir/Phoenix teams. 
 
 It provides an immediate, evidence-based understanding of whether your critical user journeys are healthy, right out of the box. Instead of dashboards with arbitrary metrics, Parapet focuses on Service Level Objectives (SLOs) built on top of standard Prometheus metrics, generated via Telemetry.
