@@ -40,6 +40,7 @@ Progress: [█░░░░░░░░░] 10% (v0.2)
 Decisions are logged in PROJECT.md Key Decisions table.
 Key decisions affecting v0.2 work:
 
+- Decided to implement dynamic Repo lookup via `Application.get_env(:parapet, :repo)` to decouple from specific host database.
 - Decided to test schema changesets purely without hitting a Repo to ensure decoupling from specific host application databases.
 - Strict boundary between ephemeral high-volume telemetry (Prometheus/Grafana) and durable low-volume evidence (Ecto/PostgreSQL).
 - Ecto must NOT be used for raw telemetry. It models incidents, timelines, and tool audits.
