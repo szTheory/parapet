@@ -6,10 +6,16 @@ defmodule Parapet.MixProject do
       app: :parapet,
       version: "0.1.0",
       elixir: "~> 1.19",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      package: [files: ~w(lib priv .formatter.exs mix.exs README* docs), licenses: ["MIT"], links: %{}],
+      package: [
+        files: ~w(lib priv .formatter.exs mix.exs README* docs),
+        licenses: ["MIT"],
+        links: %{}
+      ],
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      dialyzer: [plt_add_apps: [:mix, :ex_unit]]
     ]
   end
 
@@ -20,6 +26,9 @@ defmodule Parapet.MixProject do
       mod: {Parapet.Internal.Application, []}
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
