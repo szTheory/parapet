@@ -27,6 +27,18 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert doctor_code =~ "has_auth_plug?"
     end
 
+    test "generated UI templates enforce responsive layout contracts" do
+      template_path = "priv/templates/parapet.gen.ui/operator_live.ex.eex"
+      content = File.read!(template_path)
+      
+      # Assert structural elements of the layout to ensure it meets the 3-pane responsive contract
+      # without needing a full e2e browser test suite.
+      assert content =~ "md:flex-row", "Outer container should shift to row on desktop"
+      assert content =~ "md:w-80", "Panes 1 and 3 should have fixed desktop widths"
+      assert content =~ "hidden md:flex", "Panes should collapse/hide on mobile conditionally"
+      assert content =~ "md:hidden", "Mobile specific elements (like back button) should hide on desktop"
+    end
+
     test "UI stays generator-first and host-owned" do
       # Parapet must not define its own Plug.Router or Phoenix.Router for the UI.
       # Let's verify no router modules exist in Parapet core.
