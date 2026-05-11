@@ -16,7 +16,7 @@ defmodule Parapet.Integrations.RulesteadTest do
       assert Enum.any?(handlers, fn handler -> handler.id == "parapet-rulestead-flag" end)
       
       capabilities = Parapet.Capabilities.capabilities(:mitigation)
-      assert Enum.any?(capabilities, fn cap -> cap.id == :rulestead and cap.name == "Toggle Feature Flag" end)
+      assert Enum.any?(capabilities, fn cap -> cap.id == :rulestead and cap.name == "toggle_flag" and cap.schema.name == "Toggle Feature Flag" end)
     end
   end
 

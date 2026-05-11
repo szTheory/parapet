@@ -31,15 +31,17 @@ defmodule Parapet.Integrations.SigraTest do
       # Simulate a Sigra login stop event
       :telemetry.execute(
         [:sigra, :auth, :login, :stop],
-        %{duration: 150_000_000}, # 150ms in native time
-        %{user_id: 123, email: "test@example.com"} # PII should be stripped
+        # 150ms in native time
+        %{duration: 150_000_000},
+        # PII should be stripped
+        %{user_id: 123, email: "test@example.com"}
       )
 
       assert_receive {:telemetry_event, [:parapet, :journey, :login], measurements, metadata}
 
       assert measurements.duration == 150_000_000
       assert metadata.outcome == :success
-      
+
       # Threat Model T-03-02: Verify PII is NOT in metadata
       refute Map.has_key?(metadata, :user_id)
       refute Map.has_key?(metadata, :email)
