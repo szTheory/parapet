@@ -21,12 +21,23 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ Grafana dashboard and Prometheus alerting rule artifacts generated or documented as sane defaults — v0.1
 - ✓ Minimal `mix parapet.doctor` health check surface for adopter confidence — v0.1
 - ✓ Day-1 install guide and README that covers configuration through first alert — v0.1
+- ✓ System provides Ecto schemas for Incidents with a state machine (open, investigating, resolved) — v0.2
+- ✓ System provides Ecto schemas for Timeline Entries linked to Incidents to durably track alerts, notes, and actions — v0.2
+- ✓ System provides Ecto schemas for Tool Audits to securely log AI and human MCP tool calls — v0.2
+- ✓ System enforces a clear boundary preventing raw high-volume telemetry from entering Ecto — v0.2
+- ✓ System provides a Phoenix LiveView SRE dashboard to manage incidents and timelines — v0.2
+- ✓ System provides a secure UI surface to execute and audit application mutations (e.g., toggling feature flags) — v0.2
+- ✓ System UI integrates external visualization links (e.g., Grafana) rather than rebuilding charting in LiveView — v0.2
+- ✓ System provides generators to secure the LiveView UI behind host application authentication — v0.2
+- ✓ Optional Rulestead integration to track feature flag changes and enable flag-toggling mitigations — v0.2
+- ✓ Optional Mailglass and Chimeway integrations for deliverability SLIs — v0.2
+- ✓ Optional Accrue (billing) and Rindle (media processing) integrations for business-specific journey health — v0.2
+- ✓ Strict adherence to the "compile out cleanly" constraint for all sibling libraries — v0.2
+- ✓ Conceptual integration with Threadline for durable audit history interoperability — v0.2
 
 ### Active
 
-<!-- Current scope. Building toward these. -->
-
-(Planning next milestone)
+<!-- Add requirements for v0.3 here when planning next milestone -->
 
 ### Out of Scope
 
@@ -37,24 +48,16 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - Replacement for Phoenix Telemetry, OpenTelemetry, LiveDashboard, or vendor SDKs — composing these is the point
 - Generic cross-language platform — Elixir/Phoenix ecosystem-native first; cross-language is a different product
 - Unbounded autonomous incident-response agent — evidence-first tooling, not AI autopilot
-- DB-backed durable evidence spine in v0.1 — telemetry-first establishes the contract before committing to a persistence model; defer to v0.2
-- Operator/admin UI in v0.1 — Grafana artifacts provide the operator surface; in-app UI only when it materially beats the alternative
-- `chimeway`, `mailglass`, `threadline`, `rulestead`, `accrue`, `rindle` integrations in v0.1 — login/sigra is sufficient to validate the integration pattern; others follow after the spine is proven
 
 ## Context
 
-Phoenix SaaS teams have strong individual tools — telemetry, OTel, Prometheus, Grafana, Oban, Loki — but no opinionated layer that tells them what to measure, how to keep metrics safe, which journeys deserve SLOs, or how to correlate an incident with a deploy or flag change. The choice today is hand-assembly or a hosted platform with a different tradeoff profile. Parapet occupies the gap: open-source, host-owned, ecosystem-native.
-
-The project is part of an established Elixir OSS family (Sigra, Chimeway, Mailglass, Threadline, Rulestead, Accrue, Rindle). Engineering DNA is documented in `prompts/parapet-engineering-dna-from-sibling-libs.md` and applies here: Conventional Commits, Release Please, scripts-first CI, `mix verify.*` surfaces, optional deps that compile out cleanly, and generated code that stays host-owned.
-
-Key insight from product principles: **telemetry is lossy and ephemeral; evidence is durable**. v0.1 must establish this distinction in the model even if it only ships the telemetry side. Getting the contract right now prevents breaking changes when durable surfaces are added.
-
-Prior research is in `prompts/` — sre-observability, brand identity, elixir telemetry space, SRE best practices for solo founders, integration opportunities, and prior art. Read before making architecture decisions.
+Shipped v0.2 with a focus on Durable Evidence, LiveView Operator UI, and ecosystem integrations.
+The implementation separated ephemeral telemetry from durable low-volume Ecto schema data for incident timelines. A Phoenix LiveView SRE dashboard was generated to provide an operator workbench.
 
 ## Constraints
 
 - **Tech stack**: Elixir/Phoenix only — ecosystem-native is a hard constraint, not a preference
-- **Package boundary**: Single `parapet` Hex package for v0.1 — splitting admin/UI into a separate package is deferred but expected; design the boundary now
+- **Package boundary**: Single `parapet` Hex package for v0.1/v0.2
 - **Install model**: Generator for host-owned scaffolding, library config for runtime behavior — generated files must remain inspectable and modifiable by the adopter
 - **Metrics safety**: Low-cardinality by default, explicit label contracts, redaction-safe metadata — violations of this are bugs, not configuration options
 - **Telemetry as API**: Documented telemetry events are a public API surface with semver guarantees — treat breakage the same as a function signature change
@@ -65,18 +68,13 @@ Prior research is in `prompts/` — sre-observability, brand identity, elixir te
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Single `parapet` package for v0.1 | Avoids premature boundary splits before the public API is stable; admin/UI package boundary is designed in but deferred | — Pending |
-| Telemetry-first in v0.1, no DB-backed evidence spine | Establishes the event contract before committing to a persistence model; avoids locking adopters into a schema prematurely | — Pending |
-| HTTP + Oban as the two v0.1 SLO slices | These cover the most universal Phoenix SaaS reliability concerns and validate the full SLI→SLO→alert pipeline | — Pending |
-| Login journey (via sigra) as first business SLO | Auth is the single most universal business-critical journey; validates the sibling-library integration pattern at minimal scope | — Pending |
-| Grafana/Prometheus artifacts over in-app operator UI | Operators already have Grafana; an in-app UI in v0.1 would cost more than it buys until the evidence model is proven | — Pending |
-| Generator for scaffolding, library for runtime | Host-owned principle requires adopters to be able to read and modify what Parapet puts in their repo | — Pending |
+| Dynamic Repo lookup via `Application.get_env` | Decouples library from specific host database | ✓ Good |
+| Ecto schema changesets tested purely without DB | Ensures decoupling from specific host application databases | ✓ Good |
+| Strict boundary between telemetry and Ecto | Prevents Ecto from being used for raw high-volume telemetry | ✓ Good |
+| Sibling ecosystem integrations as optional adapters | Adheres to "compile out cleanly" constraint using `Code.ensure_loaded?` | ✓ Good |
+| AI/MCP tool calls must be audited | Requires `Parapet.Ecto.ToolAudit` for app mutations | ✓ Good |
+| Static analysis of doctor checks | Prevents global compilation side-effects by not dynamically injecting router modules in tests | ✓ Good |
+| Automated structural UI layout verification | Verifies responsive tailwind layout logic via static file testing instead of full browser E2E to keep dependency footprint light and fast | ✓ Good |
 
 ---
-*Last updated: 2026-05-09 after initial project definition*
- format for ingestion and automation integrations | ✓ Good |
-| Implemented a hardcoded label policy regex | Prevents high cardinality explosions rather than making it configurable, ensuring strict safety rails out of the box | ✓ Good |
-| Ecto timing converts native duration metrics to milliseconds | Proper bucketing in metric systems like Prometheus requires uniform time scale | ✓ Good |
-
----
-*Last updated: 2026-05-10 after v0.1 milestone*
+*Last updated: 2026-05-11 after v0.2 milestone*

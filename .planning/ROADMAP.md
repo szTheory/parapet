@@ -7,6 +7,7 @@ Parapet ships in four phases. Phase 1 lays the safety rails — the telemetry co
 ## Milestones
 
 - ✅ **v0.1 Trustworthy Spine** — Phases 1-4 (shipped 2026-05-10)
+- ✅ **v0.2 Durable Evidence** — Phases 5-7 (shipped 2026-05-11)
 
 ## Phases
 
@@ -20,10 +21,14 @@ Parapet ships in four phases. Phase 1 lays the safety rails — the telemetry co
 
 </details>
 
-### 🚧 v0.2 Durable Evidence (Planned)
+<details>
+<summary>✅ v0.2 Durable Evidence (Phases 5-7) — SHIPPED 2026-05-11</summary>
 
-- [ ] Phase 5: Durable Evidence Spine
-- [ ] Phase 6: Email Deliverability Monitoring
+- [x] **Phase 5 (v0.2 Phase 1): Durable Evidence Spine** - Data modeling for incidents, timelines, mitigations, and AI tool audits (completed 2026-05-11)
+- [x] **Phase 6 (v0.2 Phase 2): In-App Operator UI** - Action-oriented SRE dashboards focusing on incident management and mitigation (completed 2026-05-11)
+- [x] **Phase 7 (v0.2 Phase 3): Sibling Ecosystem Integrations** - Optional adapters for Rulestead, Mailglass, Chimeway, Accrue, Rindle, and Threadline (completed 2026-05-11)
+
+</details>
 
 ## Progress
 
@@ -33,4 +38,7 @@ Parapet ships in four phases. Phase 1 lays the safety rails — the telemetry co
 | 2. HTTP, Ecto, and Oban Metrics | v0.1 | 2/2 | Complete | 2026-05-09 |
 | 3. SLO DSL, Login Journey, and Deploy Markers | v0.1 | 4/4 | Complete | 2026-05-10 |
 | 4. Artifact Generation, Doctor, and Launch Readiness | v0.1 | 4/4 | Complete | 2026-05-10 |
-| 5. Durable Evidence Spine | v0.2 | 3/TBD | In Progress | — |
+| 5. Durable Evidence Spine | v0.2 | 3/3 | Complete | 2026-05-11 |
+| 6. In-App Operator UI | v0.2 | 4/4 | Complete | 2026-05-11 |
+| 7. Sibling Ecosystem Integrations | v0.2 | 4/4 | Complete | 2026-05-11 |
+
