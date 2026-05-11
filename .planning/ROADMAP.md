@@ -33,3 +33,4 @@ Parapet ships in four phases. Phase 1 lays the safety rails — the telemetry co
 | 2. HTTP, Ecto, and Oban Metrics | v0.1 | 2/2 | Complete | 2026-05-09 |
 | 3. SLO DSL, Login Journey, and Deploy Markers | v0.1 | 4/4 | Complete | 2026-05-10 |
 | 4. Artifact Generation, Doctor, and Launch Readiness | v0.1 | 4/4 | Complete | 2026-05-10 |
+| 5. Durable Evidence Spine | v0.2 | 1/TBD | In Progress | — |

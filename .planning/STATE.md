@@ -5,56 +5,47 @@
 See: .planning/PROJECT.md (updated 2026-05-10)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Planning next milestone
+**Current focus:** Execute milestone v0.2: Durable Evidence Spine, LiveView Operator UI, and Sibling Ecosystem Integrations.
 
 ## Current Position
 
-Phase: N/A
-Plan: N/A
-Status: Milestone v0.1 Complete
-Last activity: 2026-05-10 — Archived milestone v0.1
+Phase: 1
+Plan: 01
+Status: Executing Phase 1
+Last activity: Completed 01-01-PLAN.md
 
-Progress: [██████████] 100% (v0.1)
+Progress: [█░░░░░░░░░] 10% (v0.2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 18m
-- Total execution time: 2h 50m
+- Total plans completed: 1
+- Average duration: 30m
+- Total execution time: 30m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1. Foundation | 5/5 | 1h 45m | 21m |
-| 2. Metrics | 2/2 | 25m | 12m |
-| 3. SLO + Integrations | 4/4 | 40m | 10m |
-| 4. Artifacts + DX | 0/4 | — | — |
+| 1. Durable Evidence Spine (Ecto) | 1/TBD | 30m | 30m |
+| 2. In-App Operator UI (LiveView) | 0/TBD | — | — |
+| 3. Sibling Ecosystem Integrations | 0/TBD | — | — |
 
-**Recent Trend:** Steady
+**Recent Trend:** N/A
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Key decisions affecting Phase 1 work:
+Key decisions affecting v0.2 work:
 
-- Single `parapet` package for v0.1 — no premature boundary splits; admin/UI package boundary designed in but deferred
-- Telemetry-first in v0.1, no DB-backed evidence spine — establishes contract before committing to a schema
-- Generator for scaffolding, library for runtime — host-owned principle requires adopters to inspect and modify
-- Output a structured JSON manifest via stdout for downstream ingestion.
-- Moved Parapet.Application to Parapet.Internal.Application to avoid false positives in public API checks while maintaining internal functionality.
-- Implemented a hardcoded label policy regex to prevent high cardinality explosions rather than making it configurable, ensuring strict safety rails out of the box.
-- Used `Sourceror.to_string(zipper.node) =~ "Parapet.Plug.Metrics"` instead of verbose Igniter context-aware function matching to determine if the Endpoint was already patched, prioritizing simplicity and speed in the generator.
-
-- Ecto timing converts native duration metrics to milliseconds for proper bucketing.
-- Oban explicitly tracks and aliases `worker`, `queue`, and `state` on both counter and distribution to support `rate()`-based metric reporting correctly.
-- Added Oban module conditionally mapped against `Code.ensure_loaded?(Oban)` enabling optional library deployment.
-
-- LoginJourney SLO defaults to standard prometheus _count suffix for distribution metrics.
-- PII is strictly omitted from the Sigra integration outcome payload.
+- Decided to test schema changesets purely without hitting a Repo to ensure decoupling from specific host application databases.
+- Strict boundary between ephemeral high-volume telemetry (Prometheus/Grafana) and durable low-volume evidence (Ecto/PostgreSQL).
+- Ecto must NOT be used for raw telemetry. It models incidents, timelines, and tool audits.
+- LiveView Operator UI supplements, but does NOT replace, Grafana. UI focuses on application mutation, form actions, and safe mitigations.
+- Sibling ecosystem integrations (Chimeway, Mailglass, Rulestead, etc.) are implemented as optional adapters (via `Code.ensure_loaded?`), adhering to the "compile out cleanly" constraint.
+- AI/MCP tool calls that execute app mutations must be audited and recorded via `Parapet.Ecto.ToolAudit`.
 
 ### Pending Todos
 
@@ -62,16 +53,16 @@ None yet.
 
 ### Blockers/Concerns
 
-- **Phase 3/4 research flag**: Sigra telemetry event schema must be confirmed stable before Phase 3 integration work begins.
+- Threadline compatibility check required during Phase 3 to align audit/timeline logic.
 
 ## Deferred Items
 
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| *(none)* | | | |
+| Testing | `Sigra.setup/0 is undefined or private` error during `mix test` in `Parapet.Integrations.SigraTest`. Out of scope for Phase 1 Plan 1. | deferred | Phase 1 Plan 1 |
 
 ## Session Continuity
 
-Last session: 2024-05-10
-Stopped at: Phase 3 Plan 4 Complete
+Last session: [Current Date]
+Stopped at: Completed 01-01-PLAN.md
 Resume file: None
