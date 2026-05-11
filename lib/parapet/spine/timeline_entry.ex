@@ -1,4 +1,7 @@
 defmodule Parapet.Spine.TimelineEntry do
+  @moduledoc """
+  Ecto schema representing an entry in a durable incident timeline.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

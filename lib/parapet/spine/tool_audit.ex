@@ -1,4 +1,7 @@
 defmodule Parapet.Spine.ToolAudit do
+  @moduledoc """
+  Ecto schema representing an audit record of a tool execution.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

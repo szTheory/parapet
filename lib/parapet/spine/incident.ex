@@ -1,4 +1,7 @@
 defmodule Parapet.Spine.Incident do
+  @moduledoc """
+  Ecto schema representing a durable evidence incident.
+  """
   use Ecto.Schema
   import Ecto.Changeset
 
