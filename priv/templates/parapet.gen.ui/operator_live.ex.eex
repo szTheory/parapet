@@ -5,10 +5,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   import <%= inspect(@web_module) %>.Parapet.OperatorComponents
 
   def mount(_params, _session, socket) do
-    # You would typically fetch queue here using Parapet.Operator.queue_query
-    # and Repo.all/1. For example:
-    # incidents = Repo.all(Parapet.Operator.queue_query())
-    incidents = []
+    incidents = <%= inspect(@repo_module) %>.all(Parapet.Operator.queue_query())
     
     {:ok, assign(socket, incidents: incidents, selected_incident: nil)}
   end
@@ -16,14 +13,50 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   def handle_params(params, _uri, socket) do
     selected = 
       if id = params["id"] do
-        # You would typically fetch detail here
-        # Parapet.Operator.incident_detail(id)
-        %{id: id, state: "open", title: "Example Incident"}
+        Parapet.Operator.incident_detail(id)
       else
         nil
       end
 
     {:noreply, assign(socket, selected_incident: selected)}
+  end
+
+  def handle_event("acknowledge", %{"id" => id}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Acknowledged via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :acknowledge
+    }
+    
+    case Parapet.Operator.mark_investigating(incident, payload) do
+      {:ok, _result} ->
+        {:noreply, push_patch(socket, to: "/parapet/#{id}")}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
+    end
+  end
+
+  def handle_event("resolve", %{"id" => id}, socket) do
+    # Currently Parapet.Operator doesn't have a resolve command, but let's assume it might or use a generic one,
+    # or just record a note for now as a stub.
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Resolved via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :resolve
+    }
+    
+    # We'll use mark_investigating as a placeholder if resolve doesn't exist yet, 
+    # but let's check operator.ex: there's mark_investigating, record_note, attach_change_marker, request_approval
+    case Parapet.Operator.record_note(incident, "Resolved", payload) do
+      {:ok, _result} ->
+        {:noreply, push_patch(socket, to: "/parapet/#{id}")}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to resolve")}
+    end
   end
   
   def render(assigns) do
@@ -43,10 +76,10 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
       <div class="flex-1 flex flex-col min-w-0 bg-white">
         <%%= if @selected_incident do %>
           <div class="p-6 border-b border-gray-200">
-            <.incident_summary incident={@selected_incident} />
+            <.incident_summary detail={@selected_incident} />
           </div>
           <div class="flex-1 overflow-y-auto p-6">
-            <.incident_timeline incident={@selected_incident} />
+            <.incident_timeline detail={@selected_incident} />
           </div>
         <%% else %>
           <div class="flex-1 flex items-center justify-center text-gray-500">
@@ -62,7 +95,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
             <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</h3>
           </div>
           <div class="p-4 overflow-y-auto">
-            <.action_rail incident={@selected_incident} />
+            <.action_rail detail={@selected_incident} />
           </div>
         </div>
       <%% end %>

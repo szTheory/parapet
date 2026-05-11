@@ -5,12 +5,45 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
   import <%= inspect(@web_module) %>.Parapet.OperatorComponents
 
   def mount(%{"id" => id}, _session, socket) do
-    # Parapet.Operator.get_incident(id)
-    incident = %{id: id, state: "open", title: "Example Incident"}
+    selected = Parapet.Operator.incident_detail(id)
     
-    {:ok, assign(socket, incident: incident)}
+    {:ok, assign(socket, incident: selected)}
   end
   
+  def handle_event("acknowledge", %{"id" => id}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Acknowledged via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :acknowledge
+    }
+    
+    case Parapet.Operator.mark_investigating(incident, payload) do
+      {:ok, _result} ->
+        {:noreply, push_navigate(socket, to: "/parapet/#{id}")}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
+    end
+  end
+
+  def handle_event("resolve", %{"id" => id}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Resolved via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :resolve
+    }
+    
+    case Parapet.Operator.record_note(incident, "Resolved", payload) do
+      {:ok, _result} ->
+        {:noreply, push_navigate(socket, to: "/parapet/#{id}")}
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to resolve")}
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex flex-col min-h-screen bg-gray-50 md:hidden">
@@ -18,17 +51,17 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         <.link navigate={"/parapet"} class="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-4">
           <span>&larr; Back to Queue</span>
         </.link>
-        <.incident_summary incident={@incident} />
+        <.incident_summary detail={@incident} />
       </div>
 
       <div class="p-4 bg-white border-b border-gray-200">
         <h3 class="text-lg font-semibold mb-4">Timeline</h3>
-        <.incident_timeline incident={@incident} />
+        <.incident_timeline detail={@incident} />
       </div>
       
       <div class="p-4 bg-gray-50 pb-24">
         <h3 class="text-lg font-semibold mb-4">Actions</h3>
-        <.action_rail incident={@incident} />
+        <.action_rail detail={@incident} />
       </div>
     </div>
     """

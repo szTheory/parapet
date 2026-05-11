@@ -15,11 +15,16 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
     web_module = Igniter.Libs.Phoenix.web_module(igniter)
     app_name = Igniter.Project.Application.app_name(igniter)
     
+    # E.g. web_module is MyAppWeb, we want MyApp.Repo
+    base_name = web_module |> inspect() |> String.trim_trailing("Web")
+    repo_module = Module.concat([base_name, "Repo"])
+
     web_dir = Path.join(["lib", "#{app_name}_web", "live", "parapet"])
 
     assigns = [
       web_module: web_module,
-      app_name: app_name
+      app_name: app_name,
+      repo_module: repo_module
     ]
 
     igniter
