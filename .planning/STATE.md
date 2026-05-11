@@ -9,10 +9,10 @@ See: .planning/PROJECT.md (updated 2026-05-10)
 
 ## Current Position
 
-Phase: 1
-Plan: 01
-Status: Executing Phase 1
-Last activity: Completed 01-01-PLAN.md
+Phase: 3
+Plan: 1
+Status: Complete
+Last activity: Completed 03-01-PLAN.md
 
 Progress: [█░░░░░░░░░] 10% (v0.2)
 
@@ -47,6 +47,8 @@ Key decisions affecting v0.2 work:
 - LiveView Operator UI supplements, but does NOT replace, Grafana. UI focuses on application mutation, form actions, and safe mitigations.
 - Sibling ecosystem integrations (Chimeway, Mailglass, Rulestead, etc.) are implemented as optional adapters (via `Code.ensure_loaded?`), adhering to the "compile out cleanly" constraint.
 - AI/MCP tool calls that execute app mutations must be audited and recorded via `Parapet.Ecto.ToolAudit`.
+- Confirmed that Parapet core safely excludes explicit direct Phoenix dependencies.
+- Used static analysis of doctor checks rather than dynamically injecting a router module in ExUnit to prevent global compilation side-effects.
 
 ### Pending Todos
 
@@ -65,6 +67,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-05-11
-Stopped at: Completed 01-03-PLAN.md
+Stopped at: Completed 03-01-PLAN.md
 Resume file: None
-one
