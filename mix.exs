@@ -33,6 +33,8 @@ defmodule Parapet.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:ecto, "~> 3.10"},
+      {:ecto_sql, "~> 3.10"},
       {:igniter, "~> 0.7.9"},
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
