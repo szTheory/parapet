@@ -1,0 +1,15 @@
+  # Ensure you place these routes inside an existing authenticated scope,
+  # or define a new pipeline with your app's standard authentication plugs.
+  # Parapet does not provide its own auth.
+  #
+  # Example:
+  # scope "/admin", <%= inspect(web_module) %> do
+  #   pipe_through [:browser, :require_authenticated_user]
+  #
+  #   live_session :parapet_operator,
+  #     on_mount: [{<%= inspect(web_module) %>.UserAuth, :ensure_authenticated}] do
+  #
+  #     live "/parapet", Parapet.OperatorLive.Index, :index
+  #     live "/parapet/:id", Parapet.OperatorDetailLive.Show, :show
+  #   end
+  # end
