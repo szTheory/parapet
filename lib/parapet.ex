@@ -10,11 +10,33 @@ defmodule Parapet do
   alias Parapet.Internal.SafeHandler
 
   @doc """
-  Attaches an exception-safe telemetry handler.
+  Attaches an exception-safe telemetry handler or activates ecosystem integration adapters.
 
-  Delegates to Parapet.Internal.SafeHandler to ensure errors in the callback
-  do not propagate back to the execution of the instrumented application code.
+  When a list with `:adapters` is provided, it iterates and conditionally invokes `setup/0`
+  on the corresponding adapter module (e.g., `Parapet.Integrations.Rulestead`).
+
+  When a map is provided, it delegates to `Parapet.Internal.SafeHandler` to ensure errors
+  in the callback do not propagate back to the execution of the instrumented application code.
   """
+  def attach(opts) when is_list(opts) do
+    adapters = Keyword.get(opts, :adapters, [])
+
+    Enum.each(adapters, fn adapter ->
+      module_name =
+        adapter
+        |> to_string()
+        |> Macro.camelize()
+
+      module = Module.concat(Parapet.Integrations, module_name)
+
+      if Code.ensure_loaded?(module) do
+        apply(module, :setup, [])
+      end
+    end)
+
+    {:ok, adapters}
+  end
+
   def attach(
         %{
           handler_id: handler_id,
