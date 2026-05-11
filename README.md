@@ -74,7 +74,23 @@ mix parapet.gen.prometheus
 
 This generates a `.yml` file that you can deploy to your Prometheus instance or import into your infrastructure-as-code repository.
 
-### 4. Deploy Markers
+### 4. Generate Grafana Dashboards
+
+Parapet generates a complete set of Grafana dashboards and provisioning files based on your SLOs.
+
+```bash
+mix parapet.gen.grafana
+```
+
+This writes the dashboard JSON and provisioning YAML to `priv/parapet/grafana/`. You can configure your Grafana instance to read from these provisioning directories. Once Grafana is started and connected to your Prometheus datasource, your dashboards will appear automatically in the "Parapet" folder, displaying live SLO burn rates, error budgets, and system health metrics without any manual configuration.
+
+### 5. Operator UI Workbench
+
+Parapet can generate an optional, evidence-first LiveView operator workbench directly inside your host application. This UI is used for initiating mitigations and tracking immutable timeline events.
+
+For instructions on generating the UI and securing its routes, see the [Operator UI Guide](docs/operator-ui.md).
+
+### 6. Deploy Markers
 
 Parapet can automatically track your deployments. Simply add the `Parapet.Plug.DeployMarker` to your authentication or administration pipeline:
 
