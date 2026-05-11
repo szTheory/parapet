@@ -8,11 +8,16 @@ defmodule Parapet.Capabilities do
     Agent.start_link(fn -> %{mitigation: %{}} end, name: __MODULE__)
   end
 
-  def register_mitigation(_id, _name, _schema) do
-    :ok
+  def register_mitigation(id, name, schema) do
+    Agent.update(__MODULE__, fn state ->
+      capability = %{id: id, name: name, schema: schema}
+      put_in(state, [:mitigation, id], capability)
+    end)
   end
 
   def capabilities(:mitigation) do
-    []
+    Agent.get(__MODULE__, fn state ->
+      state.mitigation |> Map.values()
+    end)
   end
 end

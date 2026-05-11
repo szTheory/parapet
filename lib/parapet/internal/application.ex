@@ -8,6 +8,7 @@ defmodule Parapet.Internal.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      {Parapet.Capabilities, []}
       # Starts a worker by calling: Parapet.Worker.start_link(arg)
       # {Parapet.Worker, arg}
     ]
