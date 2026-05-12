@@ -81,6 +81,31 @@ defmodule Parapet.Operator do
   end
 
   @doc """
+  Executes an audited `acknowledge_incident` command.
+  Transitions the incident to 'investigating' state and adds an 'acknowledge' timeline entry.
+  """
+  def acknowledge_incident(%Incident{} = incident, %ActionPayload{} = payload) do
+    if valid_payload?(payload) do
+      incident_changeset = Ecto.Changeset.change(incident, %{state: "investigating"})
+      
+      timeline_attrs = %{
+        type: "acknowledge",
+        payload: %{}
+      }
+      
+      audit_attrs = build_audit("operator_acknowledge_incident", payload)
+      
+      Evidence.run_operator_command(
+        incident_changeset: incident_changeset,
+        timeline_attrs: timeline_attrs,
+        audit_attrs: audit_attrs
+      )
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  @doc """
   Executes an audited `record_note` command.
   """
   def record_note(%Incident{} = incident, text, %ActionPayload{} = payload) when is_binary(text) do
