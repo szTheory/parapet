@@ -39,6 +39,7 @@ defmodule Parapet.MixProject do
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
       {:oban, ">= 0.0.0", optional: true},
+      {:req, "~> 0.5.17", optional: true},
       {:sigra, ">= 0.0.0", optional: true},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
