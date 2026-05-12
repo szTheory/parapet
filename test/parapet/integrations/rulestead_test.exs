@@ -5,18 +5,23 @@ defmodule Parapet.Integrations.RulesteadTest do
     on_exit(fn ->
       :telemetry.detach("parapet-rulestead-flag")
     end)
+
     :ok
   end
 
   describe "setup/0" do
     test "attaches telemetry and registers capability" do
       Parapet.Integrations.Rulestead.setup()
-      
+
       handlers = :telemetry.list_handlers([:rulestead, :flag, :changed])
       assert Enum.any?(handlers, fn handler -> handler.id == "parapet-rulestead-flag" end)
-      
+
       capabilities = Parapet.Capabilities.capabilities(:mitigation)
-      assert Enum.any?(capabilities, fn cap -> cap.id == :rulestead and cap.name == "toggle_flag" and cap.schema.name == "Toggle Feature Flag" end)
+
+      assert Enum.any?(capabilities, fn cap ->
+               cap.id == :rulestead and cap.name == "toggle_flag" and
+                 cap.schema.name == "Toggle Feature Flag"
+             end)
     end
   end
 
@@ -37,7 +42,7 @@ defmodule Parapet.Integrations.RulesteadTest do
       on_exit(fn ->
         :telemetry.detach(handler_id)
       end)
-      
+
       :ok
     end
 
@@ -50,8 +55,9 @@ defmodule Parapet.Integrations.RulesteadTest do
         %{flag_name: "new_ui", state: true, user_id: 123}
       )
 
-      assert_receive {:telemetry_event, [:parapet, :mitigation, :rulestead, :flag, :changed], measurements, metadata}
-      
+      assert_receive {:telemetry_event, [:parapet, :mitigation, :rulestead, :flag, :changed],
+                      measurements, metadata}
+
       assert measurements.duration == 100
       assert metadata.flag_name == "new_ui"
       assert metadata.state == true

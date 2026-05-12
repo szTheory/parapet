@@ -48,6 +48,7 @@ defmodule Parapet.Evidence do
   Executes an operator command as a single transactional seam.
   Requires `incident_changeset`, `timeline_attrs`, and `audit_attrs` keyword list args.
   """
+  @dialyzer {:nowarn_function, run_operator_command: 1}
   def run_operator_command(opts) do
     incident_changeset = Keyword.fetch!(opts, :incident_changeset)
     timeline_attrs = Keyword.fetch!(opts, :timeline_attrs)

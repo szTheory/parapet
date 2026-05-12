@@ -10,10 +10,10 @@ defmodule Parapet.Spine.TimelineEntry do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "parapet_timeline_entries" do
-    field :type, :string
-    field :payload, :map
+    field(:type, :string)
+    field(:payload, :map)
 
-    belongs_to :incident, Incident, type: :binary_id
+    belongs_to(:incident, Incident, type: :binary_id)
 
     timestamps(type: :utc_datetime_usec)
   end

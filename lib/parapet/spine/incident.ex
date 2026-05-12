@@ -8,11 +8,11 @@ defmodule Parapet.Spine.Incident do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   schema "parapet_incidents" do
-    field :title, :string
-    field :description, :string
-    field :state, :string, default: "open"
-    field :correlation_key, :string
-    field :runbook_data, :map
+    field(:title, :string)
+    field(:description, :string)
+    field(:state, :string, default: "open")
+    field(:correlation_key, :string)
+    field(:runbook_data, :map)
 
     timestamps(type: :utc_datetime_usec)
   end

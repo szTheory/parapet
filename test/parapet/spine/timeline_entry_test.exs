@@ -19,10 +19,12 @@ defmodule Parapet.Spine.TimelineEntryTest do
     end
 
     test "valid with required fields" do
-      changeset = TimelineEntry.changeset(%TimelineEntry{}, %{
-        type: "status_change",
-        incident_id: Ecto.UUID.generate()
-      })
+      changeset =
+        TimelineEntry.changeset(%TimelineEntry{}, %{
+          type: "status_change",
+          incident_id: Ecto.UUID.generate()
+        })
+
       assert changeset.valid?
     end
   end

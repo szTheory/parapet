@@ -43,7 +43,9 @@ defmodule Parapet.Notifier.ObanWorkerTest do
     {:ok, incident_id: incident_id}
   end
 
-  test "ObanWorker perform/1 handles success and writes timeline entry", %{incident_id: incident_id} do
+  test "ObanWorker perform/1 handles success and writes timeline entry", %{
+    incident_id: incident_id
+  } do
     args = %{
       "incident_id" => incident_id,
       "adapter" => to_string(SuccessAdapter),
@@ -76,7 +78,9 @@ defmodule Parapet.Notifier.ObanWorkerTest do
     assert entry.payload.details == inspect("failed horribly")
   end
 
-  test "ObanWorker perform/1 handles exceptions and still writes timeline entry", %{incident_id: incident_id} do
+  test "ObanWorker perform/1 handles exceptions and still writes timeline entry", %{
+    incident_id: incident_id
+  } do
     args = %{
       "incident_id" => incident_id,
       "adapter" => to_string(ExceptionAdapter),

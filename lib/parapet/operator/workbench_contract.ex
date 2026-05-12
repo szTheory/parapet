@@ -21,11 +21,11 @@ defmodule Parapet.Operator.WorkbenchContract do
   """
   def derive(%Incident{} = incident, entries) when is_list(entries) do
     sorted_entries = Enum.sort_by(entries, & &1.inserted_at, {:desc, DateTime})
-    
+
     summary = find_latest(sorted_entries, ["incident_summary", "triage_snapshot"])
     change = find_latest(sorted_entries, ["change_marker"])
     resolved_event = find_latest(sorted_entries, ["incident_resolved"])
-    
+
     # State derivations
     approval_state = derive_approval_state(sorted_entries)
     recommendation_state = derive_recommendation_state(sorted_entries)
@@ -56,8 +56,9 @@ defmodule Parapet.Operator.WorkbenchContract do
 
   defp derive_approval_state(entries) do
     # Looking for newest "approval_decided" or "approval_requested"
-    latest_approval = Enum.find(entries, fn e -> e.type in ["approval_decided", "approval_requested"] end)
-    
+    latest_approval =
+      Enum.find(entries, fn e -> e.type in ["approval_decided", "approval_requested"] end)
+
     case latest_approval do
       nil -> :none
       %{type: "approval_decided", payload: %{"state" => "approved"}} -> :approved
@@ -69,13 +70,14 @@ defmodule Parapet.Operator.WorkbenchContract do
 
   defp derive_recommendation_state(entries) do
     latest_rec = Enum.find(entries, fn e -> e.type == "recommendation" end)
-    
+
     case latest_rec do
       nil -> :none
       %{payload: %{"state" => state}} when is_binary(state) -> String.to_existing_atom(state)
       _ -> :none
     end
   rescue
-    ArgumentError -> :none # in case the string isn't an existing atom
+    # in case the string isn't an existing atom
+    ArgumentError -> :none
   end
 end

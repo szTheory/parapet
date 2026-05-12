@@ -33,7 +33,8 @@ defmodule Parapet.Integrations.ChimewayTest do
         %{email: "test2@example.com", error: "rejected"}
       )
 
-      assert_receive {:telemetry_event, [:parapet, :journey, :mail_delivery], measurements, metadata}
+      assert_receive {:telemetry_event, [:parapet, :journey, :mail_delivery], measurements,
+                      metadata}
 
       assert measurements.duration == 300_000_000
       assert metadata.outcome == :failure

@@ -48,6 +48,7 @@ defmodule Parapet.Notifier.SlackTest do
     end)
 
     incident = %Incident{id: "inc_123", title: "Test", state: "open"}
+
     opts = [
       webhook_url: "https://hooks.slack.com/services/T000/B000/XXX",
       operator_url: "https://operator.example.com",

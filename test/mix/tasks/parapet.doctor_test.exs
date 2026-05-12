@@ -8,14 +8,15 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
   setup do
     Mix.shell(Mix.Shell.Process)
     Application.put_env(:parapet, :slos, [])
-    
+
     # Ensure directory exists for router
     File.mkdir_p!(Path.dirname(@router_path))
 
-    on_exit(fn -> 
-      Application.put_env(:parapet, :slos, []) 
+    on_exit(fn ->
+      Application.put_env(:parapet, :slos, [])
       File.rm(@router_path)
     end)
+
     :ok
   end
 
@@ -69,10 +70,11 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
         end
       end
       """
+
       File.write!(@router_path, router_content)
-      
+
       assert catch_exit(Doctor.run([])) == {:shutdown, 1}
-      
+
       messages = get_all_shell_messages()
       assert String.contains?(messages, "==> operator_ui: warn")
       assert String.contains?(messages, "Unsecured operator UI LiveView found")
@@ -91,10 +93,11 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
         end
       end
       """
+
       File.write!(@router_path, router_content)
-      
+
       assert Doctor.run([]) == :ok
-      
+
       messages = get_all_shell_messages()
       assert String.contains?(messages, "==> operator_ui: ok")
     end
@@ -112,14 +115,15 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
         end
       end
       """
+
       File.write!(@router_path, router_content)
-      
+
       assert Doctor.run([]) == :ok
-      
+
       messages = get_all_shell_messages()
       assert String.contains?(messages, "==> operator_ui: ok")
     end
-    
+
     test "CI output includes operator_ui check as distinct key with stable machine-readable status" do
       router_content = """
       defmodule ParapetWeb.Router do
@@ -130,16 +134,20 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
         end
       end
       """
+
       File.write!(@router_path, router_content)
-      
+
       assert catch_exit(Doctor.run(["--ci"])) == {:shutdown, 1}
-      
+
       assert_receive {:mix_shell, :info, output}
-      
+
       json_output = Jason.decode!(output)
       assert Map.has_key?(json_output["checks"], "operator_ui")
       assert json_output["checks"]["operator_ui"]["status"] == "warn"
-      assert "Unsecured operator UI LiveView found" in json_output["checks"]["operator_ui"]["messages"]
+
+      assert "Unsecured operator UI LiveView found" in json_output["checks"]["operator_ui"][
+               "messages"
+             ]
     end
   end
 end

@@ -22,6 +22,7 @@ defmodule Parapet.Spine.IncidentTest do
       assert %{state: ["is invalid"]} = errors_on(changeset)
 
       valid_states = ["open", "investigating", "resolved"]
+
       for state <- valid_states do
         changeset = Incident.changeset(%Incident{}, %{title: "Test", state: state})
         assert changeset.valid?

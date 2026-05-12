@@ -33,7 +33,8 @@ defmodule Parapet.Integrations.MailglassTest do
         %{email: "test@example.com", reason: "bounce"}
       )
 
-      assert_receive {:telemetry_event, [:parapet, :journey, :mail_delivery], measurements, metadata}
+      assert_receive {:telemetry_event, [:parapet, :journey, :mail_delivery], measurements,
+                      metadata}
 
       assert measurements.duration == 200_000_000
       assert metadata.outcome == :failure

@@ -15,7 +15,7 @@ defmodule Parapet.Spine.AlertProcessor do
   def process_batch(payload) do
     if valid_payload?(payload) do
       alerts = Map.get(payload, "alerts", [])
-      
+
       alerts
       |> Enum.filter(&(&1["status"] == "firing"))
       |> Enum.each(&process_firing_alert/1)
@@ -38,25 +38,27 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp process_firing_alert(alert) do
     correlation_key = derive_correlation_key(alert)
-    
+
     alertname = get_in(alert, ["labels", "alertname"]) || "Unknown Alert"
     title = get_in(alert, ["annotations", "summary"]) || alertname
-      
+
     description = get_in(alert, ["annotations", "description"])
-    
-    changeset = Incident.changeset(%Incident{}, %{
-      title: title,
-      description: description,
-      state: "open",
-      correlation_key: correlation_key
-    })
-    
+
+    changeset =
+      Incident.changeset(%Incident{}, %{
+        title: title,
+        description: description,
+        state: "open",
+        correlation_key: correlation_key
+      })
+
     changeset = attach_runbook_data(changeset, alertname)
-    
-    result = Evidence.repo().insert(changeset, 
-      on_conflict: :nothing,
-      conflict_target: [:correlation_key]
-    )
+
+    result =
+      Evidence.repo().insert(changeset,
+        on_conflict: :nothing,
+        conflict_target: [:correlation_key]
+      )
 
     case result do
       {:ok, inserted_incident} ->
@@ -77,23 +79,18 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp attach_runbook_data(changeset, alertname) when is_binary(alertname) do
     slo = Enum.find(Parapet.SLO.all(), fn s -> to_string(s.name) == alertname end)
-    
+
     case slo do
       %{runbook: runbook} when not is_nil(runbook) ->
-        module =
-          cond do
-            is_atom(runbook) -> runbook
-            is_binary(runbook) ->
-              try do
-                String.to_existing_atom(runbook)
-              rescue
-                ArgumentError -> nil
-              end
-            true -> nil
-          end
+        module = get_runbook_module(runbook)
 
-        if module && Code.ensure_loaded?(module) && function_exported?(module, :__runbook_schema__, 0) do
-          Ecto.Changeset.put_change(changeset, :runbook_data, apply(module, :__runbook_schema__, []))
+        if module && Code.ensure_loaded?(module) &&
+             function_exported?(module, :__runbook_schema__, 0) do
+          Ecto.Changeset.put_change(
+            changeset,
+            :runbook_data,
+            apply(module, :__runbook_schema__, [])
+          )
         else
           changeset
         end
@@ -102,24 +99,40 @@ defmodule Parapet.Spine.AlertProcessor do
         changeset
     end
   end
+
   defp attach_runbook_data(changeset, _), do: changeset
 
+  defp get_runbook_module(runbook) when is_atom(runbook), do: runbook
+
+  defp get_runbook_module(runbook) when is_binary(runbook) do
+    try do
+      String.to_existing_atom(runbook)
+    rescue
+      ArgumentError -> nil
+    end
+  end
+
+  defp get_runbook_module(_), do: nil
+
+  @dialyzer {:nowarn_function, process_resolved_alert: 1}
   defp process_resolved_alert(alert) do
     correlation_key = derive_correlation_key(alert)
     repo = Evidence.repo()
 
-    query = from i in Incident, where: i.correlation_key == ^correlation_key and i.state == "open"
-    
+    query =
+      from(i in Incident, where: i.correlation_key == ^correlation_key and i.state == "open")
+
     case repo.all(query) do
       [incident | _] ->
         incident_changeset = Incident.changeset(incident, %{state: "resolved"})
-        
-        timeline_entry_changeset = TimelineEntry.changeset(%TimelineEntry{}, %{
-          type: "auto_resolved",
-          payload: alert,
-          incident_id: incident.id
-        })
-        
+
+        timeline_entry_changeset =
+          TimelineEntry.changeset(%TimelineEntry{}, %{
+            type: "auto_resolved",
+            payload: alert,
+            incident_id: incident.id
+          })
+
         multi =
           Ecto.Multi.new()
           |> Ecto.Multi.update(:incident, incident_changeset)
@@ -128,9 +141,9 @@ defmodule Parapet.Spine.AlertProcessor do
             Parapet.Notifier.broadcast(updated_incident)
             {:ok, updated_incident}
           end)
-          
+
         repo.transaction(multi)
-        
+
       _ ->
         # Incident not found or already closed, safe to ignore
         :ok
@@ -142,13 +155,13 @@ defmodule Parapet.Spine.AlertProcessor do
       nil ->
         labels = Map.get(alert, "labels", %{})
         # Sort labels to ensure deterministic hashing
-        encoded = 
+        encoded =
           labels
           |> Enum.sort()
-          |> Enum.map(fn {k, v} -> "#{k}:#{v}" end)
-          |> Enum.join(",")
+          |> Enum.map_join(",", fn {k, v} -> "#{k}:#{v}" end)
+
         :crypto.hash(:sha256, encoded) |> Base.encode16(case: :lower)
-        
+
       fingerprint ->
         fingerprint
     end

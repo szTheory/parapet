@@ -48,6 +48,9 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - System provides a modular notification behavior (`Parapet.Notifier`) for broadcasting incident state changes — v0.3
 - System includes out-of-the-box Slack and Microsoft Teams adapters for rich notifications — v0.3
 - System durably records all dispatched notifications as Timeline Entries on the incident — v0.3
+- System allows operators to explicitly acknowledge incidents via the Operator UI, tracking the action securely — v0.3
+- System automatically generates a Markdown retrospective for resolved incidents based on the evidence timeline — v0.3
+- System achieves a 100% green test suite with zero deferred testing blockers for v0.3 — v0.3
 
 ### Out of Scope
 

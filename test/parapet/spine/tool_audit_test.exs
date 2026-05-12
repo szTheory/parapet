@@ -18,6 +18,7 @@ defmodule Parapet.Spine.ToolAuditTest do
   describe "changeset/2" do
     test "requires tool_name, input, success" do
       changeset = ToolAudit.changeset(%ToolAudit{}, %{})
+
       assert %{
                tool_name: ["can't be blank"],
                input: ["can't be blank"],
@@ -26,11 +27,13 @@ defmodule Parapet.Spine.ToolAuditTest do
     end
 
     test "valid with required fields" do
-      changeset = ToolAudit.changeset(%ToolAudit{}, %{
-        tool_name: "run_shell_command",
-        input: %{"command" => "ls -la"},
-        success: true
-      })
+      changeset =
+        ToolAudit.changeset(%ToolAudit{}, %{
+          tool_name: "run_shell_command",
+          input: %{"command" => "ls -la"},
+          success: true
+        })
+
       assert changeset.valid?
     end
   end

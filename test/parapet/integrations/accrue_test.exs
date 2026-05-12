@@ -6,7 +6,7 @@ defmodule Parapet.Integrations.AccrueTest do
 
     test_pid = self()
     handler_id = "test-parapet-journey-billing-#{System.unique_integer()}"
-    
+
     :telemetry.attach(
       handler_id,
       [:parapet, :journey, :billing],
@@ -25,9 +25,13 @@ defmodule Parapet.Integrations.AccrueTest do
 
   test "translates accrue billing event into parapet journey billing event" do
     :telemetry.execute([:accrue, :billing, :processed], %{amount: 500}, %{account_id: 1})
-    assert_receive {:telemetry_event, [:parapet, :journey, :billing], %{amount: 500}, %{account_id: 1, outcome: :success}}
-    
+
+    assert_receive {:telemetry_event, [:parapet, :journey, :billing], %{amount: 500},
+                    %{account_id: 1, outcome: :success}}
+
     :telemetry.execute([:accrue, :billing, :failed], %{amount: 500}, %{account_id: 1})
-    assert_receive {:telemetry_event, [:parapet, :journey, :billing], %{amount: 500}, %{account_id: 1, outcome: :failure}}
+
+    assert_receive {:telemetry_event, [:parapet, :journey, :billing], %{amount: 500},
+                    %{account_id: 1, outcome: :failure}}
   end
 end

@@ -10,14 +10,16 @@ defmodule Parapet.Operator.ActionPayload do
 
   @primary_key false
   embedded_schema do
-    field :actor, :string
-    field :reason, :string
-    field :correlation_id, :string
-    field :idempotency_key, :string
-    
+    field(:actor, :string)
+    field(:reason, :string)
+    field(:correlation_id, :string)
+    field(:idempotency_key, :string)
+
     # Determines if the action writes an immutable fact (e.g. change marker, resolution)
     # or a narrative edit (e.g. updating description).
-    field :action_type, Ecto.Enum, values: [:immutable_fact, :narrative_edit, :execute_mitigation, :acknowledge, :resolve]
+    field(:action_type, Ecto.Enum,
+      values: [:immutable_fact, :narrative_edit, :execute_mitigation, :acknowledge, :resolve]
+    )
   end
 
   @doc """

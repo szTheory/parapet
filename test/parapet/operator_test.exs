@@ -9,7 +9,7 @@ defmodule Parapet.OperatorTest do
       # For tests, we mock the responses based on the query or return empty list
       []
     end
-    
+
     def one(_query) do
       nil
     end
@@ -23,35 +23,35 @@ defmodule Parapet.OperatorTest do
       result =
         multi
         |> Ecto.Multi.to_list()
-        |> Enum.reduce_while(%{}, fn
-          {name, {:run, run_fn}}, acc ->
-            case run_fn.(DummyRepo, acc) do
-              {:ok, val} -> {:cont, Map.put(acc, name, val)}
-              {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:insert, %Ecto.Changeset{} = changeset, opts}}, acc ->
-            case insert(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:insert, fun, opts}}, acc when is_function(fun) ->
-            changeset = fun.(acc)
-            case insert(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:update, %Ecto.Changeset{} = changeset, opts}}, acc ->
-            case update(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-        end)
-      
+        |> Enum.reduce_while(%{}, &run_multi_op/2)
+
       case result do
         {:error, name, err, acc} -> {:error, name, err, acc}
         map -> {:ok, map}
       end
     end
+
+    defp run_multi_op({name, {:run, run_fn}}, acc) do
+      case run_fn.(DummyRepo, acc) do
+        {:ok, val} -> {:cont, Map.put(acc, name, val)}
+        {:error, err} -> {:halt, {:error, name, err, acc}}
+      end
+    end
+
+    defp run_multi_op({name, {:insert, %Ecto.Changeset{} = changeset, opts}}, acc) do
+      handle_repo_op(name, insert(changeset, opts), acc)
+    end
+
+    defp run_multi_op({name, {:insert, fun, opts}}, acc) when is_function(fun) do
+      handle_repo_op(name, insert(fun.(acc), opts), acc)
+    end
+
+    defp run_multi_op({name, {:update, %Ecto.Changeset{} = changeset, opts}}, acc) do
+      handle_repo_op(name, update(changeset, opts), acc)
+    end
+
+    defp handle_repo_op(name, {:ok, val}, acc), do: {:cont, Map.put(acc, name, val)}
+    defp handle_repo_op(name, {:error, err}, acc), do: {:halt, {:error, name, err, acc}}
 
     def insert(changeset, _opts \\ []) do
       if changeset.valid? do
@@ -60,7 +60,7 @@ defmodule Parapet.OperatorTest do
         {:error, changeset}
       end
     end
-    
+
     def update(changeset, _opts \\ []) do
       if changeset.valid? do
         {:ok, Ecto.Changeset.apply_changes(changeset)}
@@ -80,7 +80,7 @@ defmodule Parapet.OperatorTest do
     test "Queue listing returns open/investigating incidents first and resolved incidents second using the Phase 2 default sort" do
       # Note: We will test the query generation by asserting on the Ecto.Query structure
       query = Operator.queue_query()
-      
+
       # The query should have an order_by
       assert %Ecto.Query{} = query
       # In Elixir tests without full repo, we can inspect the AST roughly,
@@ -93,7 +93,7 @@ defmodule Parapet.OperatorTest do
     test "returns a workbench-ready payload containing incident, entries, derived fields, and external links" do
       # Note: The DummyRepo currently returns empty list for all(), so entries will be empty.
       detail = Operator.incident_detail("inc-123")
-      
+
       assert %Incident{id: "inc-123"} = detail.incident
       assert detail.entries == []
       assert %Parapet.Operator.WorkbenchContract{} = detail.derived
@@ -104,62 +104,102 @@ defmodule Parapet.OperatorTest do
   describe "first-class commands" do
     setup do
       valid_payload = %{
-        actor: "user_1", reason: "testing", correlation_id: "req_1", action_type: :immutable_fact
+        actor: "user_1",
+        reason: "testing",
+        correlation_id: "req_1",
+        action_type: :immutable_fact
       }
-      {:ok, payload} = ActionPayload.changeset(%ActionPayload{}, valid_payload) |> Ecto.Changeset.apply_action(:insert)
-      
+
+      {:ok, payload} =
+        ActionPayload.changeset(%ActionPayload{}, valid_payload)
+        |> Ecto.Changeset.apply_action(:insert)
+
       incident = %Incident{id: Ecto.UUID.generate(), state: "open"}
       %{payload: payload, incident: incident}
     end
 
-    test "mark_investigating executes incident change, timeline append, and audit write", %{payload: payload, incident: incident} do
+    test "mark_investigating executes incident change, timeline append, and audit write", %{
+      payload: payload,
+      incident: incident
+    } do
       assert {:ok, result} = Operator.mark_investigating(incident, payload)
       assert %Incident{state: "investigating"} = result.incident
-      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "investigating"}} = result.timeline_entry
-      assert %ToolAudit{tool_name: "operator_mark_investigating", input: input} = result.tool_audit
+
+      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "investigating"}} =
+               result.timeline_entry
+
+      assert %ToolAudit{tool_name: "operator_mark_investigating", input: input} =
+               result.tool_audit
+
       assert input["actor"] == "user_1"
     end
 
-    test "acknowledge_incident updates state to investigating, adds timeline entry, and audit write", %{payload: payload, incident: incident} do
+    test "acknowledge_incident updates state to investigating, adds timeline entry, and audit write",
+         %{payload: payload, incident: incident} do
       assert {:ok, result} = Operator.acknowledge_incident(incident, payload)
       assert %Incident{state: "investigating"} = result.incident
       assert %TimelineEntry{type: "acknowledge", payload: %{}} = result.timeline_entry
-      assert %ToolAudit{tool_name: "operator_acknowledge_incident", input: input} = result.tool_audit
+
+      assert %ToolAudit{tool_name: "operator_acknowledge_incident", input: input} =
+               result.tool_audit
+
       assert input["actor"] == "user_1"
     end
 
-    test "resolve_incident updates state to resolved, adds status_change entry, and generates retrospective", %{payload: payload, incident: incident} do
+    test "resolve_incident updates state to resolved, adds status_change entry, and generates retrospective",
+         %{payload: payload, incident: incident} do
       assert {:ok, result} = Operator.resolve_incident(incident, payload)
-      assert %Incident{state: "resolved", runbook_data: %{"retrospective" => md}} = result.incident
+
+      assert %Incident{state: "resolved", runbook_data: %{"retrospective" => md}} =
+               result.incident
+
       assert md =~ "Incident Retrospective"
       assert md =~ "**State:** Resolved"
-      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "resolved"}} = result.timeline_entry
+
+      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "resolved"}} =
+               result.timeline_entry
+
       assert %ToolAudit{tool_name: "operator_resolve_incident"} = result.tool_audit
     end
 
-    test "record_note executes append without changing incident state", %{payload: payload, incident: incident} do
+    test "record_note executes append without changing incident state", %{
+      payload: payload,
+      incident: incident
+    } do
       assert {:ok, result} = Operator.record_note(incident, "This is a note", payload)
-      assert %TimelineEntry{type: "note", payload: %{"text" => "This is a note"}} = result.timeline_entry
+
+      assert %TimelineEntry{type: "note", payload: %{"text" => "This is a note"}} =
+               result.timeline_entry
+
       assert %ToolAudit{tool_name: "operator_record_note"} = result.tool_audit
     end
 
     test "attach_change_marker executes append", %{payload: payload, incident: incident} do
       assert {:ok, result} = Operator.attach_change_marker(incident, "pr-123", payload)
-      assert %TimelineEntry{type: "change_marker", payload: %{"change_ref" => "pr-123"}} = result.timeline_entry
+
+      assert %TimelineEntry{type: "change_marker", payload: %{"change_ref" => "pr-123"}} =
+               result.timeline_entry
+
       assert %ToolAudit{tool_name: "operator_attach_change_marker"} = result.tool_audit
     end
 
     test "request_approval executes append", %{payload: payload, incident: incident} do
       assert {:ok, result} = Operator.request_approval(incident, "mitigate-1", payload)
-      assert %TimelineEntry{type: "approval_requested", payload: %{"approval_key" => "mitigate-1", "state" => "pending"}} = result.timeline_entry
+
+      assert %TimelineEntry{
+               type: "approval_requested",
+               payload: %{"approval_key" => "mitigate-1", "state" => "pending"}
+             } = result.timeline_entry
+
       assert %ToolAudit{tool_name: "operator_request_approval"} = result.tool_audit
     end
 
     test "commands require a valid ActionPayload struct" do
       incident = %Incident{id: Ecto.UUID.generate(), state: "open"}
-      
-      invalid_payload = %ActionPayload{actor: nil} # Missing actor
-      
+
+      # Missing actor
+      invalid_payload = %ActionPayload{actor: nil}
+
       assert {:error, :invalid_payload} = Operator.mark_investigating(incident, invalid_payload)
     end
   end
@@ -172,10 +212,16 @@ defmodule Parapet.OperatorTest do
   describe "execute_runbook_step" do
     setup do
       valid_payload = %{
-        actor: "operator", reason: "testing mitigations", correlation_id: "corr-1", action_type: :execute_mitigation
+        actor: "operator",
+        reason: "testing mitigations",
+        correlation_id: "corr-1",
+        action_type: :execute_mitigation
       }
-      {:ok, payload} = ActionPayload.changeset(%ActionPayload{}, valid_payload) |> Ecto.Changeset.apply_action(:insert)
-      
+
+      {:ok, payload} =
+        ActionPayload.changeset(%ActionPayload{}, valid_payload)
+        |> Ecto.Changeset.apply_action(:insert)
+
       %{payload: payload}
     end
 
@@ -194,7 +240,7 @@ defmodule Parapet.OperatorTest do
       assert p["step_id"] == "success_step"
       assert p["module"] == "Elixir.Parapet.OperatorTest.DummyRunbook"
       assert p["result"] == ":mitigated"
-      
+
       assert %ToolAudit{tool_name: "operator_execute_mitigation"} = result.tool_audit
     end
 
@@ -214,9 +260,10 @@ defmodule Parapet.OperatorTest do
       }
 
       # Creating an unexisting atom string for testing (hopefully not created anywhere else)
-      assert {:error, :invalid_step_id} = Operator.execute_runbook_step(incident, "non_existent_atom_xyz_123", payload)
+      assert {:error, :invalid_step_id} =
+               Operator.execute_runbook_step(incident, "non_existent_atom_xyz_123", payload)
     end
-    
+
     test "returns error if function not exported", %{payload: payload} do
       # Parapet.Operator exists, but doesn't have execute_mitigation/2
       incident = %Incident{
@@ -225,7 +272,8 @@ defmodule Parapet.OperatorTest do
       }
 
       # The atom "queue_query" exists in Parapet.Operator, but execute_mitigation does not
-      assert {:error, :step_no_longer_exists} = Operator.execute_runbook_step(incident, "queue_query", payload)
+      assert {:error, :step_no_longer_exists} =
+               Operator.execute_runbook_step(incident, "queue_query", payload)
     end
   end
 end

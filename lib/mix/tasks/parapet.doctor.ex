@@ -147,7 +147,10 @@ defmodule Mix.Tasks.Parapet.Doctor do
 
             {:live, _, args} = node, {scopes, violations} ->
               text = Macro.to_string(args)
-              is_operator_ui = String.contains?(text, "OperatorLive") or String.contains?(text, "OperatorDetailLive")
+
+              is_operator_ui =
+                String.contains?(text, "OperatorLive") or
+                  String.contains?(text, "OperatorDetailLive")
 
               if is_operator_ui and not has_auth_plug?(scopes) do
                 {node, {scopes, ["Unsecured operator UI LiveView found" | violations]}}
@@ -167,7 +170,10 @@ defmodule Mix.Tasks.Parapet.Doctor do
           %{status: :warn, messages: violations}
         end
       else
-        %{status: :ok, messages: ["Sourceror not available, skipping operator UI static analysis."]}
+        %{
+          status: :ok,
+          messages: ["Sourceror not available, skipping operator UI static analysis."]
+        }
       end
     else
       %{status: :ok, messages: ["No router found at #{router_path}."]}

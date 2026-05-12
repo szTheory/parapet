@@ -50,6 +50,7 @@ defmodule Parapet.Notifier.TeamsTest do
     end)
 
     incident = %Incident{id: "inc_123", title: "Test", state: "open"}
+
     opts = [
       webhook_url: "https://foo.webhook.office.com/webhookb2/XXX",
       operator_url: "https://operator.example.com",

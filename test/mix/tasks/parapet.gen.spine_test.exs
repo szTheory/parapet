@@ -18,7 +18,7 @@ defmodule Mix.Tasks.Parapet.Gen.SpineTest do
 
       files = Rewrite.sources(igniter.rewrite) |> Enum.map(&Rewrite.Source.get(&1, :path))
       migration_file = Enum.find(files, &String.contains?(&1, "add_parapet_spine_tables.exs"))
-      
+
       assert migration_file
 
       migration_source =

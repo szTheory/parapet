@@ -12,7 +12,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
         {:error, changeset}
       end
     end
-    
+
     def update(changeset, _opts \\ []) do
       if changeset.valid? do
         {:ok, Ecto.Changeset.apply_changes(changeset)}
@@ -26,35 +26,35 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       result =
         multi
         |> Ecto.Multi.to_list()
-        |> Enum.reduce_while(%{}, fn
-          {name, {:run, run_fn}}, acc ->
-            case run_fn.(DummyRepo, acc) do
-              {:ok, val} -> {:cont, Map.put(acc, name, val)}
-              {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:insert, %Ecto.Changeset{} = changeset, opts}}, acc ->
-            case insert(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:insert, fun, opts}}, acc when is_function(fun) ->
-            changeset = fun.(acc)
-            case insert(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-          {name, {:update, %Ecto.Changeset{} = changeset, opts}}, acc ->
-            case update(changeset, opts) do
-               {:ok, val} -> {:cont, Map.put(acc, name, val)}
-               {:error, err} -> {:halt, {:error, name, err, acc}}
-            end
-        end)
-      
+        |> Enum.reduce_while(%{}, &run_multi_op/2)
+
       case result do
         {:error, name, err, acc} -> {:error, name, err, acc}
         map -> {:ok, map}
       end
     end
+
+    defp run_multi_op({name, {:run, run_fn}}, acc) do
+      case run_fn.(DummyRepo, acc) do
+        {:ok, val} -> {:cont, Map.put(acc, name, val)}
+        {:error, err} -> {:halt, {:error, name, err, acc}}
+      end
+    end
+
+    defp run_multi_op({name, {:insert, %Ecto.Changeset{} = changeset, opts}}, acc) do
+      handle_repo_op(name, insert(changeset, opts), acc)
+    end
+
+    defp run_multi_op({name, {:insert, fun, opts}}, acc) when is_function(fun) do
+      handle_repo_op(name, insert(fun.(acc), opts), acc)
+    end
+
+    defp run_multi_op({name, {:update, %Ecto.Changeset{} = changeset, opts}}, acc) do
+      handle_repo_op(name, update(changeset, opts), acc)
+    end
+
+    defp handle_repo_op(name, {:ok, val}, acc), do: {:cont, Map.put(acc, name, val)}
+    defp handle_repo_op(name, {:error, err}, acc), do: {:halt, {:error, name, err, acc}}
   end
 
   setup do
@@ -65,9 +65,14 @@ defmodule Parapet.Operator.WorkbenchContractTest do
 
   describe "derivation" do
     test "Workbench derivation builds queue/detail fields from explicit timeline and audit conventions" do
-      incident = %Parapet.Spine.Incident{id: "inc-1", state: "open", updated_at: ~U[2026-05-10 10:00:00Z]}
+      incident = %Parapet.Spine.Incident{
+        id: "inc-1",
+        state: "open",
+        updated_at: ~U[2026-05-10 10:00:00Z]
+      }
+
       entries = []
-      
+
       derived = WorkbenchContract.derive(incident, entries)
       assert derived.severity == nil
       assert derived.affected_journey == nil
@@ -78,6 +83,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
 
     test "Severity and affected journey come from the latest summary/triage payload" do
       incident = %Parapet.Spine.Incident{id: "inc-1"}
+
       entries = [
         %Parapet.Spine.TimelineEntry{
           type: "triage_snapshot",
@@ -98,6 +104,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
 
     test "correlated change comes from the latest change-marker payload, resolved ordering comes from latest resolution event timestamp" do
       incident = %Parapet.Spine.Incident{id: "inc-1", updated_at: ~U[2026-05-10 09:00:00Z]}
+
       entries = [
         %Parapet.Spine.TimelineEntry{
           type: "change_marker",
@@ -117,13 +124,19 @@ defmodule Parapet.Operator.WorkbenchContractTest do
     end
 
     test "fallback for resolved_at is incident updated_at when state is resolved but no event" do
-      incident = %Parapet.Spine.Incident{id: "inc-1", state: "resolved", updated_at: ~U[2026-05-10 09:00:00Z]}
+      incident = %Parapet.Spine.Incident{
+        id: "inc-1",
+        state: "resolved",
+        updated_at: ~U[2026-05-10 09:00:00Z]
+      }
+
       derived = WorkbenchContract.derive(incident, [])
       assert derived.resolved_at == ~U[2026-05-10 09:00:00Z]
     end
 
     test "Approval state and recommendation state are derived from explicitly keyed request/decision/recommendation events" do
       incident = %Parapet.Spine.Incident{id: "inc-1"}
+
       entries = [
         %Parapet.Spine.TimelineEntry{
           type: "approval_requested",
@@ -152,16 +165,26 @@ defmodule Parapet.Operator.WorkbenchContractTest do
     test "run_operator_command/1 writes incident update, timeline append, and audit record together" do
       incident = %Parapet.Spine.Incident{id: "inc-1", title: "Test", state: "open"}
       incident_changeset = Ecto.Changeset.change(incident, %{state: "investigating"})
-      
-      timeline_attrs = %{type: "note", payload: %{"text" => "Looked into it"}, incident_id: "inc-1"}
-      audit_attrs = %{tool_name: "operator_action", input: %{"action" => "mark_investigating"}, success: true}
 
-      assert {:ok, result} = Evidence.run_operator_command(
-        incident_changeset: incident_changeset,
-        timeline_attrs: timeline_attrs,
-        audit_attrs: audit_attrs
-      )
-      
+      timeline_attrs = %{
+        type: "note",
+        payload: %{"text" => "Looked into it"},
+        incident_id: "inc-1"
+      }
+
+      audit_attrs = %{
+        tool_name: "operator_action",
+        input: %{"action" => "mark_investigating"},
+        success: true
+      }
+
+      assert {:ok, result} =
+               Evidence.run_operator_command(
+                 incident_changeset: incident_changeset,
+                 timeline_attrs: timeline_attrs,
+                 audit_attrs: audit_attrs
+               )
+
       assert %Parapet.Spine.Incident{state: "investigating"} = result.incident
       assert %Parapet.Spine.TimelineEntry{type: "note"} = result.timeline_entry
       assert %Parapet.Spine.ToolAudit{tool_name: "operator_action"} = result.tool_audit

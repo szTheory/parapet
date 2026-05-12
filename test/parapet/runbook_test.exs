@@ -4,18 +4,20 @@ defmodule Parapet.RunbookTest do
   defmodule DummyRunbook do
     use Parapet.Runbook
 
-    title "Test Runbook"
-    description "A runbook for testing purposes."
+    title("Test Runbook")
+    description("A runbook for testing purposes.")
 
-    step :restart,
+    step(:restart,
       label: "Restart Service",
       description: "Restarts the target service.",
       type: :mitigation
+    )
 
-    step :notify,
+    step(:notify,
       label: "Notify Team",
       description: "Ping the team.",
       type: :manual
+    )
 
     def execute_mitigation(:restart, _incident) do
       {:ok, %{restarted: true}}

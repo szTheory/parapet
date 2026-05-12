@@ -53,7 +53,8 @@ defmodule Parapet.Notifier.Slack do
           "type" => "section",
           "text" => %{
             "type" => "mrkdwn",
-            "text" => "*Title:* #{incident.title}\n*Status:* #{incident.state}\n*ID:* #{incident.id}"
+            "text" =>
+              "*Title:* #{incident.title}\n*Status:* #{incident.state}\n*ID:* #{incident.id}"
           }
         },
         %{

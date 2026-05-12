@@ -24,6 +24,7 @@ defmodule Parapet.EvidenceTest do
 
     test "raises a clear error when repo is not configured" do
       Application.delete_env(:parapet, :repo)
+
       assert_raise ArgumentError, ~r/requires a :repo to be configured/, fn ->
         Parapet.Evidence.repo()
       end

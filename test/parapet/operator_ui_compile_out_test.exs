@@ -16,7 +16,7 @@ defmodule Parapet.OperatorUICompileOutTest do
       # into the host unless the host already has it, or simply relies on the host's phoenix.
       # The UI generator should ideally assert the host app has Phoenix.
       assert Code.ensure_loaded?(Mix.Tasks.Parapet.Gen.Ui)
-      
+
       # We check that the UI generator uses Igniter to add the UI files,
       # but relies on the host app having Phoenix.
     end
