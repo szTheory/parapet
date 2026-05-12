@@ -113,6 +113,48 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     """
   end
 
+  attr :runbook_data, :map, required: true
+  attr :incident_id, :string, required: true
+  def runbook_card(assigns) do
+    ~H"""
+    <div class="bg-white border border-gray-200 rounded-md p-4 mb-6">
+      <h3 class="text-lg font-semibold text-gray-900 mb-1">
+        <%%= @runbook_data["title"] || @runbook_data[:title] || "Runbook" %>
+      </h3>
+      <p class="text-sm text-gray-600 mb-4">
+        <%%= @runbook_data["description"] || @runbook_data[:description] || "No description provided." %>
+      </p>
+
+      <%% steps = @runbook_data["steps"] || @runbook_data[:steps] || [] %>
+      <%%= if length(steps) > 0 do %>
+        <div class="flex flex-col gap-3">
+          <%%= for step <- steps do %>
+            <%%
+              type = step["type"] || step[:type]
+              is_mitigation = to_string(type) == "mitigation"
+            %>
+            <div class="border border-gray-100 bg-gray-50 rounded p-3">
+              <div class="flex justify-between items-start">
+                <div>
+                  <h4 class="text-sm font-medium text-gray-900"><%%= step["label"] || step[:label] %></h4>
+                  <p class="text-xs text-gray-500 mt-1"><%%= step["description"] || step[:description] %></p>
+                </div>
+                <%%= if is_mitigation do %>
+                  <button phx-click="execute_mitigation" phx-value-step={step["id"] || step[:id]} phx-value-incident_id={@incident_id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
+                    Execute
+                  </button>
+                <%% end %>
+              </div>
+            </div>
+          <%% end %>
+        </div>
+      <%% else %>
+        <p class="text-sm text-gray-500 italic">No steps defined in this runbook.</p>
+      <%% end %>
+    </div>
+    """
+  end
+
   attr :detail, :map, required: true
   def action_rail(assigns) do
     ~H"""

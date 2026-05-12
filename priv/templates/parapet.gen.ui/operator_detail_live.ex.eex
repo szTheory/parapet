@@ -60,6 +60,10 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       </div>
       
       <div class="p-4 bg-gray-50 pb-24">
+        <%%= if @incident.incident.runbook_data do %>
+          <.runbook_card runbook_data={@incident.incident.runbook_data} incident_id={@incident.incident.id} />
+        <%% end %>
+
         <h3 class="text-lg font-semibold mb-4">Actions</h3>
         <.action_rail detail={@incident} />
       </div>
