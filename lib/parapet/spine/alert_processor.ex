@@ -53,10 +53,26 @@ defmodule Parapet.Spine.AlertProcessor do
     
     changeset = attach_runbook_data(changeset, alertname)
     
-    Evidence.repo().insert(changeset, 
+    result = Evidence.repo().insert(changeset, 
       on_conflict: :nothing,
       conflict_target: [:correlation_key]
     )
+
+    case result do
+      {:ok, inserted_incident} ->
+        incident =
+          if inserted_incident.id do
+            inserted_incident
+          else
+            Evidence.repo().get_by!(Incident, correlation_key: correlation_key)
+          end
+
+        Parapet.Notifier.broadcast(incident)
+        {:ok, incident}
+
+      error ->
+        error
+    end
   end
 
   defp attach_runbook_data(changeset, alertname) when is_binary(alertname) do
@@ -108,6 +124,10 @@ defmodule Parapet.Spine.AlertProcessor do
           Ecto.Multi.new()
           |> Ecto.Multi.update(:incident, incident_changeset)
           |> Ecto.Multi.insert(:timeline_entry, timeline_entry_changeset)
+          |> Ecto.Multi.run(:broadcast, fn _repo, %{incident: updated_incident} ->
+            Parapet.Notifier.broadcast(updated_incident)
+            {:ok, updated_incident}
+          end)
           
         repo.transaction(multi)
         

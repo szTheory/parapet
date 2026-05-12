@@ -10,7 +10,11 @@ defmodule Parapet.Spine.AlertProcessorTest do
       {:ok, Ecto.Changeset.apply_changes(changeset)}
     end
 
-    def all(query) do
+    def get_by!(Parapet.Spine.Incident, [correlation_key: key]) do
+      %Parapet.Spine.Incident{id: "inc-mocked", state: "open", correlation_key: key}
+    end
+
+    def all(_query) do
       # We just mock the result based on the test setup
       # If the test needs an incident, it will put it in the process dictionary
       Process.get(:mock_incident, [])
@@ -23,17 +27,40 @@ defmodule Parapet.Spine.AlertProcessorTest do
       
       # Mock the result to satisfy the caller
       # Return ok with mock results
-      results = Enum.into(ops, %{}, fn {name, {_, changeset, _opts}} ->
-        {name, Ecto.Changeset.apply_changes(changeset)}
+      # Ecto.Multi.run operations are handled by calling the function
+      results = Enum.into(ops, %{}, fn 
+        {name, {:run, fun}} ->
+          # mock repo is passed, along with previous results which we stub as %{}
+          # actually we need to pass the updated_incident from previous steps
+          # so we just let the fun run with an empty repo and a dummy incident
+          {_status, val} = fun.(__MODULE__, %{incident: %Parapet.Spine.Incident{id: "inc-mocked", state: "resolved"}})
+          {name, val}
+        {name, {_, changeset, _opts}} ->
+          {name, Ecto.Changeset.apply_changes(changeset)}
       end)
       {:ok, results}
+    end
+  end
+
+  defmodule DummyNotifier do
+    @behaviour Parapet.Notifier
+    def deliver(incident, opts) do
+      send(opts[:test_pid], {:broadcast, incident})
+      {:ok, :delivered}
     end
   end
 
   setup do
     Process.put(:mock_incident, [])
     Application.put_env(:parapet, :repo, DummyRepo)
-    on_exit(fn -> Application.delete_env(:parapet, :repo) end)
+    Application.put_env(:parapet, :use_oban_for_notifications, false)
+    Application.put_env(:parapet, :notifiers, [{DummyNotifier, [test_pid: self()]}])
+    
+    on_exit(fn -> 
+      Application.delete_env(:parapet, :repo)
+      Application.delete_env(:parapet, :use_oban_for_notifications)
+      Application.delete_env(:parapet, :notifiers)
+    end)
     :ok
   end
 
@@ -61,6 +88,9 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert incident.correlation_key == "123456"
       assert opts[:on_conflict] == :nothing
       assert opts[:conflict_target] == [:correlation_key]
+
+      assert_receive {:broadcast, broadcasted_incident}, 1000
+      assert broadcasted_incident.correlation_key == "123456"
     end
 
     test "Test 2: An identical \"firing\" alert correlates to the existing open Incident without creating duplicates." do
@@ -92,6 +122,8 @@ defmodule Parapet.Spine.AlertProcessorTest do
       
       assert incident.correlation_key == expected_hash
       assert opts[:on_conflict] == :nothing
+
+      assert_receive {:broadcast, _}, 1000
     end
 
     test "Test 2.1: A firing alert that matches an SLO runbook attaches the runbook schema data" do
@@ -125,6 +157,8 @@ defmodule Parapet.Spine.AlertProcessorTest do
       
       assert incident.runbook_data == %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
       
+      assert_receive {:broadcast, _}, 1000
+
       # cleanup
       Application.put_env(:parapet, :slos, Enum.reject(Parapet.SLO.all(), &(&1.name == :RunbookAlert)))
     end
@@ -162,6 +196,9 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert entry.type == "auto_resolved"
       assert entry.incident_id == "inc-1"
       assert entry.payload["status"] == "resolved"
+
+      assert_receive {:broadcast, broadcasted_incident}, 1000
+      assert broadcasted_incident.state == "resolved"
     end
 
     test "Test 5: If the open Incident is not found, the resolved alert is ignored safely." do
