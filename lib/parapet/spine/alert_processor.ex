@@ -39,10 +39,8 @@ defmodule Parapet.Spine.AlertProcessor do
   defp process_firing_alert(alert) do
     correlation_key = derive_correlation_key(alert)
     
-    title = 
-      get_in(alert, ["annotations", "summary"]) || 
-      get_in(alert, ["labels", "alertname"]) || 
-      "Unknown Alert"
+    alertname = get_in(alert, ["labels", "alertname"]) || "Unknown Alert"
+    title = get_in(alert, ["annotations", "summary"]) || alertname
       
     description = get_in(alert, ["annotations", "description"])
     
@@ -53,11 +51,42 @@ defmodule Parapet.Spine.AlertProcessor do
       correlation_key: correlation_key
     })
     
+    changeset = attach_runbook_data(changeset, alertname)
+    
     Evidence.repo().insert(changeset, 
       on_conflict: :nothing,
       conflict_target: [:correlation_key]
     )
   end
+
+  defp attach_runbook_data(changeset, alertname) when is_binary(alertname) do
+    slo = Enum.find(Parapet.SLO.all(), fn s -> to_string(s.name) == alertname end)
+    
+    case slo do
+      %{runbook: runbook} when not is_nil(runbook) ->
+        module =
+          cond do
+            is_atom(runbook) -> runbook
+            is_binary(runbook) ->
+              try do
+                String.to_existing_atom(runbook)
+              rescue
+                ArgumentError -> nil
+              end
+            true -> nil
+          end
+
+        if module && Code.ensure_loaded?(module) && function_exported?(module, :__runbook_schema__, 0) do
+          Ecto.Changeset.put_change(changeset, :runbook_data, apply(module, :__runbook_schema__, []))
+        else
+          changeset
+        end
+
+      _ ->
+        changeset
+    end
+  end
+  defp attach_runbook_data(changeset, _), do: changeset
 
   defp process_resolved_alert(alert) do
     correlation_key = derive_correlation_key(alert)

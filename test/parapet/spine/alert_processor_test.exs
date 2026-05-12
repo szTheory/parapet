@@ -94,6 +94,41 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert opts[:on_conflict] == :nothing
     end
 
+    test "Test 2.1: A firing alert that matches an SLO runbook attaches the runbook schema data" do
+      defmodule MockRunbook do
+        def __runbook_schema__() do
+          %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
+        end
+      end
+      
+      Parapet.SLO.define(:RunbookAlert,
+        objective: 99.9,
+        good_events: "up",
+        total_events: "all",
+        runbook: MockRunbook
+      )
+
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "labels" => %{"alertname" => "RunbookAlert"},
+            "annotations" => %{"summary" => "Runbook trigger"}
+          }
+        ]
+      }
+      
+      assert :ok = AlertProcessor.process_batch(payload)
+      
+      assert_received {:insert, changeset, _opts}
+      incident = Ecto.Changeset.apply_changes(changeset)
+      
+      assert incident.runbook_data == %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
+      
+      # cleanup
+      Application.put_env(:parapet, :slos, Enum.reject(Parapet.SLO.all(), &(&1.name == :RunbookAlert)))
+    end
+
     test "Test 3: An invalid payload gracefully rejects." do
       assert {:error, :invalid_payload} = AlertProcessor.process_batch(%{"not_alerts" => []})
       assert {:error, :invalid_payload} = AlertProcessor.process_batch("invalid")
