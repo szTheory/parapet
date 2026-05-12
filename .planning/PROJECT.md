@@ -34,23 +34,34 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ Optional Accrue (billing) and Rindle (media processing) integrations for business-specific journey health — v0.2
 - ✓ Strict adherence to the "compile out cleanly" constraint for all sibling libraries — v0.2
 - ✓ Conceptual integration with Threadline for durable audit history interoperability — v0.2
+- ✓ System provides a webhook receiver endpoint compatible with Prometheus Alertmanager — v0.3
+- ✓ System automatically converts incoming Alertmanager "firing" alerts into durable Ecto Incidents — v0.3
+- ✓ System automatically resolves or updates Ecto Incidents when Alertmanager sends a "resolved" webhook — v0.3
+- ✓ System correlates incoming alerts to existing open incidents if they share the same alert name and labels — v0.3
+- ✓ System provides a DSL (`Parapet.Runbook`) to define structured runbooks with explicit steps — v0.3
+- ✓ System allows mapping specific runbooks to specific SLOs or alert names — v0.3
+- ✓ System Operator UI displays the attached runbook interactively on the Incident detail page — v0.3
+- ✓ System provides a mechanism for "one-click mitigations" (e.g., executing a server-side callback function) — v0.3
+- ✓ System provides a modular notification behavior (`Parapet.Notifier`) for broadcasting incident state changes — v0.3
+- ✓ System includes out-of-the-box Slack and Microsoft Teams adapters for rich notifications — v0.3
+- ✓ System durably records all dispatched notifications as Timeline Entries on the incident — v0.3
+- ✓ System allows operators to explicitly acknowledge incidents via the Operator UI, tracking the action securely — v0.3
+- ✓ System automatically generates a Markdown retrospective for resolved incidents based on the evidence timeline — v0.3
+- ✓ System achieves a 100% green test suite with zero deferred testing blockers for v0.3 — v0.3
 
 ### Active
 
-- System provides a webhook receiver endpoint compatible with Prometheus Alertmanager — v0.3
-- System automatically converts incoming Alertmanager "firing" alerts into durable Ecto Incidents — v0.3
-- System automatically resolves or updates Ecto Incidents when Alertmanager sends a "resolved" webhook — v0.3
-- System correlates incoming alerts to existing open incidents if they share the same alert name and labels — v0.3
-- System provides a DSL (`Parapet.Runbook`) to define structured runbooks with explicit steps — v0.3
-- System allows mapping specific runbooks to specific SLOs or alert names — v0.3
-- System Operator UI displays the attached runbook interactively on the Incident detail page — v0.3
-- System provides a mechanism for "one-click mitigations" (e.g., executing a server-side callback function) — v0.3
-- System provides a modular notification behavior (`Parapet.Notifier`) for broadcasting incident state changes — v0.3
-- System includes out-of-the-box Slack and Microsoft Teams adapters for rich notifications — v0.3
-- System durably records all dispatched notifications as Timeline Entries on the incident — v0.3
-- System allows operators to explicitly acknowledge incidents via the Operator UI, tracking the action securely — v0.3
-- System automatically generates a Markdown retrospective for resolved incidents based on the evidence timeline — v0.3
-- System achieves a 100% green test suite with zero deferred testing blockers for v0.3 — v0.3
+- System consumes Scoria's `Scoria.SRE.Telemetry` events and translates them into Parapet Prometheus metrics and durable Ecto Incidents — v0.4
+- System provides scoria_llm_token_count_total, scoria_llm_cost_usd, and scoria_llm_time_to_first_token_ms in Grafana out-of-the-box using the SRE telemetry layer — v0.4
+- System enforces a strict label policy that filters high-cardinality refs (like `trace_id`) from metrics labels, strictly splitting labels and refs — v0.4
+- System expands Parapet.SLO to include Parapet.SLO.ScoriaEval for defining objectives based on Scoria deterministic evaluation scores — v0.4
+- System tracks and alerts on Eval-Driven SLOs — v0.4
+- System surfaces AI Config Changes (`scorer_version`, `baseline_version`, `model`) natively from SRE telemetry — v0.4
+- System visualizes AI Config Changes in Grafana to correlate with SLO error budgets — v0.4
+- System tracks explicit failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) for Scoria MCP tools as SLIs — v0.4
+- System monitors Scoria workflow approval pauses as durable HITL states, not generic queues — v0.4
+- System can trigger alerts on stale or expiring workflow approval requests — v0.4
+- System extends the LiveView Operator UI to deep-link into Scoria's durable evidence and approval UI — v0.4
 
 ### Out of Scope
 

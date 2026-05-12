@@ -1,7 +1,7 @@
 # Architecture Patterns
 
 **Domain:** SRE / Observability / Incident Management
-**Researched:** 2026-05-11
+**Researched:** 2026-05-12
 
 ## Recommended Architecture
 
@@ -18,12 +18,12 @@ Parapet implements a **bifurcated data architecture**, separating high-volume te
 | `Parapet.Ecto.TimelineEntry` | Records specific events (alert fired, note added, flag disabled) linked to an Incident. | `Parapet.Ecto.Incident` |
 | `Parapet.Ecto.ToolAudit` | Logs AI or human MCP tool calls (e.g., query logs, runbook accessed) for security auditing. | `Parapet.Ecto.Incident` |
 | `Parapet.Live` | A Phoenix LiveView router macro providing SRE pages to operators. | `Parapet.Ecto.*`, Host App Auth |
-| `Parapet.Integrations.*` | Optional adapters intercepting telemetry from sibling libs (e.g. `Mailglass`, `Rulestead`) and translating to Parapet SLIs. | Sibling Libraries, `Parapet.Metrics` |
+| `Parapet.Integrations.*` | Optional adapters intercepting telemetry from sibling libs (e.g. `Mailglass`, `Rulestead`, `Scoria`) and translating to Parapet SLIs. | Sibling Libraries, `Parapet.Metrics` |
 
 ## Patterns to Follow
 
 ### Pattern 1: The Sibling Adapter Pattern
-**What:** Integrations with sibling libraries (`chimeway`, `mailglass`, `rulestead`) are implemented as optional adapter modules that compile conditionally.
+**What:** Integrations with sibling libraries (`chimeway`, `mailglass`, `rulestead`, `scoria`) are implemented as optional adapter modules that compile conditionally.
 **When:** You need to monitor a sibling library's reliability footprint.
 **Example:**
 ```elixir
@@ -44,7 +44,20 @@ defmodule Parapet.Integrations.Mailglass do
 end
 ```
 
-### Pattern 2: Durable Mitigation Auditing
+### Pattern 2: OpenInference to Prometheus Translation
+**What:** Scoria emits rich OpenInference OTel spans. Parapet intercepts these and increments low-cardinality Prometheus counters.
+**When:** Integrating AI agents into SRE monitoring.
+**Example:**
+```elixir
+# Parapet listens to [:scoria, :span, :stop]
+def handle_scoria_span(_event, measurements, meta, _config) do
+  # Discard high-cardinality prompt text
+  clean_meta = %{model: meta.model_name, tool: meta.tool_name}
+  :telemetry.execute([:parapet, :metrics, :llm_token], %{count: measurements.total_tokens}, clean_meta)
+end
+```
+
+### Pattern 3: Durable Mitigation Auditing
 **What:** Every application mutation taken in response to an incident must be durably logged as a `TimelineEntry` and a `ToolAudit`.
 **When:** The operator (or AI) disables a feature flag, rollbacks a deploy, or adjusts queue concurrency.
 **Example:**
@@ -82,3 +95,4 @@ Parapet.Mitigation.disable_flag(incident_id, actor, :new_checkout_flow)
 
 - `prompts/sre-observability-elixir-lib-deep-reseach.md`
 - `prompts/parapet-engineering-dna-from-sibling-libs.md`
+- `.planning/todos/deferred/scoria-ai-integration-seeds.md`

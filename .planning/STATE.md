@@ -2,44 +2,21 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-11)
+See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Executing v0.3 milestone (Alert Routing, Runbooks, Notifications).
+**Current focus:** Executing v0.4 milestone (Scoria AI Integration).
 
 ## Current Position
 
-Phase: Complete
+Phase: 1
 Plan: None
-Status: Completed v0.3
-Last activity: Completed 04-03-PLAN.md
+Status: Not started
+Last activity: Defined Phase 1 execution plans for SRE Telemetry Translation
 
-Progress: [##########] 100% (v0.3)
-
-## Performance Metrics
-
-**Velocity:**
-- Total plans completed: 11 (v0.2) + 10 (v0.3)
-- Average duration: 15m (v0.2)
-- Total execution time: ~3 hours (v0.2)
-
-**By Phase (v0.3):**
-
-| Phase | Plans | Total | Avg/Plan |
-|-------|-------|-------|----------|
-| 1. Alert Routing & Reception | 3/3 | ~20m | ~6m |
-| 2. Runbooks & Automated Mitigations | 3/3 | ~25m | ~8m |
-| 3. Notifications & Escalation | 3/3 | ~45m | ~15m |
-| 4. Acknowledgment & Polish | 1/2 | ~15m | ~15m |
-
-**Recent Trend:** Completed v0.3 Phase 4 Plan 01 successfully.
+Progress: [          ] 0%
 
 ## Accumulated Context
-
-### Decisions
-
-- Used existing Evidence.run_operator_command to ensure transactional consistency for acknowledge_incident command.
-Decisions are logged in PROJECT.md Key Decisions table. All v0.2 decisions have been fully incorporated.
 
 ### Pending Todos
 
@@ -49,14 +26,8 @@ None yet.
 
 None.
 
-## Deferred Items
-
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| Testing | `Sigra.setup/0 is undefined or private` error during `mix test` in `Parapet.Integrations.SigraTest`. Out of scope for Phase 1 Plan 1. | deferred | Phase 1 Plan 1 |
-
 ## Session Continuity
 
 Last session: 2026-05-12
-Stopped at: Completed v0.3 Phase 3 Plan 01
+Stopped at: Roadmap creation for v0.4
 Resume file: None

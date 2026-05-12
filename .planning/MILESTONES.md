@@ -38,14 +38,32 @@ None. All v0.2 requirements defined and satisfied.
 
 ## v0.3 Runbooks & Alert Routing
 
-**Date:** TBD
+**Date:** 2026-05-12
 **Stats:**
-- Phases: 1-3
+- Phases: 1-4
+- Plans: 12
+- Total LOC: 6667 (Elixir/EEx)
+
+### Accomplishments
+1. Implemented a webhook receiver endpoint for Prometheus Alertmanager, automatically routing "firing" and "resolved" alerts to the durable Ecto Incident lifecycle with intelligent deduplication and correlation.
+2. Created a structured `Parapet.Runbook` DSL for defining operator-triggered mitigation steps and attaching them based on SLOs or alert names.
+3. Extended the Operator UI to interactively display attached runbooks and execute one-click mitigations with complete `ToolAudit` logging.
+4. Built a modular `Parapet.Notifier` system with out-of-the-box Slack (Block Kit) and MS Teams (Adaptive Cards) adapters to broadcast incident state changes and record timeline entries.
+5. Added UI capabilities for Operators to explicitly acknowledge incidents and generate comprehensive markdown retrospectives automatically.
+
+### Known Gaps
+None. All v0.3 requirements defined and satisfied.
+
+## v0.4 Scoria AI Integration
+
+**Date:** 2026-05-12
+**Stats:**
+- Phases: 1-4
 - Plans: TBD
 - Total LOC: TBD
 
 ### Accomplishments
-*(Pending)*
+(Pending)
 
 ### Known Gaps
-*(Pending)*
+(Pending)
