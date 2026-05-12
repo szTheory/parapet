@@ -17,9 +17,9 @@ groups:
       # Alert: Page for rapid burn (14.4x over 1h/5m)
       - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRatePage
         expr: >
-          slo:error_ratio:rate1h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 14.4)
+          slo:error_ratio:rate1h{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 14.4)
           and
-          slo:error_ratio:rate5m{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 14.4)
+          slo:error_ratio:rate5m{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 14.4)
         labels:
           severity: page
           slo: <%= slo.name %>
@@ -30,9 +30,9 @@ groups:
       # Alert: Ticket for medium burn (6x over 6h/30m)
       - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRateTicket
         expr: >
-          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 6)
+          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 6)
           and
-          slo:error_ratio:rate30m{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 6)
+          slo:error_ratio:rate30m{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 6)
         labels:
           severity: ticket
           slo: <%= slo.name %>
@@ -43,9 +43,9 @@ groups:
       # Alert: Warning for slow burn (1x over 3d/6h)
       - alert: <%= Macro.camelize(to_string(slo.name)) %>SLOBurnRateWarning
         expr: >
-          slo:error_ratio:rate3d{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 1)
+          slo:error_ratio:rate3d{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 1)
           and
-          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - slo.objective %> * 1)
+          slo:error_ratio:rate6h{slo="<%= slo.name %>"} > (<%= 1 - (slo.objective / 100) %> * 1)
         labels:
           severity: warning
           slo: <%= slo.name %>

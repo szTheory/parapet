@@ -12,18 +12,20 @@ defmodule Mix.Tasks.Parapet.Gen.Prometheus do
     }
   end
 
+  alias Parapet.SLO
+
   @impl Igniter.Mix.Task
   def igniter(igniter) do
     # Register built-in SLOs
-    Parapet.SLO.HTTP.register()
+    SLO.HTTP.register()
 
     if Code.ensure_loaded?(Oban) do
-      Parapet.SLO.Oban.register()
+      SLO.Oban.register()
     end
 
-    Parapet.SLO.LoginJourney.register()
+    SLO.LoginJourney.register()
 
-    slos = Parapet.SLO.all()
+    slos = SLO.all()
 
     windows = ["5m", "30m", "1h", "2h", "6h", "3d"]
 

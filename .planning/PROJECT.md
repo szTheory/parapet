@@ -37,7 +37,17 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- Add requirements for v0.3 here when planning next milestone -->
+- System provides a webhook receiver endpoint compatible with Prometheus Alertmanager — v0.3
+- System automatically converts incoming Alertmanager "firing" alerts into durable Ecto Incidents — v0.3
+- System automatically resolves or updates Ecto Incidents when Alertmanager sends a "resolved" webhook — v0.3
+- System correlates incoming alerts to existing open incidents if they share the same alert name and labels — v0.3
+- System provides a DSL (`Parapet.Runbook`) to define structured runbooks with explicit steps — v0.3
+- System allows mapping specific runbooks to specific SLOs or alert names — v0.3
+- System Operator UI displays the attached runbook interactively on the Incident detail page — v0.3
+- System provides a mechanism for "one-click mitigations" (e.g., executing a server-side callback function) — v0.3
+- System provides a modular notification behavior (`Parapet.Notifier`) for broadcasting incident state changes — v0.3
+- System includes out-of-the-box Slack and Microsoft Teams adapters for rich notifications — v0.3
+- System durably records all dispatched notifications as Timeline Entries on the incident — v0.3
 
 ### Out of Scope
 

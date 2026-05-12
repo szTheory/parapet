@@ -18,11 +18,12 @@ defmodule Parapet.SLO.Oban do
   def register(opts \\ []) do
     objective = Keyword.get(opts, :objective, 99.9)
 
-    good_events = Keyword.get(
-      opts,
-      :good_events,
-      "parapet_oban_job_duration_milliseconds_count{state=\"success\"}"
-    )
+    good_events =
+      Keyword.get(
+        opts,
+        :good_events,
+        "parapet_oban_job_duration_milliseconds_count{state=\"success\"}"
+      )
 
     total_events =
       Keyword.get(

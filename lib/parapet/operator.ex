@@ -153,6 +153,68 @@ defmodule Parapet.Operator do
   end
 
   @doc """
+  Executes a mitigation step securely via dynamic dispatch from a runbook.
+  """
+  def execute_runbook_step(%Incident{} = incident, step_id, %ActionPayload{} = payload) when is_binary(step_id) or is_atom(step_id) do
+    if valid_payload?(payload) do
+      with {:ok, module} <- extract_module(incident.runbook_data),
+           {:ok, step_atom} <- parse_step_id(step_id),
+           true <- function_exported?(module, :execute_mitigation, 2) || {:error, :function_not_exported},
+           {:ok, mitigation_result} <- apply(module, :execute_mitigation, [step_atom, incident]) do
+
+        incident_changeset = Ecto.Changeset.change(incident, %{})
+        
+        timeline_attrs = %{
+          type: "mitigation_executed",
+          payload: %{
+            "step_id" => to_string(step_atom),
+            "module" => to_string(module),
+            "result" => inspect(mitigation_result)
+          }
+        }
+        
+        audit_attrs = build_audit("operator_execute_mitigation", payload)
+        
+        Evidence.run_operator_command(
+          incident_changeset: incident_changeset,
+          timeline_attrs: timeline_attrs,
+          audit_attrs: audit_attrs
+        )
+      else
+        {:error, :function_not_exported} -> {:error, :step_no_longer_exists}
+        error -> error
+      end
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  defp extract_module(%{"module" => mod_str}) when is_binary(mod_str) do
+    try do
+      {:ok, String.to_existing_atom(mod_str)}
+    rescue
+      ArgumentError -> {:error, :invalid_module}
+    end
+  end
+  defp extract_module(%{module: mod_str}) when is_binary(mod_str) do
+    try do
+      {:ok, String.to_existing_atom(mod_str)}
+    rescue
+      ArgumentError -> {:error, :invalid_module}
+    end
+  end
+  defp extract_module(_), do: {:error, :missing_runbook}
+
+  defp parse_step_id(step_id) when is_atom(step_id), do: {:ok, step_id}
+  defp parse_step_id(step_id) when is_binary(step_id) do
+    try do
+      {:ok, String.to_existing_atom(step_id)}
+    rescue
+      ArgumentError -> {:error, :invalid_step_id}
+    end
+  end
+
+  @doc """
   Delegates dynamic capability queries (e.g., UI mitigations) to the capability registry.
   """
   def capabilities(type) do

@@ -46,12 +46,10 @@ defmodule Mix.Tasks.Verify.PublicApi do
   defp check_module_docs(module) do
     has_docs =
       case Code.fetch_docs(module) do
-        {:docs_v1, _, :elixir, _, :hidden, _, _} -> false
-        {:docs_v1, _, :elixir, "none", _, _, _} -> false
-        {:docs_v1, _, :elixir, :none, _, _, _} -> false
-        {:docs_v1, _, :elixir, _, _, _, _} -> true
+        {:docs_v1, _, _, _, :hidden, _, _} -> false
+        {:docs_v1, _, _, _, :none, _, _} -> false
+        {:docs_v1, _, _, _, %{}, _, _} -> true
         {:error, _} -> false
-        _ -> false
       end
 
     %{

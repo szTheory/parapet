@@ -64,11 +64,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": <%= rem(index, 2) * 12 %>,
-        "y": <%= div(index, 2) * 8 + 1 %>
+        "w": 16,
+        "x": 0,
+        "y": <%= index * 8 + 1 %>
       },
-      "id": <%= index + 10 %>,
+      "id": <%= index * 2 + 10 %>,
       "title": "<%= slo.name %> 5m Error Ratio",
       "type": "timeseries",
       "targets": [
@@ -130,7 +130,7 @@
               },
               {
                 "color": "red",
-                "value": <%= 1 - slo.objective %>
+                "value": <%= 1 - (slo.objective / 100) %>
               }
             ]
           }
@@ -148,6 +148,75 @@
           "mode": "single",
           "sort": "none"
         }
+      }
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": <%= index * 8 + 1 %>
+      },
+      "id": <%= index * 2 + 11 %>,
+      "title": "<%= slo.name %> 3d Error Budget Spent",
+      "type": "gauge",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "editorMode": "code",
+          "expr": "slo:error_ratio:rate3d{slo=\"<%= slo.name %>\"} / <%= 1 - (slo.objective / 100) %> * 100",
+          "legendFormat": "% Budget Spent (3d)",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {},
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 80
+              },
+              {
+                "color": "red",
+                "value": 100
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "text": {}
       }
     }
 <% end %>

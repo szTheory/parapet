@@ -25,11 +25,12 @@ defmodule Parapet.SLO.HTTP do
         "parapet_http_server_duration_milliseconds_count{status_code=~\"2..|3..\"}"
       )
 
-    total_events = Keyword.get(
-      opts,
-      :total_events,
-      "parapet_http_server_duration_milliseconds_count"
-    )
+    total_events =
+      Keyword.get(
+        opts,
+        :total_events,
+        "parapet_http_server_duration_milliseconds_count"
+      )
 
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/http-slo")
 

@@ -17,20 +17,22 @@ defmodule Parapet.SLO.LoginJourney do
   """
   def register(opts \\ []) do
     objective = Keyword.get(opts, :objective, 99.9)
-    
+
     # We default to the Prometheus _count suffix generated for distributions/histograms
-    good_events = Keyword.get(
-      opts,
-      :good_events,
-      "parapet_journey_login_duration_milliseconds_count{outcome=\"success\"}"
-    )
-    
-    total_events = Keyword.get(
-      opts,
-      :total_events,
-      "parapet_journey_login_duration_milliseconds_count"
-    )
-    
+    good_events =
+      Keyword.get(
+        opts,
+        :good_events,
+        "parapet_journey_login_duration_milliseconds_count{outcome=\"success\"}"
+      )
+
+    total_events =
+      Keyword.get(
+        opts,
+        :total_events,
+        "parapet_journey_login_duration_milliseconds_count"
+      )
+
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/login-journey")
 
     Parapet.SLO.define(:login_journey,

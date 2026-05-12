@@ -1,5 +1,5 @@
 defmodule Parapet.OperatorTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   alias Parapet.Operator
   alias Parapet.Spine.{Incident, TimelineEntry, ToolAudit}
   alias Parapet.Operator.ActionPayload
@@ -144,6 +144,71 @@ defmodule Parapet.OperatorTest do
       invalid_payload = %ActionPayload{actor: nil} # Missing actor
       
       assert {:error, :invalid_payload} = Operator.mark_investigating(incident, invalid_payload)
+    end
+  end
+
+  defmodule DummyRunbook do
+    def execute_mitigation(:success_step, _incident), do: {:ok, :mitigated}
+    def execute_mitigation(:error_step, _incident), do: {:error, :failed}
+  end
+
+  describe "execute_runbook_step" do
+    setup do
+      valid_payload = %{
+        actor: "operator", reason: "testing mitigations", correlation_id: "corr-1", action_type: :execute_mitigation
+      }
+      {:ok, payload} = ActionPayload.changeset(%ActionPayload{}, valid_payload) |> Ecto.Changeset.apply_action(:insert)
+      
+      %{payload: payload}
+    end
+
+    test "executes mitigation and logs audit on success", %{payload: payload} do
+      incident = %Incident{
+        id: Ecto.UUID.generate(),
+        state: "open",
+        runbook_data: %{
+          "module" => "Elixir.Parapet.OperatorTest.DummyRunbook",
+          "steps" => [%{"id" => "success_step", "type" => "mitigation"}]
+        }
+      }
+
+      assert {:ok, result} = Operator.execute_runbook_step(incident, "success_step", payload)
+      assert %TimelineEntry{type: "mitigation_executed", payload: p} = result.timeline_entry
+      assert p["step_id"] == "success_step"
+      assert p["module"] == "Elixir.Parapet.OperatorTest.DummyRunbook"
+      assert p["result"] == ":mitigated"
+      
+      assert %ToolAudit{tool_name: "operator_execute_mitigation"} = result.tool_audit
+    end
+
+    test "returns error if module doesn't exist", %{payload: payload} do
+      incident = %Incident{
+        id: Ecto.UUID.generate(),
+        runbook_data: %{"module" => "Elixir.NonExistentModule"}
+      }
+
+      assert {:error, :invalid_module} = Operator.execute_runbook_step(incident, "step1", payload)
+    end
+
+    test "returns error if step_id doesn't exist as atom", %{payload: payload} do
+      incident = %Incident{
+        id: Ecto.UUID.generate(),
+        runbook_data: %{"module" => "Elixir.Parapet.OperatorTest.DummyRunbook"}
+      }
+
+      # Creating an unexisting atom string for testing (hopefully not created anywhere else)
+      assert {:error, :invalid_step_id} = Operator.execute_runbook_step(incident, "non_existent_atom_xyz_123", payload)
+    end
+    
+    test "returns error if function not exported", %{payload: payload} do
+      # Parapet.Operator exists, but doesn't have execute_mitigation/2
+      incident = %Incident{
+        id: Ecto.UUID.generate(),
+        runbook_data: %{"module" => "Elixir.Parapet.Operator"}
+      }
+
+      # The atom "queue_query" exists in Parapet.Operator, but execute_mitigation does not
+      assert {:error, :step_no_longer_exists} = Operator.execute_runbook_step(incident, "queue_query", payload)
     end
   end
 end

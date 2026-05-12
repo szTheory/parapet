@@ -1,5 +1,5 @@
 defmodule Parapet.EvidenceTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   defmodule DummyRepo do
     def insert(changeset) do

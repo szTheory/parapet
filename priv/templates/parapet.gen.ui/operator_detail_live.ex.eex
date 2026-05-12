@@ -44,6 +44,26 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
     end
   end
 
+  def handle_event("execute_mitigation", %{"step" => step, "incident_id" => incident_id}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, incident_id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Executed mitigation from UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :execute_mitigation
+    }
+    
+    case Parapet.Operator.execute_runbook_step(incident, step, payload) do
+      {:ok, _result} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Mitigation executed successfully")
+         |> push_navigate(to: "/parapet/#{incident_id}")}
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Mitigation failed: #{inspect(reason)}")}
+    end
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex flex-col min-h-screen bg-gray-50 md:hidden">

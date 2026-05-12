@@ -64,6 +64,45 @@ groups:
           slo: http
 
 
+      # Alert: Page for rapid burn (14.4x over 1h/5m)
+      - alert: HttpSLOBurnRatePage
+        expr: >
+          slo:error_ratio:rate1h{slo="http"} > (9.999999999998899e-4 * 14.4)
+          and
+          slo:error_ratio:rate5m{slo="http"} > (9.999999999998899e-4 * 14.4)
+        labels:
+          severity: page
+          slo: http
+        annotations:
+          summary: "High SLO burn rate for http"
+          runbook: "https://example.com/runbooks/http-slo"
+
+      # Alert: Ticket for medium burn (6x over 6h/30m)
+      - alert: HttpSLOBurnRateTicket
+        expr: >
+          slo:error_ratio:rate6h{slo="http"} > (9.999999999998899e-4 * 6)
+          and
+          slo:error_ratio:rate30m{slo="http"} > (9.999999999998899e-4 * 6)
+        labels:
+          severity: ticket
+          slo: http
+        annotations:
+          summary: "Medium SLO burn rate for http"
+          runbook: "https://example.com/runbooks/http-slo"
+
+      # Alert: Warning for slow burn (1x over 3d/6h)
+      - alert: HttpSLOBurnRateWarning
+        expr: >
+          slo:error_ratio:rate3d{slo="http"} > (9.999999999998899e-4 * 1)
+          and
+          slo:error_ratio:rate6h{slo="http"} > (9.999999999998899e-4 * 1)
+        labels:
+          severity: warning
+          slo: http
+        annotations:
+          summary: "Slow SLO burn rate for http"
+          runbook: "https://example.com/runbooks/http-slo"
+
   - name: parapet_slo_oban
     rules:
 
@@ -128,6 +167,45 @@ groups:
           slo: oban
 
 
+      # Alert: Page for rapid burn (14.4x over 1h/5m)
+      - alert: ObanSLOBurnRatePage
+        expr: >
+          slo:error_ratio:rate1h{slo="oban"} > (9.999999999998899e-4 * 14.4)
+          and
+          slo:error_ratio:rate5m{slo="oban"} > (9.999999999998899e-4 * 14.4)
+        labels:
+          severity: page
+          slo: oban
+        annotations:
+          summary: "High SLO burn rate for oban"
+          runbook: "https://example.com/runbooks/oban-slo"
+
+      # Alert: Ticket for medium burn (6x over 6h/30m)
+      - alert: ObanSLOBurnRateTicket
+        expr: >
+          slo:error_ratio:rate6h{slo="oban"} > (9.999999999998899e-4 * 6)
+          and
+          slo:error_ratio:rate30m{slo="oban"} > (9.999999999998899e-4 * 6)
+        labels:
+          severity: ticket
+          slo: oban
+        annotations:
+          summary: "Medium SLO burn rate for oban"
+          runbook: "https://example.com/runbooks/oban-slo"
+
+      # Alert: Warning for slow burn (1x over 3d/6h)
+      - alert: ObanSLOBurnRateWarning
+        expr: >
+          slo:error_ratio:rate3d{slo="oban"} > (9.999999999998899e-4 * 1)
+          and
+          slo:error_ratio:rate6h{slo="oban"} > (9.999999999998899e-4 * 1)
+        labels:
+          severity: warning
+          slo: oban
+        annotations:
+          summary: "Slow SLO burn rate for oban"
+          runbook: "https://example.com/runbooks/oban-slo"
+
   - name: parapet_slo_login_journey
     rules:
 
@@ -190,3 +268,43 @@ groups:
           )
         labels:
           slo: login_journey
+
+
+      # Alert: Page for rapid burn (14.4x over 1h/5m)
+      - alert: LoginJourneySLOBurnRatePage
+        expr: >
+          slo:error_ratio:rate1h{slo="login_journey"} > (9.999999999998899e-4 * 14.4)
+          and
+          slo:error_ratio:rate5m{slo="login_journey"} > (9.999999999998899e-4 * 14.4)
+        labels:
+          severity: page
+          slo: login_journey
+        annotations:
+          summary: "High SLO burn rate for login_journey"
+          runbook: "https://example.com/runbooks/login-journey"
+
+      # Alert: Ticket for medium burn (6x over 6h/30m)
+      - alert: LoginJourneySLOBurnRateTicket
+        expr: >
+          slo:error_ratio:rate6h{slo="login_journey"} > (9.999999999998899e-4 * 6)
+          and
+          slo:error_ratio:rate30m{slo="login_journey"} > (9.999999999998899e-4 * 6)
+        labels:
+          severity: ticket
+          slo: login_journey
+        annotations:
+          summary: "Medium SLO burn rate for login_journey"
+          runbook: "https://example.com/runbooks/login-journey"
+
+      # Alert: Warning for slow burn (1x over 3d/6h)
+      - alert: LoginJourneySLOBurnRateWarning
+        expr: >
+          slo:error_ratio:rate3d{slo="login_journey"} > (9.999999999998899e-4 * 1)
+          and
+          slo:error_ratio:rate6h{slo="login_journey"} > (9.999999999998899e-4 * 1)
+        labels:
+          severity: warning
+          slo: login_journey
+        annotations:
+          summary: "Slow SLO burn rate for login_journey"
+          runbook: "https://example.com/runbooks/login-journey"

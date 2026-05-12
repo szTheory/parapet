@@ -17,7 +17,7 @@ defmodule Parapet.Operator.ActionPayload do
     
     # Determines if the action writes an immutable fact (e.g. change marker, resolution)
     # or a narrative edit (e.g. updating description).
-    field :action_type, Ecto.Enum, values: [:immutable_fact, :narrative_edit]
+    field :action_type, Ecto.Enum, values: [:immutable_fact, :narrative_edit, :execute_mitigation, :acknowledge, :resolve]
   end
 
   @doc """

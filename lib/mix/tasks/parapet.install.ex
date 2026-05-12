@@ -97,7 +97,7 @@ defmodule Mix.Tasks.Parapet.Install do
 
   defp update_deploy_hook(igniter) do
     app_name = Igniter.Project.Application.app_name(igniter)
-    
+
     initial_content = """
     #!/bin/sh
 
@@ -109,11 +109,12 @@ defmodule Mix.Tasks.Parapet.Install do
       if String.contains?(existing_content, "Parapet.Deploy.mark") do
         existing_content
       else
-        existing_content <> """
+        existing_content <>
+          """
 
-        # Emit deploy marker for Parapet
-        bin/#{app_name} rpc "Parapet.Deploy.mark(version: \\"$RELEASE_VERSION\\")"
-        """
+          # Emit deploy marker for Parapet
+          bin/#{app_name} rpc "Parapet.Deploy.mark(version: \\"$RELEASE_VERSION\\")"
+          """
       end
     end
 

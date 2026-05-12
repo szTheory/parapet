@@ -12,12 +12,13 @@ defmodule Parapet.SLOTest do
 
   describe "define/2" do
     test "creates a valid SLO and stores it" do
-      slo = SLO.define(:api_availability,
-        objective: 99.9,
-        good_events: "http_requests_total{status=~\"5..\"}",
-        total_events: "http_requests_total",
-        runbook: "https://runbook.example.com/api"
-      )
+      slo =
+        SLO.define(:api_availability,
+          objective: 99.9,
+          good_events: "http_requests_total{status=~\"5..\"}",
+          total_events: "http_requests_total",
+          runbook: "https://runbook.example.com/api"
+        )
 
       assert %SLO{} = slo
       assert slo.name == :api_availability
@@ -52,12 +53,17 @@ defmodule Parapet.SLOTest do
       yaml = Generator.generate_yaml(slo)
 
       # Fast burn window 5m
-      assert yaml =~ "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))"
+      assert yaml =~
+               "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))"
+
       # Fast burn window 30m
-      assert yaml =~ "sum(rate(http_requests_total{status=~\"5..\"}[30m])) / sum(rate(http_requests_total[30m]))"
+      assert yaml =~
+               "sum(rate(http_requests_total{status=~\"5..\"}[30m])) / sum(rate(http_requests_total[30m]))"
+
       # Slow burn window 1h
-      assert yaml =~ "sum(rate(http_requests_total{status=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))"
-      
+      assert yaml =~
+               "sum(rate(http_requests_total{status=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))"
+
       # Optional: check with promtool if available
       if System.find_executable("promtool") do
         File.write!("tmp_rules.yaml", yaml)
