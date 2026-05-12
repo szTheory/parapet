@@ -83,6 +83,23 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       </div>
       
       <div class="p-4 bg-gray-50 pb-24">
+        <%%= if @incident.incident.state == "resolved" && is_map(@incident.incident.runbook_data) && Map.get(@incident.incident.runbook_data, "retrospective") do %>
+          <div class="mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+            <div class="flex justify-between items-center mb-4">
+              <h3 class="text-lg font-semibold">Automated Retrospective</h3>
+              <button 
+                onclick="navigator.clipboard.writeText(this.dataset.content); alert('Copied to clipboard!')"
+                data-content={@incident.incident.runbook_data["retrospective"]}
+                class="px-3 py-1 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded text-sm text-gray-700 transition-colors"
+                type="button"
+              >
+                Copy to Clipboard
+              </button>
+            </div>
+            <pre class="bg-gray-800 text-gray-100 p-4 rounded text-sm overflow-x-auto whitespace-pre-wrap font-mono"><code><%%= @incident.incident.runbook_data["retrospective"] %></code></pre>
+          </div>
+        <%% end %>
+
         <%%= if @incident.incident.runbook_data do %>
           <.runbook_card runbook_data={@incident.incident.runbook_data} incident_id={@incident.incident.id} />
         <%% end %>

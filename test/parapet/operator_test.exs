@@ -128,6 +128,15 @@ defmodule Parapet.OperatorTest do
       assert input["actor"] == "user_1"
     end
 
+    test "resolve_incident updates state to resolved, adds status_change entry, and generates retrospective", %{payload: payload, incident: incident} do
+      assert {:ok, result} = Operator.resolve_incident(incident, payload)
+      assert %Incident{state: "resolved", runbook_data: %{"retrospective" => md}} = result.incident
+      assert md =~ "Incident Retrospective"
+      assert md =~ "**State:** Resolved"
+      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "resolved"}} = result.timeline_entry
+      assert %ToolAudit{tool_name: "operator_resolve_incident"} = result.tool_audit
+    end
+
     test "record_note executes append without changing incident state", %{payload: payload, incident: incident} do
       assert {:ok, result} = Operator.record_note(incident, "This is a note", payload)
       assert %TimelineEntry{type: "note", payload: %{"text" => "This is a note"}} = result.timeline_entry

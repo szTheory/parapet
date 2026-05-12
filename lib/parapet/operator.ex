@@ -106,6 +106,49 @@ defmodule Parapet.Operator do
   end
 
   @doc """
+  Executes an audited `resolve_incident` command.
+  Transitions the incident to 'resolved' state and attaches an automated retrospective.
+  """
+  def resolve_incident(%Incident{} = incident, %ActionPayload{} = payload) do
+    if valid_payload?(payload) do
+      # Fetch entries to generate an accurate retrospective including the simulated final step
+      entries = Evidence.repo().all(
+        from t in Parapet.Spine.TimelineEntry,
+          where: t.incident_id == ^incident.id,
+          order_by: [asc: t.inserted_at]
+      )
+
+      simulated_resolve_entry = %Parapet.Spine.TimelineEntry{
+        type: "status_change",
+        payload: %{"new_state" => "resolved"},
+        inserted_at: DateTime.utc_now()
+      }
+      
+      retrospective = Parapet.Evidence.Retrospective.generate_markdown(%{incident | state: "resolved"}, entries ++ [simulated_resolve_entry])
+
+      runbook_data = incident.runbook_data || %{}
+      runbook_data = Map.put(runbook_data, "retrospective", retrospective)
+
+      incident_changeset = Ecto.Changeset.change(incident, %{state: "resolved", runbook_data: runbook_data})
+      
+      timeline_attrs = %{
+        type: "status_change",
+        payload: %{"new_state" => "resolved"}
+      }
+      
+      audit_attrs = build_audit("operator_resolve_incident", payload)
+      
+      Evidence.run_operator_command(
+        incident_changeset: incident_changeset,
+        timeline_attrs: timeline_attrs,
+        audit_attrs: audit_attrs
+      )
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  @doc """
   Executes an audited `record_note` command.
   """
   def record_note(%Incident{} = incident, text, %ActionPayload{} = payload) when is_binary(text) do
