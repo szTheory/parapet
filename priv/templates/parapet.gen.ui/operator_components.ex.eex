@@ -159,13 +159,15 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   def action_rail(assigns) do
     ~H"""
     <div class="flex flex-col gap-4">
-      <div class="bg-white border border-gray-200 rounded-md p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">Acknowledge</h4>
-        <p class="text-xs text-gray-500 mb-3">Take ownership of this incident.</p>
-        <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
-          Acknowledge
-        </button>
-      </div>
+      <%%= if @detail.incident.state == "open" do %>
+        <div class="bg-white border border-gray-200 rounded-md p-4">
+          <h4 class="text-sm font-medium text-gray-900 mb-2">Acknowledge</h4>
+          <p class="text-xs text-gray-500 mb-3">Take ownership of this incident.</p>
+          <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+            Acknowledge Incident
+          </button>
+        </div>
+      <%% end %>
 
       <div class="bg-white border border-gray-200 rounded-md p-4">
         <h4 class="text-sm font-medium text-gray-900 mb-2">Mitigate</h4>

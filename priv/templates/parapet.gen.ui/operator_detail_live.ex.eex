@@ -19,9 +19,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       action_type: :acknowledge
     }
     
-    case Parapet.Operator.mark_investigating(incident, payload) do
+    case Parapet.Operator.acknowledge_incident(incident, payload) do
       {:ok, _result} ->
-        {:noreply, push_navigate(socket, to: "/parapet/#{id}")}
+        {:noreply,
+         socket
+         |> put_flash(:info, "Incident acknowledged successfully")
+         |> push_navigate(to: "/parapet/#{id}")}
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
     end
