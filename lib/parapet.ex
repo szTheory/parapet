@@ -15,7 +15,7 @@ defmodule Parapet do
   When a list with `:adapters` is provided, it iterates and conditionally invokes `setup/0`
   on the corresponding adapter module (e.g., `Parapet.Integrations.Rulestead`).
 
-  When a map is provided, it delegates to `Parapet.Internal.SafeHandler` to ensure errors
+  When a map is provided, it delegates to Parapet.Internal.SafeHandler to ensure errors
   in the callback do not propagate back to the execution of the instrumented application code.
   """
   def attach(opts) when is_list(opts) do
