@@ -1,5 +1,8 @@
 defmodule Parapet.Notifier do
-  @callback deliver(incident :: Parapet.Spine.Incident.t(), opts :: keyword()) :: {:ok, term()} | {:error, term()}
+  @moduledoc """
+  Behaviour for incident notification adapters.
+  """
+  @callback deliver(incident :: struct(), opts :: keyword()) :: {:ok, term()} | {:error, term()}
 
   def broadcast(incident) do
     notifiers = Application.get_env(:parapet, :notifiers, [])
@@ -22,8 +25,41 @@ defmodule Parapet.Notifier do
       Parapet.Notifier.ObanWorker.new(args) |> Oban.insert()
     else
       Task.start(fn ->
-        adapter.deliver(incident, opts)
+        deliver_and_audit(incident, adapter, opts)
       end)
+    end
+  end
+
+  @doc false
+  def deliver_and_audit(incident, adapter, opts) do
+    {status, details} =
+      try do
+        case adapter.deliver(incident, opts) do
+          {:ok, result} -> {"success", inspect(result)}
+          {:error, reason} -> {"error", inspect(reason)}
+          other -> {"error", inspect(other)}
+        end
+      rescue
+        e -> {"error", inspect(e)}
+      catch
+        type, value -> {"error", "#{type}: #{inspect(value)}"}
+      end
+
+    attrs = %{
+      type: "notification_dispatched",
+      payload: %{
+        adapter: inspect(adapter),
+        status: status,
+        details: details
+      }
+    }
+
+    Parapet.Evidence.append_timeline(incident.id, attrs)
+
+    if status == "error" do
+      {:error, details}
+    else
+      :ok
     end
   end
 end
