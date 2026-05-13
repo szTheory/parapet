@@ -29,6 +29,7 @@ None.
 ## Decisions Made
 
 - Used DummyRepo approach for isolated Ecto testing in Scoria adapter without hitting real DB
+- Updated Igniter implementation to use modern arity 1 `igniter/1` callbacks for tasks
 
 ## Session Continuity
 
