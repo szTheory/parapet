@@ -1,0 +1,5 @@
+groups:
+  - name: scoria
+    rules:
+      - record: scoria_llm_token_count_total
+        expr: sum by(model) (rate(scoria_llm_token_count_total[5m]))
