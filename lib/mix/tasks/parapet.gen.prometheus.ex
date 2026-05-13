@@ -16,15 +16,6 @@ defmodule Mix.Tasks.Parapet.Gen.Prometheus do
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    # Register built-in SLOs
-    SLO.HTTP.register()
-
-    if Code.ensure_loaded?(Oban) do
-      SLO.Oban.register()
-    end
-
-    SLO.LoginJourney.register()
-
     slos = SLO.all()
 
     windows = ["5m", "30m", "1h", "2h", "6h", "3d"]
