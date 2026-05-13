@@ -35,7 +35,7 @@
 | AI-TELEMETRY-01 | Phase 1 | Complete |
 | AI-TELEMETRY-02 | Phase 1 | Complete |
 | AI-TELEMETRY-03 | Phase 1 | Complete |
-| AI-SLO-01 | Phase 2 | Pending |
+| AI-SLO-01 | Phase 2 | Complete |
 | AI-SLO-02 | Phase 2 | Pending |
 | AI-DEPLOY-01 | Phase 3 | Pending |
 | AI-DEPLOY-02 | Phase 3 | Pending |

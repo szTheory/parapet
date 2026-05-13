@@ -29,10 +29,9 @@
   1. Developer can configure an objective using the new `Parapet.SLO.ScoriaEval` module.
   2. Evaluation failures correctly deduct from the configured error budget.
   3. System triggers alerts when AI quality drops below the defined threshold (e.g., 99% pass rate over 7d).
-**Plans**:
-  1. Implement `Parapet.Integrations.Scoria` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
-  2. Create `mix parapet.gen.scoria` generator to install a standalone `scoria_dashboard.json`, Prometheus rules, and inject `Parapet.Integrations.Scoria.setup()` into the host's `ParapetInstrumenter`.
-  3. Update `mix parapet.install` to accept the `--with-scoria` flag by conditionally composing the new `parapet.gen.scoria` task.
+**Plans**: 2 plans
+- [x] 02-01-PLAN.md — Migrate Parapet.SLO to data-first Provider behaviour
+- [ ] 02-02-PLAN.md — Implement Parapet.SLO.ScoriaEval and Parapet.Metrics.Scoria telemetry
 
 ### Phase 3: AI Deploy Correlation & MCP SLIs
 **Goal**: System correlates AI configuration changes with observability metrics and monitors the reliability of individual MCP tools.
@@ -63,6 +62,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. SRE Telemetry Translation | 2/2 | Complete | 2026-05-12 |
-| 2. Eval-Driven SLOs | 0/3 | Not started | - |
+| 2. Eval-Driven SLOs | 1/2 | In Progress | - |
 | 3. AI Deploy Correlation & MCP SLIs | 0/3 | Not started | - |
 | 4. Workflow Approval Monitoring | 0/3 | Not started | - |
