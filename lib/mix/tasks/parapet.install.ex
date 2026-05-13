@@ -26,24 +26,48 @@ defmodule Mix.Tasks.Parapet.Install do
     endpoint_module = Module.concat([web_module, Endpoint])
 
     with_sigra? = igniter.args.options[:with_sigra] || false
+    with_scoria? = igniter.args.options[:with_scoria] || false
+
+    setup_code_body = []
+
+    setup_code_body =
+      if with_sigra? do
+        ["  if Code.ensure_loaded?(Parapet.Integrations.Sigra) do\n    Parapet.Integrations.Sigra.setup()\n  end" | setup_code_body]
+      else
+        setup_code_body
+      end
+
+    setup_code_body =
+      if with_scoria? do
+        ["  if Code.ensure_loaded?(Parapet.Integrations.Scoria) do\n    Parapet.Integrations.Scoria.setup()\n  end" | setup_code_body]
+      else
+        setup_code_body
+      end
+
+    setup_code_body = Enum.reverse(setup_code_body)
 
     setup_code =
-      if with_sigra? do
-        """
-        def setup do
-          if Code.ensure_loaded?(Parapet.Integrations.Sigra) do
-            Parapet.Integrations.Sigra.setup()
-          end
-          :ok
-        end
-        """
-      else
+      if setup_code_body == [] do
         """
         def setup do
           # Attach handlers here
           :ok
         end
         """
+      else
+        """
+        def setup do
+        #{Enum.join(setup_code_body, "\n")}
+          :ok
+        end
+        """
+      end
+
+    igniter =
+      if with_scoria? do
+        Igniter.compose_task(igniter, "parapet.gen.scoria", [])
+      else
+        igniter
       end
 
     igniter
