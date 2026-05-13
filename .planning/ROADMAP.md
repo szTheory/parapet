@@ -17,10 +17,9 @@
   1. `Scoria.SRE.Telemetry` events are successfully converted into target Prometheus metrics (`scoria_llm_token_count_total`, etc.).
   2. Metrics are visible and charted in the generated Grafana dashboards.
   3. Strict label policy is enforced, separating low-cardinality labels from high-cardinality references (like `trace_id`).
-**Plans**:
-  1. Implement `Parapet.Scoria.SRETelemetryHandler` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
-  2. Create `mix parapet.gen.scoria` generator to install dashboards, Prometheus rules, and inject `Parapet.Scoria.SRETelemetryHandler.setup()` into the host's `ParapetInstrumenter`.
-  3. Update `mix parapet.install` to accept the `--with-scoria` flag by composing the new `parapet.gen.scoria` task.
+**Plans**: 2 plans
+- [ ] 01-01-PLAN.md — Scoria Telemetry Adapter
+- [ ] 01-02-PLAN.md — Generator & Installer Integration
 
 ### Phase 2: Eval-Driven SLOs
 **Goal**: Operators can define, monitor, and alert on system objectives derived from Scoria AI evaluation pass rates.
@@ -31,9 +30,9 @@
   2. Evaluation failures correctly deduct from the configured error budget.
   3. System triggers alerts when AI quality drops below the defined threshold (e.g., 99% pass rate over 7d).
 **Plans**:
-  1. Implement `Parapet.Scoria.SRETelemetryHandler` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
-  2. Create `mix parapet.gen.scoria` generator to install dashboards, Prometheus rules, and inject `Parapet.Scoria.SRETelemetryHandler.setup()` into the host's `ParapetInstrumenter`.
-  3. Update `mix parapet.install` to accept the `--with-scoria` flag by composing the new `parapet.gen.scoria` task.
+  1. Implement `Parapet.Integrations.Scoria` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
+  2. Create `mix parapet.gen.scoria` generator to install a standalone `scoria_dashboard.json`, Prometheus rules, and inject `Parapet.Integrations.Scoria.setup()` into the host's `ParapetInstrumenter`.
+  3. Update `mix parapet.install` to accept the `--with-scoria` flag by conditionally composing the new `parapet.gen.scoria` task.
 
 ### Phase 3: AI Deploy Correlation & MCP SLIs
 **Goal**: System correlates AI configuration changes with observability metrics and monitors the reliability of individual MCP tools.
@@ -54,16 +53,16 @@
   2. Operators receive alerts when approval requests go stale or expire.
   3. Parapet's Operator UI deep-links to Scoria's native trace/approval UI rather than rebuilding approval management natively.
 **Plans**:
-  1. Implement `Parapet.Scoria.SRETelemetryHandler` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
-  2. Create `mix parapet.gen.scoria` generator to install dashboards, Prometheus rules, and inject `Parapet.Scoria.SRETelemetryHandler.setup()` into the host's `ParapetInstrumenter`.
-  3. Update `mix parapet.install` to accept the `--with-scoria` flag by composing the new `parapet.gen.scoria` task.
+  1. Implement `Parapet.Integrations.Scoria` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
+  2. Create `mix parapet.gen.scoria` generator to install a standalone `scoria_dashboard.json`, Prometheus rules, and inject `Parapet.Integrations.Scoria.setup()` into the host's `ParapetInstrumenter`.
+  3. Update `mix parapet.install` to accept the `--with-scoria` flag by conditionally composing the new `parapet.gen.scoria` task.
 **UI hint**: yes
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. SRE Telemetry Translation | 3/3 | Not started | - |
+| 1. SRE Telemetry Translation | 0/2 | Not started | - |
 | 2. Eval-Driven SLOs | 0/3 | Not started | - |
 | 3. AI Deploy Correlation & MCP SLIs | 0/3 | Not started | - |
 | 4. Workflow Approval Monitoring | 0/3 | Not started | - |
