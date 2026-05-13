@@ -13,12 +13,16 @@ defmodule Parapet.Integrations.Scoria do
   Attaches telemetry handlers for Scoria events.
   """
   def setup do
+    # Attach Phase 1 SRE telemetry
     :telemetry.attach(
       "parapet-scoria-telemetry",
       [:scoria, :sre, :telemetry],
       &__MODULE__.handle_event/4,
       nil
     )
+    
+    # Attach Phase 2 AI Eval metrics
+    Parapet.Metrics.Scoria.setup()
   end
 
   @doc """
