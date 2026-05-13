@@ -40,6 +40,46 @@ defmodule Parapet.SLOTest do
     end
   end
 
+  describe "all/0" do
+    defmodule DummyProvider do
+      @behaviour Parapet.SLO.Provider
+
+      def slos do
+        [
+          %Parapet.SLO{
+            name: :provider_slo,
+            objective: 99.0,
+            good_events: "provider_good",
+            total_events: "provider_total",
+            runbook: "provider_runbook"
+          }
+        ]
+      end
+    end
+
+    test "merges legacy environment state and data-first providers" do
+      # Set up legacy
+      SLO.define(:legacy_slo,
+        objective: 99.9,
+        good_events: "legacy_good",
+        total_events: "legacy_total",
+        runbook: "legacy_runbook"
+      )
+
+      # Set up provider
+      Application.put_env(:parapet, :providers, [DummyProvider])
+
+      all_slos = SLO.all()
+
+      assert length(all_slos) == 2
+      assert Enum.any?(all_slos, &(&1.name == :legacy_slo))
+      assert Enum.any?(all_slos, &(&1.name == :provider_slo))
+
+      # Cleanup
+      Application.put_env(:parapet, :providers, [])
+    end
+  end
+
   describe "Parapet.SLO.Generator.generate_yaml/1" do
     test "generates multi-window PromQL avoiding rate(sum(...))" do
       slo = %SLO{

@@ -26,6 +26,7 @@ defmodule Parapet.SLO do
 
   Raises `ArgumentError` if required fields are missing.
   """
+  @deprecated "Use a Parapet.SLO.Provider module instead"
   def define(name, opts) do
     objective = Keyword.get(opts, :objective)
     good_events = Keyword.get(opts, :good_events)
@@ -59,11 +60,18 @@ defmodule Parapet.SLO do
   Returns all registered SLOs.
   """
   def all do
-    Application.get_env(:parapet, :slos, [])
+    legacy_slos = Application.get_env(:parapet, :slos, [])
+    
+    provider_slos =
+      Application.get_env(:parapet, :providers, [])
+      |> Enum.flat_map(fn provider -> provider.slos() end)
+      |> Enum.map(&Parapet.SLO.Resolvable.to_slo/1)
+
+    legacy_slos ++ provider_slos
   end
 
   defp store(slo) do
-    slos = all()
+    slos = Application.get_env(:parapet, :slos, [])
     # remove existing with same name and append new
     slos = Enum.reject(slos, &(&1.name == slo.name)) ++ [slo]
     Application.put_env(:parapet, :slos, slos)
