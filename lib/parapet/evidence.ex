@@ -29,7 +29,13 @@ defmodule Parapet.Evidence do
 
   @doc """
   Idempotently marks an ActionItem as resolved.
+  Accepts either the internal primary key ID or a keyword list of criteria.
   """
+  def resolve_action_item(criteria) when is_list(criteria) do
+    from(a in ActionItem, where: ^criteria)
+    |> repo().update_all(set: [state: "resolved"])
+  end
+
   def resolve_action_item(id) do
     from(a in ActionItem, where: a.id == ^id)
     |> repo().update_all(set: [state: "resolved"])

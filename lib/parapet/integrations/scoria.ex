@@ -37,12 +37,13 @@ defmodule Parapet.Integrations.Scoria do
       nil
     )
     
-    # Attach Phase 4 workflow staleness/expiration
+    # Attach Phase 4 workflow staleness/expiration/resumed
     :telemetry.attach_many(
       "parapet-scoria-workflow-telemetry",
       [
         [:scoria, :workflow, :stale],
-        [:scoria, :workflow, :expired]
+        [:scoria, :workflow, :expired],
+        [:scoria, :workflow, :resumed]
       ],
       &__MODULE__.handle_event/4,
       nil
@@ -153,6 +154,33 @@ defmodule Parapet.Integrations.Scoria do
     )
 
     :ok
+  end
+
+  defp process_event([:scoria, :workflow, :resumed], measurements, metadata) do
+    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+
+    :telemetry.execute(
+      [:parapet, :scoria, :metrics, :resumed],
+      measurements,
+      safe_metadata
+    )
+
+    check_status(metadata[:workflow_id])
+
+    :ok
+  end
+
+  @doc """
+  Checks the external Scoria workflow state and conditionally resolves the action item
+  if the workflow is no longer paused.
+  """
+  def check_status(workflow_id) do
+    if Code.ensure_loaded?(Scoria.Workflow) do
+      state = Scoria.Workflow.get_state(workflow_id)
+      if state != :paused do
+        Parapet.Evidence.resolve_action_item(integration: "scoria", external_id: workflow_id)
+      end
+    end
   end
 
   # Catch-all
