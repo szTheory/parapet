@@ -5,7 +5,8 @@ defmodule Parapet.Evidence do
   to the durable Ecto database.
   """
 
-  alias Parapet.Spine.{Incident, TimelineEntry, ToolAudit}
+  alias Parapet.Spine.{ActionItem, Incident, TimelineEntry, ToolAudit}
+  import Ecto.Query
 
   @doc """
   Returns the configured Ecto.Repo for the host application.
@@ -15,6 +16,23 @@ defmodule Parapet.Evidence do
     Application.get_env(:parapet, :repo) ||
       raise ArgumentError,
             "Parapet requires a :repo to be configured. Please set `config :parapet, repo: MyApp.Repo`."
+  end
+
+  @doc """
+  Creates a new ActionItem.
+  """
+  def create_action_item(attrs \\ %{}) do
+    %ActionItem{}
+    |> ActionItem.changeset(attrs)
+    |> repo().insert()
+  end
+
+  @doc """
+  Idempotently marks an ActionItem as resolved.
+  """
+  def resolve_action_item(id) do
+    from(a in ActionItem, where: a.id == ^id)
+    |> repo().update_all(set: [state: "resolved"])
   end
 
   @doc """

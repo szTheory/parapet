@@ -10,7 +10,7 @@ defmodule Parapet.Evidence.ActionItemTest do
       end
     end
 
-    def update_all(query, updates) do
+    def update_all(_query, _updates) do
       # Mock update_all returning a fake count
       {1, nil}
     end
