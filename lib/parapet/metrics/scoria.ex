@@ -45,6 +45,11 @@ defmodule Parapet.Metrics.Scoria do
         event_name: [:parapet, :scoria, :eval, :completed],
         tags: [:guardrail, :passed, :model_name],
         description: "Total number of Scoria AI evaluations"
+      ),
+      counter("scoria_mcp_errors_total",
+        event_name: [:parapet, :scoria, :mcp, :error],
+        tags: [:reason, :tool_name],
+        description: "Total number of Scoria MCP tool failures"
       )
     ]
   end

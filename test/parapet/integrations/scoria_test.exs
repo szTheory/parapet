@@ -21,6 +21,8 @@ defmodule Parapet.Integrations.ScoriaTest do
     
     # Detach any existing handlers to prevent duplicate errors between tests
     :telemetry.detach("parapet-scoria-telemetry")
+    :telemetry.detach("parapet-scoria-config-telemetry")
+    :telemetry.detach("parapet-scoria-mcp-telemetry")
     Parapet.Integrations.Scoria.setup()
 
     test_pid = self()
@@ -38,6 +40,8 @@ defmodule Parapet.Integrations.ScoriaTest do
     on_exit(fn ->
       :telemetry.detach(handler_id)
       :telemetry.detach("parapet-scoria-telemetry")
+      :telemetry.detach("parapet-scoria-config-telemetry")
+      :telemetry.detach("parapet-scoria-mcp-telemetry")
       Application.delete_env(:parapet, :repo)
     end)
 
@@ -125,5 +129,76 @@ defmodule Parapet.Integrations.ScoriaTest do
              :not_a_map,
              nil
            ) == :ok
+  end
+
+  describe "[:scoria, :config, :deployed] telemetry" do
+    test "delegates to Parapet.Evidence.create_incident/1 with type config_change" do
+      metadata = %{
+        scorer_version: "v1.2",
+        baseline_version: "v1.0",
+        model: "gpt-4"
+      }
+
+      :telemetry.execute([:scoria, :config, :deployed], %{}, metadata)
+
+      assert_receive {:dummy_repo_insert, changeset}
+      assert changeset.data.__struct__ == Parapet.Spine.Incident
+      assert Ecto.Changeset.get_field(changeset, :title) == "AI Config Deployed"
+      assert Ecto.Changeset.get_field(changeset, :state) == "open"
+
+      runbook_data = Ecto.Changeset.get_field(changeset, :runbook_data)
+      assert runbook_data["type"] == "config_change"
+      assert runbook_data["scorer_version"] == "v1.2"
+      assert runbook_data["baseline_version"] == "v1.0"
+      assert runbook_data["model"] == "gpt-4"
+    end
+  end
+
+  describe "[:scoria, :mcp, :tool, :exception] telemetry" do
+    setup do
+      test_pid = self()
+      handler_id = "test-parapet-mcp-error-#{System.unique_integer()}"
+
+      :telemetry.attach(
+        handler_id,
+        [:parapet, :scoria, :mcp, :error],
+        fn name, measurements, metadata, _config ->
+          send(test_pid, {:telemetry_event, name, measurements, metadata})
+        end,
+        nil
+      )
+
+      on_exit(fn ->
+        :telemetry.detach(handler_id)
+      end)
+
+      :ok
+    end
+
+    test "maps known error reasons safely and emits [:parapet, :scoria, :mcp, :error]" do
+      metadata = %{
+        tool_name: "fetch_data",
+        error: %{reason: :timeout}
+      }
+
+      :telemetry.execute([:scoria, :mcp, :tool, :exception], %{duration: 50}, metadata)
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50}, received_meta}
+      assert received_meta.reason == "timeout"
+      assert received_meta.tool_name == "fetch_data"
+    end
+
+    test "unknown reasons fall back to 'execution_failed'" do
+      metadata = %{
+        tool_name: "fetch_data",
+        error: %{reason: :weird_unknown_error}
+      }
+
+      :telemetry.execute([:scoria, :mcp, :tool, :exception], %{duration: 50}, metadata)
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50}, received_meta}
+      assert received_meta.reason == "execution_failed"
+      assert received_meta.tool_name == "fetch_data"
+    end
   end
 end

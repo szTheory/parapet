@@ -20,6 +20,22 @@ defmodule Parapet.Integrations.Scoria do
       &__MODULE__.handle_event/4,
       nil
     )
+
+    # Attach AI Config deployments
+    :telemetry.attach(
+      "parapet-scoria-config-telemetry",
+      [:scoria, :config, :deployed],
+      &__MODULE__.handle_event/4,
+      nil
+    )
+
+    # Attach MCP tool exceptions
+    :telemetry.attach(
+      "parapet-scoria-mcp-telemetry",
+      [:scoria, :mcp, :tool, :exception],
+      &__MODULE__.handle_event/4,
+      nil
+    )
     
     # Attach Phase 2 AI Eval metrics
     Parapet.Metrics.Scoria.setup()
@@ -69,6 +85,38 @@ defmodule Parapet.Integrations.Scoria do
     :ok
   end
 
+  defp process_event([:scoria, :config, :deployed], _measurements, metadata) do
+    Parapet.Evidence.create_incident(%{
+      title: "AI Config Deployed",
+      state: "open",
+      runbook_data: %{
+        "type" => "config_change",
+        "scorer_version" => metadata[:scorer_version],
+        "baseline_version" => metadata[:baseline_version],
+        "model" => metadata[:model]
+      }
+    })
+
+    :ok
+  end
+
+  defp process_event([:scoria, :mcp, :tool, :exception], measurements, metadata) do
+    mapped_reason = map_mcp_failure(metadata[:error])
+    
+    :telemetry.execute(
+      [:parapet, :scoria, :mcp, :error],
+      measurements,
+      %{reason: mapped_reason, tool_name: metadata[:tool_name]}
+    )
+
+    :ok
+  end
+
   # Catch-all
   defp process_event(_event, _measurements, _metadata), do: :ok
+
+  defp map_mcp_failure(%{reason: :timeout}), do: "timeout"
+  defp map_mcp_failure(%{reason: :breaker_open}), do: "breaker_open"
+  defp map_mcp_failure(%{reason: :access_denied}), do: "access_denied"
+  defp map_mcp_failure(_), do: "execution_failed"
 end

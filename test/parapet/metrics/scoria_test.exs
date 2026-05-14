@@ -57,11 +57,15 @@ defmodule Parapet.Metrics.ScoriaTest do
   test "metrics definition matches downstream event" do
     metrics = Scoria.metrics()
 
-    assert [counter] = metrics
+    assert [eval_counter, mcp_counter] = metrics
     
     # Telemetry.Metrics representation of "scoria_evaluation_total"
-    assert counter.name == [:scoria_evaluation_total]
-    assert counter.event_name == [:parapet, :scoria, :eval, :completed]
-    assert counter.tags == [:guardrail, :passed, :model_name]
+    assert eval_counter.name == [:scoria_evaluation_total]
+    assert eval_counter.event_name == [:parapet, :scoria, :eval, :completed]
+    assert eval_counter.tags == [:guardrail, :passed, :model_name]
+
+    assert mcp_counter.name == [:scoria_mcp_errors_total]
+    assert mcp_counter.event_name == [:parapet, :scoria, :mcp, :error]
+    assert mcp_counter.tags == [:reason, :tool_name]
   end
 end
