@@ -1,3 +1,9 @@
+defmodule Scoria.Workflow do
+  def get_state(id) do
+    Process.get({:scoria_workflow_state, id}, :active)
+  end
+end
+
 defmodule Parapet.Integrations.ScoriaTest do
   use ExUnit.Case, async: false
 
@@ -13,6 +19,11 @@ defmodule Parapet.Integrations.ScoriaTest do
       else
         {:error, changeset}
       end
+    end
+
+    def update_all(query, updates) do
+      send(self(), {:dummy_repo_update_all, query, updates})
+      {1, nil}
     end
   end
 
@@ -41,7 +52,8 @@ defmodule Parapet.Integrations.ScoriaTest do
       "#{handler_id}-workflow",
       [
         [:parapet, :scoria, :metrics, :stale],
-        [:parapet, :scoria, :metrics, :expired]
+        [:parapet, :scoria, :metrics, :expired],
+        [:parapet, :scoria, :metrics, :resumed]
       ],
       fn name, measurements, metadata, _config ->
         send(test_pid, {:telemetry_event, name, measurements, metadata})
@@ -244,6 +256,36 @@ defmodule Parapet.Integrations.ScoriaTest do
 
       assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :expired], %{scoria_workflow_expired_total: 1}, received_meta}
       assert received_meta.workflow_id == "wf_expired_123"
+    end
+  end
+
+  describe "[:scoria, :workflow, :resumed] telemetry and check_status/1" do
+    test "resume event checks external state before closing the action item" do
+      workflow_id = "wf_resumed_123"
+      metadata = %{
+        workflow_id: workflow_id,
+        model: "gpt-4"
+      }
+
+      # Setup mock state to return :paused, meaning it's still paused and shouldn't be closed
+      Process.put({:scoria_workflow_state, workflow_id}, :paused)
+      :telemetry.execute([:scoria, :workflow, :resumed], %{scoria_workflow_resumed_total: 1}, metadata)
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :resumed], %{scoria_workflow_resumed_total: 1}, received_meta}
+      assert received_meta.workflow_id == workflow_id
+      
+      # Since it's still :paused, it shouldn't update the repo
+      refute_receive {:dummy_repo_update_all, _query, _updates}
+
+      # Now change the mock state to return :active, meaning it's no longer paused
+      Process.put({:scoria_workflow_state, workflow_id}, :active)
+      :telemetry.execute([:scoria, :workflow, :resumed], %{scoria_workflow_resumed_total: 1}, metadata)
+
+      # It should now resolve the action item
+      assert_receive {:dummy_repo_update_all, query, updates}
+      
+      # The update should set state: "resolved"
+      assert updates == [set: [state: "resolved"]]
     end
   end
 end
