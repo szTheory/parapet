@@ -6,8 +6,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
 
   def mount(_params, _session, socket) do
     incidents = <%= inspect(@repo_module) %>.all(Parapet.Operator.queue_query())
+    action_items = <%= inspect(@repo_module) %>.all(Parapet.Operator.action_items_query())
     
-    {:ok, assign(socket, incidents: incidents, selected_incident: nil)}
+    {:ok, assign(socket, incidents: incidents, action_items: action_items, selected_incident: nil)}
   end
 
   def handle_params(params, _uri, socket) do
@@ -70,8 +71,15 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
         <div class="p-4 border-b border-gray-200">
           <h2 class="text-lg font-semibold">Incident Queue</h2>
         </div>
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto border-b border-gray-200">
           <.incident_list incidents={@incidents} selected={@selected_incident} />
+        </div>
+        
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-semibold text-gray-800">Action Items</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-gray-50">
+          <.action_item_list items={@action_items} />
         </div>
       </div>
 
