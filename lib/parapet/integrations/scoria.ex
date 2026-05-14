@@ -37,6 +37,17 @@ defmodule Parapet.Integrations.Scoria do
       nil
     )
     
+    # Attach Phase 4 workflow staleness/expiration
+    :telemetry.attach_many(
+      "parapet-scoria-workflow-telemetry",
+      [
+        [:scoria, :workflow, :stale],
+        [:scoria, :workflow, :expired]
+      ],
+      &__MODULE__.handle_event/4,
+      nil
+    )
+    
     # Attach Phase 2 AI Eval metrics
     Parapet.Metrics.Scoria.setup()
   end
@@ -107,6 +118,38 @@ defmodule Parapet.Integrations.Scoria do
       [:parapet, :scoria, :mcp, :error],
       measurements,
       %{reason: mapped_reason, tool_name: metadata[:tool_name]}
+    )
+
+    :ok
+  end
+
+  defp process_event([:scoria, :workflow, :stale], measurements, metadata) do
+    # Track 1: Low cardinality metrics
+    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+    
+    :telemetry.execute(
+      [:parapet, :scoria, :metrics, :stale],
+      measurements,
+      safe_metadata
+    )
+
+    # Track 2: Durable Evidence for Operator UI
+    Parapet.Evidence.create_action_item(%{
+      integration: "scoria",
+      external_id: metadata[:workflow_id],
+      title: "Workflow #{metadata[:workflow_id]} is stale"
+    })
+
+    :ok
+  end
+
+  defp process_event([:scoria, :workflow, :expired], measurements, metadata) do
+    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+
+    :telemetry.execute(
+      [:parapet, :scoria, :metrics, :expired],
+      measurements,
+      safe_metadata
     )
 
     :ok
