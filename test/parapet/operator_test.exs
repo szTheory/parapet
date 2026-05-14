@@ -87,6 +87,14 @@ defmodule Parapet.OperatorTest do
       # but it's better to ensure the query is formed.
       assert inspect(query) =~ "order_by:"
     end
+
+    test "action_items_query returns an Ecto.Query for open action items" do
+      query = Operator.action_items_query()
+      assert %Ecto.Query{} = query
+      query_str = inspect(query)
+      assert query_str =~ "where: a0.state == \"open\""
+      assert query_str =~ "order_by:"
+    end
   end
 
   describe "incident detail" do

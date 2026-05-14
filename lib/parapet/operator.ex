@@ -5,10 +5,21 @@ defmodule Parapet.Operator do
   """
   import Ecto.Query
   alias Parapet.Spine.Incident
+  alias Parapet.Spine.ActionItem
   alias Parapet.Operator.ActionPayload
   alias Parapet.Evidence
 
   alias Parapet.Operator.WorkbenchContract
+
+  @doc """
+  Returns an Ecto.Query for open action items, sorted by inserted_at ascending.
+  """
+  def action_items_query do
+    from(a in ActionItem,
+      where: a.state == "open",
+      order_by: [asc: a.inserted_at]
+    )
+  end
 
   @doc """
   Returns an Ecto.Query for the incident queue, sorting open/investigating first,
