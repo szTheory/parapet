@@ -33,6 +33,23 @@
         },
         "titleFormat": "Deploy: {{version}}",
         "type": "dashboard"
+      {
+        "datasource": {
+          "type": "postgres",
+          "uid": "${DS_POSTGRES}"
+        },
+        "enable": true,
+        "hide": false,
+        "iconColor": "rgb(255, 0, 255)",
+        "name": "AI Config Changes",
+        "rawQuery": "SELECT inserted_at AS \"time\", title AS \"text\", runbook_data->>'model' AS \"tags\" FROM parapet_incidents WHERE runbook_data->>'type' = 'config_change'",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "tags"
+        },
+        "type": "dashboard"
       }
     ]
   },
@@ -239,6 +256,23 @@
         "name": "DS_PROMETHEUS",
         "options": [],
         "query": "prometheus",
+        "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "type": "datasource"
+      },
+      {
+        "current": {
+          "selected": false,
+          "text": "PostgreSQL",
+          "value": "PostgreSQL"
+        },
+        "hide": 0,
+        "includeAll": false,
+        "multi": false,
+        "name": "DS_POSTGRES",
+        "options": [],
+        "query": "postgres",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,

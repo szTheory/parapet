@@ -22,6 +22,8 @@ defmodule Mix.Tasks.Parapet.Gen.GrafanaTest do
       assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"http\\\"}"
       assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"oban\\\"}"
       assert dashboard_json =~ "slo:error_ratio:rate5m{slo=\\\"login_journey\\\"}"
+      assert dashboard_json =~ "DS_POSTGRES"
+      assert dashboard_json =~ "AI Config Changes"
 
       provisioning_yml =
         Rewrite.source!(igniter.rewrite, "priv/parapet/grafana/provisioning/dashboards.yml")
