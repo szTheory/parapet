@@ -36,8 +36,21 @@ defmodule Parapet.Integrations.ScoriaTest do
       end,
       nil
     )
+    
+    :telemetry.attach_many(
+      "#{handler_id}-workflow",
+      [
+        [:parapet, :scoria, :metrics, :stale],
+        [:parapet, :scoria, :metrics, :expired]
+      ],
+      fn name, measurements, metadata, _config ->
+        send(test_pid, {:telemetry_event, name, measurements, metadata})
+      end,
+      nil
+    )
 
     on_exit(fn ->
+      :telemetry.detach("#{handler_id}-workflow")
       :telemetry.detach(handler_id)
       :telemetry.detach("parapet-scoria-telemetry")
       :telemetry.detach("parapet-scoria-config-telemetry")
@@ -199,6 +212,38 @@ defmodule Parapet.Integrations.ScoriaTest do
       assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50}, received_meta}
       assert received_meta.reason == "execution_failed"
       assert received_meta.tool_name == "fetch_data"
+    end
+  end
+
+  describe "[:scoria, :workflow, :stale] and [:scoria, :workflow, :expired] telemetry" do
+    test "staleness event emits [:parapet, :scoria, :metrics, :stale] and calls Evidence.create_action_item" do
+      metadata = %{
+        workflow_id: "wf_stale_123",
+        model: "gpt-4"
+      }
+
+      :telemetry.execute([:scoria, :workflow, :stale], %{scoria_workflow_stale_total: 1}, metadata)
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :stale], %{scoria_workflow_stale_total: 1}, received_meta}
+      assert received_meta.workflow_id == "wf_stale_123"
+
+      assert_receive {:dummy_repo_insert, changeset}
+      assert changeset.data.__struct__ == Parapet.Spine.ActionItem
+      assert Ecto.Changeset.get_field(changeset, :integration) == "scoria"
+      assert Ecto.Changeset.get_field(changeset, :external_id) == "wf_stale_123"
+      assert Ecto.Changeset.get_field(changeset, :title) =~ "Workflow wf_stale_123 is stale"
+    end
+
+    test "expiration event emits [:parapet, :scoria, :metrics, :expired]" do
+      metadata = %{
+        workflow_id: "wf_expired_123",
+        model: "gpt-4"
+      }
+
+      :telemetry.execute([:scoria, :workflow, :expired], %{scoria_workflow_expired_total: 1}, metadata)
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :expired], %{scoria_workflow_expired_total: 1}, received_meta}
+      assert received_meta.workflow_id == "wf_expired_123"
     end
   end
 end
