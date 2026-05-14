@@ -24,6 +24,16 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
     |> Igniter.Libs.Ecto.gen_migration(repo_module, "add_parapet_spine_tables",
       body: """
         def change do
+          create table(:parapet_action_items, primary_key: false) do
+            add :id, :binary_id, primary_key: true
+            add :title, :string, null: false
+            add :integration, :string, null: false
+            add :external_id, :string, null: false
+            add :state, :string, default: "open", null: false
+
+            timestamps()
+          end
+
           create table(:parapet_incidents, primary_key: false) do
             add :id, :binary_id, primary_key: true
             add :state, :string, default: "open", null: false
