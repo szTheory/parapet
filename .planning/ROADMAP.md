@@ -41,7 +41,9 @@
   1. System surfaces explicit markers for AI config changes (`model`, `scorer_version`) directly from SRE telemetry.
   2. Operator can view these changes as distinct annotations on Grafana dashboards to spot correlations with SLO burns.
   3. System exposes explicit failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) for Scoria MCP tools as SLIs, generating alerts prior to AI agent hallucination loops.
-**Plans**: TBD
+**Plans**: 2 plans
+- [x] 03-01-PLAN.md — Telemetry and Incident Backend Integration
+- [x] 03-02-PLAN.md — Grafana Postgres Annotations
 
 ### Phase 4: Workflow Approval Monitoring
 **Goal**: Operators can monitor stale Scoria Workflow approvals and deep-link into Scoria's evidence UI to prevent AI workflows from hanging indefinitely.
@@ -63,5 +65,5 @@
 |-------|----------------|--------|-----------|
 | 1. SRE Telemetry Translation | 2/2 | Complete | 2026-05-12 |
 | 2. Eval-Driven SLOs | 1/2 | In Progress | - |
-| 3. AI Deploy Correlation & MCP SLIs | 0/3 | Not started | - |
-| 4. Workflow Approval Monitoring | 0/3 | Not started | - |
+| 3. AI Deploy Correlation & MCP SLIs | 0/2 | Not started | - |
+| 4. Workflow Approval Monitoring | 0/3 | Not started | - | | - |
