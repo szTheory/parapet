@@ -1,69 +1,50 @@
-# Roadmap: Parapet v0.4 (Scoria AI Integration)
+# Roadmap: Parapet v0.5 (Proactive Resilience & Copilot Triage)
 
 ## Phases
 
-- [ ] **Phase 1: SRE Telemetry Translation** - Wire up consumption of `Scoria.SRE.Telemetry` into Parapet metrics and incidents.
-- [ ] **Phase 2: Eval-Driven SLOs** - Expand `Parapet.SLO` to natively support Scoria evaluation pass rates based on grounding scores.
-- [ ] **Phase 3: AI Deploy Correlation & MCP SLIs** - Add specific markers for AI config changes and track explicit MCP failure modes (`timeout`, `breaker_open`).
-- [x] **Phase 4: Workflow Approval Monitoring** - Monitor durable approval pauses and provide deep links from Parapet alerts to Scoria UI.
+- [ ] **Phase 1: Synthetic Probes** - Implement `Parapet.Probe` for active monitoring of critical flows in low-traffic environments.
+- [ ] **Phase 2: Deepened Journey Integrations** - Concrete SLIs for `Sigra` (auth) and `Accrue` (billing).
+- [ ] **Phase 3: Parapet MCP Server** - Expose Parapet incidents and runbooks as an MCP server for AI copilot investigation.
 
 ## Phase Details
 
-### Phase 1: SRE Telemetry Translation
-**Goal**: System safely consumes Scoria's `Scoria.SRE.Telemetry` layer to provide aggregated, low-cardinality Prometheus metrics and durable Ecto Incidents.
+### Phase 1: Synthetic Probes
+**Goal**: Operators can define periodic active checks to maintain SLO signal quality even when organic user traffic is too low for stable math.
 **Depends on**: Nothing
-**Requirements**: AI-TELEMETRY-01, AI-TELEMETRY-02, AI-TELEMETRY-03
+**Requirements**: PROBE-01, PROBE-02, PROBE-03
 **Success Criteria**:
-  1. `Scoria.SRE.Telemetry` events are successfully converted into target Prometheus metrics (`scoria_llm_token_count_total`, etc.).
-  2. Metrics are visible and charted in the generated Grafana dashboards.
-  3. Strict label policy is enforced, separating low-cardinality labels from high-cardinality references (like `trace_id`).
-**Plans**: 2 plans
-- [ ] 01-01-PLAN.md — Scoria Telemetry Adapter
-- [ ] 01-02-PLAN.md — Generator & Installer Integration
-
-### Phase 2: Eval-Driven SLOs
-**Goal**: Operators can define, monitor, and alert on system objectives derived from Scoria AI evaluation pass rates.
-**Depends on**: Phase 1
-**Requirements**: AI-SLO-01, AI-SLO-02
-**Success Criteria**:
-  1. Developer can configure an objective using the new `Parapet.SLO.ScoriaEval` module.
-  2. Evaluation failures correctly deduct from the configured error budget.
-  3. System triggers alerts when AI quality drops below the defined threshold (e.g., 99% pass rate over 7d).
-**Plans**: 2 plans
-- [x] 02-01-PLAN.md — Migrate Parapet.SLO to data-first Provider behaviour
-- [ ] 02-02-PLAN.md — Implement Parapet.SLO.ScoriaEval and Parapet.Metrics.Scoria telemetry
-
-### Phase 3: AI Deploy Correlation & MCP SLIs
-**Goal**: System correlates AI configuration changes with observability metrics and monitors the reliability of individual MCP tools.
-**Depends on**: Phase 1
-**Requirements**: AI-DEPLOY-01, AI-DEPLOY-02, AI-DEPLOY-03
-**Success Criteria**:
-  1. System surfaces explicit markers for AI config changes (`model`, `scorer_version`) directly from SRE telemetry.
-  2. Operator can view these changes as distinct annotations on Grafana dashboards to spot correlations with SLO burns.
-  3. System exposes explicit failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) for Scoria MCP tools as SLIs, generating alerts prior to AI agent hallucination loops.
-**Plans**: 2 plans
-- [x] 03-01-PLAN.md — Telemetry and Incident Backend Integration
-- [x] 03-02-PLAN.md — Grafana Postgres Annotations
-
-### Phase 4: Workflow Approval Monitoring
-**Goal**: Operators can monitor stale Scoria Workflow approvals and deep-link into Scoria's evidence UI to prevent AI workflows from hanging indefinitely.
-**Depends on**: Phase 1
-**Requirements**: AI-HITL-01, AI-HITL-02, AI-HITL-03
-**Success Criteria**:
-  1. System emits metrics tracking the duration of durable Scoria workflow approval pauses.
-  2. Operators receive alerts when approval requests go stale or expire.
-  3. Parapet's Operator UI deep-links to Scoria's native trace/approval UI rather than rebuilding approval management natively.
+  1. Developer can define a module using `Parapet.Probe`.
+  2. Probe runs on a schedule and emits pass/fail metrics.
+  3. Failure of a critical probe triggers the associated alert rules.
 **Plans**: 3 plans
-- [x] 04-01-PLAN.md — ActionItem Domain Model
-- [x] 04-02-PLAN.md — Scoria Telemetry Integration
-- [x] 04-03-PLAN.md — Operator UI Integration
-**UI hint**: yes
+- [ ] 01-01-PLAN.md — Implement Parapet.Probe macro and Metrics handler
+- [ ] 01-02-PLAN.md — Implement pluggable schedulers (Native and Oban)
+- [ ] 01-03-PLAN.md — Wire up initialization and update documentation
+
+### Phase 2: Deepened Journey Integrations
+**Goal**: Go beyond basic capability stubs by providing out-of-the-box, opinionated metrics translation for authentication (Sigra) and billing (Accrue).
+**Depends on**: Phase 1
+**Requirements**: JTBD-01, JTBD-02, JTBD-03
+**Success Criteria**:
+  1. `Parapet.Integrations.Sigra` correctly emits login/signup success rates.
+  2. `Parapet.Integrations.Accrue` correctly emits checkout success and webhook latency.
+  3. Operator UI surfaces these specific journeys explicitly.
+**Plans**: 0 plans
+
+### Phase 3: Parapet MCP Server
+**Goal**: Allow external AI agents (like Claude or custom copilots) to interrogate Parapet's SRE state to draft postmortems and investigate incidents safely.
+**Depends on**: Phase 1, Phase 2
+**Requirements**: MCP-01, MCP-02, MCP-03
+**Success Criteria**:
+  1. System exposes a standard MCP server protocol.
+  2. External agent can query `list_incidents`, `get_incident_timeline`, and `read_runbook`.
+  3. Access is strictly read-only, honoring the "AI as copilot, not unbounded actor" principle.
+**Plans**: 0 plans
 
 ## Progress
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. SRE Telemetry Translation | 2/2 | Complete | 2026-05-12 |
-| 2. Eval-Driven SLOs | 2/2 | Complete | 2026-05-13 |
-| 3. AI Deploy Correlation & MCP SLIs | 2/2 | Complete | 2026-05-14 |
-| 4. Workflow Approval Monitoring | 3/3 | Complete | 2026-05-14 |
+| 1. Synthetic Probes | 0/3 | Pending | |
+| 2. Deepened Journey Integrations | 0/0 | Pending | |
+| 3. Parapet MCP Server | 0/0 | Pending | |
