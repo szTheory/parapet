@@ -5,7 +5,7 @@
 - [ ] **Phase 1: SRE Telemetry Translation** - Wire up consumption of `Scoria.SRE.Telemetry` into Parapet metrics and incidents.
 - [ ] **Phase 2: Eval-Driven SLOs** - Expand `Parapet.SLO` to natively support Scoria evaluation pass rates based on grounding scores.
 - [ ] **Phase 3: AI Deploy Correlation & MCP SLIs** - Add specific markers for AI config changes and track explicit MCP failure modes (`timeout`, `breaker_open`).
-- [ ] **Phase 4: Workflow Approval Monitoring** - Monitor durable approval pauses and provide deep links from Parapet alerts to Scoria UI.
+- [x] **Phase 4: Workflow Approval Monitoring** - Monitor durable approval pauses and provide deep links from Parapet alerts to Scoria UI.
 
 ## Phase Details
 
@@ -53,10 +53,10 @@
   1. System emits metrics tracking the duration of durable Scoria workflow approval pauses.
   2. Operators receive alerts when approval requests go stale or expire.
   3. Parapet's Operator UI deep-links to Scoria's native trace/approval UI rather than rebuilding approval management natively.
-**Plans**:
-  1. Implement `Parapet.Integrations.Scoria` to consume `Scoria.SRE.Telemetry` and emit metrics and LoggerJSON Wide Events.
-  2. Create `mix parapet.gen.scoria` generator to install a standalone `scoria_dashboard.json`, Prometheus rules, and inject `Parapet.Integrations.Scoria.setup()` into the host's `ParapetInstrumenter`.
-  3. Update `mix parapet.install` to accept the `--with-scoria` flag by conditionally composing the new `parapet.gen.scoria` task.
+**Plans**: 3 plans
+- [x] 04-01-PLAN.md — ActionItem Domain Model
+- [x] 04-02-PLAN.md — Scoria Telemetry Integration
+- [x] 04-03-PLAN.md — Operator UI Integration
 **UI hint**: yes
 
 ## Progress
@@ -64,6 +64,6 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. SRE Telemetry Translation | 2/2 | Complete | 2026-05-12 |
-| 2. Eval-Driven SLOs | 1/2 | In Progress | - |
-| 3. AI Deploy Correlation & MCP SLIs | 0/2 | Not started | - |
-| 4. Workflow Approval Monitoring | 0/3 | Not started | - | | - |
+| 2. Eval-Driven SLOs | 2/2 | Complete | 2026-05-13 |
+| 3. AI Deploy Correlation & MCP SLIs | 2/2 | Complete | 2026-05-14 |
+| 4. Workflow Approval Monitoring | 3/3 | Complete | 2026-05-14 |

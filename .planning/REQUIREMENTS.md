@@ -36,10 +36,10 @@
 | AI-TELEMETRY-02 | Phase 1 | Complete |
 | AI-TELEMETRY-03 | Phase 1 | Complete |
 | AI-SLO-01 | Phase 2 | Complete |
-| AI-SLO-02 | Phase 2 | Pending |
-| AI-DEPLOY-01 | Phase 3 | Pending |
-| AI-DEPLOY-02 | Phase 3 | Pending |
-| AI-DEPLOY-03 | Phase 3 | Pending |
-| AI-HITL-01 | Phase 4 | Pending |
-| AI-HITL-02 | Phase 4 | Pending |
-| AI-HITL-03 | Phase 4 | Pending |
+| AI-SLO-02 | Phase 2 | Complete |
+| AI-DEPLOY-01 | Phase 3 | Complete |
+| AI-DEPLOY-02 | Phase 3 | Complete |
+| AI-DEPLOY-03 | Phase 3 | Complete |
+| AI-HITL-01 | Phase 4 | Complete |
+| AI-HITL-02 | Phase 4 | Complete |
+| AI-HITL-03 | Phase 4 | Complete |

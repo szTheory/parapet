@@ -5,6 +5,13 @@ defmodule Mix.Tasks.Parapet.Gen.PrometheusTest do
   alias Mix.Tasks.Parapet.Gen.Prometheus
 
   describe "mix parapet.gen.prometheus" do
+    setup do
+      # Register a default SLO for the generator to pick up
+      Parapet.SLO.HTTP.register()
+      on_exit(fn -> Application.put_env(:parapet, :slos, []) end)
+      :ok
+    end
+
     test "generates a valid prometheus rules file" do
       igniter =
         test_project(app_name: :test)

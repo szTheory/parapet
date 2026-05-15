@@ -56,14 +56,18 @@ None. All v0.3 requirements defined and satisfied.
 
 ## v0.4 Scoria AI Integration
 
-**Date:** 2026-05-12
+**Date:** 2026-05-15
 **Stats:**
 - Phases: 1-4
-- Plans: TBD
-- Total LOC: TBD
+- Plans: 9
+- Total LOC: 7847 (Elixir/EEx)
 
 ### Accomplishments
-(Pending)
+1. Implemented telemetry translation consuming `Scoria.SRE.Telemetry` events and producing Parapet Prometheus metrics and durable Ecto Incidents.
+2. Built `Parapet.SLO.ScoriaEval` to define and alert on Eval-Driven SLOs based on Scoria deterministic evaluation scores.
+3. Added native tracking of AI Config Changes (`scorer_version`, `baseline_version`, `model`) and visualization in Grafana for SLO error budget correlation.
+4. Monitored Scoria MCP tools failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) as explicit SLIs.
+5. Monitored Scoria workflow approval pauses as durable HITL states, triggering alerts on stale requests, and extending Operator UI with deep-links to Scoria's durable evidence.
 
 ### Known Gaps
-(Pending)
+None. All 11/11 requirements defined for v0.4 were satisfied and verified.
