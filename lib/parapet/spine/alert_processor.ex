@@ -64,6 +64,7 @@ defmodule Parapet.Spine.AlertProcessor do
       {:ok, inserted_incident} ->
         incident =
           if inserted_incident.id do
+            correlate_recent_events(inserted_incident)
             inserted_incident
           else
             Evidence.repo().get_by!(Incident, correlation_key: correlation_key)
@@ -75,6 +76,25 @@ defmodule Parapet.Spine.AlertProcessor do
       error ->
         error
     end
+  end
+
+  defp correlate_recent_events(incident) do
+    time_threshold = DateTime.add(DateTime.utc_now(), -60, :minute)
+    
+    query = 
+      from e in Parapet.Spine.SystemEvent,
+        where: e.inserted_at >= ^time_threshold
+        
+    events = Evidence.repo().all(query)
+    
+    Enum.each(events, fn event ->
+      changeset = TimelineEntry.changeset(%TimelineEntry{}, %{
+        incident_id: incident.id,
+        type: event.type,
+        payload: event.payload
+      })
+      Evidence.repo().insert(changeset)
+    end)
   end
 
   defp attach_runbook_data(changeset, alertname) when is_binary(alertname) do

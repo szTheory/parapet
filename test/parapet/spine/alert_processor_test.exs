@@ -7,17 +7,31 @@ defmodule Parapet.Spine.AlertProcessorTest do
       # For tests, we just send a message to the test process
       # so we can assert it was called.
       send(self(), {:insert, changeset, opts})
-      {:ok, Ecto.Changeset.apply_changes(changeset)}
+      
+      struct = Ecto.Changeset.apply_changes(changeset)
+      
+      struct =
+        if Process.get(:mock_insert_id) && struct.__struct__ == Parapet.Spine.Incident do
+          %{struct | id: Process.get(:mock_insert_id)}
+        else
+          struct
+        end
+
+      {:ok, struct}
     end
 
     def get_by!(Parapet.Spine.Incident, correlation_key: key) do
       %Parapet.Spine.Incident{id: "inc-mocked", state: "open", correlation_key: key}
     end
 
-    def all(_query) do
+    def all(query) do
       # We just mock the result based on the test setup
       # If the test needs an incident, it will put it in the process dictionary
-      Process.get(:mock_incident, [])
+      if is_map(query) && Map.get(query, :from) && elem(query.from.source, 1) == Parapet.Spine.SystemEvent do
+        Process.get(:mock_system_events, [])
+      else
+        Process.get(:mock_incident, [])
+      end
     end
 
     def transaction(multi) do
@@ -134,6 +148,76 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert_receive {:broadcast, _}, 1000
     end
 
+    test "Test 2.0.1: Creating a new Incident correlates recent SystemEvents to TimelineEntries" do
+      # Simulate a NEW incident by setting an ID in the insert struct
+      Process.put(:mock_insert_id, "new-incident-id")
+      
+      Process.put(:mock_system_events, [
+        %Parapet.Spine.SystemEvent{
+          id: "evt-1",
+          type: "rulestead_flag_change",
+          payload: %{"flag" => "feature_x"}
+        }
+      ])
+
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "labels" => %{"alertname" => "HighCPU"}
+          }
+        ]
+      }
+
+      assert :ok = AlertProcessor.process_batch(payload)
+
+      # We expect two inserts: one for Incident, one for TimelineEntry
+      assert_received {:insert, incident_cs, opts}
+      assert incident_cs.data.__struct__ == Parapet.Spine.Incident
+      assert opts[:on_conflict] == :nothing
+      
+      assert_received {:insert, timeline_cs, _opts}
+      assert timeline_cs.data.__struct__ == Parapet.Spine.TimelineEntry
+      assert Ecto.Changeset.get_field(timeline_cs, :incident_id) == "new-incident-id"
+      assert Ecto.Changeset.get_field(timeline_cs, :type) == "rulestead_flag_change"
+      assert Ecto.Changeset.get_field(timeline_cs, :payload) == %{"flag" => "feature_x"}
+      
+      assert_receive {:broadcast, _}, 1000
+    end
+
+    test "Test 2.0.2: An existing Incident does NOT correlate SystemEvents again" do
+      # Simulate an EXISTING incident by NOT setting an ID in the insert struct
+      Process.put(:mock_insert_id, nil)
+      
+      Process.put(:mock_system_events, [
+        %Parapet.Spine.SystemEvent{
+          id: "evt-1",
+          type: "rulestead_flag_change",
+          payload: %{"flag" => "feature_x"}
+        }
+      ])
+
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "labels" => %{"alertname" => "HighCPU"}
+          }
+        ]
+      }
+
+      assert :ok = AlertProcessor.process_batch(payload)
+
+      assert_received {:insert, incident_cs, _opts}
+      assert incident_cs.data.__struct__ == Parapet.Spine.Incident
+      
+      # We should NOT receive a second insert for the timeline entry
+      refute_received {:insert, %Ecto.Changeset{data: %Parapet.Spine.TimelineEntry{}}, _opts}
+      
+      assert_receive {:broadcast, _}, 1000
+    end
+
+
     test "Test 2.1: A firing alert that matches an SLO runbook attaches the runbook schema data" do
       defmodule MockRunbook do
         def __runbook_schema__() do
@@ -141,12 +225,15 @@ defmodule Parapet.Spine.AlertProcessorTest do
         end
       end
 
-      Parapet.SLO.define(:RunbookAlert,
-        objective: 99.9,
-        good_events: "up",
-        total_events: "all",
-        runbook: MockRunbook
-      )
+      apply(Parapet.SLO, :define, [
+        :RunbookAlert,
+        [
+          objective: 99.9,
+          good_events: "up",
+          total_events: "all",
+          runbook: MockRunbook
+        ]
+      ])
 
       payload = %{
         "alerts" => [
