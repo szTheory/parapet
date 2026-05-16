@@ -8,7 +8,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
     incidents = <%= inspect(@repo_module) %>.all(Parapet.Operator.queue_query())
     action_items = <%= inspect(@repo_module) %>.all(Parapet.Operator.action_items_query())
     
-    {:ok, assign(socket, incidents: incidents, action_items: action_items, selected_incident: nil)}
+    journeys = [
+      %{name: "Login", status: :healthy},
+      %{name: "Signup", status: :healthy},
+      %{name: "Checkout", status: :degraded},
+      %{name: "Webhooks", status: :healthy}
+    ]
+    
+    {:ok, assign(socket, incidents: incidents, action_items: action_items, journeys: journeys, selected_incident: nil)}
   end
 
   def handle_params(params, _uri, socket) do
@@ -68,6 +75,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
     <div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
       <!-- Pane 1: Queue -->
       <div class={"w-full md:w-80 border-r border-gray-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+          <.critical_journeys journeys={@journeys} />
+        </div>
         <div class="p-4 border-b border-gray-200">
           <h2 class="text-lg font-semibold">Incident Queue</h2>
         </div>
@@ -95,22 +105,22 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
 
         <!-- Pane 2: Detail / Timeline -->
         <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-gray-200">
-          <%= if @selected_incident do %>
+          <%%= if @selected_incident do %>
             <div class="p-6 border-b border-gray-200">
               <.incident_summary detail={@selected_incident} />
             </div>
             <div class="flex-1 overflow-y-auto p-6">
               <.incident_timeline detail={@selected_incident} />
             </div>
-          <% else %>
+          <%% else %>
             <div class="flex-1 flex items-center justify-center text-gray-500">
               Select an incident to view details
             </div>
-          <% end %>
+          <%% end %>
         </div>
 
         <!-- Pane 3: Action Rail -->
-        <%= if @selected_incident do %>
+        <%%= if @selected_incident do %>
           <div class="w-full md:w-80 bg-gray-50 flex flex-col flex-shrink-0">
             <div class="p-4 border-b border-gray-200 bg-white md:bg-transparent">
               <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</h3>
@@ -119,7 +129,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
               <.action_rail detail={@selected_incident} />
             </div>
           </div>
-        <% end %>
+        <%% end %>
       </div>
     </div>
     """
