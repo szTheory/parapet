@@ -83,6 +83,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       </div>
       
       <div class="p-4 bg-gray-50 pb-24">
+        <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
+
         <%%= if @incident.incident.state == "resolved" && is_map(@incident.incident.runbook_data) && Map.get(@incident.incident.runbook_data, "retrospective") do %>
           <div class="mb-6 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
             <div class="flex justify-between items-center mb-4">

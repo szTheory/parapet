@@ -93,20 +93,34 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     <div class="flow-root">
       <ul role="list" class="-mb-8">
         <%%= for entry <- @detail.entries do %>
+          <%% is_flag_change = entry.type == "rulestead_flag_change" %>
           <li>
             <div class="relative pb-8">
               <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
               <div class="relative flex space-x-3">
                 <div>
-                  <span class="h-8 w-8 rounded-full bg-gray-400 flex items-center justify-center ring-8 ring-white">
+                  <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white", is_flag_change && "bg-purple-500 ring-purple-200" || "bg-gray-400"]}>
+                    <%%= if is_flag_change do %>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                      </svg>
+                    <%% end %>
                   </span>
                 </div>
                 <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                   <div>
-                    <p class="text-sm text-gray-500">
-                      <span class="font-medium text-gray-900"><%%= entry.type %></span>
-                      <%%= inspect(entry.payload) %>
-                    </p>
+                    <%%= if is_flag_change do %>
+                      <p class="text-sm text-gray-500">
+                        <span class="font-medium text-gray-900"><%%= Map.get(entry.payload, "actor") || Map.get(entry.payload, :actor) || "System" %></span> changed flag
+                        <span class="font-mono text-xs bg-gray-100 px-1 rounded border border-gray-200"><%%= Map.get(entry.payload, "flag") || Map.get(entry.payload, :flag) %></span>
+                        in scope <span class="font-medium text-gray-900"><%%= inspect(Map.get(entry.payload, "scope") || Map.get(entry.payload, :scope)) %></span>
+                      </p>
+                    <%% else %>
+                      <p class="text-sm text-gray-500">
+                        <span class="font-medium text-gray-900"><%%= entry.type %></span>
+                        <%%= inspect(entry.payload) %>
+                      </p>
+                    <%% end %>
                   </div>
                   <div class="whitespace-nowrap text-right text-sm text-gray-500">
                     <time datetime={entry.inserted_at}><%%= entry.inserted_at %></time>
@@ -118,6 +132,49 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <%% end %>
       </ul>
     </div>
+    """
+  end
+
+  attr :entries, :list, required: true
+  def suspect_changes_card(assigns) do
+    ~H"""
+    <%%= if not Enum.empty?(@entries) do %>
+      <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Recent System Changes (&plusmn; 60 mins)</h3>
+        <div class="flex flex-col gap-3">
+          <%%= for entry <- @entries do %>
+            <%% actor = Map.get(entry.payload, "actor") || Map.get(entry.payload, :actor) || "System" %>
+            <%% flag = Map.get(entry.payload, "flag") || Map.get(entry.payload, :flag) %>
+            <%% scope = Map.get(entry.payload, "scope") || Map.get(entry.payload, :scope) %>
+            <div class="flex justify-between items-start bg-white border border-blue-100 rounded p-3 shadow-sm">
+              <div class="flex items-start gap-3">
+                <div class="mt-0.5">
+                  <span class="h-6 w-6 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                    </svg>
+                  </span>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-900">
+                    Flag <span class="font-mono text-xs bg-gray-100 px-1 rounded border border-gray-200"><%%= flag %></span> updated
+                  </p>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    <%%= actor %> published ruleset
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col items-end gap-1">
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                  <%%= inspect(scope) %>
+                </span>
+                <time datetime={entry.inserted_at} class="text-xs text-gray-500"><%%= entry.inserted_at %></time>
+              </div>
+            </div>
+          <%% end %>
+        </div>
+      </div>
+    <%% end %>
     """
   end
 
