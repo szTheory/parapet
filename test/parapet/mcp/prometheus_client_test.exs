@@ -32,8 +32,9 @@ defmodule Parapet.MCP.PrometheusClientTest do
         assert conn.request_path == "/api/v1/query"
         query = conn.query_params["query"]
         assert query =~ "my_slo"
-        assert query =~ "rate(" # Ensure it's doing some rate query
-        
+        # Ensure it's doing some rate query
+        assert query =~ "rate("
+
         conn
         |> Plug.Conn.put_resp_content_type("application/json")
         |> Plug.Conn.send_resp(
@@ -42,7 +43,9 @@ defmodule Parapet.MCP.PrometheusClientTest do
         )
       end
 
-      assert {:ok, result} = PrometheusClient.get_slo_burn_rate("my_slo", req_options: [plug: plug])
+      assert {:ok, result} =
+               PrometheusClient.get_slo_burn_rate("my_slo", req_options: [plug: plug])
+
       assert result["status"] == "success"
       assert result["data"]["resultType"] == "vector"
     end
