@@ -5,6 +5,15 @@ defmodule Parapet.Plug.MCPTest do
 
   alias Parapet.Plug.MCP
 
+  defmodule DummyRepo do
+    def all(_query), do: []
+  end
+
+  setup do
+    Application.put_env(:parapet, :repo, DummyRepo)
+    :ok
+  end
+
   @opts MCP.init([])
 
   test "rejects non-POST requests with 405 Method Not Allowed" do
