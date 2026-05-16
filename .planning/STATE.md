@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-05-12)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Executing v0.4 milestone (Scoria AI Integration).
+**Current focus:** Executing v0.5 milestone (Proactive Resilience & Copilot Triage).
 
 ## Current Position
 
-Phase: Complete
-Plan: Complete
-Status: Milestone Completed
-Last activity: Completed v0.4 milestone (Scoria AI Integration) and updated MILESTONES.md.
+Phase: 1
+Plan: .planning/phases/1/PLAN.md
+Status: Planned
+Last activity: Planned Phase 1 (Synthetic Probes).
 
-Progress: [==========] 100%
+Progress: [..........] 0%
 
 ## Accumulated Context
 

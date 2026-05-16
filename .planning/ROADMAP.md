@@ -29,7 +29,10 @@
   1. `Parapet.Integrations.Sigra` correctly emits login/signup success rates.
   2. `Parapet.Integrations.Accrue` correctly emits checkout success and webhook latency.
   3. Operator UI surfaces these specific journeys explicitly.
-**Plans**: 0 plans
+**Plans**: 3 plans
+- [ ] 02-01-PLAN.md — Implement concrete SLIs for Sigra authentication journeys
+- [ ] 02-02-PLAN.md — Implement concrete SLIs for Accrue billing journeys
+- [ ] 02-03-PLAN.md — Surface Critical Journeys explicitly in the Operator UI
 
 ### Phase 3: Parapet MCP Server
 **Goal**: Allow external AI agents (like Claude or custom copilots) to interrogate Parapet's SRE state to draft postmortems and investigate incidents safely.
@@ -46,5 +49,5 @@
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Synthetic Probes | 0/3 | Pending | |
-| 2. Deepened Journey Integrations | 0/0 | Pending | |
+| 2. Deepened Journey Integrations | 0/3 | Pending | |
 | 3. Parapet MCP Server | 0/0 | Pending | |

@@ -1,59 +1,39 @@
 ---
-phase: "02"
-plan: "01"
-subsystem: "SLO"
+phase: 2
+plan: 01
+subsystem: metrics
 tags:
-  - refactor
-  - providers
-  - prometheus
-dependency_graph:
-  requires:
-    - none
-  provides:
-    - Parapet.SLO.Provider
-    - Parapet.SLO.Resolvable
-  affects:
-    - Mix.Tasks.Parapet.Gen.Prometheus
-tech_stack:
+  - telemetry
+  - sigra
+  - authentication
+requires: []
+provides:
+  - sigra telemetry translation
+affects:
+  - lib/parapet/integrations/sigra.ex
+tech-stack:
   added:
-    - Behaviour
-    - Protocol
+    - Telemetry.Metrics
   patterns:
-    - Data-first registry
-key_files:
+    - telemetry translation
+key-files:
   created:
-    - lib/parapet/slo/provider.ex
-    - lib/parapet/slo/resolvable.ex
-    - test/parapet/slo/resolvable_test.exs
+    - lib/parapet/metrics/sigra.ex
   modified:
-    - lib/parapet/slo.ex
-    - lib/mix/tasks/parapet.gen.prometheus.ex
-    - test/parapet/slo_test.exs
+    - lib/parapet/integrations/sigra.ex
+decisions:
+  - Translate Sigra auth telemetry to Parapet journey metrics.
 metrics:
-  duration: 5
-  completed_date: "2026-05-13"
+  duration: 2m
+  completed_date: 2026-05-14
 ---
 
-# Phase 02 Plan 01: Data-First SLO Providers Summary
+# Phase 2 Plan 01: Sigra Metrics Translation Summary
 
-Migrated the Parapet SLO architecture to a declarative `Provider` behaviour, eliminating reliance on runtime mutation for SLO registration.
-
-## Key Changes
-- Created `Parapet.SLO.Provider` behaviour with `slos/0` callback.
-- Created `Parapet.SLO.Resolvable` protocol to map custom provider structs to canonical `Parapet.SLO.t()`.
-- Refactored `Parapet.SLO.all/0` to dynamically merge configured providers with legacy environment variables.
-- Removed hardcoded registration calls from `mix parapet.gen.prometheus` task, making it reliant strictly on the updated registry.
-- Deprecated `Parapet.SLO.define/2`.
+Translate Sigra authentication events into concrete SLO-backed metrics, specifically targeting login and signup success rates.
 
 ## Deviations from Plan
+
 None - plan executed exactly as written.
 
-## Known Stubs
-None.
-
 ## Self-Check: PASSED
-FOUND: lib/parapet/slo/provider.ex
-FOUND: lib/parapet/slo/resolvable.ex
-FOUND: aabe465
-FOUND: a1f8e45
-FOUND: 3fd42de
