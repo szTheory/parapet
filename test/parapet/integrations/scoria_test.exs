@@ -282,7 +282,7 @@ defmodule Parapet.Integrations.ScoriaTest do
       :telemetry.execute([:scoria, :workflow, :resumed], %{scoria_workflow_resumed_total: 1}, metadata)
 
       # It should now resolve the action item
-      assert_receive {:dummy_repo_update_all, query, updates}
+      assert_receive {:dummy_repo_update_all, _query, updates}
       
       # The update should set state: "resolved"
       assert updates == [set: [state: "resolved"]]

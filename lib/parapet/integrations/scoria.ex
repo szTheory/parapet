@@ -170,21 +170,21 @@ defmodule Parapet.Integrations.Scoria do
     :ok
   end
 
+  # Catch-all
+  defp process_event(_event, _measurements, _metadata), do: :ok
+
   @doc """
   Checks the external Scoria workflow state and conditionally resolves the action item
   if the workflow is no longer paused.
   """
   def check_status(workflow_id) do
     if Code.ensure_loaded?(Scoria.Workflow) do
-      state = Scoria.Workflow.get_state(workflow_id)
+      state = apply(Scoria.Workflow, :get_state, [workflow_id])
       if state != :paused do
         Parapet.Evidence.resolve_action_item(integration: "scoria", external_id: workflow_id)
       end
     end
   end
-
-  # Catch-all
-  defp process_event(_event, _measurements, _metadata), do: :ok
 
   defp map_mcp_failure(%{reason: :timeout}), do: "timeout"
   defp map_mcp_failure(%{reason: :breaker_open}), do: "breaker_open"
