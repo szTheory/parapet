@@ -8,6 +8,7 @@ defmodule Parapet.Spine.IncidentTest do
       assert %Incident{}.state == "open"
       assert Map.has_key?(%Incident{}, :title)
       assert Map.has_key?(%Incident{}, :description)
+      assert Map.has_key?(%Incident{}, :trace_id)
     end
   end
 
@@ -27,6 +28,12 @@ defmodule Parapet.Spine.IncidentTest do
         changeset = Incident.changeset(%Incident{}, %{title: "Test", state: state})
         assert changeset.valid?
       end
+    end
+
+    test "casts trace_id" do
+      changeset = Incident.changeset(%Incident{}, %{title: "Test", trace_id: "trace-123"})
+      assert changeset.valid?
+      assert Ecto.Changeset.get_change(changeset, :trace_id) == "trace-123"
     end
   end
 
