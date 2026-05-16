@@ -34,8 +34,9 @@ defmodule Parapet.MCP.PrometheusClientTest do
         assert query =~ "my_slo"
         assert query =~ "rate(" # Ensure it's doing some rate query
         
-        Plug.Conn.send_resp(
-          conn,
+        conn
+        |> Plug.Conn.put_resp_content_type("application/json")
+        |> Plug.Conn.send_resp(
           200,
           ~s({"status":"success","data":{"resultType":"vector","result":[{"metric":{},"value":[1715694000,"0.1"]}]}})
         )
