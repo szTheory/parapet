@@ -1,0 +1,39 @@
+defmodule Parapet.Metrics.ExemplarTelemetry do
+  @moduledoc """
+  Attaches to Telemetry events to capture trace_ids and store them as exemplars.
+  """
+
+  alias Parapet.Metrics.ExemplarStore
+
+  def attach do
+    events = [
+      [:parapet, :http, :request],
+      [:parapet, :oban, :job]
+    ]
+
+    :telemetry.attach_many(
+      "parapet-exemplar-telemetry",
+      events,
+      &__MODULE__.handle_event/4,
+      nil
+    )
+  end
+
+  def handle_event([:parapet, :http, :request], _measurements, metadata, _config) do
+    case Map.get(metadata, :trace_id) do
+      nil -> :ok
+      trace_id when is_binary(trace_id) ->
+        tags = Map.take(metadata, [:route, :method, :status_class])
+        ExemplarStore.record_trace("parapet.http.request.duration_ms", tags, trace_id)
+    end
+  end
+
+  def handle_event([:parapet, :oban, :job], _measurements, metadata, _config) do
+    case Map.get(metadata, :trace_id) do
+      nil -> :ok
+      trace_id when is_binary(trace_id) ->
+        tags = Map.take(metadata, [:worker, :queue, :state])
+        ExemplarStore.record_trace("parapet.oban.job.duration_ms", tags, trace_id)
+    end
+  end
+end
