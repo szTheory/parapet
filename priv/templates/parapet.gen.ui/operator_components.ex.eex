@@ -64,12 +64,20 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <div class="border border-gray-200 rounded-md p-4">
           <h4 class="text-sm font-medium text-gray-700 mb-2">Observability</h4>
           <div class="flex flex-col gap-2">
+            <%%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
+              <%% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
+              <%% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
+              <a href={url} class="text-sm text-purple-600 hover:underline flex items-center gap-1" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <span>Trace: <%%= trace_id %></span> &nearr;
+              </a>
+            <%% end %>
             <%%= for link <- @detail.external_links do %>
               <a href={link} class="text-sm text-blue-600 hover:underline flex items-center gap-1" target="_blank">
                 <span><%%= link %></span> &nearr;
               </a>
             <%% end %>
-            <%%= if Enum.empty?(@detail.external_links) do %>
+            <%%= if Enum.empty?(@detail.external_links) && is_nil(Map.get(@detail.incident, :trace_id)) do %>
               <span class="text-sm text-gray-500">No external links attached.</span>
             <%% end %>
           </div>
