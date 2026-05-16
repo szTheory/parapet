@@ -48,20 +48,29 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ System allows operators to explicitly acknowledge incidents via the Operator UI, tracking the action securely — v0.3
 - ✓ System automatically generates a Markdown retrospective for resolved incidents based on the evidence timeline — v0.3
 - ✓ System achieves a 100% green test suite with zero deferred testing blockers for v0.3 — v0.3
+- ✓ System consumes Scoria's `Scoria.SRE.Telemetry` events and translates them into Parapet Prometheus metrics and durable Ecto Incidents — v0.4
+- ✓ System provides scoria_llm_token_count_total, scoria_llm_cost_usd, and scoria_llm_time_to_first_token_ms in Grafana out-of-the-box using the SRE telemetry layer — v0.4
+- ✓ System enforces a strict label policy that filters high-cardinality refs (like `trace_id`) from metrics labels, strictly splitting labels and refs — v0.4
+- ✓ System expands Parapet.SLO to include Parapet.SLO.ScoriaEval for defining objectives based on Scoria deterministic evaluation scores — v0.4
+- ✓ System tracks and alerts on Eval-Driven SLOs — v0.4
+- ✓ System surfaces AI Config Changes (`scorer_version`, `baseline_version`, `model`) natively from SRE telemetry — v0.4
+- ✓ System visualizes AI Config Changes in Grafana to correlate with SLO error budgets — v0.4
+- ✓ System tracks explicit failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) for Scoria MCP tools as SLIs — v0.4
+- ✓ System monitors Scoria workflow approval pauses as durable HITL states, not generic queues — v0.4
+- ✓ System can trigger alerts on stale or expiring workflow approval requests — v0.4
+- ✓ System extends the LiveView Operator UI to deep-link into Scoria's durable evidence and approval UI — v0.4
 
 ### Active
 
-- System consumes Scoria's `Scoria.SRE.Telemetry` events and translates them into Parapet Prometheus metrics and durable Ecto Incidents — v0.4
-- System provides scoria_llm_token_count_total, scoria_llm_cost_usd, and scoria_llm_time_to_first_token_ms in Grafana out-of-the-box using the SRE telemetry layer — v0.4
-- System enforces a strict label policy that filters high-cardinality refs (like `trace_id`) from metrics labels, strictly splitting labels and refs — v0.4
-- System expands Parapet.SLO to include Parapet.SLO.ScoriaEval for defining objectives based on Scoria deterministic evaluation scores — v0.4
-- System tracks and alerts on Eval-Driven SLOs — v0.4
-- System surfaces AI Config Changes (`scorer_version`, `baseline_version`, `model`) natively from SRE telemetry — v0.4
-- System visualizes AI Config Changes in Grafana to correlate with SLO error budgets — v0.4
-- System tracks explicit failure modes (`timeout`, `execution_failed`, `breaker_open`, `access_denied`) for Scoria MCP tools as SLIs — v0.4
-- System monitors Scoria workflow approval pauses as durable HITL states, not generic queues — v0.4
-- System can trigger alerts on stale or expiring workflow approval requests — v0.4
-- System extends the LiveView Operator UI to deep-link into Scoria's durable evidence and approval UI — v0.4
+- [ ] System provides a `Parapet.Probe` behavior for periodic synthetic checks — v0.5
+- [ ] System executes probes independently of organic web traffic — v0.5
+- [ ] System emits metrics for probe outcomes for stable low-traffic SLOs — v0.5
+- [ ] System expands Sigra integration for login/signup SLIs — v0.5
+- [ ] System expands Accrue integration for billing/webhook SLIs — v0.5
+- [ ] System correlates Auth/Billing regressions to deploy changes — v0.5
+- [ ] System provides an MCP server interface for SRE data — v0.5
+- [ ] External agents can query incidents, timelines, and runbooks via MCP — v0.5
+- [ ] External agents can read SLO burn rates for autonomous triage — v0.5
 
 ### Out of Scope
 
@@ -77,6 +86,8 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 Shipped v0.2 with a focus on Durable Evidence, LiveView Operator UI, and ecosystem integrations.
 The implementation separated ephemeral telemetry from durable low-volume Ecto schema data for incident timelines. A Phoenix LiveView SRE dashboard was generated to provide an operator workbench.
+Shipped v0.3 extending capabilities with Alert Routing, Runbooks, and Notifications via Slack/Teams.
+Shipped v0.4 adding complete AI observability integration for Scoria (Eval-Driven SLOs, deploy correlation, HITL workflow monitoring).
 
 ## Constraints
 
@@ -99,6 +110,14 @@ The implementation separated ephemeral telemetry from durable low-volume Ecto sc
 | AI/MCP tool calls must be audited | Requires `Parapet.Ecto.ToolAudit` for app mutations | ✓ Good |
 | Static analysis of doctor checks | Prevents global compilation side-effects by not dynamically injecting router modules in tests | ✓ Good |
 | Automated structural UI layout verification | Verifies responsive tailwind layout logic via static file testing instead of full browser E2E to keep dependency footprint light and fast | ✓ Good |
+| Migrate to `Provider` behaviour for SLO Registry | Guarantees compile-time validation and GitOps auditability | ✓ Good |
+| Strict cardinality control on Scoria metrics | Aggressively strips high-cardinality data to prevent TSDB bloat | ✓ Good |
+| Generate multi-burn-rate PromQL alerts | Adopts Google SRE methodology to prevent false positives on low-traffic | ✓ Good |
+| Write AI Config Changes to Ecto as `Incident` | Enables direct querying without round-trips to external TSDB | ✓ Good |
+| Map MCP tool failure modes to bounded atoms | Protects Ecto from high-volume telemetry | ✓ Good |
+| Parapet observes Scoria native state | Avoids duplicating state or polling | ✓ Good |
+| Dual-Track Telemetry for workflow pauses | Prometheus for systemic alerting, Ecto for 100% reliable deep links | ✓ Good |
+| Configurable MFA for UI URL resolving | Decouples Parapet from Scoria's routing layer | ✓ Good |
 
 ---
-*Last updated: 2026-05-11 after v0.2 milestone*
+*Last updated: 2026-05-16 after v0.4 milestone*

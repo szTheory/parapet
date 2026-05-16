@@ -6,6 +6,51 @@
 |-----------|---------|------|-----|----------|
 | v0.1 | 4 / 15 | 2 | 1992 | 15 plans / 2 days |
 | v0.2 | 3 / 11 | 1 | 3164 | 11 plans / 1 day |
+| v0.3 | 4 / 12 | 1 | 6667 | 12 plans / 1 day |
+| v0.4 | 4 / 9 | 3 | 7847 | 9 plans / 3 days |
+
+## Milestone: v0.4 — Scoria AI Integration
+
+**Shipped:** 2026-05-15
+**Phases:** 4 | **Plans:** 9
+
+### What Was Built
+Implemented AI telemetry translation, eval-driven SLOs, deploy correlation for AI configs, and workflow approval pauses as durable HITL states.
+
+### What Worked
+- **Strict Cardinality Control:** The `Parapet.Metrics.Scoria` translation layer successfully protected the TSDB from high-cardinality AI refs.
+- **Data-First Providers:** Moving the SLO registry to a `Provider` behaviour enabled compile-time validation.
+
+### What Was Inefficient
+- Minimal friction encountered; test-driven approach ensured smooth implementation.
+
+### Patterns Established
+- **Dual-Track Telemetry:** Using Prometheus for systemic alerting and Ecto for 100% reliable deep links for workflow pauses.
+- **Telemetry for UX, Adapter for Truth:** Using adapter polling as a cache-invalidation hint to prevent state drift.
+
+### Key Lessons
+- Alerting on low-volume AI endpoints requires multi-burn-rate PromQL to avoid false positives.
+- Decoupling UI URLs from the routing layer via configurable MFA keeps the library pure.
+
+## Milestone: v0.3 — Runbooks & Alert Routing
+
+**Shipped:** 2026-05-12
+**Phases:** 4 | **Plans:** 12
+
+### What Was Built
+Implemented webhook receiver for Prometheus Alertmanager, structured Runbook DSL, and modular Notifier system for Slack/Teams.
+
+### What Worked
+- Leveraging existing Ecto `Incident` schema for Alertmanager correlation simplified the state machine.
+
+### What Was Inefficient
+- Parsing external JSON payloads reliably required strict schema validation.
+
+### Patterns Established
+- One-click mitigations securely audited via the `ToolAudit` Ecto schema.
+
+### Key Lessons
+- Operator UI requires interactive state to display attached runbooks efficiently.
 
 ## Milestone: v0.2 — Durable Spine and Operator UI
 

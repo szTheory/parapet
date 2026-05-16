@@ -1,171 +1,130 @@
-# Phase 1: SRE Telemetry Translation - Research
-
-**Researched:** 2026-05-12
-**Domain:** Elixir Telemetry, Prometheus Metrics, Code Scaffolding via Igniter
-**Confidence:** HIGH
-
-## Summary
-
-This phase integrates Parapet with the Scoria AI library by safely parsing `Scoria.SRE.Telemetry` events. We will implement `Parapet.Integrations.Scoria` to serve as the telemetry consumption seam, translating low-cardinality metadata into Prometheus metrics and routing severe AI failures to durable Ecto Incidents via `Parapet.Evidence`. We will also implement a dedicated `mix parapet.gen.scoria` generator that scaffolds a standalone Grafana dashboard and conditionally composes into `mix parapet.install`.
-
-**Primary recommendation:** Use `Parapet.Integrations.Scoria` to translate events, filter out high-cardinality refs (like `trace_id`), and implement an Igniter-based `mix parapet.gen.scoria` task that `parapet.install` can compose with `--with-scoria`.
-
 <phase_requirements>
 ## Phase Requirements
 
 | ID | Description | Research Support |
 |----|-------------|------------------|
-| AI-TELEMETRY-01 | System consumes Scoria's `Scoria.SRE.Telemetry` events and translates them into Parapet Prometheus metrics and durable Ecto Incidents. | Handled via `Parapet.Integrations.Scoria` and `:telemetry.attach/4`, delegating to `Parapet.Evidence.create_incident/1`. |
-| AI-TELEMETRY-02 | System provides `scoria_llm_token_count_total`, `scoria_llm_cost_usd`, and `scoria_llm_time_to_first_token_ms` in Grafana out-of-the-box. | Generator task `mix parapet.gen.scoria` will scaffold a standalone `scoria_dashboard.json` and Prometheus rules file. |
-| AI-TELEMETRY-03 | System enforces a strict label policy that filters high-cardinality refs (like `trace_id`) from metrics labels, strictly splitting labels and refs. | Inside `Parapet.Integrations.Scoria`, the telemetry event payload will be parsed to explicitly extract low-cardinality labels before emitting `:telemetry.execute([:parapet, ...])` events. |
+| REQ-01 | Define `Parapet.Probe` behavior and macro | Confirmed `:telemetry.span/3` usage for wrapping `run/0`. |
+| REQ-02 | Implement `Parapet.Probe.NativeScheduler` | Best approach is a standard GenServer using `:timer.send_interval` per probe. |
+| REQ-03 | Implement `Parapet.Probe.ObanScheduler` | Requires setting `max_attempts: 1` to avoid muddying SLO stats. |
+| REQ-04 | Implement `Parapet.Metrics.Probe` telemetry handler | Identified `Parapet.attach/1` as the correct dynamic registration method. |
+| REQ-05 | Update configuration and documentation | Configuration must accept a `scheduler` key to flip between modes. |
 </phase_requirements>
+
+# Phase 1: Synthetic Probes - Research
+
+**Researched:** 2024-07
+**Domain:** Elixir, Telemetry, GenServer, Oban
+**Confidence:** HIGH
+
+## Summary
+
+This phase implements synthetic probes to generate predictable traffic for SLO measurements. Probes are simply Elixir modules that wrap arbitrary business logic. The architecture introduces a pluggable scheduling system, allowing probes to be run via a simple `GenServer` timer (`NativeScheduler`) for standalone apps, or via Oban's Cron plugin (`ObanScheduler`) for durable, clustered environments.
+
+**Primary recommendation:** Use `:telemetry.span/3` in the `Parapet.Probe` macro to ensure strictly standardized metric emission that is identical to existing core framework instrumentation, and enforce `max_attempts: 1` in the Oban worker.
 
 ## Architectural Responsibility Map
 
 | Capability | Primary Tier | Secondary Tier | Rationale |
 |------------|-------------|----------------|-----------|
-| SRE Telemetry Consumption | API / Backend | — | Elixir `:telemetry` handlers run in the backend application memory space. |
-| Durable Incidents | API / Backend | Database | Extracted anomalies trigger Ecto Repo inserts via `Parapet.Evidence`. |
-| Scaffolding / Code Gen | Build / Tooling | — | Mix tasks utilizing `Igniter` to modify AST and place standalone JSON files. |
-| Dashboarding | Tooling | Grafana | Standalone JSON file provisioning follows the Parapet "host-owned" ethos. |
+| Probe Execution Wrapper | API / Backend | — | The macro ensures consistent telemetry events before yielding to user code. |
+| Time-based Scheduling | API / Backend | Database | NativeScheduler uses memory timers; ObanScheduler uses PostgreSQL for distributed cron logic. |
+| Metric Aggregation | API / Backend | — | `Parapet.Metrics.Probe` registers handlers to translate probe spans into Prometheus distributions. |
 
 ## Standard Stack
 
 ### Core
 | Library | Version | Purpose | Why Standard |
 |---------|---------|---------|--------------|
-| `igniter` | Current | AST manipulation and scaffolding | Official Parapet code-gen foundation. Provides composable generator tasks. |
-| `:telemetry` | Current | In-memory event routing | Native Erlang/Elixir standard for decoupled event publishing. |
-| `ecto` | Current | Persistence | Used via `Parapet.Evidence` for tracking durable AI anomalies. |
+| Oban | Core | Durable Job Scheduling | Used heavily in the project; Oban Cron solves distributed scheduling. |
+| Telemetry | Core | Metric standardization | Required for `[:parapet, :probe, :run]` span execution. |
 
 ## Architecture Patterns
 
-### Recommended Project Structure
-```
-lib/
-├── parapet/
-│   ├── integrations/
-│   │   └── scoria.ex           # Telemetry translation adapter
-├── mix/
-│   ├── tasks/
-│   │   └── parapet.gen.scoria.ex # Scoria generator task
-priv/
-├── templates/
-│   └── parapet.gen.scoria/
-│       ├── scoria_dashboard.json.eex
-│       └── rules.yml.eex
+### System Architecture Diagram
+
+```mermaid
+flowchart TD
+    Config[Application Config] --> |Configures| Sched[Pluggable Scheduler]
+    Sched --> |Dispatches| PW[Probe Wrapper]
+    
+    PW --> |Starts Span| Telem[:telemetry.span]
+    Telem --> |Executes| PC[User Probe Code]
+    Telem --> |Emits stop/exception| H[Parapet.Metrics.Probe]
+    H --> |Translates| Prom[Prometheus distributions]
 ```
 
-### Pattern 1: Sibling Library Telemetry Adapter
-**What:** Consuming sibling library telemetry safely and forwarding to internal metrics channels.
-**When to use:** Integrating external libraries like Chimeway, Mailglass, or Scoria.
+### Pattern 1: Probe Macro
+**What:** The `Parapet.Probe` module using `__using__` to inject execution wrappers.
+**When to use:** Whenever a developer wants to run synthetic checks.
 **Example:**
 ```elixir
-defmodule Parapet.Integrations.Scoria do
-  require Logger
-
-  def setup do
-    :telemetry.attach(
-      "parapet-scoria-sre-telemetry",
-      [:scoria, :sre, :telemetry],
-      &__MODULE__.handle_event/4,
-      nil
-    )
-  end
-
-  def handle_event(event, measurements, metadata, _config) do
-    # Strip high cardinality refs here
-    safe_labels = Map.take(metadata, [:model, :provider, :tool_name])
-    
-    :telemetry.execute(
-      [:parapet, :scoria, :metrics],
-      measurements,
-      safe_labels
-    )
-    
-    # Example: Create an incident on error
-    if metadata[:error] do
-      Parapet.Evidence.create_incident(%{
-        title: "AI Tool Failure: #{metadata[:tool_name]}",
-        description: inspect(metadata[:error])
-      })
+defmodule Parapet.Probe do
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Parapet.Probe
+      
+      def execute do
+        :telemetry.span([:parapet, :probe, :run], %{probe: inspect(__MODULE__)}, fn ->
+          case run() do
+            :ok -> {:ok, %{probe: inspect(__MODULE__), status: "success"}}
+            {:error, reason} -> {{:error, reason}, %{probe: inspect(__MODULE__), status: "error"}}
+          end
+        end)
+      end
     end
-  rescue
-    e ->
-      Logger.error("Parapet telemetry handler exception: #{Exception.message(e)}")
   end
+
+  @callback run() :: :ok | {:error, term()}
 end
 ```
 
-### Pattern 2: Composable Generators in `mix parapet.install`
-**What:** Invoking optional external generators if flags are passed.
-**When to use:** Expanding the Parapet installer.
+### Pattern 2: Pluggable Scheduler
+**What:** Configurable scheduler implementation.
+**When to use:** To support both simple setups and clustered setups.
 **Example:**
-```elixir
-with_scoria? = igniter.args.options[:with_scoria] || false
-
-igniter = 
-  if with_scoria? do
-    Igniter.compose_task(igniter, "parapet.gen.scoria", [])
-  else
-    igniter
-  end
-```
-
-### Anti-Patterns to Avoid
-- **Anti-pattern:** Editing `main_dashboard.json` dynamically via the generator. 
-  *Fix:* Parapet DNA mandates standalone domain-specific dashboards (`scoria_dashboard.json`) so users can modify their `main_dashboard` freely without generator conflicts.
-- **Anti-pattern:** Parsing raw OpenInference OTel spans. 
-  *Fix:* Only consume the explicit `Scoria.SRE.Telemetry` event, which comes pre-sanitized for SRE use.
+- `Parapet.Probe.NativeScheduler`: `GenServer` that takes a list of probes and intervals, scheduling them via `:timer.send_interval` or `Process.send_after`.
+- `Parapet.Probe.ObanScheduler`: A generic `Oban.Worker` that receives the probe module name and invokes its `execute/0` function, triggered by Oban Cron.
 
 ## Don't Hand-Roll
 
 | Problem | Don't Build | Use Instead | Why |
 |---------|-------------|-------------|-----|
-| Creating durable anomalies | Direct Ecto `Repo.insert` | `Parapet.Evidence.create_incident/1` | Enforces structural constraints and schema validation boundaries. |
-| AST injection | Regex / String replacement | `Igniter` / `Sourceror` | Parapet relies on Igniter's AST zipper for safe, deterministic `ParapetInstrumenter` modifications. |
-| Custom Telemetry parsing | Raw OTel | `Scoria.SRE.Telemetry` | The Scoria project explicitly provides a pre-formatted SRE channel to avoid parser bloat. |
-
-**Key insight:** Scoria is an AI-first sibling. Its primary abstractions operate with high cardinality contexts (traces, prompts). SRE needs strict bounded cardinality (models, tool names, outcomes). The translation layer (`Parapet.Integrations.Scoria`) must enforce this boundary rigorously.
+| Distributed Scheduling | GenServer + pg | Oban Cron | Cron strings and clustered execution are already solved by Oban in this stack. |
+| Telemetry Events | try/rescue + :telemetry.execute | :telemetry.span/3 | Emitting start/stop/exception triplets reliably is solved by `.span/3`, mandated by codebase style. |
 
 ## Common Pitfalls
 
-### Pitfall 1: High Cardinality Label Leaks
-**What goes wrong:** `trace_id` or `run_id` strings sneak into the Prometheus labels.
-**Why it happens:** Passing the raw `metadata` map from `Scoria.SRE.Telemetry` directly into the Parapet metric execution.
-**How to avoid:** Define an explicit safelist of labels (e.g., `model`, `tool_name`, `provider`) and `Map.take/2` before forwarding to the metrics pipeline.
+### Pitfall 1: Retrying Synthetic Probes
+**What goes wrong:** Oban scheduler attempts to retry failing probes, muddying the SLO metrics by generating back-to-back failures for a single scheduled point.
+**Why it happens:** Oban defaults to 20 retries for failed workers.
+**How to avoid:** Hardcode `max_attempts: 1` in the generic probe Oban worker. Probes are time-series checks; a failed check is a data point, not a task to be eventually accomplished.
 
-### Pitfall 2: Missing Optional Dependency Safety
-**What goes wrong:** `mix parapet.install` crashes if Scoria is not installed but `--with-scoria` is passed.
-**Why it happens:** Code unconditionally calls `Parapet.Integrations.Scoria.setup()`.
-**How to avoid:** The generated host `ParapetInstrumenter` must wrap the call in `if Code.ensure_loaded?(Parapet.Integrations.Scoria)`.
+### Pitfall 2: High Cardinality Labels
+**What goes wrong:** Prometheus runs out of memory tracking distinct metric labels.
+**Why it happens:** Emitting probe paths, tokens, or dynamic IDs as labels.
+**How to avoid:** `Parapet.Internal.LabelPolicy` explicitly forbids labels like `id` and `path`. Probe metrics must only use `probe` (the module name) and `status`.
 
 ## Code Examples
 
-### Modifying the Host Instrumenter
-The AST generator should create a setup similar to:
+### Telemetry Handler Registration
 ```elixir
+# lib/parapet/metrics/probe.ex
 def setup do
-  if Code.ensure_loaded?(Parapet.Integrations.Scoria) do
-    Parapet.Integrations.Scoria.setup()
-  end
-  # other handlers...
-  :ok
+  Parapet.attach(%{
+    handler_id: "parapet-probe-run-stop",
+    event_name: [:parapet, :probe, :run, :stop],
+    handler_module: __MODULE__,
+    function_name: :handle_event
+  })
+  
+  Parapet.attach(%{
+    handler_id: "parapet-probe-run-exception",
+    event_name: [:parapet, :probe, :run, :exception],
+    handler_module: __MODULE__,
+    function_name: :handle_event
+  })
 end
 ```
-
-## State of the Art
-
-| Old Approach | Current Approach | When Changed | Impact |
-|--------------|------------------|--------------|--------|
-| Unified dashboards | Standalone JSON dashboards | v0.4 (Scoria Integration) | Generators won't destroy user modifications. PromEx-like architecture. |
-
-## Open Questions
-
-1. **Dashboard Alert Linkage**
-   - What we know: Scoria dashboard will be created.
-   - What's unclear: Should it automatically link AI-HITL (Workflow Pauses) to Parapet's UI?
-   - Recommendation: Follow up in Phase 4 when building HITL integrations. For Phase 1, strictly translate RED metrics.
 
 ## Validation Architecture
 
@@ -180,30 +139,36 @@ end
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| AI-TELEMETRY-01 | Emits events & inserts incidents | unit | `mix test test/parapet/integrations/scoria_test.exs` | ❌ Phase 1 |
-| AI-TELEMETRY-02 | Generates standalone dashboard | unit | `mix test test/mix/tasks/parapet.gen.scoria_test.exs` | ❌ Phase 1 |
-| AI-TELEMETRY-03 | Enforces label policy (no traces) | unit | `mix test test/parapet/integrations/scoria_test.exs` | ❌ Phase 1 |
+| REQ-01 | `Parapet.Probe` macro wraps `run/0` with telemetry | unit | `mix test test/parapet/probe_test.exs` | ❌ Wave 0 |
+| REQ-02 | `NativeScheduler` runs probes on intervals | unit | `mix test test/parapet/probe/native_scheduler_test.exs` | ❌ Wave 0 |
+| REQ-03 | `ObanScheduler` delegates to probes without retries | unit | `mix test test/parapet/probe/oban_scheduler_test.exs` | ❌ Wave 0 |
+| REQ-04 | `Metrics.Probe` registers and tracks distributions | unit | `mix test test/parapet/metrics/probe_test.exs` | ❌ Wave 0 |
+
+### Wave 0 Gaps
+- [ ] `test/parapet/probe_test.exs` — covers REQ-01
+- [ ] `test/parapet/probe/native_scheduler_test.exs` — covers REQ-02
+- [ ] `test/parapet/probe/oban_scheduler_test.exs` — covers REQ-03
+- [ ] `test/parapet/metrics/probe_test.exs` — covers REQ-04
 
 ## Environment Availability
 
 | Dependency | Required By | Available | Version | Fallback |
 |------------|------------|-----------|---------|----------|
-| `Elixir` | App Runtime | ✓ | >= 1.15 | — |
-| `Mix` | Build / CLI | ✓ | — | — |
-
-**Missing dependencies with no fallback:**
-- None.
+| Elixir | Framework core | ✓ | (Implied) | — |
+| PostgreSQL / Oban | ObanScheduler | ✓ | (Implied) | NativeScheduler |
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- `parapet/.planning/research/PHASE-1-SCORIA-DECISIONS.md` - Verified architecture decisions for Scoria telemetry integration and standalone dashboard strategy.
-- `parapet/.planning/memory/scoria-v1.3-context.md` - Verified requirement to use `Scoria.SRE.Telemetry`.
-- `lib/parapet/integrations/chimeway.ex` - Verified standard Parapet adapter pattern implementation.
+- Codebase grep - Verified `Parapet.attach/1` setup in `Parapet.Metrics.Oban`.
+- Codebase grep - Verified project-wide usage of `:telemetry.span/3` for standard instrumentation via `prompts/prior-art/rulestead-telemetry-observability-and-audit.md`.
 
 ## Metadata
 
 **Confidence breakdown:**
-- Standard stack: HIGH - Directly follows existing Parapet `Igniter` & `:telemetry` implementation logic.
-- Architecture: HIGH - Dictated explicitly by `PHASE-1-SCORIA-DECISIONS.md`.
-- Pitfalls: HIGH - High-cardinality leakage is specifically called out in memory contexts.
+- Standard stack: HIGH - Aligning exactly with existing `ObanWorker` and `LabelPolicy` setups.
+- Architecture: HIGH - Fits neatly into existing metric handler plugin architecture (`Parapet.attach`).
+- Pitfalls: HIGH - Oban retries and Label cardinality are well-documented concerns in this specific application.
+
+**Research date:** 2024-07
+**Valid until:** 30 days

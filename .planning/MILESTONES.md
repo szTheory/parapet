@@ -71,3 +71,19 @@ None. All v0.3 requirements defined and satisfied.
 
 ### Known Gaps
 None. All 11/11 requirements defined for v0.4 were satisfied and verified.
+
+## v0.5 Proactive Resilience & Copilot Triage
+
+**Date:** TBD
+**Stats:**
+- Phases: 1-3
+- Plans: 0
+- Total LOC: TBD
+
+### Target Accomplishments
+1. Implement `Parapet.Probe` for defining and scheduling active synthetic canaries.
+2. Expand Sigra and Accrue integrations to emit explicit login, signup, and checkout SLIs.
+3. Build a Parapet MCP server to allow AI agents to safely read incident data and act as triage copilots.
+
+### Known Gaps
+In planning.

@@ -1,6 +1,26 @@
-# Roadmap: Parapet v0.5 (Proactive Resilience & Copilot Triage)
+# Roadmap: Parapet
+
+## Milestones
+
+- ✅ **v0.1 Trustworthy Spine** — Phases 1-4 (shipped 2026-05-10)
+- ✅ **v0.2 Durable Spine and Operator UI** — Phases 1-3 (shipped 2026-05-11)
+- ✅ **v0.3 Runbooks & Alert Routing** — Phases 1-4 (shipped 2026-05-12)
+- ✅ **v0.4 Scoria AI Integration** — Phases 1-4 (shipped 2026-05-15)
+- 🚧 **v0.5 Proactive Resilience & Copilot Triage** — Phases 1-3 (in progress)
 
 ## Phases
+
+<details>
+<summary>✅ v0.4 Scoria AI Integration (Phases 1-4) — SHIPPED 2026-05-15</summary>
+
+- [x] Phase 1: Scoria Telemetry & Translation (3/3 plans) — completed
+- [x] Phase 2: Eval-Driven SLOs (2/2 plans) — completed
+- [x] Phase 3: Deploy Correlation & MCP SLIs (3/3 plans) — completed
+- [x] Phase 4: Workflow Approval Pauses (3/3 plans) — completed
+
+</details>
+
+### 🚧 v0.5 Proactive Resilience & Copilot Triage (Planned)
 
 - [ ] **Phase 1: Synthetic Probes** - Implement `Parapet.Probe` for active monitoring of critical flows in low-traffic environments.
 - [ ] **Phase 2: Deepened Journey Integrations** - Concrete SLIs for `Sigra` (auth) and `Accrue` (billing).
@@ -42,7 +62,10 @@
   1. System exposes a standard MCP server protocol.
   2. External agent can query `list_incidents`, `get_incident_timeline`, and `read_runbook`.
   3. Access is strictly read-only, honoring the "AI as copilot, not unbounded actor" principle.
-**Plans**: 0 plans
+**Plans**: 3 plans
+- [ ] 03-01-PLAN.md — Implement read-only Prometheus HTTP API proxy using Req
+- [ ] 03-02-PLAN.md — Implement core MCP tool execution logic in Parapet.MCP.Server
+- [ ] 03-03-PLAN.md — Implement MCP HTTP transport layer via custom Plug (SSE and JSON-RPC)
 
 ## Progress
 
@@ -50,4 +73,4 @@
 |-------|----------------|--------|-----------|
 | 1. Synthetic Probes | 0/3 | Pending | |
 | 2. Deepened Journey Integrations | 0/3 | Pending | |
-| 3. Parapet MCP Server | 0/0 | Pending | |
+| 3. Parapet MCP Server | 0/3 | Pending | |

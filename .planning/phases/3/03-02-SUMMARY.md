@@ -1,10 +1,36 @@
-# Phase 3 Plan 02 Summary: Grafana Postgres Annotations
+---
+phase: "3"
+plan: "03-02"
+subsystem: "MCP"
+tags: ["mcp", "server", "tools", "read-only"]
+duration: "~5m"
+tasks_completed: 2
+tasks_total: 2
+completed_date: "2024-05-16"
+---
 
-## Tasks Completed
-1. **Integrate Postgres Datasource and Annotations into Dashboard Template**:
-   - Modified `priv/templates/parapet.gen.grafana/main_dashboard.json.eex` to add a new `DS_POSTGRES` datasource variable in the templating section.
-   - Added an `AI Config Changes` annotation that queries the Postgres database for Ecto `parapet_incidents` records of type `config_change`. This surfaces AI configuration updates visually as specific colored lines directly on the SLO burn rate graphs.
-   - Verified functionality by adding assertions in `test/mix/tasks/parapet.gen.grafana_test.exs` ensuring that both the datasource and annotation are generated effectively.
+# Phase 3 Plan 2: Parapet.MCP.Server Summary
 
-## Next Steps
-All plans for Phase 3 (AI Deploy Correlation & MCP SLIs) are now complete. The phase goal to expose explicit AI config markers and bounded MCP SLIs has been achieved successfully. We can now proceed with standard phase verification if required, or update roadmaps and transition to Phase 4.
+## Objective
+Implement the core MCP tool execution logic in `Parapet.MCP.Server` to provide a controlled, read-only interface for external AI agents to investigate incidents safely.
+
+## Key Changes
+- Implemented `Parapet.MCP.Server` with safe dispatch for `list_incidents`, `get_incident_timeline`, `read_runbook`, and `get_slo_burn_rates`.
+- Created robust test scaffolding with `DummyRepo` and `DummyPrometheusClient` to isolate external dependencies and enforce correct data filtering.
+- Ensured strictly read-only tools and safeguarded `String.to_existing_atom` against atom exhaustion.
+
+## Deviations from Plan
+- None - plan executed exactly as written.
+
+## State Changes
+- Added tool execution dispatch for MCP Server.
+
+## Key Decisions
+- Mocked PrometheusClient via application env to cleanly test delegation without network setup.
+- Kept queries explicitly read-only, leaning on `Parapet.Evidence.repo()` directly as expected by the pattern.
+
+## Code Quality Verification
+- Fully tested using TDD (tests cover 100% of tool behaviors).
+- Tests passed.
+
+## Self-Check: PASSED

@@ -1,158 +1,139 @@
-# Phase 3: AI Deploy Correlation & MCP SLIs - Pattern Map
+# Phase 3: Parapet MCP Server - Pattern Map
 
-**Mapped:** 2024-05-14
-**Files analyzed:** 5
-**Analogs found:** 5 / 5
+**Mapped:** 2024-05-16
+**Files analyzed:** 2 (new/modified)
+**Analogs found:** 2 / 2
 
 ## File Classification
 
 | New/Modified File | Role | Data Flow | Closest Analog | Match Quality |
 |-------------------|------|-----------|----------------|---------------|
-| `lib/parapet/integrations/scoria.ex` | integration | event-driven | itself (Phase 1) | exact |
-| `lib/parapet/metrics/scoria.ex` | config | configuration | itself (Phase 2) | exact |
-| `priv/templates/parapet.gen.scoria/rules.yml.eex` | config | declarative | `priv/templates/parapet.gen.prometheus/rules.yml.eex` | exact |
-| `priv/templates/parapet.gen.scoria/scoria_dashboard.json.eex` | config | declarative | `priv/templates/parapet.gen.grafana/main_dashboard.json.eex` | exact |
-| `lib/parapet/spine/incident.ex` | model | CRUD | itself | exact |
+| `lib/parapet/plug/mcp.ex` | controller | request-response | `lib/parapet/plug/webhook.ex` | exact |
+| `lib/parapet/mcp/server.ex` | service | CRUD (Read-only) | `lib/parapet/spine/alert_processor.ex` | role-match |
 
 ## Pattern Assignments
 
-### SRE Telemetry Consumption (`lib/parapet/integrations/scoria.ex`, `lib/parapet/metrics/scoria.ex`)
+### `lib/parapet/plug/mcp.ex` (controller, request-response)
 
-**Analog:** Existing Phase 1 SRE telemetry processing in `lib/parapet/integrations/scoria.ex` and Phase 2 metrics in `lib/parapet/metrics/scoria.ex`.
+**Analog:** `lib/parapet/plug/webhook.ex`
 
-**SRE Event Processing Pattern** (`lib/parapet/integrations/scoria.ex`, lines 39-55):
+**Plug behaviour and Imports pattern** (lines 1-8):
 ```elixir
-  defp process_event([:scoria, :sre, :telemetry], measurements, metadata) do
-    # Extract only low-cardinality labels
-    safe_metadata = Map.take(metadata, @safe_labels)
+defmodule Parapet.Plug.Webhook do
+  @moduledoc """
+  A Plug to receive webhooks from Alertmanager and route them to the AlertProcessor.
+  """
 
-    # Determine outcome based on :error presence
-    has_error? = Map.has_key?(metadata, :error) and not is_nil(metadata.error)
-    outcome = if has_error?, do: :failure, else: :success
+  @behaviour Plug
+  import Plug.Conn
+
+  @impl true
+  def init(opts), do: opts
+```
+
+**Core Request Handling (POST) pattern** (lines 12-20):
+```elixir
+  @impl true
+  def call(%{method: "POST"} = conn, _opts) do
+    payload = conn.body_params || %{}
+    Parapet.Spine.AlertProcessor.process_batch(payload)
+
+    conn
+    |> put_resp_content_type("application/json")
+    |> send_resp(202, Jason.encode!(%{"status" => "accepted"}))
+  end
+```
+
+**Error Handling (Method Not Allowed) pattern** (lines 22-26):
+```elixir
+  @impl true
+  def call(conn, _opts) do
+    conn
+    |> send_resp(405, "")
+  end
+```
+
+---
+
+### `lib/parapet/mcp/server.ex` (service, CRUD Read-only)
+
+**Analog:** `lib/parapet/spine/alert_processor.ex`
+
+**Ecto Query Imports pattern** (lines 6-10):
+```elixir
+  alias Parapet.Spine.Incident
+  alias Parapet.Spine.TimelineEntry
+  alias Parapet.Evidence
+
+  import Ecto.Query, only: [from: 2]
+```
+
+**Database Query (Read) pattern** (lines 78-83):
+```elixir
+    repo = Evidence.repo()
+
+    query =
+      from(i in Incident, where: i.correlation_key == ^correlation_key and i.state == "open")
+
+    case repo.all(query) do
+      [incident | _] ->
+```
+
+**Runbook Fetching & Processing pattern** (lines 52-60):
+```elixir
+    slo = Enum.find(Parapet.SLO.all(), fn s -> to_string(s.name) == alertname end)
+
+    case slo do
+      %{runbook: runbook} when not is_nil(runbook) ->
+        module = get_runbook_module(runbook)
+
+        if module && Code.ensure_loaded?(module) &&
+             function_exported?(module, :__runbook_schema__, 0) do
+          # Example of fetching runbook schema details
+          apply(module, :__runbook_schema__, [])
+```
+
+## Shared Patterns
+
+### Safely Loading Modules / Runbooks
+**Source:** `lib/parapet/spine/alert_processor.ex` (lines 71-76)
+**Apply to:** `lib/parapet/mcp/server.ex` for safely resolving string runbook references to module atoms during MCP queries.
+```elixir
+  defp get_runbook_module(runbook) when is_binary(runbook) do
+    try do
+      String.to_existing_atom(runbook)
+    rescue
+      ArgumentError -> nil
+    end
+  end
+```
+
+### Retrieving Global SLO Data
+**Source:** `lib/parapet/slo.ex` (lines 48-56)
+**Apply to:** `lib/parapet/mcp/server.ex` for retrieving SLO details and evaluating burn rates as required by MCP-03.
+```elixir
+  def all do
+    legacy_slos = Application.get_env(:parapet, :slos, [])
     
-    parapet_metadata = Map.put(safe_metadata, :outcome, outcome)
+    provider_slos =
+      Application.get_env(:parapet, :providers, [])
+      |> Enum.flat_map(fn provider -> provider.slos() end)
+      |> Enum.map(&Parapet.SLO.Resolvable.to_slo/1)
 
-    # Emit translated event
-    :telemetry.execute(
-      [:parapet, :scoria, :metrics],
-      measurements,
-      parapet_metadata
-    )
-```
-
-**Metrics Declaration Pattern** (`lib/parapet/metrics/scoria.ex`, lines 36-43):
-```elixir
-  def metrics do
-    import Telemetry.Metrics
-
-    [
-      counter("scoria_evaluation_total",
-        event_name: [:parapet, :scoria, :eval, :completed],
-        tags: [:guardrail, :passed, :model_name],
-        description: "Total number of Scoria AI evaluations"
-      )
-    ]
+    legacy_slos ++ provider_slos
   end
 ```
 
-### SLI / Prometheus Rules (`priv/templates/parapet.gen.scoria/rules.yml.eex`)
+## No Analog Found
 
-**Analog:** `priv/templates/parapet.gen.prometheus/rules.yml.eex`
+Files with no close match in the codebase:
 
-**Rule Group Template Pattern** (`priv/templates/parapet.gen.prometheus/rules.yml.eex`, lines 1-14):
-```yaml
-groups:
-<%= for slo <- slos do %>
-  - name: parapet_slo_<%= slo.name %>
-    rules:
-<%= for window <- windows do %>
-      - record: slo:error_ratio:rate<%= window %>
-        expr: >
-          1 - (
-            sum(rate(<%= slo.good_events %>[<%= window %>]))
-            /
-            sum(rate(<%= slo.total_events %>[<%= window %>]))
-          )
-        labels:
-          slo: <%= slo.name %>
-<% end %>
-```
+| File | Role | Data Flow | Reason |
+|------|------|-----------|--------|
+| -    | -    | -         | All components have an existing analog. |
 
-### Grafana Dashboard Generation (`priv/templates/parapet.gen.scoria/scoria_dashboard.json.eex`)
+## Metadata
 
-**Analog:** `priv/templates/parapet.gen.grafana/main_dashboard.json.eex`
-
-**EEx Injecting Prometheus Targets Pattern** (`priv/templates/parapet.gen.grafana/main_dashboard.json.eex`, lines 56-82):
-```json
-<%= for {slo, index} <- Enum.with_index(slos) do %>
-    ,{
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${DS_PROMETHEUS}"
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 16,
-        "x": 0,
-        "y": <%= index * 8 + 1 %>
-      },
-      "id": <%= index * 2 + 10 %>,
-      "title": "<%= slo.name %> 5m Error Ratio",
-      "type": "timeseries",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
-          },
-          "editorMode": "code",
-          "expr": "slo:error_ratio:rate5m{slo=\"<%= slo.name %>\"}",
-          "legendFormat": "Error Ratio (5m)",
-          "range": true,
-          "refId": "A"
-        }
-      ],
-```
-
-**Annotation Tracking Deploy/Config Patterns** (`priv/templates/parapet.gen.grafana/main_dashboard.json.eex`, lines 13-31):
-```json
-      {
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${DS_PROMETHEUS}"
-        },
-        "enable": true,
-        "expr": "parapet_deploy_info",
-        "hide": false,
-        "iconColor": "rgb(255, 0, 0)",
-        "name": "Deploys",
-        "step": "1m",
-        "tagKeys": "version",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "tags": [],
-          "type": "tags"
-        },
-        "titleFormat": "Deploy: {{version}}",
-        "type": "dashboard"
-      }
-```
-
-### Incident Model for DB Config Events (`lib/parapet/spine/incident.ex`)
-
-**Analog:** `lib/parapet/spine/incident.ex`
-
-**Incident Structure** (`lib/parapet/spine/incident.ex`, lines 10-18):
-```elixir
-  schema "parapet_incidents" do
-    field(:title, :string)
-    field(:description, :string)
-    field(:state, :string, default: "open")
-    field(:correlation_key, :string)
-    field(:runbook_data, :map)
-
-    timestamps(type: :utc_datetime_usec)
-  end
-```
-*Note: Config change markers will likely leverage these fields (e.g., `runbook_data` for specific config payloads) directly from the Parapet UI / Integrations since Grafana will query the Postgres data source directly instead of emitting to Prometheus.*
+**Analog search scope:** `lib/parapet/**/*.ex`
+**Files scanned:** 10+
+**Pattern extraction date:** 2024-05-16
