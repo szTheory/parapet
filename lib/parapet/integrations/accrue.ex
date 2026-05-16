@@ -23,6 +23,20 @@ defmodule Parapet.Integrations.Accrue do
       &__MODULE__.handle_event/4,
       nil
     )
+
+    :telemetry.attach_many(
+      "parapet-accrue-billing-checkout-webhook",
+      [
+        [:accrue, :billing, :checkout, :stop],
+        [:accrue, :billing, :checkout, :exception],
+        [:accrue, :billing, :webhook, :stop],
+        [:accrue, :billing, :webhook, :exception]
+      ],
+      &__MODULE__.handle_event/4,
+      nil
+    )
+
+    Parapet.Metrics.Accrue.setup()
   end
 
   @doc """
@@ -33,7 +47,7 @@ defmodule Parapet.Integrations.Accrue do
   rescue
     e ->
       Logger.error(
-        "Parapet telemetry handler exception in #{__MODULE__}.handle_event/4 for event #{inspect(event)}: #{Exception.message(e)}"
+        "Parapet telemetry handler exception in #{__MODULE__}.handle_event/4 for event #{inspect(event)}: #{Exception.message(e)}\nStacktrace: #{inspect(__STACKTRACE__)}"
       )
   end
 
@@ -46,6 +60,34 @@ defmodule Parapet.Integrations.Accrue do
     :telemetry.execute(
       [:parapet, :journey, :billing],
       measurements,
+      parapet_metadata
+    )
+  end
+
+  defp process_event([:accrue, :billing, :checkout, state], measurements, metadata)
+       when state in [:stop, :exception] do
+    outcome = if state == :stop, do: :success, else: :failure
+    plan = Map.get(metadata, :plan, "unknown")
+
+    parapet_metadata = %{outcome: outcome, plan: plan}
+
+    :telemetry.execute(
+      [:parapet, :journey, :billing, :checkout],
+      measurements,
+      parapet_metadata
+    )
+  end
+
+  defp process_event([:accrue, :billing, :webhook, state], measurements, metadata)
+       when state in [:stop, :exception] do
+    outcome = if state == :stop, do: :success, else: :failure
+    event_type = Map.get(metadata, :event_type, "unknown")
+
+    parapet_metadata = %{outcome: outcome, event_type: event_type}
+
+    :telemetry.execute(
+      [:parapet, :journey, :billing, :webhook],
+      %{duration: Map.get(measurements, :duration, 0)},
       parapet_metadata
     )
   end
