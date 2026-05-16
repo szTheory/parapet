@@ -60,4 +60,41 @@ defmodule Parapet.Integrations.RulesteadTest do
              nil
            ) == :ok
   end
+
+  describe "metrics" do
+    test "Parapet.Metrics.Rulestead.metrics/0 returns the flag change counter" do
+      metrics = Parapet.Metrics.Rulestead.metrics()
+      assert Enum.any?(metrics, fn metric ->
+        match?(%Telemetry.Metrics.Counter{}, metric) and
+          metric.event_name == [:parapet, :rulestead, :flag_change] and
+          metric.name == [:parapet_rulestead_flag_change_total]
+      end)
+    end
+
+    test "firing rulestead telemetry causes parapet telemetry to execute" do
+      test_pid = self()
+      
+      handler_id = "test-parapet-rulestead-flag-change"
+      :telemetry.attach(
+        handler_id,
+        [:parapet, :rulestead, :flag_change],
+        fn _event, measurements, metadata, _config ->
+          send(test_pid, {:telemetry_executed, measurements, metadata})
+        end,
+        nil
+      )
+
+      metadata = %{
+        flag_name: "feature_y",
+        ruleset_id: "rs_999"
+      }
+
+      :telemetry.execute([:rulestead, :admin, :ruleset, :published], %{}, metadata)
+
+      assert_receive {:telemetry_executed, _measurements, received_metadata}
+      assert received_metadata.flag_name == "feature_y"
+
+      :telemetry.detach(handler_id)
+    end
+  end
 end

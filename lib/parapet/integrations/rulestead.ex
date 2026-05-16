@@ -32,6 +32,7 @@ defmodule Parapet.Integrations.Rulestead do
 
         case repo.insert(changeset) do
           {:ok, _} ->
+            :telemetry.execute([:parapet, :rulestead, :flag_change], %{}, metadata)
             :ok
 
           {:error, error} ->
