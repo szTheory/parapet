@@ -69,11 +69,32 @@ if Code.ensure_loaded?(Oban) do
       queue = to_string(Map.get(metadata, :queue, "unknown"))
       state = to_string(Map.get(metadata, :state, "unknown"))
 
+      out_metadata = %{worker: worker, queue: queue, state: state}
+
+      out_metadata =
+        if trace_id = get_trace_id() do
+          Map.put(out_metadata, :trace_id, to_string(trace_id))
+        else
+          out_metadata
+        end
+
       :telemetry.execute(
         [:parapet, :oban, :job],
         %{duration_ms: duration_ms},
-        %{worker: worker, queue: queue, state: state}
+        out_metadata
       )
+    end
+
+    defp get_trace_id do
+      if Code.ensure_loaded?(:opentelemetry) and function_exported?(OpenTelemetry.Tracer, :current_span_ctx, 0) do
+        span_ctx = OpenTelemetry.Tracer.current_span_ctx()
+
+        if span_ctx != :undefined do
+          OpenTelemetry.Span.hex_trace_id(span_ctx)
+        end
+      end
+    rescue
+      _ -> nil
     end
   end
 end
