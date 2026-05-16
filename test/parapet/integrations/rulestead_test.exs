@@ -1,67 +1,63 @@
 defmodule Parapet.Integrations.RulesteadTest do
   use ExUnit.Case, async: false
 
+  defmodule DummyRepo do
+    def insert(changeset) do
+      send(self(), {:dummy_repo_insert, changeset})
+
+      if changeset.valid? do
+        {:ok, Ecto.Changeset.apply_changes(changeset)}
+      else
+        {:error, changeset}
+      end
+    end
+  end
+
   setup do
+    Application.put_env(:parapet, :repo, DummyRepo)
+
+    # Detach to prevent duplicate handlers
+    :telemetry.detach("parapet-rulestead-telemetry")
+    Parapet.Integrations.Rulestead.attach()
+
     on_exit(fn ->
-      :telemetry.detach("parapet-rulestead-flag")
+      :telemetry.detach("parapet-rulestead-telemetry")
+      Application.delete_env(:parapet, :repo)
     end)
 
     :ok
   end
 
-  describe "setup/0" do
-    test "attaches telemetry and registers capability" do
-      Parapet.Integrations.Rulestead.setup()
-
-      handlers = :telemetry.list_handlers([:rulestead, :flag, :changed])
-      assert Enum.any?(handlers, fn handler -> handler.id == "parapet-rulestead-flag" end)
-
-      capabilities = Parapet.Capabilities.capabilities(:mitigation)
-
-      assert Enum.any?(capabilities, fn cap ->
-               cap.id == :rulestead and cap.name == "toggle_flag" and
-                 cap.schema.name == "Toggle Feature Flag"
-             end)
-    end
+  test "attach/0 registers the telemetry handler" do
+    handlers = :telemetry.list_handlers([:rulestead, :admin, :ruleset, :published])
+    assert Enum.any?(handlers, fn h -> h.id == "parapet-rulestead-telemetry" end)
   end
 
-  describe "handle_event/4" do
-    setup do
-      test_pid = self()
-      handler_id = "test-parapet-journey-flag"
+  test "firing telemetry inserts a SystemEvent with rulestead_flag_change type" do
+    metadata = %{
+      flag_name: "feature_x",
+      ruleset_id: "rs_123",
+      published_by: "user_456"
+    }
 
-      :telemetry.attach(
-        handler_id,
-        [:parapet, :mitigation, :rulestead, :flag, :changed],
-        fn name, measurements, metadata, _config ->
-          send(test_pid, {:telemetry_event, name, measurements, metadata})
-        end,
-        nil
-      )
+    :telemetry.execute([:rulestead, :admin, :ruleset, :published], %{}, metadata)
 
-      on_exit(fn ->
-        :telemetry.detach(handler_id)
-      end)
+    assert_receive {:dummy_repo_insert, changeset}
+    assert changeset.data.__struct__ == Parapet.Spine.SystemEvent
+    assert Ecto.Changeset.get_field(changeset, :type) == "rulestead_flag_change"
+    
+    payload = Ecto.Changeset.get_field(changeset, :payload)
+    assert payload["flag_name"] == "feature_x"
+    assert payload["ruleset_id"] == "rs_123"
+  end
 
-      :ok
-    end
-
-    test "translates rulestead flag change event safely without PII" do
-      Parapet.Integrations.Rulestead.setup()
-
-      :telemetry.execute(
-        [:rulestead, :flag, :changed],
-        %{duration: 100},
-        %{flag_name: "new_ui", state: true, user_id: 123}
-      )
-
-      assert_receive {:telemetry_event, [:parapet, :mitigation, :rulestead, :flag, :changed],
-                      measurements, metadata}
-
-      assert measurements.duration == 100
-      assert metadata.flag_name == "new_ui"
-      assert metadata.state == true
-      refute Map.has_key?(metadata, :user_id)
-    end
+  test "exceptions in the handler are rescued and do not crash the caller" do
+    # Pass bad metadata that would cause a crash if not rescued
+    assert Parapet.Integrations.Rulestead.handle_event(
+             [:rulestead, :admin, :ruleset, :published],
+             %{},
+             :not_a_map,
+             nil
+           ) == :ok
   end
 end
