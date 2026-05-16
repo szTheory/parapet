@@ -20,12 +20,11 @@ defmodule Mix.Tasks.Parapet.InstallTest do
         @moduledoc "Host-owned telemetry instrumentation for Parapet."
 
         def setup do
-          # Attach handlers here
+          Parapet.Metrics.Probe.setup()
           :ok
         end
       end
       """)
-
       # Assert updates using the updated sources from igniter.rewrite
       endpoint_source =
         Rewrite.source!(igniter.rewrite, "lib/test_web/endpoint.ex")

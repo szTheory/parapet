@@ -94,7 +94,31 @@ Parapet can generate an optional, evidence-first LiveView operator workbench dir
 
 For instructions on generating the UI and securing its routes, see the [Operator UI Guide](docs/operator-ui.md).
 
-### 6. Deploy Markers
+### 6. Synthetic Probes
+
+Parapet provides active checks to maintain SLO signal quality using Synthetic Probes. You can define a probe by implementing the `Parapet.Probe` behavior:
+
+```elixir
+defmodule MyApp.Probes.Checkout do
+  use Parapet.Probe
+
+  @impl true
+  def run do
+    # Run active test logic here
+    # Return :ok or {:error, reason}
+    :ok
+  end
+end
+```
+
+To schedule probes, Parapet includes two pluggable schedulers:
+
+- **NativeScheduler:** A standalone memory-based timer ideal for single-node setups. Configure it in your application tree:
+  `{Parapet.Probe.NativeScheduler, probes: [{MyApp.Probes.Checkout, 60_000}]}`
+- **ObanScheduler:** A distributed, cron-like scheduler for clustered setups without retries. Requires [Oban](https://getoban.pro/). Configure it in your Oban cron jobs:
+  `{"* * * * *", Parapet.Probe.ObanScheduler, args: %{probe: to_string(MyApp.Probes.Checkout)}}`
+
+### 7. Deploy Markers
 
 Parapet can automatically track your deployments. Simply add the `Parapet.Plug.DeployMarker` to your authentication or administration pipeline:
 

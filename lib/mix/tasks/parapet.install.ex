@@ -28,7 +28,7 @@ defmodule Mix.Tasks.Parapet.Install do
     with_sigra? = igniter.args.options[:with_sigra] || false
     with_scoria? = igniter.args.options[:with_scoria] || false
 
-    setup_code_body = []
+    setup_code_body = ["  Parapet.Metrics.Probe.setup()"]
 
     setup_code_body =
       if with_sigra? do
