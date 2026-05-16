@@ -12,6 +12,7 @@ defmodule Parapet.Spine.Incident do
     field(:description, :string)
     field(:state, :string, default: "open")
     field(:correlation_key, :string)
+    field(:trace_id, :string)
     field(:runbook_data, :map)
 
     timestamps(type: :utc_datetime_usec)
@@ -20,7 +21,7 @@ defmodule Parapet.Spine.Incident do
   @doc false
   def changeset(incident, attrs) do
     incident
-    |> cast(attrs, [:title, :description, :state, :correlation_key, :runbook_data])
+    |> cast(attrs, [:title, :description, :state, :correlation_key, :trace_id, :runbook_data])
     |> validate_required([:title])
     |> validate_inclusion(:state, ["open", "investigating", "resolved"])
   end
