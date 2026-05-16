@@ -1,32 +1,32 @@
 defmodule Parapet.Integrations.Sigra do
   @moduledoc """
   Parapet integration for the Sigra authentication library.
-  Listens to Sigra telemetry events and translates them into standard Parapet login journey metrics.
+  Listens to Sigra telemetry events and translates them into standard Parapet login and signup journey metrics.
   """
 
   require Logger
 
   @doc """
-  Attaches telemetry handlers for Sigra login events.
+  Attaches telemetry handlers for Sigra login and signup events.
   """
   def setup do
-    :telemetry.attach(
-      "parapet-sigra-login-stop",
-      [:sigra, :auth, :login, :stop],
+    :telemetry.attach_many(
+      "parapet-sigra-auth",
+      [
+        [:sigra, :auth, :login, :stop],
+        [:sigra, :auth, :login, :exception],
+        [:sigra, :auth, :signup, :stop],
+        [:sigra, :auth, :signup, :exception]
+      ],
       &__MODULE__.handle_event/4,
       nil
     )
 
-    :telemetry.attach(
-      "parapet-sigra-login-exception",
-      [:sigra, :auth, :login, :exception],
-      &__MODULE__.handle_event/4,
-      nil
-    )
+    Parapet.Metrics.Sigra.setup()
   end
 
   @doc """
-  Handles Sigra telemetry events safely and emits Parapet login journey events.
+  Handles Sigra telemetry events safely and emits Parapet journey events.
   """
   def handle_event(event, measurements, metadata, _config) do
     process_event(event, measurements, metadata)
@@ -41,12 +41,25 @@ defmodule Parapet.Integrations.Sigra do
        when state in [:stop, :exception] do
     outcome = if state == :stop, do: :success, else: :failure
 
-    # Strip PII from metadata, but you can pass relevant non-PII if needed.
-    # Right now we just send outcome.
     parapet_metadata = %{outcome: outcome}
 
     :telemetry.execute(
       [:parapet, :journey, :login],
+      %{duration: measurements.duration},
+      parapet_metadata
+    )
+  end
+
+  defp process_event([:sigra, :auth, :signup, state], measurements, metadata)
+       when state in [:stop, :exception] do
+    outcome = if state == :stop, do: :success, else: :failure
+    provider = Map.get(metadata, :provider, "unknown")
+
+    # Strip PII from metadata, only tracking outcome and provider
+    parapet_metadata = %{outcome: outcome, provider: provider}
+
+    :telemetry.execute(
+      [:parapet, :journey, :signup],
       %{duration: measurements.duration},
       parapet_metadata
     )
