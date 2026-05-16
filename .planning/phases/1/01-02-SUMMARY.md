@@ -1,48 +1,13 @@
----
-phase: "01"
-plan: "02"
-subsystem: "Scoria Telemetry"
-tags: ["ai", "telemetry", "generator", "igniter"]
-requires: ["01-01"]
-provides: ["parapet.gen.scoria"]
-affects: ["mix parapet.install"]
-tech-stack:
-  added: []
-  patterns: ["Igniter.Mix.Task", "EEx.eval_file", "Igniter.compose_task"]
-key-files:
-  created:
-    - lib/mix/tasks/parapet.gen.scoria.ex
-    - test/mix/tasks/parapet.gen.scoria_test.exs
-    - priv/templates/parapet.gen.scoria/scoria_dashboard.json.eex
-    - priv/templates/parapet.gen.scoria/rules.yml.eex
-  modified:
-    - lib/mix/tasks/parapet.install.ex
-key-decisions:
-  - "Updated Igniter implementation to use modern arity 1 `igniter/1` callbacks for tasks"
-metrics:
-  duration: 10m
-  completed_at: 2026-05-12T00:00:00Z
----
+# Phase 1 - Plan 2 Summary (Synthetic Probe Schedulers)
 
-# Phase 01 Plan 02: Scoria Generator and Installer Summary
+## Objective Completed
+Implemented pluggable schedulers for executing probes: `NativeScheduler` for standalone memory-based timers and `ObanScheduler` for distributed clustered setups without retries.
 
-Creates the `mix parapet.gen.scoria` generator to scaffold Grafana dashboards and Prometheus rules, and wires it into the main Parapet installer.
+## Tasks Completed
+1. **Parapet.Probe.NativeScheduler:** Created as a GenServer to dispatch probe execution continuously based on a simple configuration `[{MyProbe, 60_000}]`.
+2. **Parapet.Probe.ObanScheduler:** Created as an Oban worker configured with `max_attempts: 1`. It dynamically invokes the probe using `apply(module, :execute, [])`.
 
-## Deviations from Plan
-
-### Auto-fixed Issues
-
-**1. [Rule 1 - Bug] Fixed deprecated Igniter.Mix.Task callback arity**
-- **Found during:** Task 1
-- **Issue:** The test was trying to use `Scoria.igniter(igniter)` but the implemented code used `def igniter(igniter, _argv)` which failed since `igniter/2` is deprecated.
-- **Fix:** Refactored `igniter/2` to `igniter/1` in the generator module.
-- **Files modified:** `lib/mix/tasks/parapet.gen.scoria.ex`
-- **Commit:** 256d1cb
-
-## Known Stubs
-
-| File | Location | Reason |
-|------|----------|--------|
-| `priv/templates/parapet.gen.scoria/scoria_dashboard.json.eex` | Line 1 | Contains empty `{}` as instructed by the plan. A real Grafana dashboard JSON will be populated in a future plan. |
-
-## Self-Check: PASSED
+## Security & Verification
+- `max_attempts: 1` explicitly asserted and verified in tests.
+- Dynamically invoked probe module is validated via `Code.ensure_loaded?` and `function_exported?`.
+- Automated test coverage provided for both native timer scheduling and Oban worker logic.
