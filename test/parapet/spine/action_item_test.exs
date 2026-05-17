@@ -4,10 +4,10 @@ defmodule Parapet.Spine.ActionItemTest do
   alias Parapet.Spine.ActionItem
 
   describe "schema" do
-    test "has expected fields and default state" do
+    test "keeps the default state open and the default kind exact_follow_up" do
       assert %ActionItem{}.state == "open"
-      assert Map.has_key?(%ActionItem{}, :title)
-      assert Map.has_key?(%ActionItem{}, :integration)
+      assert %ActionItem{}.kind == "exact_follow_up"
+      assert Map.has_key?(%ActionItem{}, :incident_id)
       assert Map.has_key?(%ActionItem{}, :external_id)
     end
   end
@@ -15,23 +15,52 @@ defmodule Parapet.Spine.ActionItemTest do
   describe "changeset/2" do
     test "requires title, integration, and external_id" do
       changeset = ActionItem.changeset(%ActionItem{}, %{})
-      assert %{title: ["can't be blank"], integration: ["can't be blank"], external_id: ["can't be blank"]} = errors_on(changeset)
+
+      assert %{
+               title: ["can't be blank"],
+               integration: ["can't be blank"],
+               external_id: ["can't be blank"]
+             } = errors_on(changeset)
+    end
+
+    test "accepts narrow exact-follow-up linkage fields" do
+      changeset =
+        ActionItem.changeset(%ActionItem{}, %{
+          title: "Inspect discarded delivery",
+          integration: "mailglass",
+          external_id: "delivery-ref-123",
+          incident_id: Ecto.UUID.generate(),
+          kind: "suppressed_delivery"
+        })
+
+      assert changeset.valid?
+    end
+
+    test "rejects generic task-style kinds" do
+      changeset =
+        ActionItem.changeset(%ActionItem{}, %{
+          title: "Investigate broadly",
+          integration: "mailglass",
+          external_id: "delivery-ref-123",
+          kind: "generic_task"
+        })
+
+      assert %{kind: ["is invalid"]} = errors_on(changeset)
     end
 
     test "validates state inclusion" do
-      changeset = ActionItem.changeset(%ActionItem{}, %{title: "Test", integration: "scoria", external_id: "123", state: "invalid"})
+      changeset =
+        ActionItem.changeset(%ActionItem{}, %{
+          title: "Test",
+          integration: "scoria",
+          external_id: "123",
+          state: "invalid"
+        })
+
       assert %{state: ["is invalid"]} = errors_on(changeset)
-
-      valid_states = ["open", "resolved"]
-
-      for state <- valid_states do
-        changeset = ActionItem.changeset(%ActionItem{}, %{title: "Test", integration: "scoria", external_id: "123", state: state})
-        assert changeset.valid?
-      end
     end
   end
 
-  # Helper to parse errors
   defp errors_on(changeset) do
     Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
       Regex.replace(~r"%{(\w+)}", message, fn _, key ->

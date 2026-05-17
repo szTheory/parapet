@@ -2,6 +2,8 @@
 
 The Parapet Operator UI is an optional, generated LiveView workbench that sits inside your host application. Rather than offering another dashboard with raw telemetry, it provides a strictly controlled surface for initiating actionable mitigations when an SLO is burning, with an immutable audit trail for every action.
 
+Phase 6 extends that boundary with fault-domain triage for async and delivery incidents. The workbench now treats a compact evidence-backed triage block as the current-state index and the incident chronology as the authoritative source of sequence.
+
 ## Prerequisites
 
 - Phoenix and LiveView installed in your host app
@@ -62,3 +64,27 @@ The Parapet operator workbench adheres to strict evidence-first design principle
 2. **First-Class Actions:** (D-07 - D-09) The UI surface is explicitly limited to initiating predefined, safe mitigation actions. It is not an arbitrary admin console.
 3. **Immutable Factual Timelines:** (D-10 - D-12) Any events or incidents viewed within the UI reflect immutable facts stored in the evidence spine. The UI reads these facts but cannot alter history.
 4. **Required Audit Context:** (D-17 - D-19) Every mutating action triggered from the workbench automatically captures audit context, including the actor's identity and the rationale. This ensures every operational change leaves a durable, queryable trace.
+
+## Phase 6 Triage Contract
+
+For async and delivery incidents, the generated detail view should render:
+
+1. A compact triage block derived from durable evidence only.
+2. The normalized chronology immediately underneath it.
+3. External links outward to provider consoles, Grafana, and runbooks.
+4. Exact action items only when one concrete object needs manual follow-up.
+
+The triage block is sourced from the incident summary in `runbook_data["triage"]` and the latest `triage_snapshot` timeline entry. It should answer:
+
+- Observed symptom
+- Likely fault plane
+- Why we think that, using 2-4 bounded evidence facts
+- Safe next step
+
+The detail page should not infer fault planes by parsing titles, should not treat `runbook_data` as a hidden timeline, and should not attempt provider-console-style forensics.
+
+## Exact Follow-Up Only
+
+`ActionItem`s remain a narrow exact-object seam. They are appropriate when one concrete async or delivery object needs operator attention, such as a suppressed delivery, dead-lettered job, stale workflow, or orphaned callback. They are not generic investigation todos, ownership queues, or SLA-tracked incident tasks.
+
+Phase 7 recovery actions remain host-wired and explicitly audited. The Phase 6 workbench is evidence-first and operator-guided, not an autonomous remediation surface.
