@@ -63,4 +63,34 @@ defmodule Parapet.Integrations.ThreadlineTest do
     # We shouldn't crash the test process
     assert true
   end
+
+  test "handle_event/4 correctly formats payload and calls Threadline when Code.ensure_loaded?(Threadline) is true" do
+    Process.register(self(), :threadline_test_receiver)
+
+    audit_attrs = %{tool_name: "my_tool", input: %{"a" => 1}, success: true}
+
+    :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: audit_attrs})
+
+    assert_receive {:threadline_log_audit, attrs}
+    assert attrs.action == "my_tool"
+    assert attrs.payload == %{"a" => 1}
+    assert attrs.success == true
+
+    Process.unregister(:threadline_test_receiver)
+  end
+
+  test "handle_event/4 safely returns :ok without crashing when Code.ensure_loaded?(Threadline) is false" do
+    beam_path = :code.which(Threadline)
+    bak_path = to_string(beam_path) <> ".bak"
+    File.rename!(beam_path, bak_path)
+
+    :code.delete(Threadline)
+    :code.purge(Threadline)
+
+    assert :ok = :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: %{tool_name: "test"}})
+    refute_receive {:threadline_log_audit, _}
+
+    File.rename!(bak_path, beam_path)
+    Code.ensure_loaded?(Threadline)
+  end
 end
