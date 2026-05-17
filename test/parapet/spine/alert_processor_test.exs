@@ -37,22 +37,16 @@ defmodule Parapet.Spine.AlertProcessorTest do
 
       Enum.reduce_while(ops, {:ok, %{}}, fn
         {name, {:insert, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
-          case insert(changeset) do
-            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
-            {:error, error} -> {:halt, {:error, name, error, acc}}
-          end
+          {:ok, struct} = insert(changeset)
+          {:cont, {:ok, Map.put(acc, name, struct)}}
 
         {name, {:insert, fun, _opts}}, {:ok, acc} ->
-          case insert(fun.(acc)) do
-            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
-            {:error, error} -> {:halt, {:error, name, error, acc}}
-          end
+          {:ok, struct} = insert(fun.(acc))
+          {:cont, {:ok, Map.put(acc, name, struct)}}
 
         {name, {:update, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
-          case update(changeset) do
-            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
-            {:error, error} -> {:halt, {:error, name, error, acc}}
-          end
+          {:ok, struct} = update(changeset)
+          {:cont, {:ok, Map.put(acc, name, struct)}}
 
         {name, {:run, fun}}, {:ok, acc} ->
           case fun.(__MODULE__, acc) do

@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-12)
+See: .planning/PROJECT.md (updated 2026-05-17)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Executing v0.6 milestone (Change Correlation & Audit Trailing).
+**Current focus:** Preparing Phase 7 host-owned recovery runbooks on top of the completed Phase 6 triage and evidence seams.
 
 ## Current Position
 
-Phase: 03
-Plan: 03
-Status: Completed
-Last activity: Completed 03-03-PLAN.md
+Phase: 6
+Plan: Phase 6 complete
+Status: Ready for Phase 7 planning
+Last activity: 2026-05-18 - Phase 6 execution completed
 
-Progress: [XXXXXXX...] 77%
+Progress: [#######---] 70%
 
 ## Accumulated Context
 
@@ -39,9 +39,15 @@ None.
 - Used `Code.ensure_loaded?(Threadline)` to check for Threadline dependency safely before routing.
 - Adapted `to_threadline_shape` to support maps to accommodate telemetry payloads.
 - Added telemetry event handler for `[:parapet, :audit, :created]` events.
+- Added shared async/delivery metric families plus a bounded `Parapet.SLO.SliceSpec` seam for provider-owned reliability slices.
+- Added explicit `Parapet.SLO.MailglassDelivery`, `Parapet.SLO.ChimewayDelivery`, and `Parapet.SLO.RindleAsync` provider catalogs.
+- Reworked `mix parapet.gen.prometheus` into a provider-first generator that writes split recording and alert artifacts plus a compatibility aggregate.
+- Added bounded Phase 6 triage summaries under `incident.runbook_data["triage"]` plus append-only `triage_snapshot` chronology for async and delivery incidents.
+- Replaced generic workbench derivation with a durable evidence-backed triage contract and chronology-first incident detail ordering.
+- Narrowed `ActionItem` to incident-linked exact follow-up work with bounded kinds for concrete async and delivery objects.
 
 ## Session Continuity
 
-Last session: 2026-05-24
-Stopped at: Completed 03-02-PLAN.md
+Last session: 2026-05-18
+Stopped at: Phase 6 execution wrap-up
 Resume file: None
