@@ -49,7 +49,7 @@ defmodule Parapet.Operator do
       Evidence.repo().all(
         from(t in Parapet.Spine.TimelineEntry,
           where: t.incident_id == ^incident_id,
-          order_by: [desc: t.inserted_at]
+          order_by: [asc: t.inserted_at]
         )
       )
 
