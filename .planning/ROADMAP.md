@@ -71,6 +71,6 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Synthetic Probes | 0/3 | Pending | |
-| 2. Deepened Journey Integrations | 0/3 | Pending | |
-| 3. Parapet MCP Server | 0/3 | Pending | |
+| 1. OpenTelemetry Trace Exemplars | 0/3 | Pending | |
+| 2. Rulestead Flag Correlation | 0/3 | Pending | |
+| 3. Threadline Compliance Sync | 2/3 | In Progress | |
