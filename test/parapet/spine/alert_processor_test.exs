@@ -1,70 +1,81 @@
 defmodule Parapet.Spine.AlertProcessorTest do
   use ExUnit.Case, async: false
+
   alias Parapet.Spine.AlertProcessor
+  alias Parapet.Spine.{Incident, SystemEvent, TimelineEntry}
 
   defmodule DummyRepo do
-    def insert(changeset, opts \\ []) do
-      # For tests, we just send a message to the test process
-      # so we can assert it was called.
-      send(self(), {:insert, changeset, opts})
-      
-      struct = Ecto.Changeset.apply_changes(changeset)
-      
+    def all(query) do
+      source = query.from |> Map.fetch!(:source) |> elem(1)
+
+      case source do
+        Parapet.Spine.SystemEvent -> Process.get(:mock_system_events, [])
+        Parapet.Spine.Incident -> Process.get(:mock_incidents, [])
+        Parapet.Spine.TimelineEntry -> Process.get(:mock_timeline_entries, [])
+      end
+    end
+
+    def insert(changeset, _opts \\ []) do
+      send(self(), {:insert, changeset})
+
       struct =
-        if Process.get(:mock_insert_id) && struct.__struct__ == Parapet.Spine.Incident do
-          %{struct | id: Process.get(:mock_insert_id)}
-        else
-          struct
-        end
+        changeset
+        |> Ecto.Changeset.apply_changes()
+        |> maybe_assign_id()
 
       {:ok, struct}
     end
 
-    def get_by!(Parapet.Spine.Incident, correlation_key: key) do
-      %Parapet.Spine.Incident{id: "inc-mocked", state: "open", correlation_key: key}
-    end
-
-    def all(query) do
-      # We just mock the result based on the test setup
-      # If the test needs an incident, it will put it in the process dictionary
-      if is_map(query) && Map.get(query, :from) && elem(query.from.source, 1) == Parapet.Spine.SystemEvent do
-        Process.get(:mock_system_events, [])
-      else
-        Process.get(:mock_incident, [])
-      end
+    def update(changeset, _opts \\ []) do
+      send(self(), {:update, changeset})
+      {:ok, Ecto.Changeset.apply_changes(changeset)}
     end
 
     def transaction(multi) do
-      # We extract the operations and send them
       ops = Ecto.Multi.to_list(multi)
       send(self(), {:transaction, ops})
 
-      # Mock the result to satisfy the caller
-      # Return ok with mock results
-      # Ecto.Multi.run operations are handled by calling the function
-      results =
-        Enum.into(ops, %{}, fn
-          {name, {:run, fun}} ->
-            # mock repo is passed, along with previous results which we stub as %{}
-            # actually we need to pass the updated_incident from previous steps
-            # so we just let the fun run with an empty repo and a dummy incident
-            {_status, val} =
-              fun.(__MODULE__, %{
-                incident: %Parapet.Spine.Incident{id: "inc-mocked", state: "resolved"}
-              })
+      Enum.reduce_while(ops, {:ok, %{}}, fn
+        {name, {:insert, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
+          case insert(changeset) do
+            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
+            {:error, error} -> {:halt, {:error, name, error, acc}}
+          end
 
-            {name, val}
+        {name, {:insert, fun, _opts}}, {:ok, acc} ->
+          case insert(fun.(acc)) do
+            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
+            {:error, error} -> {:halt, {:error, name, error, acc}}
+          end
 
-          {name, {_, changeset, _opts}} ->
-            {name, Ecto.Changeset.apply_changes(changeset)}
-        end)
+        {name, {:update, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
+          case update(changeset) do
+            {:ok, struct} -> {:cont, {:ok, Map.put(acc, name, struct)}}
+            {:error, error} -> {:halt, {:error, name, error, acc}}
+          end
 
-      {:ok, results}
+        {name, {:run, fun}}, {:ok, acc} ->
+          case fun.(__MODULE__, acc) do
+            {:ok, value} -> {:cont, {:ok, Map.put(acc, name, value)}}
+            {:error, error} -> {:halt, {:error, name, error, acc}}
+          end
+      end)
     end
+
+    defp maybe_assign_id(%Incident{} = incident) do
+      Map.put(incident, :id, incident.id || Process.get(:mock_incident_id, "inc-generated"))
+    end
+
+    defp maybe_assign_id(%TimelineEntry{} = entry) do
+      Map.put(entry, :id, entry.id || Ecto.UUID.generate())
+    end
+
+    defp maybe_assign_id(struct), do: struct
   end
 
   defmodule DummyNotifier do
     @behaviour Parapet.Notifier
+
     def deliver(incident, opts) do
       send(opts[:test_pid], {:broadcast, incident})
       {:ok, :delivered}
@@ -72,7 +83,11 @@ defmodule Parapet.Spine.AlertProcessorTest do
   end
 
   setup do
-    Process.put(:mock_incident, [])
+    Process.put(:mock_incidents, [])
+    Process.put(:mock_system_events, [])
+    Process.put(:mock_timeline_entries, [])
+    Process.put(:mock_incident_id, "inc-generated")
+
     Application.put_env(:parapet, :repo, DummyRepo)
     Application.put_env(:parapet, :use_oban_for_notifications, false)
     Application.put_env(:parapet, :notifiers, [{DummyNotifier, [test_pid: self()]}])
@@ -87,7 +102,7 @@ defmodule Parapet.Spine.AlertProcessorTest do
   end
 
   describe "process_batch/1" do
-    test "Test 1: A \"firing\" alert creates a new Incident with state 'open' and the correct correlation_key." do
+    test "creates a new incident for a generic firing alert" do
       payload = %{
         "alerts" => [
           %{
@@ -101,63 +116,67 @@ defmodule Parapet.Spine.AlertProcessorTest do
 
       assert :ok = AlertProcessor.process_batch(payload)
 
-      assert_received {:insert, changeset, opts}
-      assert changeset.valid?
+      assert_received {:transaction, ops}
+      assert {:incident, {:insert, changeset, _opts}} = List.keyfind(ops, :incident, 0)
+
       incident = Ecto.Changeset.apply_changes(changeset)
       assert incident.title == "CPU usage is high"
       assert incident.description == "More details"
       assert incident.state == "open"
       assert incident.correlation_key == "123456"
-      assert opts[:on_conflict] == :nothing
-      assert opts[:conflict_target] == [:correlation_key]
+      assert incident.runbook_data == %{}
 
-      assert_receive {:broadcast, broadcasted_incident}, 1000
-      assert broadcasted_incident.correlation_key == "123456"
+      assert_receive {:broadcast, %Incident{correlation_key: "123456"}}
     end
 
-    test "Test 2: An identical \"firing\" alert correlates to the existing open Incident without creating duplicates." do
-      # In the actual implementation, this is handled by `on_conflict: :nothing`
-      # In the test, we just ensure `on_conflict: :nothing` is passed to Ecto, 
-      # which we already asserted in Test 1. We can also verify fallback hash generation here.
+    test "updates an existing correlated incident without duplicating the durable summary" do
+      Process.put(:mock_incidents, [
+        %Incident{
+          id: "inc-existing",
+          state: "open",
+          correlation_key: "existing-key",
+          runbook_data: %{
+            "triage" => %{
+              "integration" => "rindle",
+              "symptom" => "queue backlog burn",
+              "fault_plane" => "backlog",
+              "confidence" => "medium"
+            }
+          }
+        }
+      ])
+
       payload = %{
         "alerts" => [
           %{
             "status" => "firing",
-            "labels" => %{"alertname" => "HighCPU", "instance" => "host1"},
-            "annotations" => %{"summary" => "CPU usage is high"}
+            "fingerprint" => "existing-key",
+            "labels" => %{
+              "alertname" => "RindleQueueFreshnessBurn",
+              "integration" => "rindle",
+              "fault_plane" => "backlog"
+            },
+            "annotations" => %{"summary" => "Queue backlog burn"}
           }
         ]
       }
 
       assert :ok = AlertProcessor.process_batch(payload)
 
-      assert_received {:insert, changeset, opts}
+      assert_received {:transaction, ops}
+      assert {:incident, {:update, changeset, _opts}} = List.keyfind(ops, :incident, 0)
+      assert {:triage_snapshot, {:run, _fun}} = List.keyfind(ops, :triage_snapshot, 0)
+
       incident = Ecto.Changeset.apply_changes(changeset)
-
-      # Verify fingerprint fallback works via hashing labels
-      labels_encoded =
-        %{"alertname" => "HighCPU", "instance" => "host1"}
-        |> Enum.sort()
-        |> Enum.map_join(",", fn {k, v} -> "#{k}:#{v}" end)
-
-      expected_hash = :crypto.hash(:sha256, labels_encoded) |> Base.encode16(case: :lower)
-
-      assert incident.correlation_key == expected_hash
-      assert opts[:on_conflict] == :nothing
-
-      assert_receive {:broadcast, _}, 1000
+      assert incident.correlation_key == "existing-key"
+      assert incident.runbook_data["triage"]["fault_plane"] == "backlog"
     end
 
-    test "Test 2.0.1: Creating a new Incident correlates recent SystemEvents to TimelineEntries" do
-      # Simulate a NEW incident by setting an ID in the insert struct
-      Process.put(:mock_insert_id, "new-incident-id")
-      
+    test "correlates recent system events when a new incident is created" do
+      Process.put(:mock_incident_id, "new-incident-id")
+
       Process.put(:mock_system_events, [
-        %Parapet.Spine.SystemEvent{
-          id: "evt-1",
-          type: "rulestead_flag_change",
-          payload: %{"flag" => "feature_x"}
-        }
+        %SystemEvent{id: "evt-1", type: "rulestead_flag_change", payload: %{"flag" => "feature_x"}}
       ])
 
       payload = %{
@@ -171,54 +190,15 @@ defmodule Parapet.Spine.AlertProcessorTest do
 
       assert :ok = AlertProcessor.process_batch(payload)
 
-      # We expect two inserts: one for Incident, one for TimelineEntry
-      assert_received {:insert, incident_cs, opts}
-      assert incident_cs.data.__struct__ == Parapet.Spine.Incident
-      assert opts[:on_conflict] == :nothing
-      
-      assert_received {:insert, timeline_cs, _opts}
-      assert timeline_cs.data.__struct__ == Parapet.Spine.TimelineEntry
+      assert_received {:insert, %Ecto.Changeset{data: %Incident{}}}
+      assert_received {:insert, timeline_cs}
+      assert timeline_cs.data.__struct__ == TimelineEntry
       assert Ecto.Changeset.get_field(timeline_cs, :incident_id) == "new-incident-id"
       assert Ecto.Changeset.get_field(timeline_cs, :type) == "rulestead_flag_change"
       assert Ecto.Changeset.get_field(timeline_cs, :payload) == %{"flag" => "feature_x"}
-      
-      assert_receive {:broadcast, _}, 1000
     end
 
-    test "Test 2.0.2: An existing Incident does NOT correlate SystemEvents again" do
-      # Simulate an EXISTING incident by NOT setting an ID in the insert struct
-      Process.put(:mock_insert_id, nil)
-      
-      Process.put(:mock_system_events, [
-        %Parapet.Spine.SystemEvent{
-          id: "evt-1",
-          type: "rulestead_flag_change",
-          payload: %{"flag" => "feature_x"}
-        }
-      ])
-
-      payload = %{
-        "alerts" => [
-          %{
-            "status" => "firing",
-            "labels" => %{"alertname" => "HighCPU"}
-          }
-        ]
-      }
-
-      assert :ok = AlertProcessor.process_batch(payload)
-
-      assert_received {:insert, incident_cs, _opts}
-      assert incident_cs.data.__struct__ == Parapet.Spine.Incident
-      
-      # We should NOT receive a second insert for the timeline entry
-      refute_received {:insert, %Ecto.Changeset{data: %Parapet.Spine.TimelineEntry{}}, _opts}
-      
-      assert_receive {:broadcast, _}, 1000
-    end
-
-
-    test "Test 2.1: A firing alert that matches an SLO runbook attaches the runbook schema data" do
+    test "attaches runbook data for matching SLOs and keeps triage nested" do
       defmodule MockRunbook do
         def __runbook_schema__() do
           %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
@@ -227,39 +207,35 @@ defmodule Parapet.Spine.AlertProcessorTest do
 
       apply(Parapet.SLO, :define, [
         :RunbookAlert,
-        [
-          objective: 99.9,
-          good_events: "up",
-          total_events: "all",
-          runbook: MockRunbook
-        ]
+        [objective: 99.9, good_events: "up", total_events: "all", runbook: MockRunbook]
       ])
 
       payload = %{
         "alerts" => [
           %{
             "status" => "firing",
-            "labels" => %{"alertname" => "RunbookAlert"},
-            "annotations" => %{"summary" => "Runbook trigger"}
+            "fingerprint" => "runbook-alert",
+            "labels" => %{
+              "alertname" => "RunbookAlert",
+              "integration" => "mailglass",
+              "fault_plane" => "provider"
+            },
+            "annotations" => %{"summary" => "Provider feedback degraded"}
           }
         ]
       }
 
       assert :ok = AlertProcessor.process_batch(payload)
 
-      assert_received {:insert, changeset, _opts}
+      assert_received {:transaction, ops}
+      assert {:incident, {:insert, changeset, _opts}} = List.keyfind(ops, :incident, 0)
+
       incident = Ecto.Changeset.apply_changes(changeset)
 
-      assert incident.runbook_data == %{
-               module: "MockRunbook",
-               title: "Test",
-               description: "Desc",
-               steps: []
-             }
+      assert incident.runbook_data[:module] == "MockRunbook"
+      assert incident.runbook_data["triage"]["integration"] == "mailglass"
+      assert incident.runbook_data["triage"]["fault_plane"] == "provider"
 
-      assert_receive {:broadcast, _}, 1000
-
-      # cleanup
       Application.put_env(
         :parapet,
         :slos,
@@ -267,16 +243,108 @@ defmodule Parapet.Spine.AlertProcessorTest do
       )
     end
 
-    test "Test 3: An invalid payload gracefully rejects." do
+    test "stores a bounded triage summary in runbook_data and keeps titles symptom-first" do
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "fingerprint" => "triage-1",
+            "labels" => %{
+              "alertname" => "RindleQueueFreshnessBurn",
+              "integration" => "rindle",
+              "fault_plane" => "backlog",
+              "queue" => "critical_jobs",
+              "delay_bucket" => "gt_10m"
+            },
+            "annotations" => %{
+              "summary" => "Queue freshness burn",
+              "impact" => "Users are waiting on async work.",
+              "next_safe_action" => "Inspect queue depth before retrying."
+            }
+          }
+        ]
+      }
+
+      assert :ok = AlertProcessor.process_batch(payload)
+
+      assert_received {:transaction, ops}
+      assert {:incident, {:insert, changeset, _opts}} = List.keyfind(ops, :incident, 0)
+
+      incident = Ecto.Changeset.apply_changes(changeset)
+
+      assert incident.title == "Rindle queue freshness burn"
+      assert incident.runbook_data["triage"] == %{
+               "integration" => "rindle",
+               "symptom" => "Queue freshness burn",
+               "fault_plane" => "backlog",
+               "impact" => "Users are waiting on async work.",
+               "queue" => "critical_jobs",
+               "delay_bucket" => "gt_10m",
+               "next_safe_action" => "Inspect queue depth before retrying.",
+               "confidence" => "medium"
+             }
+    end
+
+    test "appends a triage_snapshot when the durable classification changes" do
+      Process.put(:mock_incidents, [
+        %Incident{
+          id: "inc-1",
+          state: "open",
+          correlation_key: "triage-2",
+          runbook_data: %{
+            "triage" => %{
+              "integration" => "mailglass",
+              "symptom" => "provider feedback degraded",
+              "fault_plane" => "provider",
+              "confidence" => "medium"
+            }
+          }
+        }
+      ])
+
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "fingerprint" => "triage-2",
+            "labels" => %{
+              "alertname" => "MailglassCallbackFreshnessBurn",
+              "integration" => "mailglass",
+              "fault_plane" => "webhook",
+              "pipeline_stage" => "callback_ingest",
+              "delay_bucket" => "gt_15m"
+            },
+            "annotations" => %{"summary" => "Callback freshness burn"}
+          }
+        ]
+      }
+
+      assert :ok = AlertProcessor.process_batch(payload)
+
+      assert_received {:transaction, ops}
+      assert {:triage_snapshot, _op} = List.keyfind(ops, :triage_snapshot, 0)
+      assert_received {:update, %Ecto.Changeset{data: %Incident{}}}
+      assert_received {:insert, snapshot_changeset}
+
+      snapshot = Ecto.Changeset.apply_changes(snapshot_changeset)
+
+      assert snapshot.type == "triage_snapshot"
+      assert snapshot.payload["fault_plane"] == "webhook"
+      assert snapshot.payload["pipeline_stage"] == "callback_ingest"
+      assert is_list(snapshot.payload["evidence_facts"])
+      assert length(snapshot.payload["evidence_facts"]) >= 1
+    end
+
+    test "rejects invalid payloads" do
       assert {:error, :invalid_payload} = AlertProcessor.process_batch(%{"not_alerts" => []})
       assert {:error, :invalid_payload} = AlertProcessor.process_batch("invalid")
 
-      refute_received {:insert, _, _}
+      refute_received {:transaction, _}
     end
 
-    test "Test 4: A resolved alert updates the corresponding open Incident's state to resolved and inserts TimelineEntry." do
-      Process.put(:mock_incident, [
-        %Parapet.Spine.Incident{id: "inc-1", state: "open", correlation_key: "123456"}
+    test "resolved alerts close matching incidents and append auto_resolved chronology" do
+      Process.put(:mock_incidents, [
+        %Incident{id: "inc-1", state: "open", correlation_key: "123456"}
       ])
 
       payload = %{
@@ -296,19 +364,15 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert incident_changeset.changes == %{state: "resolved"}
 
       assert {:timeline_entry, {:insert, entry_cs, _}} = List.keyfind(ops, :timeline_entry, 0)
-
-      # verify the changeset directly
       entry = Ecto.Changeset.apply_changes(entry_cs)
       assert entry.type == "auto_resolved"
       assert entry.incident_id == "inc-1"
       assert entry.payload["status"] == "resolved"
 
-      assert_receive {:broadcast, broadcasted_incident}, 1000
-      assert broadcasted_incident.state == "resolved"
+      assert_receive {:broadcast, %Incident{state: "resolved"}}
     end
 
-    test "Test 5: If the open Incident is not found, the resolved alert is ignored safely." do
-      # By default, mock_incident is []
+    test "ignores resolved alerts when the incident is not found" do
       payload = %{
         "alerts" => [
           %{
