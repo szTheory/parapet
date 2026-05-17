@@ -63,9 +63,26 @@ defmodule Parapet.Evidence do
   Logs a ToolAudit entry.
   """
   def log_tool_audit(attrs \\ %{}) do
-    %ToolAudit{}
-    |> ToolAudit.changeset(attrs)
-    |> repo().insert()
+    case Application.get_env(:parapet, :audit_mode, :dual_write) do
+      :threadline_deferred ->
+        :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: attrs})
+        {:ok, :deferred}
+
+      :dual_write ->
+        result =
+          %ToolAudit{}
+          |> ToolAudit.changeset(attrs)
+          |> repo().insert()
+
+        case result do
+          {:ok, struct} ->
+            :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: attrs})
+            {:ok, struct}
+
+          error ->
+            error
+        end
+    end
   end
 
   @doc """
@@ -85,10 +102,28 @@ defmodule Parapet.Evidence do
         %TimelineEntry{}
         |> TimelineEntry.changeset(Map.put(timeline_attrs, :incident_id, incident.id))
       end)
-      |> Ecto.Multi.insert(:tool_audit, fn %{timeline_entry: entry} ->
-        %ToolAudit{}
-        |> ToolAudit.changeset(Map.put(audit_attrs, :timeline_entry_id, entry.id))
-      end)
+
+    multi =
+      case Application.get_env(:parapet, :audit_mode, :dual_write) do
+        :threadline_deferred ->
+          Ecto.Multi.run(multi, :tool_audit, fn _repo, %{timeline_entry: entry} ->
+            full_attrs = Map.put(audit_attrs, :timeline_entry_id, entry.id)
+            :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: full_attrs})
+            {:ok, :deferred}
+          end)
+
+        :dual_write ->
+          multi
+          |> Ecto.Multi.insert(:tool_audit, fn %{timeline_entry: entry} ->
+            %ToolAudit{}
+            |> ToolAudit.changeset(Map.put(audit_attrs, :timeline_entry_id, entry.id))
+          end)
+          |> Ecto.Multi.run(:broadcast_audit, fn _repo, %{timeline_entry: entry} ->
+            full_attrs = Map.put(audit_attrs, :timeline_entry_id, entry.id)
+            :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: full_attrs})
+            {:ok, :broadcasted}
+          end)
+      end
 
     repo().transaction(multi)
   end
