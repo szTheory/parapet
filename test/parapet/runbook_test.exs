@@ -38,6 +38,13 @@ defmodule Parapet.RunbookTest do
       guidance: "Go to Grafana..."
     )
 
+    step(:auto_mitigate,
+      label: "Auto Mitigate",
+      description: "Automatically mitigates the issue.",
+      type: :mitigation,
+      auto_execute: true
+    )
+
     def execute_mitigation(:restart, _incident) do
       {:ok, %{restarted: true}}
     end
@@ -54,9 +61,9 @@ defmodule Parapet.RunbookTest do
       assert schema.module == "Elixir.Parapet.RunbookTest.DummyRunbook"
       assert schema.title == "Test Runbook"
       assert schema.description == "A runbook for testing purposes."
-      assert length(schema.steps) == 4
+      assert length(schema.steps) == 5
 
-      [restart_step, notify_step, retry_step, investigate_step] = schema.steps
+      [restart_step, notify_step, retry_step, investigate_step, auto_mitigate_step] = schema.steps
 
       assert restart_step.id == :restart
       assert restart_step.label == "Restart Service"
@@ -64,6 +71,7 @@ defmodule Parapet.RunbookTest do
       assert restart_step.type == :mitigation
       assert restart_step.requires_preview == false
       assert restart_step.preview_only == false
+      assert restart_step.auto_execute == false
 
       assert notify_step.id == :notify
       assert notify_step.label == "Notify Team"
@@ -71,6 +79,7 @@ defmodule Parapet.RunbookTest do
       assert notify_step.type == :manual
       assert notify_step.requires_preview == false
       assert notify_step.preview_only == false
+      assert notify_step.auto_execute == false
 
       assert retry_step.id == :retry
       assert retry_step.label == "Retry Item"
@@ -81,6 +90,7 @@ defmodule Parapet.RunbookTest do
       assert retry_step.target_kind == :async_item
       assert retry_step.requires_preview == true
       assert retry_step.preview_only == false
+      assert retry_step.auto_execute == false
 
       assert investigate_step.id == :investigate
       assert investigate_step.label == "Investigate Manually"
@@ -89,7 +99,16 @@ defmodule Parapet.RunbookTest do
       assert investigate_step.kind == :guidance
       assert investigate_step.requires_preview == false
       assert investigate_step.preview_only == true
+      assert investigate_step.auto_execute == false
       assert investigate_step.guidance == "Go to Grafana..."
+
+      assert auto_mitigate_step.id == :auto_mitigate
+      assert auto_mitigate_step.label == "Auto Mitigate"
+      assert auto_mitigate_step.description == "Automatically mitigates the issue."
+      assert auto_mitigate_step.type == :mitigation
+      assert auto_mitigate_step.requires_preview == false
+      assert auto_mitigate_step.preview_only == false
+      assert auto_mitigate_step.auto_execute == true
     end
 
     test "default execute_mitigation returns {:error, :not_implemented}" do

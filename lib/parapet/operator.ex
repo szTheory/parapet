@@ -272,7 +272,8 @@ defmodule Parapet.Operator do
           payload: %{
             "step_id" => to_string(step_atom),
             "module" => to_string(module),
-            "result" => inspect(mitigation_result)
+            "result" => inspect(mitigation_result),
+            "actor" => payload.actor
           }
         }
 

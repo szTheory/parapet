@@ -28,6 +28,7 @@ defmodule Parapet.Runbook do
         target_kind: unquote(opts)[:target_kind],
         requires_preview: Keyword.get(unquote(opts), :requires_preview, false),
         preview_only: Keyword.get(unquote(opts), :preview_only, false),
+        auto_execute: Keyword.get(unquote(opts), :auto_execute, false),
         guidance: unquote(opts)[:guidance]
       }
     end
