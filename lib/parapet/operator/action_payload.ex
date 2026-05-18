@@ -32,6 +32,15 @@ defmodule Parapet.Operator.ActionPayload do
     |> validate_not_blank(:actor)
     |> validate_not_blank(:reason)
     |> validate_not_blank(:correlation_id)
+    |> validate_mutation_idempotency()
+  end
+
+  defp validate_mutation_idempotency(changeset) do
+    if get_field(changeset, :action_type) == :execute_mitigation do
+      validate_required(changeset, [:idempotency_key])
+    else
+      changeset
+    end
   end
 
   defp validate_not_blank(changeset, field) do

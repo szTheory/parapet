@@ -60,6 +60,12 @@ defmodule Parapet.Spine.Incident do
 
   def put_triage_summary(runbook_data, _summary), do: ensure_runbook_data(runbook_data)
 
+  def put_runbook_schema(runbook_data, schema) when is_map(schema) do
+    runbook_data
+    |> ensure_runbook_data()
+    |> Map.merge(schema)
+  end
+
   defp validate_triage_summary(changeset) do
     case get_field(changeset, :runbook_data) do
       runbook_data when is_map(runbook_data) ->

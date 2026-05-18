@@ -116,6 +116,81 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert derived.classification_updated_at == ~U[2026-05-10 10:00:00Z]
     end
 
+    test "derives runbook steps with previewable and guidance distinctions" do
+      incident = %Incident{
+        id: "inc-1",
+        runbook_data: %{
+          "title" => "Mailglass Recovery",
+          "description" => "Recovery steps for Mailglass",
+          "steps" => [
+            %{id: "step-1", label: "Check status", preview_only: true},
+            %{id: "step-2", label: "Retry delivery", requires_preview: true, target_kind: "suppressed_delivery"},
+            %{id: "step-3", label: "Direct mitigation", requires_preview: false}
+          ]
+        }
+      }
+
+      action_items = [
+        %{id: "ai-1", kind: "suppressed_delivery", title: "Suppressed delivery for item X", external_id: "ext-1"}
+      ]
+
+      entries = [
+        %TimelineEntry{
+          type: "recovery_preview",
+          payload: %{
+            "step_id" => "step-2",
+            "preview_token" => "token-1",
+            "expires_at" => DateTime.add(DateTime.utc_now(), 300) |> DateTime.to_iso8601(),
+            "target_refs" => ["ext-1"]
+          },
+          inserted_at: ~U[2026-05-10 10:10:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries, action_items)
+
+      assert derived.runbook_title == "Mailglass Recovery"
+      assert length(derived.runbook_steps) == 3
+
+      [s1, s2, s3] = derived.runbook_steps
+      assert s1.id == "step-1"
+      assert s1.state == :guidance
+      assert s1.targeting_hints == []
+
+      assert s2.id == "step-2"
+      assert s2.state == :previewable
+      assert length(s2.targeting_hints) == 1
+      assert hd(s2.targeting_hints).id == "ai-1"
+
+      assert s3.id == "step-3"
+      assert s3.state == :executable
+
+      assert derived.active_preview.step_id == "step-2"
+      assert derived.active_preview.preview_token == "token-1"
+    end
+
+    test "marks steps as executed if a mitigation_executed entry exists" do
+      incident = %Incident{
+        id: "inc-1",
+        runbook_data: %{
+          "steps" => [%{id: "step-1", label: "Fix it"}]
+        }
+      }
+
+      entries = [
+        %TimelineEntry{
+          type: "mitigation_executed",
+          payload: %{"step_id" => "step-1"},
+          inserted_at: ~U[2026-05-10 10:15:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries)
+      step = hd(derived.runbook_steps)
+      assert step.state == :executed
+      assert step.executed_at == ~U[2026-05-10 10:15:00Z]
+    end
+
     test "does not parse titles or descriptions when no durable triage evidence exists" do
       incident = %Incident{
         id: "inc-1",

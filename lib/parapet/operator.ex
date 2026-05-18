@@ -53,12 +53,20 @@ defmodule Parapet.Operator do
         )
       )
 
-    derived = WorkbenchContract.derive(incident, entries)
+    action_items =
+      Evidence.repo().all(
+        from(a in Parapet.Spine.ActionItem,
+          where: a.incident_id == ^incident_id
+        )
+      )
+
+    derived = WorkbenchContract.derive(incident, entries, action_items)
 
     %{
       incident: incident,
       entries: entries,
       derived: derived,
+      action_items: action_items,
       external_links: extract_links(entries)
     }
   end
