@@ -2,19 +2,19 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-17)
+See: .planning/PROJECT.md (updated 2026-05-18)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Preparing Phase 7 host-owned recovery runbooks on top of the completed Phase 6 triage and evidence seams.
+**Current focus:** Ready for v0.8 Escalation & Auto-Remediation milestone planning.
 
 ## Current Position
 
-Phase: 7
-Plan: 3
-Status: Phase 7 Completed
-Last activity: 2026-05-18 - Phase 7 Plan 3 completed (Host-Owned Recovery Runbooks)
+Phase: 1
+Plan: 1
+Status: Ready for Phase 1 execution
+Last activity: 2026-05-18 - Phase 1 plan verified
 
-Progress: [##########] 100%
+Progress: [          ] 0%
 
 ## Accumulated Context
 

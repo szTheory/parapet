@@ -21,6 +21,42 @@ defmodule Parapet.Integrations.ScoriaTest do
       end
     end
 
+    def transaction(%Ecto.Multi{} = multi) do
+      ops = Ecto.Multi.to_list(multi)
+
+      try do
+        results =
+          Enum.reduce(ops, %{}, fn op, acc ->
+            case op do
+              {name, {:insert, changeset, _opts}} when not is_function(changeset) ->
+                if changeset.valid? do
+                  struct = Ecto.Changeset.apply_changes(changeset)
+                  struct = Map.put(struct, :id, Ecto.UUID.generate())
+                  send(self(), {:dummy_repo_insert, changeset})
+                  Map.put(acc, name, struct)
+                else
+                  throw({:rollback, name, changeset, acc})
+                end
+
+              {name, {:insert, fun, _opts}} when is_function(fun) ->
+                changeset = fun.(acc)
+                if changeset.valid? do
+                  struct = Ecto.Changeset.apply_changes(changeset)
+                  struct = Map.put(struct, :id, Ecto.UUID.generate())
+                  send(self(), {:dummy_repo_insert, changeset})
+                  Map.put(acc, name, struct)
+                else
+                  throw({:rollback, name, changeset, acc})
+                end
+            end
+          end)
+
+        {:ok, results}
+      catch
+        {:rollback, name, changeset, acc} -> {:error, name, changeset, acc}
+      end
+    end
+
     def update_all(query, updates) do
       send(self(), {:dummy_repo_update_all, query, updates})
       {1, nil}

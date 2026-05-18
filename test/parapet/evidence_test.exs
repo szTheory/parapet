@@ -26,34 +26,61 @@ defmodule Parapet.EvidenceTest do
     def transaction(%Ecto.Multi{} = multi) do
       ops = Ecto.Multi.to_list(multi)
       
-      results = 
-        Enum.reduce(ops, %{}, fn op, acc ->
-          case op do
-            {name, {:insert, changeset, _opts}} when not is_function(changeset) ->
-              struct = Ecto.Changeset.apply_changes(changeset)
-              struct = Map.put(struct, :id, Ecto.UUID.generate())
-              send(self(), {:dummy_repo_insert, struct.__struct__})
-              Map.put(acc, name, struct)
-              
-            {name, {:insert, fun, _opts}} when is_function(fun) ->
-              changeset = fun.(acc)
-              struct = Ecto.Changeset.apply_changes(changeset)
-              struct = Map.put(struct, :id, Ecto.UUID.generate())
-              send(self(), {:dummy_repo_insert, struct.__struct__})
-              Map.put(acc, name, struct)
+      try do
+        results = 
+          Enum.reduce(ops, %{}, fn op, acc ->
+            case op do
+              {name, {:insert, changeset, _opts}} when not is_function(changeset) ->
+                if changeset.valid? do
+                  struct = Ecto.Changeset.apply_changes(changeset)
+                  struct = Map.put(struct, :id, Ecto.UUID.generate())
+                  send(self(), {:dummy_repo_insert, struct.__struct__})
+                  Map.put(acc, name, struct)
+                else
+                  throw({:rollback, name, changeset, acc})
+                end
+                
+              {name, {:insert, fun, _opts}} when is_function(fun) ->
+                changeset = fun.(acc)
+                is_valid = case changeset do
+                  %Ecto.Changeset{valid?: valid} -> valid
+                  _ -> true
+                end
+                
+                if is_valid do
+                  struct = case changeset do
+                    %Ecto.Changeset{} -> Ecto.Changeset.apply_changes(changeset)
+                    other -> other
+                  end
+                  struct = Map.put(struct, :id, Ecto.UUID.generate())
+                  send(self(), {:dummy_repo_insert, struct.__struct__})
+                  Map.put(acc, name, struct)
+                else
+                  throw({:rollback, name, changeset, acc})
+                end
 
-            {name, {:update, changeset, _opts}} when not is_function(changeset) ->
-              struct = Ecto.Changeset.apply_changes(changeset)
-              send(self(), {:dummy_repo_update, struct.__struct__})
-              Map.put(acc, name, struct)
-              
-            {name, {:run, fun}} ->
-              {:ok, result} = fun.(__MODULE__, acc)
-              Map.put(acc, name, result)
-          end
-        end)
-        
-      {:ok, results}
+              {name, {:update, changeset, _opts}} when not is_function(changeset) ->
+                if changeset.valid? do
+                  struct = Ecto.Changeset.apply_changes(changeset)
+                  send(self(), {:dummy_repo_update, struct.__struct__})
+                  Map.put(acc, name, struct)
+                else
+                  throw({:rollback, name, changeset, acc})
+                end
+                
+              {name, {:run, fun}} ->
+                case fun.(__MODULE__, acc) do
+                  {:ok, result} -> Map.put(acc, name, result)
+                  {:error, reason} -> throw({:rollback, name, reason, acc})
+                end
+            end
+          end)
+          
+        {:ok, results}
+      catch
+        {:rollback, name, error_val, results} ->
+          {:error, name, error_val, results}
+      end
     end
   end
 
@@ -83,6 +110,18 @@ defmodule Parapet.EvidenceTest do
       assert {:ok, incident} = Parapet.Evidence.create_incident(attrs)
       assert incident.title == "API Outage"
       assert incident.state == "open"
+    end
+
+    test "enqueues escalation job if policy is configured" do
+      Application.put_env(:parapet, :escalation_policy, Parapet.Escalation.WorkerTest.SuccessPolicy)
+      on_exit(fn -> Application.delete_env(:parapet, :escalation_policy) end)
+
+      attrs = %{title: "API Outage 2", description: "Database is down"}
+      assert {:ok, incident} = Parapet.Evidence.create_incident(attrs)
+      assert incident.title == "API Outage 2"
+
+      # Verify Oban job is inserted via multi
+      assert_receive {:dummy_repo_insert, Oban.Job}
     end
 
     test "returns error changeset for invalid attrs" do

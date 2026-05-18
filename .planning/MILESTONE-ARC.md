@@ -2,30 +2,20 @@
 
 ## Active Milestone
 
-### v0.7 Async & Delivery Reliability
+### v0.8 Deterministic Escalation & Bounded Mitigation
 
 - status: active
-- theme: Confidence in the background
-- why_now: Extend Parapet from request-time reliability into async and provider-mediated pathways where issues surface later and with weaker default signals.
+- theme: The system protects itself predictably
+- why_now: With async visibility and basic runbooks established, the system must now ensure that unacknowledged incidents durably escalate, and that safe, predefined mitigations execute automatically to protect SLOs without relying on autonomous LLM mutations.
 - goals:
-  - Expand `Chimeway` and `Mailglass` into concrete deliverability SLI adapters
-  - Expand `Rindle` into concrete async and media pipeline observability
-  - Add built-in runbook support for stalled jobs, backlog recovery, and safe retries
+  - Durable, Oban-backed escalation routing (e.g. SEV-1 -> Slack -> 5m -> SMS)
+  - Deterministic bounded mitigations using the `Parapet.Operator` API
+  - Ecto-backed circuit breakers (via `ToolAudit` lookbacks) to prevent flap-loops
 - non_goals:
-  - Full PagerDuty-style escalation management
-  - Autonomous remediation that mutates production state without explicit operator intent
-  - Rebuilding vendor dashboards or time-series storage inside Parapet
+  - Autonomous AI remediation (violates evidence-first, bounded-action mandate)
+  - External state engines (escalation state must live in host Oban/Postgres)
 
 ## Candidate Milestones
-
-### v0.8 Escalation & Auto-Remediation
-
-- status: candidate
-- theme: The system heals itself where safe
-- why_next: After async and delivery visibility exists, Parapet can layer safe host-owned escalation and selective automation on top of clearer evidence.
-- goals:
-  - Host-owned escalation policies for severity- and time-based routing
-  - Safe reversible auto-executed runbooks for bounded mitigations
 
 ### v0.9 Performance, Scale & DX
 

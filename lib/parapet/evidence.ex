@@ -45,9 +45,26 @@ defmodule Parapet.Evidence do
   Creates a new Incident.
   """
   def create_incident(attrs \\ %{}) do
-    %Incident{}
-    |> Incident.changeset(attrs)
-    |> repo().insert()
+    multi =
+      Ecto.Multi.new()
+      |> Ecto.Multi.insert(:incident, Incident.changeset(%Incident{}, attrs))
+      |> maybe_enqueue_escalation()
+
+    case repo().transaction(multi) do
+      {:ok, %{incident: incident}} -> {:ok, incident}
+      {:error, :incident, changeset, _} -> {:error, changeset}
+      {:error, _step, reason, _} -> {:error, reason}
+    end
+  end
+
+  defp maybe_enqueue_escalation(multi) do
+    if Code.ensure_loaded?(Oban) and Application.get_env(:parapet, :escalation_policy) do
+      Ecto.Multi.insert(multi, :escalation_job, fn %{incident: incident} ->
+        Parapet.Escalation.Worker.new(%{"incident_id" => incident.id})
+      end)
+    else
+      multi
+    end
   end
 
   @doc """

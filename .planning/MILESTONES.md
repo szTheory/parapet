@@ -107,3 +107,20 @@ None. All requirements defined for v0.5 were satisfied and verified.
 
 ### Known Gaps
 None. All v0.6 requirements defined and satisfied. Tests pass locally.
+
+## v0.7 Async & Delivery Reliability
+
+**Date:** 2026-05-18
+**Stats:**
+- Phases: 4-7
+- Plans: 12
+- Total LOC: 13401 (Elixir/EEx)
+
+### Accomplishments
+1. Established safe telemetry contracts for `Mailglass`, `Chimeway`, and `Rindle` integrations to emit bounded async and delivery events.
+2. Implemented out-of-the-box provider-first SLOs for async pipeline health and provider delivery states.
+3. Created explicit fault-domain triage enrichment for async and delivery incidents, leveraging durable evidence over UI heuristics.
+4. Added safe, host-wired recovery runbook templates for stalled async work (e.g., dead-letter handling, retry workflows).
+
+### Known Gaps
+None. All v0.7 requirements defined and satisfied. Tests pass locally.

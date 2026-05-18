@@ -8,6 +8,29 @@
 | v0.2 | 3 / 11 | 1 | 3164 | 11 plans / 1 day |
 | v0.3 | 4 / 12 | 1 | 6667 | 12 plans / 1 day |
 | v0.4 | 4 / 9 | 3 | 7847 | 9 plans / 3 days |
+| v0.7 | 4 / 12 | 1 | 13401 | 12 plans / 1 day |
+
+## Milestone: v0.7 — Async & Delivery Reliability
+
+**Shipped:** 2026-05-18
+**Phases:** 4 | **Plans:** 12
+
+### What Was Built
+Implemented out-of-the-box SLIs for async pipeline health and provider delivery states (Chimeway, Mailglass, Rindle), added explicit fault-domain triage enrichment leveraging durable evidence, and introduced safe, host-wired recovery runbook templates for stalled async work.
+
+### What Worked
+- **Provider-First SLOs:** Extending the metrics layer to directly model provider states (like MailglassDelivery or RindleAsync) simplified creating actionable SLIs.
+- **Evidence-Backed Triage:** Shifting triage classification from UI heuristics down to durable Ecto snapshot evidence ensures accuracy.
+
+### What Was Inefficient
+- Integrating across varying third-party service semantics required careful modeling of states to ensure low cardinality without losing fidelity.
+
+### Patterns Established
+- **Bounded SliceSpec Seam:** Providing a narrow surface to define provider-specific delivery slices.
+- **Host-Owned Modules:** Utilizing generators to copy fixed template runbooks rather than inventing dynamic workflow DSLs.
+
+### Key Lessons
+- Providing exact recovery guidance requires distinguishing webhook/callback drift from internal queue backlogs or provider outages.
 
 ## Milestone: v0.4 — Scoria AI Integration
 
