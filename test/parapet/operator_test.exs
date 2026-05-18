@@ -170,4 +170,101 @@ defmodule Parapet.OperatorTest do
       assert {:error, :invalid_payload} = Operator.mark_investigating(incident, invalid_payload)
     end
   end
+
+  describe "recovery execution" do
+    defmodule MockRunbook do
+      use Parapet.Runbook
+      title "Mock Runbook"
+      step(:retry, capability: :retry_async_item, target_kind: "async_item")
+    end
+
+    setup do
+      # Ensure registry is fresh (manual reset for tests)
+      Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+
+      Parapet.Capabilities.register_recovery(:retry_async_item,
+        name: "Retry Item",
+        target_kind: "async_item",
+        execute: fn _incident, _refs -> {:ok, :executed} end
+      )
+
+      valid_payload = %{
+        actor: "user_1",
+        reason: "testing",
+        correlation_id: "req_1",
+        action_type: :execute_mitigation,
+        idempotency_key: "idem_1"
+      }
+
+      {:ok, payload} =
+        ActionPayload.changeset(%ActionPayload{}, valid_payload)
+        |> Ecto.Changeset.apply_action(:insert)
+
+      incident = %Incident{
+        id: Ecto.UUID.generate(),
+        state: "open",
+        runbook_data: %{"module" => to_string(MockRunbook)}
+      }
+
+      %{payload: payload, incident: incident}
+    end
+
+    test "preview_runbook_step generates a bounded preview and records evidence", %{
+      payload: payload,
+      incident: incident
+    } do
+      assert {:ok, result} = Operator.preview_runbook_step(incident, :retry, payload)
+      assert %{preview: preview} = result
+      assert preview["capability"] == "retry_async_item"
+      assert preview["preview_token"] != nil
+      assert %TimelineEntry{type: "recovery_preview"} = result.timeline_entry
+    end
+
+    test "confirm_runbook_step executes and rejects stale previews", %{
+      payload: payload,
+      incident: incident
+    } do
+      # 1. Preview first
+      {:ok, %{preview: preview}} = Operator.preview_runbook_step(incident, :retry, payload)
+      token = preview["preview_token"]
+
+      # Mock the entry in the Repo so confirm can find it
+      entry = %TimelineEntry{
+        incident_id: incident.id,
+        type: "recovery_preview",
+        payload: preview,
+        inserted_at: DateTime.utc_now()
+      }
+
+      Process.put(:mock_entries, [entry])
+
+      # 2. Confirm
+      assert {:ok, result} = Operator.confirm_runbook_step(incident, :retry, token, payload)
+      assert %TimelineEntry{type: "recovery_confirmed"} = result.timeline_entry
+
+      # 3. Test stale preview (expired)
+      expired_preview =
+        Map.put(preview, "expires_at", DateTime.utc_now() |> DateTime.add(-10, :second))
+
+      expired_entry = %TimelineEntry{entry | payload: expired_preview}
+      Process.put(:mock_entries, [expired_entry])
+
+      assert {:error, :stale_preview} =
+               Operator.confirm_runbook_step(incident, :retry, token, payload)
+    end
+
+    test "missing or unwired capability returns error", %{payload: payload, incident: incident} do
+      defmodule UnwiredRunbook do
+        use Parapet.Runbook
+        step(:ghost, capability: :request_manual_provider_check)
+      end
+
+      unwired_incident =
+        %{incident | runbook_data: %{"module" => to_string(UnwiredRunbook)}}
+
+      # Capability not registered
+      assert {:error, :capability_unwired} =
+               Operator.preview_runbook_step(unwired_incident, :ghost, payload)
+    end
+  end
 end

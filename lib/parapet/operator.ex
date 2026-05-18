@@ -284,6 +284,176 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc """
+  Previews a recovery action for a runbook step.
+  Resolves the named capability and returns a bounded preview payload.
+  """
+  def preview_runbook_step(%Incident{} = incident, step_id, %ActionPayload{} = payload) do
+    if valid_payload?(payload) do
+      with {:ok, module} <- extract_module(incident.runbook_data),
+           {:ok, step_id_atom} <- parse_step_id(step_id),
+           true <- function_exported?(module, :__runbook_schema__, 0) || {:error, :not_a_runbook},
+           schema <- module.__runbook_schema__(),
+           step <- Enum.find(schema.steps, &(&1.id == step_id_atom)),
+           {:ok, step} <- validate_step_exists(step),
+           capability_id <- step.capability,
+           capability when not is_nil(capability) <- Parapet.Capabilities.get_recovery(capability_id) do
+        preview_data = compute_preview(capability, incident, step)
+
+        timeline_attrs = %{
+          type: "recovery_preview",
+          payload: preview_data
+        }
+
+        audit_attrs = build_audit("operator_preview_recovery", payload)
+
+        Evidence.run_operator_command(
+          incident_changeset: Ecto.Changeset.change(incident, %{}),
+          timeline_attrs: timeline_attrs,
+          audit_attrs: audit_attrs
+        )
+        |> case do
+          {:ok, result} -> {:ok, Map.put(result, :preview, preview_data)}
+          error -> error
+        end
+      else
+        nil -> {:error, :capability_unwired}
+        {:error, _} = error -> error
+      end
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  @doc """
+  Confirms and executes a recovery action.
+  Validates the preview_token and requires an idempotency_key in the payload.
+  """
+  def confirm_runbook_step(%Incident{} = incident, step_id, preview_token, %ActionPayload{} = payload) do
+    if valid_payload?(payload) do
+      with {:ok, module} <- extract_module(incident.runbook_data),
+           {:ok, step_id_atom} <- parse_step_id(step_id),
+           true <- function_exported?(module, :__runbook_schema__, 0) || {:error, :not_a_runbook},
+           schema <- module.__runbook_schema__(),
+           step <- Enum.find(schema.steps, &(&1.id == step_id_atom)),
+           {:ok, step} <- validate_step_exists(step),
+           capability_id <- step.capability,
+           capability when not is_nil(capability) <- Parapet.Capabilities.get_recovery(capability_id),
+           {:ok, preview_entry} <- find_recent_preview(incident.id, step_id_atom, preview_token) do
+        if DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) == :gt do
+          # Execute the capability
+          if is_function(capability.execute, 2) do
+            case capability.execute.(incident, preview_entry.target_refs) do
+              {:ok, exec_result} ->
+                timeline_attrs = %{
+                  type: "recovery_confirmed",
+                  payload: %{
+                    "step_id" => to_string(step_id_atom),
+                    "capability" => to_string(capability_id),
+                    "result" => inspect(exec_result)
+                  }
+                }
+
+                audit_attrs = build_audit("operator_confirm_recovery", payload)
+
+                Evidence.run_operator_command(
+                  incident_changeset: Ecto.Changeset.change(incident, %{}),
+                  timeline_attrs: timeline_attrs,
+                  audit_attrs: audit_attrs
+                )
+
+              {:error, reason} ->
+                {:error, reason}
+            end
+          else
+            {:error, :capability_no_execute_callback}
+          end
+        else
+          {:error, :stale_preview}
+        end
+      else
+        nil -> {:error, :capability_unwired}
+        {:error, _} = error -> error
+      end
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  defp validate_step_exists(nil), do: {:error, :step_not_found}
+  defp validate_step_exists(step), do: {:ok, step}
+
+  defp compute_preview(capability, incident, step) do
+    expires_at = DateTime.utc_now() |> DateTime.add(300, :second)
+    preview_token = :crypto.strong_rand_bytes(16) |> Base.encode16()
+
+    base_preview = %{
+      "capability" => to_string(capability.id),
+      "step_id" => to_string(step.id),
+      "target_kind" => capability.target_kind || step.target_kind,
+      "target_refs" => [],
+      "count" => 0,
+      "preconditions" => [],
+      "warnings" => [],
+      "idempotency_caveats" => "Standard idempotency applies.",
+      "expires_at" => expires_at,
+      "preview_token" => preview_token
+    }
+
+    if is_function(capability.preview, 2) do
+      case capability.preview.(incident, step) do
+        {:ok, host_data} ->
+          # Convert host_data keys to strings for consistency in timeline payload
+          host_data_str = for {k, v} <- host_data, into: %{}, do: {to_string(k), v}
+          Map.merge(base_preview, host_data_str)
+
+        _ ->
+          base_preview
+      end
+    else
+      base_preview
+    end
+  end
+
+  defp find_recent_preview(incident_id, step_id, token) do
+    # Fetch from Evidence repo
+    entries =
+      Evidence.repo().all(
+        from(t in Parapet.Spine.TimelineEntry,
+          where: t.incident_id == ^incident_id and t.type == "recovery_preview",
+          order_by: [desc: t.inserted_at]
+        )
+      )
+
+    # Find matching token
+    match =
+      Enum.find(entries, fn entry ->
+        entry.payload["preview_token"] == token and
+          entry.payload["step_id"] == to_string(step_id)
+      end)
+
+    case match do
+      %{payload: payload} ->
+        expires_at =
+          case payload["expires_at"] do
+            %DateTime{} = dt ->
+              dt
+
+            str when is_binary(str) ->
+              {:ok, dt, _} = DateTime.from_iso8601(str)
+              dt
+
+            _ ->
+              DateTime.utc_now()
+          end
+
+        {:ok, %{expires_at: expires_at, target_refs: payload["target_refs"]}}
+
+      _ ->
+        {:error, :mismatched_preview}
+    end
+  end
+
   defp extract_module(%{"module" => mod_str}) when is_binary(mod_str) do
     try do
       {:ok, String.to_existing_atom(mod_str)}
@@ -319,14 +489,23 @@ defmodule Parapet.Operator do
     Parapet.Capabilities.capabilities(type)
   end
 
-  defp valid_payload?(%ActionPayload{
-         actor: actor,
-         reason: reason,
-         correlation_id: correlation_id,
-         action_type: action_type
-       }) do
-    not is_nil(actor) and not is_nil(reason) and not is_nil(correlation_id) and
-      not is_nil(action_type)
+  defp valid_payload?(%ActionPayload{} = payload) do
+    # Basic presence check for mandatory audit fields
+    has_audit =
+      not is_nil(payload.actor) and not is_nil(payload.reason) and
+        not is_nil(payload.correlation_id) and
+        not is_nil(payload.action_type)
+
+    # Mutating recovery actions must have an idempotency key
+    if has_audit do
+      if payload.action_type == :execute_mitigation do
+        not is_nil(payload.idempotency_key)
+      else
+        true
+      end
+    else
+      false
+    end
   end
 
   defp build_audit(tool_name, %ActionPayload{} = payload) do
