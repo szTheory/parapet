@@ -65,6 +65,7 @@ defmodule Parapet.Spine.AlertProcessor do
       Ecto.Multi.new()
       |> put_incident(existing_incident, incident_changeset)
       |> maybe_insert_triage_snapshot(snapshot_required?, triage_snapshot)
+      |> maybe_enqueue_automations(existing_incident)
       |> Ecto.Multi.run(:broadcast, fn _repo, %{incident: incident} ->
         Parapet.Notifier.broadcast(incident)
         {:ok, incident}
@@ -217,6 +218,30 @@ defmodule Parapet.Spine.AlertProcessor do
         incident_id: incident.id
       })
     end)
+  end
+
+  defp maybe_enqueue_automations(multi, existing_incident) do
+    if is_nil(existing_incident) do
+      Ecto.Multi.run(multi, :enqueue_automations, fn _repo, %{incident: incident} ->
+        steps = get_in(incident.runbook_data || %{}, ["steps"]) || get_in(incident.runbook_data || %{}, [:steps]) || []
+        
+        Enum.each(steps, fn step ->
+          auto_exec = Map.get(step, "auto_execute") || Map.get(step, :auto_execute) || false
+          
+          if auto_exec do
+            step_id = Map.get(step, "id") || Map.get(step, :id)
+            
+            %{incident_id: incident.id, step_id: to_string(step_id)}
+            |> Parapet.Automation.Executor.new()
+            |> Oban.insert!()
+          end
+        end)
+        
+        {:ok, :enqueued}
+      end)
+    else
+      multi
+    end
   end
 
   defp build_triage_summary(alert) do
