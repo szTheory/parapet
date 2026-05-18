@@ -1,0 +1,25 @@
+defmodule <%= inspect(@module_prefix) %>.ProviderOutage do
+  use Parapet.Runbook
+
+  title("Provider Outage Handling")
+  description("Guidance and actions during an external API or service provider outage.")
+
+  step(:check_status,
+    label: "Check Provider Status Page",
+    description: "Verify if the provider is currently experiencing an outage.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check the official provider status page."
+  )
+
+  step(:request_manual_check,
+    label: "Request Manual Follow-up",
+    description: "Flag this provider incident for manual investigation by the team.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :request_manual_provider_check,
+    target_kind: :provider,
+    requires_preview: true
+  )
+end

@@ -1,0 +1,15 @@
+defmodule <%= inspect(@module_prefix) %>.CallbackDelay do
+  use Parapet.Runbook
+
+  title("Callback Delay Investigation")
+  description("Guidance for investigating delayed webhooks or asynchronous callbacks.")
+
+  step(:verify_receipt,
+    label: "Verify Webhook Receipt",
+    description: "Check if the callback was ever received by the system.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Search HTTP logs for incoming requests matching the expected path and payload."
+  )
+end

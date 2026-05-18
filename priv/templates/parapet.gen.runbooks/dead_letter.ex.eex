@@ -1,0 +1,25 @@
+defmodule <%= inspect(@module_prefix) %>.DeadLetter do
+  use Parapet.Runbook
+
+  title("Dead Letter Queue Recovery")
+  description("Guidance and recovery actions for items that have permanently failed processing.")
+
+  step(:investigate_error,
+    label: "Analyze Error Reason",
+    description: "Check the last error message for why the item was dead lettered.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Review the attached exception and stacktrace."
+  )
+
+  step(:requeue_item,
+    label: "Requeue Item",
+    description: "Move the item out of the dead letter queue to be processed again.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :requeue_dead_letter,
+    target_kind: :async_item,
+    requires_preview: true
+  )
+end

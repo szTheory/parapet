@@ -1,0 +1,25 @@
+defmodule <%= inspect(@module_prefix) %>.StalledExecutor do
+  use Parapet.Runbook
+
+  title("Stalled Executor Recovery")
+  description("Guidance and recovery actions for background jobs stuck in an executing state.")
+
+  step(:investigate_logs,
+    label: "Check Worker Logs",
+    description: "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Search your APM for the worker executing this item."
+  )
+
+  step(:retry_item,
+    label: "Retry Item",
+    description: "Force the async item to be retried.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :retry_async_item,
+    target_kind: :async_item,
+    requires_preview: true
+  )
+end
