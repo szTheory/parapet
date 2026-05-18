@@ -15,6 +15,7 @@ defmodule Parapet.Metrics.Scoria do
       &__MODULE__.handle_event/4,
       nil
     )
+
     :ok
   rescue
     e in [ArgumentError] ->

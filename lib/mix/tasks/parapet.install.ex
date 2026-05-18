@@ -32,14 +32,20 @@ defmodule Mix.Tasks.Parapet.Install do
 
     setup_code_body =
       if with_sigra? do
-        ["  if Code.ensure_loaded?(Parapet.Integrations.Sigra) do\n    Parapet.Integrations.Sigra.setup()\n  end" | setup_code_body]
+        [
+          "  if Code.ensure_loaded?(Parapet.Integrations.Sigra) do\n    Parapet.Integrations.Sigra.setup()\n  end"
+          | setup_code_body
+        ]
       else
         setup_code_body
       end
 
     setup_code_body =
       if with_scoria? do
-        ["  if Code.ensure_loaded?(Parapet.Integrations.Scoria) do\n    Parapet.Integrations.Scoria.setup()\n  end" | setup_code_body]
+        [
+          "  if Code.ensure_loaded?(Parapet.Integrations.Scoria) do\n    Parapet.Integrations.Scoria.setup()\n  end"
+          | setup_code_body
+        ]
       else
         setup_code_body
       end

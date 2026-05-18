@@ -7,6 +7,13 @@ defmodule Parapet.SLOTest do
   setup do
     # Clear the SLOs before each test
     Application.put_env(:parapet, :slos, [])
+    Application.put_env(:parapet, :providers, [])
+
+    on_exit(fn ->
+      Application.put_env(:parapet, :slos, [])
+      Application.put_env(:parapet, :providers, [])
+    end)
+
     :ok
   end
 
@@ -31,11 +38,14 @@ defmodule Parapet.SLOTest do
 
     test "raises ArgumentError when missing required fields" do
       assert_raise ArgumentError, ~r/missing required fields.*runbook/, fn ->
-        SLO.define(:api_availability,
-          objective: 99.9,
-          good_events: "http_requests_total",
-          total_events: "http_requests_total"
-        )
+        apply(SLO, :define, [
+          :api_availability,
+          [
+            objective: 99.9,
+            good_events: "http_requests_total",
+            total_events: "http_requests_total"
+          ]
+        ])
       end
     end
   end
@@ -74,9 +84,12 @@ defmodule Parapet.SLOTest do
       assert length(all_slos) == 2
       assert Enum.any?(all_slos, &(&1.name == :legacy_slo))
       assert Enum.any?(all_slos, &(&1.name == :provider_slo))
+    end
 
-      # Cleanup
-      Application.put_env(:parapet, :providers, [])
+    test "attach does not silently activate providers" do
+      Parapet.attach(adapters: [:mailglass, :chimeway, :rindle])
+      assert SLO.provider_catalog() == []
+      assert SLO.all() == []
     end
   end
 
@@ -92,17 +105,11 @@ defmodule Parapet.SLOTest do
 
       yaml = Generator.generate_yaml(slo)
 
-      # Fast burn window 5m
-      assert yaml =~
-               "sum(rate(http_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))"
-
-      # Fast burn window 30m
-      assert yaml =~
-               "sum(rate(http_requests_total{status=~\"5..\"}[30m])) / sum(rate(http_requests_total[30m]))"
-
-      # Slow burn window 1h
-      assert yaml =~
-               "sum(rate(http_requests_total{status=~\"5..\"}[1h])) / sum(rate(http_requests_total[1h]))"
+      assert yaml =~ "parapet:api_availability:error_ratio:5m"
+      assert yaml =~ "sum(rate(http_requests_total{status=~\\\"5..\\\"}[5m]))"
+      assert yaml =~ "clamp_min(sum(rate(http_requests_total[5m])), 1)"
+      assert yaml =~ "parapet:api_availability:error_ratio:30m"
+      assert yaml =~ "parapet:api_availability:error_ratio:1h"
 
       # Optional: check with promtool if available
       if System.find_executable("promtool") do

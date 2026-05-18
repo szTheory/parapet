@@ -13,5 +13,6 @@ defmodule Mix.Tasks.Verify.PublicApiTest do
 
     assert output =~ "Parapet"
     assert output =~ "has_docs"
+    assert output =~ "Parapet.Telemetry.AsyncDelivery"
   end
 end

@@ -13,7 +13,7 @@ defmodule Parapet.Integrations.ScoriaTest do
       # We look up the test pid using a registered name or just assume
       # telemetry is executed in the same process, which it is.
       send(self(), {:dummy_repo_insert, changeset})
-      
+
       if changeset.valid? do
         {:ok, Ecto.Changeset.apply_changes(changeset)}
       else
@@ -29,7 +29,7 @@ defmodule Parapet.Integrations.ScoriaTest do
 
   setup do
     Application.put_env(:parapet, :repo, DummyRepo)
-    
+
     # Detach any existing handlers to prevent duplicate errors between tests
     :telemetry.detach("parapet-scoria-telemetry")
     :telemetry.detach("parapet-scoria-config-telemetry")
@@ -47,7 +47,7 @@ defmodule Parapet.Integrations.ScoriaTest do
       end,
       nil
     )
-    
+
     :telemetry.attach_many(
       "#{handler_id}-workflow",
       [
@@ -89,16 +89,17 @@ defmodule Parapet.Integrations.ScoriaTest do
 
     :telemetry.execute([:scoria, :sre, :telemetry], %{duration: 100}, metadata)
 
-    assert_receive {:telemetry_event, [:parapet, :scoria, :metrics], %{duration: 100}, received_meta}
-    
+    assert_receive {:telemetry_event, [:parapet, :scoria, :metrics], %{duration: 100},
+                    received_meta}
+
     # Check that low cardinality labels are kept
     assert received_meta.model == "gpt-4"
     assert received_meta.provider == "openai"
     assert received_meta.tool_name == "test_tool"
-    
+
     # Check that outcome is computed correctly
     assert received_meta.outcome == :success
-    
+
     # Check that high cardinality labels are dropped
     refute Map.has_key?(received_meta, :trace_id)
     refute Map.has_key?(received_meta, :other_data)
@@ -114,12 +115,15 @@ defmodule Parapet.Integrations.ScoriaTest do
 
     :telemetry.execute([:scoria, :sre, :telemetry], %{duration: 100}, metadata)
 
-    assert_receive {:telemetry_event, [:parapet, :scoria, :metrics], %{duration: 100}, received_meta}
+    assert_receive {:telemetry_event, [:parapet, :scoria, :metrics], %{duration: 100},
+                    received_meta}
+
     assert received_meta.outcome == :failure
   end
 
   test "handle_event/4 routes errors to Parapet.Evidence.create_incident/1" do
     error_struct = %RuntimeError{message: "boom"}
+
     metadata = %{
       model: "gpt-4",
       provider: "openai",
@@ -131,12 +135,12 @@ defmodule Parapet.Integrations.ScoriaTest do
 
     assert_receive {:dummy_repo_insert, changeset}
     assert changeset.data.__struct__ == Parapet.Spine.Incident
-    
+
     # Description should contain the inspected error
     description = Ecto.Changeset.get_field(changeset, :description)
     assert description =~ "RuntimeError"
     assert description =~ "boom"
-    
+
     # The title should probably indicate a Scoria failure
     title = Ecto.Changeset.get_field(changeset, :title)
     assert title =~ "Scoria" || title =~ "test_tool" || title =~ "AI"
@@ -146,7 +150,7 @@ defmodule Parapet.Integrations.ScoriaTest do
     # Intentionally pass bad data that would cause a crash if not rescued
     # In Elixir, Map.take on a non-map raises, for example. We can call handle_event directly
     # with a non-map metadata to force an exception.
-    
+
     # Should not raise
     assert Parapet.Integrations.Scoria.handle_event(
              [:scoria, :sre, :telemetry],
@@ -208,7 +212,9 @@ defmodule Parapet.Integrations.ScoriaTest do
 
       :telemetry.execute([:scoria, :mcp, :tool, :exception], %{duration: 50}, metadata)
 
-      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50}, received_meta}
+      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50},
+                      received_meta}
+
       assert received_meta.reason == "timeout"
       assert received_meta.tool_name == "fetch_data"
     end
@@ -221,7 +227,9 @@ defmodule Parapet.Integrations.ScoriaTest do
 
       :telemetry.execute([:scoria, :mcp, :tool, :exception], %{duration: 50}, metadata)
 
-      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50}, received_meta}
+      assert_receive {:telemetry_event, [:parapet, :scoria, :mcp, :error], %{duration: 50},
+                      received_meta}
+
       assert received_meta.reason == "execution_failed"
       assert received_meta.tool_name == "fetch_data"
     end
@@ -234,9 +242,15 @@ defmodule Parapet.Integrations.ScoriaTest do
         model: "gpt-4"
       }
 
-      :telemetry.execute([:scoria, :workflow, :stale], %{scoria_workflow_stale_total: 1}, metadata)
+      :telemetry.execute(
+        [:scoria, :workflow, :stale],
+        %{scoria_workflow_stale_total: 1},
+        metadata
+      )
 
-      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :stale], %{scoria_workflow_stale_total: 1}, received_meta}
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :stale],
+                      %{scoria_workflow_stale_total: 1}, received_meta}
+
       assert received_meta.workflow_id == "wf_stale_123"
 
       assert_receive {:dummy_repo_insert, changeset}
@@ -252,9 +266,15 @@ defmodule Parapet.Integrations.ScoriaTest do
         model: "gpt-4"
       }
 
-      :telemetry.execute([:scoria, :workflow, :expired], %{scoria_workflow_expired_total: 1}, metadata)
+      :telemetry.execute(
+        [:scoria, :workflow, :expired],
+        %{scoria_workflow_expired_total: 1},
+        metadata
+      )
 
-      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :expired], %{scoria_workflow_expired_total: 1}, received_meta}
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :expired],
+                      %{scoria_workflow_expired_total: 1}, received_meta}
+
       assert received_meta.workflow_id == "wf_expired_123"
     end
   end
@@ -262,6 +282,7 @@ defmodule Parapet.Integrations.ScoriaTest do
   describe "[:scoria, :workflow, :resumed] telemetry and check_status/1" do
     test "resume event checks external state before closing the action item" do
       workflow_id = "wf_resumed_123"
+
       metadata = %{
         workflow_id: workflow_id,
         model: "gpt-4"
@@ -269,21 +290,33 @@ defmodule Parapet.Integrations.ScoriaTest do
 
       # Setup mock state to return :paused, meaning it's still paused and shouldn't be closed
       Process.put({:scoria_workflow_state, workflow_id}, :paused)
-      :telemetry.execute([:scoria, :workflow, :resumed], %{scoria_workflow_resumed_total: 1}, metadata)
 
-      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :resumed], %{scoria_workflow_resumed_total: 1}, received_meta}
+      :telemetry.execute(
+        [:scoria, :workflow, :resumed],
+        %{scoria_workflow_resumed_total: 1},
+        metadata
+      )
+
+      assert_receive {:telemetry_event, [:parapet, :scoria, :metrics, :resumed],
+                      %{scoria_workflow_resumed_total: 1}, received_meta}
+
       assert received_meta.workflow_id == workflow_id
-      
+
       # Since it's still :paused, it shouldn't update the repo
       refute_receive {:dummy_repo_update_all, _query, _updates}
 
       # Now change the mock state to return :active, meaning it's no longer paused
       Process.put({:scoria_workflow_state, workflow_id}, :active)
-      :telemetry.execute([:scoria, :workflow, :resumed], %{scoria_workflow_resumed_total: 1}, metadata)
+
+      :telemetry.execute(
+        [:scoria, :workflow, :resumed],
+        %{scoria_workflow_resumed_total: 1},
+        metadata
+      )
 
       # It should now resolve the action item
       assert_receive {:dummy_repo_update_all, _query, updates}
-      
+
       # The update should set state: "resolved"
       assert updates == [set: [state: "resolved"]]
     end

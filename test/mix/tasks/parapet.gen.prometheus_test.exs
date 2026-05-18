@@ -3,34 +3,43 @@ defmodule Mix.Tasks.Parapet.Gen.PrometheusTest do
   import Igniter.Test
 
   alias Mix.Tasks.Parapet.Gen.Prometheus
+  alias Parapet.SLO.MailglassDelivery
 
   describe "mix parapet.gen.prometheus" do
     setup do
-      # Register a default SLO for the generator to pick up
-      Parapet.SLO.HTTP.register()
-      on_exit(fn -> Application.put_env(:parapet, :slos, []) end)
+      Application.put_env(:parapet, :providers, [MailglassDelivery])
+      on_exit(fn -> Application.put_env(:parapet, :providers, []) end)
       :ok
     end
 
-    test "generates a valid prometheus rules file" do
+    test "generates split provider-first prometheus files" do
       igniter =
         test_project(app_name: :test)
         |> Prometheus.igniter()
 
-      # Assert file creation and capture the content
+      assert_creates(igniter, "priv/parapet/prometheus/recording_rules.yml")
+      assert_creates(igniter, "priv/parapet/prometheus/alerts.yml")
       assert_creates(igniter, "priv/parapet/prometheus/rules.yml")
 
-      yaml_content =
+      rules_content =
         Rewrite.source!(igniter.rewrite, "priv/parapet/prometheus/rules.yml")
         |> Rewrite.Source.get(:content)
 
-      # Check that some expected content is present
-      assert yaml_content =~ "name: parapet_slo_http"
-      assert yaml_content =~ "record: slo:error_ratio:rate5m"
+      recording_content =
+        Rewrite.source!(igniter.rewrite, "priv/parapet/prometheus/recording_rules.yml")
+        |> Rewrite.Source.get(:content)
+
+      alerts_content =
+        Rewrite.source!(igniter.rewrite, "priv/parapet/prometheus/alerts.yml")
+        |> Rewrite.Source.get(:content)
+
+      assert recording_content =~ "groups:"
+      assert alerts_content =~ "groups:"
+      assert rules_content =~ "groups:"
 
       # Write to a temp file and check with promtool
       temp_file = Path.join(System.tmp_dir!(), "rules_#{System.unique_integer()}.yml")
-      File.write!(temp_file, yaml_content)
+      File.write!(temp_file, rules_content)
 
       try do
         case System.cmd("promtool", ["check", "rules", temp_file], stderr_to_stdout: true) do

@@ -16,14 +16,23 @@ defmodule Mix.Tasks.Parapet.Gen.Scoria do
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    dashboard_template = Path.join(:code.priv_dir(:parapet), "templates/parapet.gen.scoria/scoria_dashboard.json.eex")
-    rules_template = Path.join(:code.priv_dir(:parapet), "templates/parapet.gen.scoria/rules.yml.eex")
+    dashboard_template =
+      Path.join(
+        :code.priv_dir(:parapet),
+        "templates/parapet.gen.scoria/scoria_dashboard.json.eex"
+      )
+
+    rules_template =
+      Path.join(:code.priv_dir(:parapet), "templates/parapet.gen.scoria/rules.yml.eex")
 
     dashboard_content = EEx.eval_file(dashboard_template)
     rules_content = EEx.eval_file(rules_template)
 
     igniter
-    |> Igniter.create_new_file("priv/parapet/grafana/dashboards/scoria_dashboard.json", dashboard_content)
+    |> Igniter.create_new_file(
+      "priv/parapet/grafana/dashboards/scoria_dashboard.json",
+      dashboard_content
+    )
     |> Igniter.create_new_file("priv/parapet/prometheus/rules.yml", rules_content)
   end
 end

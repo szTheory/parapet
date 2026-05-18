@@ -34,11 +34,17 @@ defmodule Parapet.SLO.HTTP do
 
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/http-slo")
 
-    Parapet.SLO.define(:http,
+    slo = %Parapet.SLO{
+      name: :http,
       objective: objective,
       good_events: good_events,
       total_events: total_events,
       runbook: runbook
-    )
+    }
+
+    slos = Application.get_env(:parapet, :slos, [])
+    slos = Enum.reject(slos, &(&1.name == :http)) ++ [slo]
+    Application.put_env(:parapet, :slos, slos)
+    slo
   end
 end

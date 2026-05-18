@@ -10,8 +10,14 @@ defmodule Parapet.Metrics.Sigra do
 
   def metrics do
     [
-      counter("parapet.journey.login.count", event_name: [:parapet, :journey, :login], tags: [:outcome]),
-      counter("parapet.journey.signup.count", event_name: [:parapet, :journey, :signup], tags: [:outcome, :provider])
+      counter("parapet.journey.login.count",
+        event_name: [:parapet, :journey, :login],
+        tags: [:outcome]
+      ),
+      counter("parapet.journey.signup.count",
+        event_name: [:parapet, :journey, :signup],
+        tags: [:outcome, :provider]
+      )
     ]
   end
 end

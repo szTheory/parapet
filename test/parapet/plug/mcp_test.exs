@@ -22,9 +22,10 @@ defmodule Parapet.Plug.MCPTest do
   end
 
   test "sets proper SSE headers on POST" do
-    conn = conn(:post, "/mcp", %{"jsonrpc" => "2.0", "method" => "ping"}) 
-    |> put_req_header("content-type", "application/json")
-    |> MCP.call(@opts)
+    conn =
+      conn(:post, "/mcp", %{"jsonrpc" => "2.0", "method" => "ping"})
+      |> put_req_header("content-type", "application/json")
+      |> MCP.call(@opts)
 
     assert conn.status == 200
     assert get_resp_header(conn, "content-type") == ["text/event-stream"]
@@ -44,9 +45,10 @@ defmodule Parapet.Plug.MCPTest do
       "id" => 1
     }
 
-    conn = conn(:post, "/mcp", payload)
-    |> put_req_header("content-type", "application/json")
-    |> MCP.call(@opts)
+    conn =
+      conn(:post, "/mcp", payload)
+      |> put_req_header("content-type", "application/json")
+      |> MCP.call(@opts)
 
     assert conn.status == 200
     assert conn.state == :chunked
@@ -65,7 +67,8 @@ defmodule Parapet.Plug.MCPTest do
     assert response["jsonrpc"] == "2.0"
     assert response["id"] == 1
     # unknown_tool returns {:error, :unknown_tool}, which the plug should map to an error response
-    assert response["error"]["code"] == -32601 # Method not found
+    # Method not found
+    assert response["error"]["code"] == -32601
   end
 
   test "formats successful Server response back into JSON-RPC over SSE" do
@@ -82,9 +85,10 @@ defmodule Parapet.Plug.MCPTest do
 
     # To isolate, we might need a dummy repo, but since `list_incidents` returns `{:ok, []}` when db is empty.
     # We can just verify the structure.
-    conn = conn(:post, "/mcp", payload)
-    |> put_req_header("content-type", "application/json")
-    |> MCP.call(@opts)
+    conn =
+      conn(:post, "/mcp", payload)
+      |> put_req_header("content-type", "application/json")
+      |> MCP.call(@opts)
 
     assert conn.status == 200
 

@@ -12,23 +12,24 @@ defmodule Mix.Tasks.Parapet.Gen.Prometheus do
     }
   end
 
-  alias Parapet.SLO
+  alias Parapet.SLO.Generator
 
   @impl Igniter.Mix.Task
   def igniter(igniter) do
-    slos = SLO.all()
-
-    windows = ["5m", "30m", "1h", "2h", "6h", "3d"]
-
-    template_path =
-      Application.app_dir(:parapet, "priv/templates/parapet.gen.prometheus/rules.yml.eex")
-
-    yaml_content = EEx.eval_file(template_path, slos: slos, windows: windows)
+    artifacts = Generator.provider_artifacts()
 
     Igniter.create_new_file(
       igniter,
+      "priv/parapet/prometheus/recording_rules.yml",
+      artifacts.recording_rules
+    )
+    |> Igniter.create_new_file(
+      "priv/parapet/prometheus/alerts.yml",
+      artifacts.alerts
+    )
+    |> Igniter.create_new_file(
       "priv/parapet/prometheus/rules.yml",
-      yaml_content
+      artifacts.rules
     )
   end
 end

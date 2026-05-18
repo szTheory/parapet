@@ -68,4 +68,34 @@ defmodule Parapet.Internal.LabelPolicyTest do
                    end
     end
   end
+
+  describe "assert_family_keys!/2" do
+    test "permits only the allowed keys for a phase 4 family" do
+      assert :ok =
+               LabelPolicy.assert_family_keys!(:provider_feedback, [
+                 :integration,
+                 :provider,
+                 :channel,
+                 :outcome,
+                 :failure_class,
+                 :fault_plane
+               ])
+    end
+
+    test "rejects unsupported keys for a phase 4 family" do
+      assert_raise ArgumentError, ~r/Unsupported public metadata key/, fn ->
+        LabelPolicy.assert_family_keys!(:provider_feedback, [:queue])
+      end
+    end
+
+    test "rejects suspicious keys even when they resemble contract metadata" do
+      assert_raise ArgumentError, ~r/High cardinality label rejected/, fn ->
+        LabelPolicy.assert_family_keys!(:provider_feedback, [:provider_message_id])
+      end
+
+      assert_raise ArgumentError, ~r/High cardinality label rejected/, fn ->
+        LabelPolicy.assert_family_keys!(:callback, [:request_path])
+      end
+    end
+  end
 end

@@ -36,7 +36,7 @@ defmodule Parapet.Integrations.Scoria do
       &__MODULE__.handle_event/4,
       nil
     )
-    
+
     # Attach Phase 4 workflow staleness/expiration/resumed
     :telemetry.attach_many(
       "parapet-scoria-workflow-telemetry",
@@ -48,7 +48,7 @@ defmodule Parapet.Integrations.Scoria do
       &__MODULE__.handle_event/4,
       nil
     )
-    
+
     # Attach Phase 2 AI Eval metrics
     Parapet.Metrics.Scoria.setup()
   end
@@ -64,6 +64,7 @@ defmodule Parapet.Integrations.Scoria do
       Logger.error(
         "Parapet telemetry handler exception in #{__MODULE__}.handle_event/4 for event #{inspect(event)}: #{Exception.message(e)}"
       )
+
       :ok
   end
 
@@ -74,7 +75,7 @@ defmodule Parapet.Integrations.Scoria do
     # Determine outcome based on :error presence
     has_error? = Map.has_key?(metadata, :error) and not is_nil(metadata.error)
     outcome = if has_error?, do: :failure, else: :success
-    
+
     parapet_metadata = Map.put(safe_metadata, :outcome, outcome)
 
     # Emit translated event
@@ -114,7 +115,7 @@ defmodule Parapet.Integrations.Scoria do
 
   defp process_event([:scoria, :mcp, :tool, :exception], measurements, metadata) do
     mapped_reason = map_mcp_failure(metadata[:error])
-    
+
     :telemetry.execute(
       [:parapet, :scoria, :mcp, :error],
       measurements,
@@ -126,8 +127,9 @@ defmodule Parapet.Integrations.Scoria do
 
   defp process_event([:scoria, :workflow, :stale], measurements, metadata) do
     # Track 1: Low cardinality metrics
-    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
-    
+    safe_metadata =
+      Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+
     :telemetry.execute(
       [:parapet, :scoria, :metrics, :stale],
       measurements,
@@ -145,7 +147,8 @@ defmodule Parapet.Integrations.Scoria do
   end
 
   defp process_event([:scoria, :workflow, :expired], measurements, metadata) do
-    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+    safe_metadata =
+      Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
 
     :telemetry.execute(
       [:parapet, :scoria, :metrics, :expired],
@@ -157,7 +160,8 @@ defmodule Parapet.Integrations.Scoria do
   end
 
   defp process_event([:scoria, :workflow, :resumed], measurements, metadata) do
-    safe_metadata = Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
+    safe_metadata =
+      Map.take(metadata, @safe_labels) |> Map.put(:workflow_id, metadata[:workflow_id])
 
     :telemetry.execute(
       [:parapet, :scoria, :metrics, :resumed],
@@ -180,6 +184,7 @@ defmodule Parapet.Integrations.Scoria do
   def check_status(workflow_id) do
     if Code.ensure_loaded?(Scoria.Workflow) do
       state = apply(Scoria.Workflow, :get_state, [workflow_id])
+
       if state != :paused do
         Parapet.Evidence.resolve_action_item(integration: "scoria", external_id: workflow_id)
       end

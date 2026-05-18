@@ -41,6 +41,7 @@ defmodule Parapet.MCP.ServerTest do
       incidents = [
         %Incident{id: "inc-1", title: "API down", state: "open", correlation_key: "corr-1"}
       ]
+
       Process.put(:mock_repo_all, incidents)
 
       assert {:ok, result} = Server.execute_tool("list_incidents", %{})
@@ -55,9 +56,12 @@ defmodule Parapet.MCP.ServerTest do
       entries = [
         %TimelineEntry{id: "entry-1", type: "note", payload: %{"text" => "working on it"}}
       ]
+
       Process.put(:mock_repo_all, entries)
 
-      assert {:ok, result} = Server.execute_tool("get_incident_timeline", %{"correlation_key" => "corr-1"})
+      assert {:ok, result} =
+               Server.execute_tool("get_incident_timeline", %{"correlation_key" => "corr-1"})
+
       assert result == entries
 
       assert_received {:repo_all, query_str}
@@ -70,21 +74,29 @@ defmodule Parapet.MCP.ServerTest do
 
     test "Test 3: read_runbook correctly and safely resolves module names and fetches the runbook schema" do
       # Need to setup SLO to match the alertname
-      Parapet.SLO.define(:RunbookAlert,
-        objective: 99.9,
-        good_events: "up",
-        total_events: "all",
-        runbook: MockRunbook
-      )
+      apply(Parapet.SLO, :define, [
+        :RunbookAlert,
+        [
+          objective: 99.9,
+          good_events: "up",
+          total_events: "all",
+          runbook: MockRunbook
+        ]
+      ])
 
       assert {:ok, result} = Server.execute_tool("read_runbook", %{"alertname" => "RunbookAlert"})
       assert result == %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
 
-      Application.put_env(:parapet, :slos, Enum.reject(Parapet.SLO.all(), &(&1.name == :RunbookAlert)))
+      Application.put_env(
+        :parapet,
+        :slos,
+        Enum.reject(Parapet.SLO.all(), &(&1.name == :RunbookAlert))
+      )
     end
 
     test "Test 3.1: read_runbook returns error if SLO not found" do
-      assert {:error, :not_found} = Server.execute_tool("read_runbook", %{"alertname" => "UnknownAlert"})
+      assert {:error, :not_found} =
+               Server.execute_tool("read_runbook", %{"alertname" => "UnknownAlert"})
     end
 
     test "Test 4: get_slo_burn_rates delegates to Parapet.MCP.PrometheusClient" do

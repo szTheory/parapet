@@ -9,7 +9,7 @@ defmodule Parapet.Probe.NativeSchedulerTest do
     @impl true
     def run do
       send(:test_process, :probe_executed)
-      :ok
+      if Process.get(:test_fail), do: {:error, :fail}, else: :ok
     end
   end
 
@@ -18,12 +18,12 @@ defmodule Parapet.Probe.NativeSchedulerTest do
 
     # Schedule TestProbe to run every 10ms
     probes = [{TestProbe, 10}]
-    
+
     {:ok, pid} = start_supervised({NativeScheduler, probes})
-    
+
     # Wait for the probe to execute
     assert_receive :probe_executed, 100
-    
+
     # It should run continuously
     assert_receive :probe_executed, 100
   end

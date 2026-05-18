@@ -46,12 +46,15 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
   end
 
   test "fails and halts when slo has empty runbook" do
-    Parapet.SLO.define(:bad_slo,
-      objective: 99.9,
-      good_events: "rate(good)",
-      total_events: "rate(total)",
-      runbook: ""
-    )
+    apply(Parapet.SLO, :define, [
+      :bad_slo,
+      [
+        objective: 99.9,
+        good_events: "rate(good)",
+        total_events: "rate(total)",
+        runbook: ""
+      ]
+    ])
 
     assert catch_exit(Doctor.run([])) == {:shutdown, 2}
 

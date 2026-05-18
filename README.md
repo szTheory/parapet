@@ -133,6 +133,18 @@ Then, trigger a deploy marker via a webhook or internal API to annotate your Gra
 
 ## Advanced Usage
 
+### Optional Async And Delivery Integrations
+
+Parapet's Phase 4 async and delivery contract is host-owned and explicit. To enable the built-in adapters, opt in through `Parapet.attach/1`:
+
+```elixir
+Parapet.attach(adapters: [:mailglass, :chimeway, :rindle])
+```
+
+These adapters emit bounded public telemetry families such as `[:parapet, :delivery, :provider_feedback]` and `[:parapet, :async, :backlog]`. Exact identifiers are kept in `metadata.refs`, not top-level labels.
+
+For the full contract, safe metadata rules, and event-family semantics, see [docs/telemetry.md](docs/telemetry.md).
+
 For more detailed information, check the [Documentation](https://hexdocs.pm/parapet).
 
 ## License

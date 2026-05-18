@@ -34,11 +34,17 @@ defmodule Parapet.SLO.Oban do
 
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/oban-slo")
 
-    Parapet.SLO.define(:oban,
+    slo = %Parapet.SLO{
+      name: :oban,
       objective: objective,
       good_events: good_events,
       total_events: total_events,
       runbook: runbook
-    )
+    }
+
+    slos = Application.get_env(:parapet, :slos, [])
+    slos = Enum.reject(slos, &(&1.name == :oban)) ++ [slo]
+    Application.put_env(:parapet, :slos, slos)
+    slo
   end
 end

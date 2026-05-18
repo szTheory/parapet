@@ -3,14 +3,6 @@ groups:
   - name: <%= group.name %>
     rules:
 <%= for rule <- group.rules do %>
-<%= if Map.has_key?(rule, :record) do %>
-      - record: <%= rule.record %>
-        expr: <%= generator.yaml_value(rule.expr) %>
-        labels:
-<%= for {key, value} <- Enum.sort(rule.labels) do %>
-          <%= key %>: <%= generator.yaml_value(value) %>
-<% end %>
-<% else %>
       - alert: <%= rule.alert %>
         expr: <%= generator.yaml_value(rule.expr) %>
         for: <%= generator.yaml_value(rule.for) %>
@@ -22,7 +14,6 @@ groups:
         annotations:
 <%= for {key, value} <- Enum.sort(rule.annotations) do %>
           <%= key %>: <%= generator.yaml_value(value) %>
-<% end %>
 <% end %>
 <% end %>
 <% end %>

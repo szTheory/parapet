@@ -1,49 +1,73 @@
 # Parapet SLO Reference
 
-Service-Level Objectives (SLOs) are a core primitive in Parapet, allowing you to define the expected reliability of critical user journeys in your application.
+Parapet now has two SLO paths:
 
-## Defining an SLO
+1. Legacy `%Parapet.SLO{}` definitions for existing custom slices.
+2. Provider-owned Phase 5 slice specs for built-in async and delivery reliability.
 
-SLOs are defined using `Parapet.SLO.define/2`. The recommended place to define your application's SLOs is during your application startup (e.g., in `application.ex`) or in a dedicated module that is invoked at startup.
+The blessed path for built-ins is explicit provider registration plus host-owned generated Prometheus files.
 
-### Example: Login Journey
+## Phase 5 Provider Registration
 
-Here is a complete example of defining an SLO for a critical user journey: user logins.
+Register built-in providers through application config:
 
 ```elixir
-Parapet.SLO.define(:user_login_success,
-  objective: 99.9,
-  good_events: ~s{sum(rate(phoenix_controller_call_count{action="create", controller="MyAppWeb.UserSessionController", status=~"2.."}[$__rate_interval]))},
-  total_events: ~s{sum(rate(phoenix_controller_call_count{action="create", controller="MyAppWeb.UserSessionController"}[$__rate_interval]))},
-  runbook: "https://wiki.mycompany.com/runbooks/user_login_failures"
-)
+config :parapet,
+  providers: [
+    Parapet.SLO.MailglassDelivery,
+    Parapet.SLO.ChimewayDelivery,
+    Parapet.SLO.RindleAsync
+  ]
 ```
 
-## Required Fields
+`Parapet.attach(adapters: [...])` only enables telemetry adapters. It does not auto-register SLO providers or silently generate alerts.
 
-Every SLO definition requires the following fields:
+## Built-In Provider Modules
 
-- **`name`** (`atom()`): A unique identifier for the SLO. This will be used in generated Prometheus recording rules and alerts.
-- **`objective`** (`float()`): The target reliability percentage (e.g., `99.9` for "three nines").
-- **`good_events`** (`String.t()`): A PromQL expression that returns the rate of successful events.
-- **`total_events`** (`String.t()`): A PromQL expression that returns the rate of all events (successful + failed).
-- **`runbook`** (`String.t()`): A required URL pointing to the remediation steps for this specific SLO.
+- `Parapet.SLO.MailglassDelivery`
+  - `mailglass_submit_acceptance`
+  - `mailglass_confirmed_delivery`
+  - `mailglass_webhook_freshness`
+  - `mailglass_suppression_drift`
+- `Parapet.SLO.ChimewayDelivery`
+  - `chimeway_provider_acceptance`
+  - `chimeway_callback_confirmation`
+  - `chimeway_callback_freshness`
+- `Parapet.SLO.RindleAsync`
+  - `rindle_terminal_success`
+  - `rindle_queue_freshness`
+  - `rindle_callback_freshness`
+  - `rindle_long_running_stage`
+  - `rindle_funnel_regression`
 
-## The Importance of Runbooks
+These providers return bounded `Parapet.SLO.SliceSpec` structs. The generator owns the PromQL shape so built-ins stay low-cardinality and symptom-first.
 
-In Parapet, **runbooks are mandatory**. The `mix parapet.doctor` task statically analyzes your SLO definitions to ensure every SLO has a valid runbook URL. 
+## Generated Artifacts
 
-This enforces the best practice that an alert should never fire without clear, actionable remediation steps for the operator. If a runbook is missing, the `parapet.doctor` task will exit with a failure code, preventing CI/CD pipelines from deploying the configuration.
+Run:
 
-## Multi-Window Burn-Rate Mechanics
+```bash
+mix parapet.gen.prometheus
+```
 
-Parapet utilizes the **multi-window, multi-burn-rate** alerting technique recommended by the Google SRE workbook.
+This task reads active providers only and writes:
 
-Instead of alerting on simple error rate thresholds (which can be noisy or too slow to react), burn-rate alerting measures how quickly you are consuming your error budget.
+- `priv/parapet/prometheus/recording_rules.yml`
+- `priv/parapet/prometheus/alerts.yml`
+- `priv/parapet/prometheus/rules.yml`
 
-Parapet automatically generates Prometheus alerting rules for each SLO that evaluate multiple time windows simultaneously:
+`rules.yml` is the compatibility aggregate. The split `recording_rules.yml` and `alerts.yml` files are the preferred host-owned path.
 
-1. **Short Window (Fast Burn):** Detects massive outages quickly (e.g., 14.4x burn rate over 1 hour). Pages the on-call engineer immediately.
-2. **Long Window (Slow Burn):** Detects subtle, lingering degradation (e.g., 1.5x burn rate over 3 days). Creates a ticket rather than paging, preserving on-call sleep.
+## Legacy Compatibility
 
-Because Parapet translates your `good_events`, `total_events`, and `objective` into these complex recording and alerting rules, you get best-in-class alerting out-of-the-box without having to write complex PromQL manually.
+`Parapet.SLO.define/2` and legacy `%Parapet.SLO{}` values still work, but they are compatibility surfaces. New async and delivery slices should be implemented as provider modules instead of mutating the `:slos` application env at runtime.
+
+## Runbooks And Severity
+
+Runbooks remain mandatory. Every generated alert carries a runbook URL and a bounded severity:
+
+- `page` for terminal or clearly user-harming symptoms
+- `ticket` for sustained but less urgent degradation
+- `warning` for early or lower-confidence regressions
+
+Phase 5 also keeps retry noise and freshness failures separate. Queue backlog, callback delay, suppression drift, and terminal discard are different operator symptoms and generate different slices.

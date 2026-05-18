@@ -35,11 +35,17 @@ defmodule Parapet.SLO.LoginJourney do
 
     runbook = Keyword.get(opts, :runbook, "https://example.com/runbooks/login-journey")
 
-    Parapet.SLO.define(:login_journey,
+    slo = %Parapet.SLO{
+      name: :login_journey,
       objective: objective,
       good_events: good_events,
       total_events: total_events,
       runbook: runbook
-    )
+    }
+
+    slos = Application.get_env(:parapet, :slos, [])
+    slos = Enum.reject(slos, &(&1.name == :login_journey)) ++ [slo]
+    Application.put_env(:parapet, :slos, slos)
+    slo
   end
 end

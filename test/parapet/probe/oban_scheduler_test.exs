@@ -9,7 +9,7 @@ defmodule Parapet.Probe.ObanSchedulerTest do
     @impl true
     def run do
       send(:test_process_oban, :probe_executed)
-      :ok
+      if Process.get(:test_fail), do: {:error, :fail}, else: :ok
     end
   end
 
@@ -26,20 +26,20 @@ defmodule Parapet.Probe.ObanSchedulerTest do
     Process.register(self(), :test_process_oban)
 
     job = %Oban.Job{args: %{"probe" => to_string(TestProbe)}}
-    
+
     assert :ok == ObanScheduler.perform(job)
     assert_receive :probe_executed
   end
 
   test "perform/1 returns error if module is not a probe" do
     job = %Oban.Job{args: %{"probe" => to_string(NotAProbe)}}
-    
+
     assert {:error, :invalid_probe} == ObanScheduler.perform(job)
   end
 
   test "perform/1 returns error if module does not exist" do
     job = %Oban.Job{args: %{"probe" => "Elixir.NonExistentProbe"}}
-    
+
     assert {:error, :invalid_probe} == ObanScheduler.perform(job)
   end
 end

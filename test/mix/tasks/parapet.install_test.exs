@@ -25,6 +25,7 @@ defmodule Mix.Tasks.Parapet.InstallTest do
         end
       end
       """)
+
       # Assert updates using the updated sources from igniter.rewrite
       endpoint_source =
         Rewrite.source!(igniter.rewrite, "lib/test_web/endpoint.ex")

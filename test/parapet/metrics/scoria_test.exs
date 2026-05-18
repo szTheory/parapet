@@ -5,9 +5,11 @@ defmodule Parapet.Metrics.ScoriaTest do
 
   setup do
     Scoria.setup()
+
     on_exit(fn ->
       :telemetry.detach("parapet-scoria-eval-handler")
     end)
+
     :ok
   end
 
@@ -58,7 +60,7 @@ defmodule Parapet.Metrics.ScoriaTest do
     metrics = Scoria.metrics()
 
     assert [eval_counter, mcp_counter] = metrics
-    
+
     # Telemetry.Metrics representation of "scoria_evaluation_total"
     assert eval_counter.name == [:scoria_evaluation_total]
     assert eval_counter.event_name == [:parapet, :scoria, :eval, :completed]

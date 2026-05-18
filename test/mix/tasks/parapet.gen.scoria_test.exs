@@ -17,12 +17,12 @@ defmodule Mix.Tasks.Parapet.Gen.ScoriaTest do
 
       assert_creates(igniter, "priv/parapet/grafana/dashboards/scoria_dashboard.json")
       assert_creates(igniter, "priv/parapet/prometheus/rules.yml")
-      
+
       # Verify contents
       dashboard_content =
         Rewrite.source!(igniter.rewrite, "priv/parapet/grafana/dashboards/scoria_dashboard.json")
         |> Rewrite.Source.get(:content)
-        
+
       rules_content =
         Rewrite.source!(igniter.rewrite, "priv/parapet/prometheus/rules.yml")
         |> Rewrite.Source.get(:content)

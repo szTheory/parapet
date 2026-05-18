@@ -8,7 +8,7 @@ defmodule Parapet.Metrics.PrometheusFormatter do
 
   def scrape do
     if Code.ensure_loaded?(:telemetry_metrics_prometheus_core) do
-      base_text = :telemetry_metrics_prometheus_core.scrape()
+      base_text = apply(:telemetry_metrics_prometheus_core, :scrape, [])
       process(base_text)
     else
       ""

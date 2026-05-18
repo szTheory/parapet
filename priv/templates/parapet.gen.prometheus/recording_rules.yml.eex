@@ -1,0 +1,13 @@
+groups:
+<%= for group <- groups do %>
+  - name: <%= group.name %>
+    rules:
+<%= for rule <- group.rules do %>
+      - record: <%= rule.record %>
+        expr: <%= generator.yaml_value(rule.expr) %>
+        labels:
+<%= for {key, value} <- Enum.sort(rule.labels) do %>
+          <%= key %>: <%= generator.yaml_value(value) %>
+<% end %>
+<% end %>
+<% end %>

@@ -60,14 +60,21 @@ defmodule Parapet.SLO do
   Returns all registered SLOs.
   """
   def all do
-    legacy_slos = Application.get_env(:parapet, :slos, [])
-    
-    provider_slos =
-      Application.get_env(:parapet, :providers, [])
-      |> Enum.flat_map(fn provider -> provider.slos() end)
-      |> Enum.map(&Parapet.SLO.Resolvable.to_slo/1)
+    legacy() ++ provider_slos()
+  end
 
-    legacy_slos ++ provider_slos
+  def legacy do
+    Application.get_env(:parapet, :slos, [])
+  end
+
+  def provider_catalog do
+    Application.get_env(:parapet, :providers, [])
+    |> Enum.flat_map(fn provider -> provider.slos() end)
+  end
+
+  def provider_slos do
+    provider_catalog()
+    |> Enum.map(&Parapet.SLO.Resolvable.to_slo/1)
   end
 
   defp store(slo) do
