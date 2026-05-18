@@ -22,3 +22,9 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 parapet-*.tar
 
+# Local Finder metadata and one-off debugging artifacts.
+.DS_Store
+**/.DS_Store
+generated_components.ex
+run_debug.exs
+test.exs
