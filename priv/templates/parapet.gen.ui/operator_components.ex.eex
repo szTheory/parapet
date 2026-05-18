@@ -178,44 +178,132 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     """
   end
 
-  attr :runbook_data, :map, required: true
-  attr :incident_id, :string, required: true
+  attr :detail, :map, required: true
   def runbook_card(assigns) do
     ~H"""
     <div class="bg-white border border-gray-200 rounded-md p-4 mb-6">
       <h3 class="text-lg font-semibold text-gray-900 mb-1">
-        <%%= @runbook_data["title"] || @runbook_data[:title] || "Runbook" %>
+        <%%= @detail.derived.runbook_title || "Runbook" %>
       </h3>
       <p class="text-sm text-gray-600 mb-4">
-        <%%= @runbook_data["description"] || @runbook_data[:description] || "No description provided." %>
+        <%%= @detail.derived.runbook_description || "No description provided." %>
       </p>
 
-      <%% steps = @runbook_data["steps"] || @runbook_data[:steps] || [] %>
-      <%%= if length(steps) > 0 do %>
-        <div class="flex flex-col gap-3">
-          <%%= for step <- steps do %>
-            <%%
-              type = step["type"] || step[:type]
-              is_mitigation = to_string(type) == "mitigation"
-            %>
-            <div class="border border-gray-100 bg-gray-50 rounded p-3">
-              <div class="flex justify-between items-start">
-                <div>
-                  <h4 class="text-sm font-medium text-gray-900"><%%= step["label"] || step[:label] %></h4>
-                  <p class="text-xs text-gray-500 mt-1"><%%= step["description"] || step[:description] %></p>
+      <div class="flex flex-col gap-3">
+        <%%= for step <- @detail.derived.runbook_steps do %>
+          <div class="border border-gray-100 bg-gray-50 rounded p-3">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <div class="flex items-center gap-2">
+                  <h4 class="text-sm font-medium text-gray-900"><%%= step.label %></h4>
+                  <%%= if step.state == :executed do %>
+                    <span class="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-green-100 text-green-700 border border-green-200">Executed</span>
+                  <%% end %>
                 </div>
-                <%%= if is_mitigation do %>
-                  <button phx-click="execute_mitigation" phx-value-step={step["id"] || step[:id]} phx-value-incident_id={@incident_id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
-                    Execute
-                  </button>
+                <p class="text-xs text-gray-500 mt-1"><%%= step.description %></p>
+                
+                <%%= if step.state == :guidance && step.guidance do %>
+                  <div class="mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs text-blue-800 italic">
+                    <%%= step.guidance %>
+                  </div>
+                <%% end %>
+
+                <%%= if length(step.targeting_hints) > 0 do %>
+                  <div class="mt-2 flex flex-wrap gap-1">
+                    <%%= for hint <- step.targeting_hints do %>
+                      <span class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-purple-50 text-purple-700 border border-purple-100" title={hint.title}>
+                        <%%= hint.kind %>:<%%= String.slice(to_string(hint.external_id), 0..7) %>
+                      </span>
+                    <%% end %>
+                  </div>
+                <%% end %>
+              </div>
+
+              <div class="ml-4">
+                <%%= case step.state do %>
+                  <%% :previewable -> %>
+                    <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
+                      Preview
+                    </button>
+                  <%% :executable -> %>
+                     <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
+                      Execute
+                    </button>
+                  <%% :executed -> %>
+                    <div class="text-[10px] text-gray-400 text-right">
+                      <%%# show time if available %>
+                    </div>
+                  <%% _ -> %>
+                    <%# No button for guidance %>
                 <%% end %>
               </div>
             </div>
-          <%% end %>
+          </div>
+        <%% end %>
+      </div>
+    </div>
+    """
+  end
+
+  attr :detail, :map, required: true
+  def preview_panel(assigns) do
+    ~H"""
+    <%% preview = @detail.derived.active_preview %>
+    <div class="fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
+      <div class="bg-white border-2 border-indigo-500 rounded-lg shadow-xl overflow-hidden">
+        <div class="bg-indigo-500 px-4 py-2 flex justify-between items-center">
+          <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
+          <button phx-click="cancel_preview" class="text-white hover:text-indigo-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
         </div>
-      <%% else %>
-        <p class="text-sm text-gray-500 italic">No steps defined in this runbook.</p>
-      <%% end %>
+        
+        <div class="p-4">
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p class="text-[10px] text-gray-500 uppercase font-bold">Target Kind</p>
+              <p class="text-sm font-medium text-gray-900"><%%= preview.data["target_kind"] %></p>
+            </div>
+            <div>
+              <p class="text-[10px] text-gray-500 uppercase font-bold">Affected Count</p>
+              <p class="text-sm font-medium text-gray-900"><%%= preview.data["count"] %></p>
+            </div>
+          </div>
+
+          <%%= if (preview.data["warnings"] || []) != [] do %>
+            <div class="mb-4 p-2 bg-red-50 border border-red-100 rounded">
+              <p class="text-[10px] text-red-700 uppercase font-bold mb-1">Warnings</p>
+              <ul class="text-xs text-red-600 list-disc pl-4">
+                <%%= for w <- preview.data["warnings"] do %>
+                  <li><%%= w %></li>
+                <%% end %>
+              </ul>
+            </div>
+          <%% end %>
+
+          <%%= if preview.data["idempotency_caveats"] do %>
+            <div class="mb-4">
+              <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Idempotency</p>
+              <p class="text-xs text-gray-600"><%%= preview.data["idempotency_caveats"] %></p>
+            </div>
+          <%% end %>
+
+          <div class="flex gap-2">
+            <button 
+              phx-click="confirm_mitigation" 
+              phx-value-step={preview.step_id} 
+              phx-value-incident_id={@detail.incident.id}
+              phx-value-token={preview.preview_token}
+              class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm shadow-md transition-all active:scale-95"
+            >
+              Confirm Recovery
+            </button>
+          </div>
+          <p class="text-[10px] text-center text-gray-400 mt-2 italic">
+            Preview is active.
+          </p>
+        </div>
+      </div>
     </div>
     """
   end

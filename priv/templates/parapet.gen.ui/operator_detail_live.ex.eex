@@ -47,24 +47,52 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
     end
   end
 
-  def handle_event("execute_mitigation", %{"step" => step, "incident_id" => incident_id}, socket) do
+  def handle_event("preview_mitigation", %{"step" => step, "incident_id" => incident_id}, socket) do
     incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, incident_id)
     payload = %Parapet.Operator.ActionPayload{
       actor: "operator_ui",
-      reason: "Executed mitigation from UI",
+      reason: "Previewed mitigation from UI",
       correlation_id: Ecto.UUID.generate(),
-      action_type: :execute_mitigation
+      action_type: :preview_mitigation
     }
     
-    case Parapet.Operator.execute_runbook_step(incident, step, payload) do
+    case Parapet.Operator.preview_runbook_step(incident, step, payload) do
       {:ok, _result} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Mitigation executed successfully")
-         |> push_navigate(to: "/parapet/#{incident_id}")}
+         |> put_flash(:info, "Preview generated")
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Mitigation failed: #{inspect(reason)}")}
+        {:noreply, put_flash(socket, :error, "Preview failed: #{inspect(reason)}")}
     end
+  end
+
+  def handle_event("confirm_mitigation", %{"step" => step, "incident_id" => incident_id, "token" => token}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, incident_id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Confirmed mitigation from UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :execute_mitigation,
+      idempotency_key: Ecto.UUID.generate()
+    }
+    
+    case Parapet.Operator.confirm_runbook_step(incident, step, token, payload) do
+      {:ok, _result} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Mitigation confirmed and executed")
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Confirmation failed: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_event("cancel_preview", _params, socket) do
+    # Simply refresh without an active preview in local state if we had one
+    # Though it's derived from timeline, so we might need a "cancel" timeline event
+    # For now, just a UI refresh
+    {:noreply, socket}
   end
 
   def render(assigns) do
@@ -102,8 +130,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
           </div>
         <%% end %>
 
-        <%%= if @incident.incident.runbook_data do %>
-          <.runbook_card runbook_data={@incident.incident.runbook_data} incident_id={@incident.incident.id} />
+        <%%= if @incident.derived.runbook_steps != [] do %>
+          <.runbook_card detail={@incident} />
+        <%% end %>
+
+        <%%= if @incident.derived.active_preview do %>
+          <.preview_panel detail={@incident} />
         <%% end %>
 
         <h3 class="text-lg font-semibold mb-4">Actions</h3>

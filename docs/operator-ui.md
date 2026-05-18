@@ -87,4 +87,34 @@ The detail page should not infer fault planes by parsing titles, should not trea
 
 `ActionItem`s remain a narrow exact-object seam. They are appropriate when one concrete async or delivery object needs operator attention, such as a suppressed delivery, dead-lettered job, stale workflow, or orphaned callback. They are not generic investigation todos, ownership queues, or SLA-tracked incident tasks.
 
-Phase 7 recovery actions remain host-wired and explicitly audited. The Phase 6 workbench is evidence-first and operator-guided, not an autonomous remediation surface.
+## Phase 7 Preview-First Recovery
+
+Phase 7 introduces a formal recovery model built on top of the Phase 6 triage foundation. The workbench moves from evidence display to guided recovery, while maintaining strict safety boundaries.
+
+### Safe Recovery Principles
+
+The operator workbench adheres to these recovery principles (D-20, D-21):
+
+1. **Chronology First:** Investigation always starts with the chronological evidence. Recovery actions are only considered after the operator has reviewed the triage facts and timeline.
+2. **Preview Before Mutation:** Destructive or mutating recovery actions (e.g., retrying jobs, clearing suppressions) must be previewed. The UI renders the exact scope of the change, warnings, and idempotency caveats before asking for confirmation.
+3. **Bounded Recovery:** Recovery is not a broad admin console. It is limited to the specific capabilities and runbook steps defined for the burning SLO.
+4. **Exact-Item Preference:** Scoped recovery targeting specific `ActionItem`s (exact-item recovery) is preferred over bulk replays or opaque automation.
+
+### Recovery Flow
+
+The generated UI implements a three-state recovery flow for runbook steps:
+
+- **Guidance:** For steps that are purely informational or not yet wired to a host capability. These render with guidance text and no action button.
+- **Preview:** For executable steps, the operator first clicks "Preview". This triggers a call to the host capability to calculate the effect of the recovery (e.g., "This will retry 42 suppressed deliveries").
+- **Confirm:** After reviewing the preview, warnings, and target scope, the operator confirms the action. This execution is recorded in the immutable timeline with a unique idempotency key.
+
+### Named Capabilities
+
+Recovery actions are backed by named host capabilities. These capabilities are responsible for:
+- Validating preconditions.
+- Generating a time-bounded preview.
+- Executing the mutation idempotently.
+- Reporting success or failure back to the evidence spine.
+
+By naming and bounding these capabilities, the host application maintains control over what the operator can do, ensuring the workbench remains a safe environment for high-stakes incident response.
+
