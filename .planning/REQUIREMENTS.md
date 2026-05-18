@@ -73,7 +73,7 @@
 | TRIAGE-01 | Phase 4 | Pending |
 | TRIAGE-02 | Phase 6 | Completed |
 | TRIAGE-03 | Phase 6 | Completed |
-| RNBK-01 | Phase 7 | Pending |
+| RNBK-01 | Phase 7 | Completed |
 | RNBK-02 | Phase 7 | Pending |
 | RNBK-03 | Phase 6 | Completed |
 

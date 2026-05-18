@@ -9,12 +9,12 @@ See: .planning/PROJECT.md (updated 2026-05-17)
 
 ## Current Position
 
-Phase: 6
-Plan: Phase 6 complete
-Status: Ready for Phase 7 planning
-Last activity: 2026-05-18 - Phase 6 execution completed
+Phase: 7
+Plan: 1
+Status: Executing
+Last activity: 2026-05-18 - Phase 7 Plan 1 completed
 
-Progress: [#######---] 70%
+Progress: [#######---] 71%
 
 ## Accumulated Context
 
@@ -45,9 +45,11 @@ None.
 - Added bounded Phase 6 triage summaries under `incident.runbook_data["triage"]` plus append-only `triage_snapshot` chronology for async and delivery incidents.
 - Replaced generic workbench derivation with a durable evidence-backed triage contract and chronology-first incident detail ordering.
 - Narrowed `ActionItem` to incident-linked exact follow-up work with bounded kinds for concrete async and delivery objects.
+- We defaulted preview_only and requires_preview to false for backward compatibility with existing simple mitigations.
+- The generator copies fixed templates to create host-owned modules instead of using dynamic workflow DSLs.
 
 ## Session Continuity
 
 Last session: 2026-05-18
-Stopped at: Phase 6 execution wrap-up
+Stopped at: Phase 7 Plan 1 execution wrap-up
 Resume file: None
