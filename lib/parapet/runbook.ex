@@ -22,7 +22,13 @@ defmodule Parapet.Runbook do
         id: unquote(id),
         label: unquote(opts)[:label],
         description: unquote(opts)[:description],
-        type: unquote(opts)[:type]
+        type: unquote(opts)[:type],
+        kind: unquote(opts)[:kind],
+        capability: unquote(opts)[:capability],
+        target_kind: unquote(opts)[:target_kind],
+        requires_preview: Keyword.get(unquote(opts), :requires_preview, false),
+        preview_only: Keyword.get(unquote(opts), :preview_only, false),
+        guidance: unquote(opts)[:guidance]
       }
     end
   end
