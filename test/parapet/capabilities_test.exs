@@ -4,46 +4,50 @@ defmodule Parapet.CapabilitiesTest do
   alias Parapet.Capabilities
 
   setup do
-    # Ensure it's started fresh or cleaned up? We will just start it if not started
-    # In actual usage it will be started by application tree.
     case start_supervised(Capabilities) do
       {:ok, _pid} ->
         :ok
 
       {:error, {:already_started, _pid}} ->
-        Agent.update(Capabilities, fn _ -> %{mitigation: %{}} end)
+        Agent.update(Capabilities, fn _ -> %{recovery: %{}} end)
         :ok
     end
 
     :ok
   end
 
-  describe "register_mitigation/3" do
+  describe "register_recovery/2" do
     test "adds capability to list without duplicates" do
-      schema = [flag_name: :string, state: :boolean]
+      attrs = [name: "Retry Async", target_kind: :async_item, preview: &(&1), execute: &(&1)]
 
-      assert :ok = Capabilities.register_mitigation(:toggle_flag, "Toggle Feature Flag", schema)
-      assert :ok = Capabilities.register_mitigation(:toggle_flag, "Toggle Feature Flag", schema)
+      assert :ok = Capabilities.register_recovery(:retry_async_item, attrs)
+      assert :ok = Capabilities.register_recovery(:retry_async_item, attrs)
 
-      capabilities = Capabilities.capabilities(:mitigation)
+      capabilities = Capabilities.capabilities(:recovery)
       assert length(capabilities) == 1
-      assert hd(capabilities).id == :toggle_flag
-      assert hd(capabilities).name == "Toggle Feature Flag"
-      assert hd(capabilities).schema == schema
+      assert hd(capabilities).id == :retry_async_item
+      assert hd(capabilities).name == "Retry Async"
+    end
+
+    test "raises on invalid capability id" do
+      assert_raise ArgumentError, ~r/Invalid recovery capability id/, fn ->
+        Capabilities.register_recovery(:invalid_capability, name: "Invalid")
+      end
     end
   end
 
-  describe "capabilities/1" do
-    test "returns list of registered capabilities" do
-      assert Capabilities.capabilities(:mitigation) == []
+  describe "get_recovery/1" do
+    test "returns nil for unwired capability" do
+      assert Capabilities.get_recovery(:retry_async_item) == nil
+    end
 
-      Capabilities.register_mitigation(:c1, "Cap 1", [])
-      Capabilities.register_mitigation(:c2, "Cap 2", [])
+    test "supports preview-only capability" do
+      attrs = [name: "Check Provider", preview_only: true, preview: &(&1)]
+      assert :ok = Capabilities.register_recovery(:request_manual_provider_check, attrs)
 
-      caps = Capabilities.capabilities(:mitigation)
-      assert length(caps) == 2
-      assert Enum.any?(caps, &(&1.id == :c1))
-      assert Enum.any?(caps, &(&1.id == :c2))
+      cap = Capabilities.get_recovery(:request_manual_provider_check)
+      assert cap.preview_only == true
+      assert cap.execute == nil
     end
   end
 end
