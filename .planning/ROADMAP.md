@@ -59,7 +59,7 @@ This milestone extends Parapet from request-time reliability into async and deli
 | TRIAGE-03 | Phase 6 | Completed |
 | RNBK-03 | Phase 6 | Completed |
 | RNBK-01 | Phase 7 | Completed |
-| RNBK-02 | Phase 7 | Pending |
+| RNBK-02 | Phase 7 | Completed |
 
 ## Coverage
 

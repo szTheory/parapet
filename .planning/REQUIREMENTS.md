@@ -32,8 +32,8 @@
 
 ### Host-Owned Recovery Runbooks (RNBK)
 
-- [ ] **RNBK-01**: System provides host-generated runbook templates for stalled executors, dead-letter handling, safe retry decisions, provider outage triage, and callback-delay investigation.
-- [ ] **RNBK-02**: System scopes any built-in recovery action behind explicit host wiring, audit logging, and preview-first safety guidance rather than autonomous replay or mutation.
+- [x] **RNBK-01**: System provides host-generated runbook templates for stalled executors, dead-letter handling, safe retry decisions, provider outage triage, and callback-delay investigation.
+- [x] **RNBK-02**: System scopes any built-in recovery action behind explicit host wiring, audit logging, and preview-first safety guidance rather than autonomous replay or mutation.
 - [x] **RNBK-03**: System can create durable follow-up items only for exact operator-owned async or delivery work that requires manual action, without storing raw high-volume event streams in Ecto.
 
 ## v2 Requirements
@@ -74,7 +74,7 @@
 | TRIAGE-02 | Phase 6 | Completed |
 | TRIAGE-03 | Phase 6 | Completed |
 | RNBK-01 | Phase 7 | Completed |
-| RNBK-02 | Phase 7 | Pending |
+| RNBK-02 | Phase 7 | Completed |
 | RNBK-03 | Phase 6 | Completed |
 
 **Coverage:**
