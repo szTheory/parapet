@@ -8,6 +8,17 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
+## Current Milestone: v0.7 Async & Delivery Reliability
+
+**Goal:** Give operators reliable visibility into background and external-delivery failure modes, not just foreground request health.
+
+**Target features:**
+- Concrete `Chimeway` and `Mailglass` SLIs for deliverability, suppression drift, and notification failure
+- `Rindle` observability for long-running media jobs, async pipeline regressions, and external webhook delays
+- Built-in runbook support for stalled async work like dead-letter queues, stuck jobs, and retry workflows
+
+**Why now:** v0.6 improved root-cause correlation for incidents that are already detected. v0.7 broadens what Parapet can detect across async and provider-driven paths, which are a common reliability blind spot for Phoenix SaaS teams.
+
 ## Requirements
 
 ### Validated
@@ -62,15 +73,11 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-- [ ] System provides a `Parapet.Probe` behavior for periodic synthetic checks — v0.5
-- [ ] System executes probes independently of organic web traffic — v0.5
-- [ ] System emits metrics for probe outcomes for stable low-traffic SLOs — v0.5
-- [ ] System expands Sigra integration for login/signup SLIs — v0.5
-- [ ] System expands Accrue integration for billing/webhook SLIs — v0.5
-- [ ] System correlates Auth/Billing regressions to deploy changes — v0.5
-- [ ] System provides an MCP server interface for SRE data — v0.5
-- [ ] External agents can query incidents, timelines, and runbooks via MCP — v0.5
-- [ ] External agents can read SLO burn rates for autonomous triage — v0.5
+- [ ] System expands `Chimeway` integration with out-of-the-box SLIs for notification deliverability, provider failures, and backlog drift — v0.7
+- [ ] System expands `Mailglass` integration with out-of-the-box SLIs for email deliverability, suppression anomalies, and provider health — v0.7
+- [ ] System expands `Rindle` integration with out-of-the-box SLIs for long-running media jobs, webhook delays, and async funnel health — v0.7
+- [ ] System surfaces async and delivery incidents in the Operator UI with enough context to distinguish provider drift from internal queue backlog — v0.7
+- [ ] System provides built-in runbook templates for stalled async work, including dead-letter handling and safe retry flows — v0.7
 
 ### Out of Scope
 
@@ -88,6 +95,9 @@ Shipped v0.2 with a focus on Durable Evidence, LiveView Operator UI, and ecosyst
 The implementation separated ephemeral telemetry from durable low-volume Ecto schema data for incident timelines. A Phoenix LiveView SRE dashboard was generated to provide an operator workbench.
 Shipped v0.3 extending capabilities with Alert Routing, Runbooks, and Notifications via Slack/Teams.
 Shipped v0.4 adding complete AI observability integration for Scoria (Eval-Driven SLOs, deploy correlation, HITL workflow monitoring).
+Shipped v0.5 adding Synthetic Probes, deepened Accrue/Sigra integrations, and a read-only MCP server.
+Shipped v0.6 adding trace exemplars, Rulestead change correlation, and Threadline compliance sync.
+v0.7 is intended to extend Parapet's reliability coverage from request-time journeys into async and provider-mediated pathways where incidents often emerge later and with weaker default signals.
 
 ## Constraints
 
@@ -119,5 +129,22 @@ Shipped v0.4 adding complete AI observability integration for Scoria (Eval-Drive
 | Dual-Track Telemetry for workflow pauses | Prometheus for systemic alerting, Ecto for 100% reliable deep links | ✓ Good |
 | Configurable MFA for UI URL resolving | Decouples Parapet from Scoria's routing layer | ✓ Good |
 
+## Evolution
+
+This document evolves at phase transitions and milestone boundaries.
+
+**After each phase transition** (via `$gsd-transition`):
+1. Requirements invalidated? -> Move to Out of Scope with reason
+2. Requirements validated? -> Move to Validated with phase reference
+3. New requirements emerged? -> Add to Active
+4. Decisions to log? -> Add to Key Decisions
+5. "What This Is" still accurate? -> Update if drifted
+
+**After each milestone** (via `$gsd-complete-milestone`):
+1. Full review of all sections
+2. Core Value check - still the right priority?
+3. Audit Out of Scope - reasons still valid?
+4. Update Context with current state
+
 ---
-*Last updated: 2026-05-16 after v0.4 milestone*
+*Last updated: 2026-05-17 for v0.7 milestone setup*

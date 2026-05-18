@@ -74,16 +74,36 @@ None. All 11/11 requirements defined for v0.4 were satisfied and verified.
 
 ## v0.5 Proactive Resilience & Copilot Triage
 
-**Date:** TBD
+**Date:** 2026-05-16
 **Stats:**
 - Phases: 1-3
-- Plans: 0
-- Total LOC: TBD
+- Plans: 9
+- Total LOC: ~8500 (Elixir/EEx)
 
-### Target Accomplishments
-1. Implement `Parapet.Probe` for defining and scheduling active synthetic canaries.
-2. Expand Sigra and Accrue integrations to emit explicit login, signup, and checkout SLIs.
-3. Build a Parapet MCP server to allow AI agents to safely read incident data and act as triage copilots.
+### Accomplishments
+1. Implemented `Parapet.Probe` for defining and scheduling active synthetic canaries via `NativeScheduler` and `ObanScheduler`.
+2. Expanded `Sigra` and `Accrue` integrations to emit explicit login, signup, and checkout SLIs.
+3. Built a Parapet MCP server to allow AI agents to safely read incident data and act as triage copilots.
+4. Resolved compilation and type warnings across the project, achieving a clean zero-warning compilation state.
 
 ### Known Gaps
-In planning.
+None. All requirements defined for v0.5 were satisfied and verified.
+
+## v0.6 Change Correlation & Audit Trailing
+
+**Date:** 2026-05-17
+**Stats:**
+- Phases: 1-3
+- Plans: 9
+- Total LOC: 8968 (Elixir/EEx)
+
+### Accomplishments
+1. Implemented OpenTelemetry trace exemplar extraction from events and process dictionaries, appending `trace_id` to generated Prometheus metrics.
+2. Added `trace_id` storage to Ecto `Incident` schemas and dynamically formatted trace links within the Operator UI.
+3. Consumed `Rulestead` feature flag toggles via telemetry, creating durable timeline entries and suspect change markers to instantly correlate changes with SLO burn rates.
+4. Highlighted recent proximate system changes (like flag toggles) on active incidents in the Operator UI, distinguishing them visually from human actions.
+5. Implemented `Parapet.Integrations.Threadline` for compliance sync, mirroring Operator audit actions to Threadline event logs.
+6. Added `:threadline_deferred` and `:dual_write` audit modes to satisfy strict compliance constraints (bypassing internal Parapet storage entirely when deferred).
+
+### Known Gaps
+None. All v0.6 requirements defined and satisfied. Tests pass locally.
