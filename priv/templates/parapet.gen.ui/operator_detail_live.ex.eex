@@ -47,6 +47,53 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
     end
   end
 
+  def handle_event("trigger_next_escalation", %{"id" => id}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Requested next escalation from UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :trigger_next_escalation
+    }
+
+    case Parapet.Operator.trigger_next_escalation(incident, payload) do
+      {:ok, _result} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Escalation request recorded")
+         |> assign(incident: Parapet.Operator.incident_detail(id))}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to request escalation: #{inspect(reason)}")}
+    end
+  end
+
+  def handle_event("suppress_pending_escalation", %{"id" => id, "minutes" => minutes}, socket) do
+    incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
+    suppress_until =
+      DateTime.utc_now()
+      |> DateTime.add(String.to_integer(minutes) * 60, :second)
+      |> DateTime.truncate(:second)
+
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Temporarily suppressed pending escalation from UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :suppress_pending_escalation
+    }
+
+    case Parapet.Operator.suppress_pending_escalation(incident, suppress_until, payload) do
+      {:ok, _result} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Escalation suppression recorded")
+         |> assign(incident: Parapet.Operator.incident_detail(id))}
+
+      {:error, reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to suppress escalation: #{inspect(reason)}")}
+    end
+  end
+
   def handle_event("preview_mitigation", %{"step" => step, "incident_id" => incident_id}, socket) do
     incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, incident_id)
     payload = %Parapet.Operator.ActionPayload{

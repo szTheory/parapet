@@ -20,5 +20,26 @@ defmodule Parapet.OperatorUICompileOutTest do
       # We check that the UI generator uses Igniter to add the UI files,
       # but relies on the host app having Phoenix.
     end
+
+    test "generated detail LiveView routes escalation controls through the public operator API" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
+
+      assert content =~ "handle_event(\"trigger_next_escalation\""
+      assert content =~ "handle_event(\"suppress_pending_escalation\""
+      assert content =~ "Parapet.Operator.trigger_next_escalation"
+      assert content =~ "Parapet.Operator.suppress_pending_escalation"
+      assert content =~ "%Parapet.Operator.ActionPayload{"
+      assert content =~ "assign(incident: Parapet.Operator.incident_detail(id))"
+    end
+
+    test "operator UI docs describe the evidence-first escalation posture" do
+      content = File.read!("docs/operator-ui.md")
+
+      assert content =~ "summary-first"
+      assert content =~ "canonical timeline"
+      assert content =~ "durable"
+      assert content =~ "suppression"
+      assert content =~ "host-owned"
+    end
   end
 end

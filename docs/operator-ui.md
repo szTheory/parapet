@@ -2,6 +2,8 @@
 
 The Parapet Operator UI is an optional, generated LiveView workbench that sits inside your host application. Rather than offering another dashboard with raw telemetry, it provides a strictly controlled surface for initiating actionable mitigations when an SLO is burning, with an immutable audit trail for every action.
 
+The workbench remains host-owned and evidence-first: summary-first for current truth, canonical timeline immediately after it for chronology, and risky controls only after enough context is visible.
+
 Phase 6 extends that boundary with fault-domain triage for async and delivery incidents. The workbench now treats a compact evidence-backed triage block as the current-state index and the incident chronology as the authoritative source of sequence.
 
 ## Prerequisites
@@ -65,6 +67,29 @@ The Parapet operator workbench adheres to strict evidence-first design principle
 3. **Immutable Factual Timelines:** (D-10 - D-12) Any events or incidents viewed within the UI reflect immutable facts stored in the evidence spine. The UI reads these facts but cannot alter history.
 4. **Required Audit Context:** (D-17 - D-19) Every mutating action triggered from the workbench automatically captures audit context, including the actor's identity and the rationale. This ensures every operational change leaves a durable, queryable trace.
 
+## Phase 4 Escalation Surfacing
+
+Phase 4 extends the generated detail view with escalation-aware operator surfacing without widening Parapet into a control-plane console.
+
+The generated detail page should render:
+
+1. A summary-first escalation status block that answers current state, next derived step, suppression state, and whether the system already acted.
+2. The canonical timeline directly underneath that summary, with typed entries that make system automation, operator actions, and external evidence visibly distinct.
+3. Bounded manual controls only after the summary and chronology are visible.
+
+### Durable Escalation Truth
+
+- Escalation status in the UI is a derived projection over durable incident state and timeline evidence.
+- The canonical timeline remains the authoritative sequence of what happened.
+- System-executed mitigations and escalation actions stay inside that single chronology; there is no second automation narrative.
+
+### Bounded Manual Controls
+
+- `Trigger Next Escalation` records operator intent through the public `Parapet.Operator` API.
+- `Suppress Pending Escalation` records a durable, expiring suppression window through the same audited seam.
+- Suppression is not scheduler surgery, direct Oban job manipulation, or hidden UI-only state. Workers remain the final truth gate.
+- Generated LiveView code should refresh `Parapet.Operator.incident_detail/1` after those actions rather than maintain its own escalation state machine.
+
 ## Phase 6 Triage Contract
 
 For async and delivery incidents, the generated detail view should render:
@@ -117,4 +142,3 @@ Recovery actions are backed by named host capabilities. These capabilities are r
 - Reporting success or failure back to the evidence spine.
 
 By naming and bounding these capabilities, the host application maintains control over what the operator can do, ensuring the workbench remains a safe environment for high-stakes incident response.
-
