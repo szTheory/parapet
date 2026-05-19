@@ -254,6 +254,98 @@ defmodule Parapet.Operator do
   end
 
   @doc """
+  Records an explicit operator request to trigger the next escalation.
+  Persists only bounded current-state metadata and leaves execution to the worker.
+  """
+  def trigger_next_escalation(%Incident{} = incident, %ActionPayload{} = payload) do
+    if valid_payload?(payload) do
+      escalation_data =
+        incident
+        |> escalation_command_state()
+        |> Map.put("pending_trigger", true)
+        |> Map.put("triggered_by", payload.actor)
+        |> Map.put("trigger_reason", payload.reason)
+        |> Map.put("trigger_requested_at", DateTime.utc_now() |> DateTime.truncate(:second))
+
+      incident_changeset =
+        Ecto.Changeset.change(incident, %{
+          runbook_data: put_escalation_command_state(incident.runbook_data, escalation_data)
+        })
+
+      timeline_attrs = %{
+        type: "escalation_trigger_requested",
+        payload: %{
+          "actor" => payload.actor,
+          "reason" => payload.reason,
+          "mode" => "manual",
+          "pending_trigger" => true
+        }
+      }
+
+      audit_attrs = build_audit("operator_trigger_next_escalation", payload)
+
+      Evidence.run_operator_command(
+        incident_changeset: incident_changeset,
+        timeline_attrs: timeline_attrs,
+        audit_attrs: audit_attrs
+      )
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  @doc """
+  Records a temporary suppression window for pending escalation execution.
+  """
+  def suppress_pending_escalation(
+        %Incident{} = incident,
+        %DateTime{} = suppressed_until,
+        %ActionPayload{} = payload
+      ) do
+    if valid_payload?(payload) do
+      case validate_suppression_window(suppressed_until) do
+        :ok ->
+          bounded_until = DateTime.truncate(suppressed_until, :second)
+
+          escalation_data =
+            incident
+            |> escalation_command_state()
+            |> Map.put("suppressed_until", bounded_until)
+            |> Map.put("suppressed_by", payload.actor)
+            |> Map.put("suppression_reason", payload.reason)
+            |> Map.delete("pending_trigger")
+
+          incident_changeset =
+            Ecto.Changeset.change(incident, %{
+              runbook_data: put_escalation_command_state(incident.runbook_data, escalation_data)
+            })
+
+          timeline_attrs = %{
+            type: "escalation_suppressed",
+            payload: %{
+              "actor" => payload.actor,
+              "reason" => payload.reason,
+              "suppressed_until" => bounded_until
+            }
+          }
+
+          audit_attrs = build_audit("operator_suppress_pending_escalation", payload)
+
+          Evidence.run_operator_command(
+            incident_changeset: incident_changeset,
+            timeline_attrs: timeline_attrs,
+            audit_attrs: audit_attrs
+          )
+
+        {:error, reason} ->
+          {:error, reason}
+      end
+    else
+      {:error, :invalid_payload}
+    end
+  end
+
+  @doc """
   Executes a mitigation step securely via dynamic dispatch from a runbook.
   """
   def execute_runbook_step(%Incident{} = incident, step_id, %ActionPayload{} = payload)
@@ -514,6 +606,43 @@ defmodule Parapet.Operator do
       end
     else
       false
+    end
+  end
+
+  defp escalation_command_state(%Incident{runbook_data: runbook_data}) when is_map(runbook_data) do
+    case Map.get(runbook_data, "escalation") || Map.get(runbook_data, :escalation) do
+      escalation when is_map(escalation) -> normalize_map_keys(escalation)
+      _ -> %{}
+    end
+  end
+
+  defp escalation_command_state(_incident), do: %{}
+
+  defp put_escalation_command_state(runbook_data, escalation_data) do
+    runbook_data
+    |> normalize_map_keys()
+    |> Map.put("escalation", escalation_data)
+  end
+
+  defp normalize_map_keys(runbook_data) when is_map(runbook_data) do
+    Map.new(runbook_data, fn {key, value} -> {to_string(key), value} end)
+  end
+
+  defp normalize_map_keys(_), do: %{}
+
+  defp validate_suppression_window(%DateTime{} = suppressed_until) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+    max_until = DateTime.add(now, 86_400, :second)
+
+    cond do
+      DateTime.compare(suppressed_until, now) != :gt ->
+        {:error, :invalid_suppression_window}
+
+      DateTime.compare(suppressed_until, max_until) == :gt ->
+        {:error, :invalid_suppression_window}
+
+      true ->
+        :ok
     end
   end
 

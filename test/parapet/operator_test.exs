@@ -169,6 +169,74 @@ defmodule Parapet.OperatorTest do
 
       assert {:error, :invalid_payload} = Operator.mark_investigating(incident, invalid_payload)
     end
+
+    test "trigger_next_escalation writes typed manual escalation evidence", %{
+      payload: payload,
+      incident: incident
+    } do
+      assert {:ok, result} = Operator.trigger_next_escalation(incident, payload)
+
+      assert %Incident{runbook_data: runbook_data} = result.incident
+      assert get_in(runbook_data, ["escalation", "pending_trigger"]) == true
+      assert get_in(runbook_data, ["escalation", "triggered_by"]) == payload.actor
+      assert get_in(runbook_data, ["escalation", "trigger_reason"]) == payload.reason
+
+      assert %TimelineEntry{
+               type: "escalation_trigger_requested",
+               payload: %{
+                 "actor" => actor,
+                 "reason" => reason,
+                 "mode" => "manual",
+                 "pending_trigger" => true
+               }
+             } = result.timeline_entry
+
+      assert actor == payload.actor
+      assert reason == payload.reason
+      assert %ToolAudit{tool_name: "operator_trigger_next_escalation"} = result.tool_audit
+    end
+
+    test "suppress_pending_escalation stores a bounded suppression window", %{
+      payload: payload,
+      incident: incident
+    } do
+      expires_at = DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.truncate(:second)
+
+      assert {:ok, result} =
+               Operator.suppress_pending_escalation(incident, expires_at, payload)
+
+      assert %Incident{state: "open", runbook_data: runbook_data} = result.incident
+      assert get_in(runbook_data, ["escalation", "suppressed_until"]) == expires_at
+      assert get_in(runbook_data, ["escalation", "suppressed_by"]) == payload.actor
+      assert get_in(runbook_data, ["escalation", "suppression_reason"]) == payload.reason
+
+      assert %TimelineEntry{
+               type: "escalation_suppressed",
+               payload: %{
+                 "actor" => actor,
+                 "reason" => reason,
+                 "suppressed_until" => ^expires_at
+               }
+             } = result.timeline_entry
+
+      assert actor == payload.actor
+      assert reason == payload.reason
+      assert %ToolAudit{tool_name: "operator_suppress_pending_escalation"} = result.tool_audit
+    end
+
+    test "manual escalation commands reject invalid payloads and windows", %{payload: payload} do
+      incident = %Incident{id: Ecto.UUID.generate(), state: "open"}
+      invalid_payload = %ActionPayload{actor: nil}
+      past_expiry = DateTime.utc_now() |> DateTime.add(-60, :second) |> DateTime.truncate(:second)
+      too_far_expiry = DateTime.utc_now() |> DateTime.add(86_401, :second) |> DateTime.truncate(:second)
+
+      assert {:error, :invalid_payload} = Operator.trigger_next_escalation(incident, invalid_payload)
+      assert {:error, :invalid_suppression_window} =
+               Operator.suppress_pending_escalation(incident, past_expiry, payload)
+
+      assert {:error, :invalid_suppression_window} =
+               Operator.suppress_pending_escalation(incident, too_far_expiry, payload)
+    end
   end
 
   describe "recovery execution" do
