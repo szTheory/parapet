@@ -140,7 +140,7 @@ defmodule Parapet.OperatorTest do
     end
 
     test "returns escalation-aware derived detail and timeline helpers without hiding canonical evidence" do
-      suppressed_until = ~U[2026-05-10 10:15:00Z]
+      suppressed_until = DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.truncate(:second)
 
       incident = %Incident{
         id: "inc-123",
@@ -168,7 +168,7 @@ defmodule Parapet.OperatorTest do
           incident_id: "inc-123",
           type: "external_link",
           payload: %{"label" => "Grafana", "url" => "https://grafana.example.com"},
-          inserted_at: ~U[2026-05-10 10:00:00Z]
+          inserted_at: DateTime.add(suppressed_until, -180, :second)
         },
         %TimelineEntry{
           incident_id: "inc-123",
@@ -178,13 +178,13 @@ defmodule Parapet.OperatorTest do
             "reason" => "Waiting for provider callback",
             "suppressed_until" => suppressed_until
           },
-          inserted_at: ~U[2026-05-10 10:01:00Z]
+          inserted_at: DateTime.add(suppressed_until, -120, :second)
         },
         %TimelineEntry{
           incident_id: "inc-123",
           type: "mitigation_executed",
           payload: %{"actor" => "system:automation:executor", "step_id" => "retry_delivery"},
-          inserted_at: ~U[2026-05-10 10:02:00Z]
+          inserted_at: DateTime.add(suppressed_until, -60, :second)
         }
       ]
 

@@ -61,13 +61,21 @@ defmodule Parapet.Operator do
       )
 
     derived = WorkbenchContract.derive(incident, entries, action_items)
+    timeline_entries =
+      entries
+      |> Enum.zip(derived.timeline_presentations || [])
+      |> Enum.map(fn {entry, presentation} ->
+        %{entry: entry, presentation: presentation}
+      end)
 
     %{
       incident: incident,
       entries: entries,
       derived: derived,
       action_items: action_items,
-      external_links: extract_links(entries)
+      external_links: extract_links(entries),
+      escalation_summary: derived.escalation_summary,
+      timeline_entries: timeline_entries
     }
   end
 
