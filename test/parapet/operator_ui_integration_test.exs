@@ -1,6 +1,13 @@
 defmodule Parapet.OperatorUIIntegrationTest do
   use ExUnit.Case, async: true
 
+  defp index_of(content, needle) do
+    case :binary.match(content, needle) do
+      {index, _length} -> index
+      :nomatch -> nil
+    end
+  end
+
   describe "UI generator integration" do
     test "generated UI templates align with Parapet.Operator actions" do
       # The UI template should assume the existence of Parapet.Operator.queue_query
@@ -51,6 +58,42 @@ defmodule Parapet.OperatorUIIntegrationTest do
         refute content =~ "use Phoenix.Router", "Found Phoenix.Router in core file: \#{file}"
         refute content =~ "use Plug.Router", "Found Plug.Router in core file: \#{file}"
       end
+    end
+
+    test "detail components render escalation summary before the canonical timeline" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      assert content =~ "Escalation Status"
+      assert content =~ "@detail.escalation_summary"
+      assert content =~ "@detail.timeline_entries"
+
+      assert index_of(content, "Escalation Status") <
+               index_of(content, "def incident_timeline"),
+             "Escalation summary should be defined ahead of timeline rendering in the template"
+    end
+
+    test "timeline rows render typed system and escalation evidence without generic payload dumps" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      assert content =~ "timeline_entry_title"
+      assert content =~ "timeline_entry_body"
+      assert content =~ "presentation.actor_class"
+      refute content =~ "inspect(entry.payload)"
+    end
+
+    test "manual escalation controls appear after summary context inside the generated component surface" do
+      components_content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      assert components_content =~ "Trigger Next Escalation"
+      assert components_content =~ "Suppress Pending Escalation"
+
+      assert index_of(components_content, "Escalation Status") <
+               index_of(components_content, "Trigger Next Escalation"),
+             "Escalation controls should appear after summary context"
+
+      assert index_of(components_content, "def incident_timeline") <
+               index_of(components_content, "Trigger Next Escalation"),
+             "Escalation controls should stay below the canonical timeline"
     end
   end
 end

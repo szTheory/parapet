@@ -50,15 +50,54 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <div class="bg-blue-50 p-4 rounded-md mb-6">
         <h4 class="text-sm font-medium text-blue-900 mb-2">Impact Summary</h4>
         <p class="text-sm text-blue-800">
-          <%%= Map.get(@detail.derived, :impact_summary, "No impact summary recorded.") %>
+          <%%= @detail.derived.impact || "No impact summary recorded." %>
         </p>
       </div>
+
+      <div class="border border-amber-200 bg-amber-50 rounded-lg p-4 mb-6">
+        <div class="flex items-start justify-between gap-3 mb-3">
+          <div>
+            <h4 class="text-sm font-semibold text-amber-950">Escalation Status</h4>
+            <p class="text-sm text-amber-900 mt-1">
+              <%%= escalation_status_copy(@detail.escalation_summary.status) %>
+            </p>
+          </div>
+          <span class="px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
+            <%%= escalation_status_badge(@detail.escalation_summary.status) %>
+          </span>
+        </div>
+
+        <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Next Step</dt>
+            <dd class="mt-1 text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
+          </div>
+          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">System Action</dt>
+            <dd class="mt-1 text-amber-950"><%%= system_action_copy(@detail.escalation_summary.system_action) %></dd>
+          </div>
+          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Suppression</dt>
+            <dd class="mt-1 text-amber-950"><%%= suppression_copy(@detail.escalation_summary.suppression) %></dd>
+          </div>
+          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Latest Evidence</dt>
+            <dd class="mt-1 text-amber-950"><%%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
+          </div>
+        </dl>
+      </div>
       
-      <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div class="border border-gray-200 rounded-md p-4">
           <h4 class="text-sm font-medium text-gray-700 mb-2">Top Facts</h4>
           <ul class="text-sm text-gray-600 list-disc pl-5">
             <li>Created at <%%= @detail.incident.inserted_at %></li>
+            <%%= if @detail.derived.fault_plane do %>
+              <li>Likely fault plane: <%%= @detail.derived.fault_plane %></li>
+            <%% end %>
+            <%%= if @detail.derived.next_safe_action do %>
+              <li>Next safe action: <%%= @detail.derived.next_safe_action %></li>
+            <%% end %>
           </ul>
         </div>
         <div class="border border-gray-200 rounded-md p-4">
@@ -67,14 +106,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <%%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
               <%% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
               <%% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
-              <a href={url} class="text-sm text-purple-600 hover:underline flex items-center gap-1" target="_blank">
+              <a href={url} class="text-sm text-indigo-700 hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 <span>Trace: <%%= trace_id %></span> &nearr;
               </a>
             <%% end %>
             <%%= for link <- @detail.external_links do %>
-              <a href={link} class="text-sm text-blue-600 hover:underline flex items-center gap-1" target="_blank">
-                <span><%%= link %></span> &nearr;
+              <a href={external_link_url(link)} class="text-sm text-blue-600 hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
+                <span><%%= external_link_label(link) %></span> &nearr;
               </a>
             <%% end %>
             <%%= if Enum.empty?(@detail.external_links) && is_nil(Map.get(@detail.incident, :trace_id)) do %>
@@ -92,35 +131,30 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     ~H"""
     <div class="flow-root">
       <ul role="list" class="-mb-8">
-        <%%= for entry <- @detail.entries do %>
-          <%% is_flag_change = entry.type == "rulestead_flag_change" %>
+        <%% timeline_entries = @detail.timeline_entries || Enum.map(@detail.entries, fn entry -> %{entry: entry, presentation: %{actor_class: :evidence, style_variant: :neutral_evidence, system_action?: false}} end) %>
+        <%%= for item <- timeline_entries do %>
+          <%% entry = item.entry %>
+          <%% presentation = item.presentation %>
           <li>
             <div class="relative pb-8">
               <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
               <div class="relative flex space-x-3">
                 <div>
-                  <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white", is_flag_change && "bg-purple-500 ring-purple-200" || "bg-gray-400"]}>
-                    <%%= if is_flag_change do %>
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
-                      </svg>
-                    <%% end %>
+                  <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white text-[11px] font-semibold", timeline_entry_badge_class(presentation)]}>
+                    <%%= timeline_entry_badge_text(presentation) %>
                   </span>
                 </div>
                 <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                   <div>
-                    <%%= if is_flag_change do %>
-                      <p class="text-sm text-gray-500">
-                        <span class="font-medium text-gray-900"><%%= Map.get(entry.payload, "actor") || Map.get(entry.payload, :actor) || "System" %></span> changed flag
-                        <span class="font-mono text-xs bg-gray-100 px-1 rounded border border-gray-200"><%%= Map.get(entry.payload, "flag") || Map.get(entry.payload, :flag) %></span>
-                        in scope <span class="font-medium text-gray-900"><%%= inspect(Map.get(entry.payload, "scope") || Map.get(entry.payload, :scope)) %></span>
-                      </p>
-                    <%% else %>
-                      <p class="text-sm text-gray-500">
-                        <span class="font-medium text-gray-900"><%%= entry.type %></span>
-                        <%%= inspect(entry.payload) %>
-                      </p>
-                    <%% end %>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <p class="text-sm font-medium text-gray-900"><%%= timeline_entry_title(entry, presentation) %></p>
+                      <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
+                        <%%= timeline_actor_copy(presentation.actor_class) %>
+                      </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">
+                      <%%= timeline_entry_body(entry, presentation) %>
+                    </p>
                   </div>
                   <div class="whitespace-nowrap text-right text-sm text-gray-500">
                     <time datetime={entry.inserted_at}><%%= entry.inserted_at %></time>
@@ -323,13 +357,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <%% end %>
 
       <div class="bg-white border border-gray-200 rounded-md p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">Mitigate</h4>
-        <p class="text-xs text-gray-500 mb-3">Apply known mitigations.</p>
-        <button class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded text-sm transition-colors mb-2">
-          Rollback Deployment
+        <h4 class="text-sm font-medium text-gray-900 mb-2">Escalation Controls</h4>
+        <p class="text-xs text-gray-500 mb-3">Use bounded controls only after reviewing current status and the canonical timeline.</p>
+        <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors mb-2">
+          Trigger Next Escalation
         </button>
-        <button class="w-full bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-2 px-4 rounded text-sm transition-colors">
-          Failover DB
+        <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class="w-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 font-medium py-2 px-4 rounded text-sm transition-colors">
+          Suppress Pending Escalation
         </button>
       </div>
 
@@ -416,6 +450,155 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp state_color("acknowledged"), do: "bg-yellow-100 text-yellow-800"
   defp state_color("resolved"), do: "bg-green-100 text-green-800"
   defp state_color(_), do: "bg-gray-100 text-gray-800"
+
+  defp escalation_status_copy(:suppressed), do: "Pending escalation is durably suppressed until the recorded window expires."
+  defp escalation_status_copy(:manual_trigger_requested), do: "An operator requested the next escalation and the worker has not written the outcome yet."
+  defp escalation_status_copy(:recently_executed), do: "The system recently executed an escalation step and recorded the result in the timeline."
+  defp escalation_status_copy(:recently_short_circuited), do: "The latest escalation attempt was safely short-circuited and logged."
+  defp escalation_status_copy(_), do: "No active escalation override is recorded. Continue from the latest durable evidence."
+
+  defp escalation_status_badge(:suppressed), do: "Suppressed"
+  defp escalation_status_badge(:manual_trigger_requested), do: "Requested"
+  defp escalation_status_badge(:recently_executed), do: "Executed"
+  defp escalation_status_badge(:recently_short_circuited), do: "Short-Circuited"
+  defp escalation_status_badge(_), do: "Idle"
+
+  defp escalation_next_step_copy(%{kind: :await_suppression_expiry, at: %DateTime{} = at}),
+    do: "Wait for suppression to expire at #{at}."
+
+  defp escalation_next_step_copy(%{kind: :await_worker_execution, at: %DateTime{} = at}),
+    do: "Await worker execution for the pending escalation request recorded at #{at}."
+
+  defp escalation_next_step_copy(%{kind: :monitor_timeline, at: %DateTime{} = at}),
+    do: "Monitor the canonical timeline. Latest escalation evidence landed at #{at}."
+
+  defp escalation_next_step_copy(_), do: "Monitor the canonical timeline for the next durable escalation event."
+
+  defp system_action_copy(%{status: :executed, at: %DateTime{} = at, mode: mode}),
+    do: "System action executed at #{at}#{if(mode, do: " via #{mode}", else: "")}."
+
+  defp system_action_copy(%{status: :short_circuited, at: %DateTime{} = at}),
+    do: "System execution was short-circuited at #{at}."
+
+  defp system_action_copy(_), do: "No recent system action is recorded."
+
+  defp suppression_copy(%{active?: true, until: %DateTime{} = until, actor: actor, reason: reason}) do
+    "#{actor || "Operator"} suppressed pending escalation until #{until}. #{reason || "No reason recorded."}"
+  end
+
+  defp suppression_copy(_), do: "No active suppression window is recorded."
+
+  defp latest_event_copy(%{type: type, at: %DateTime{} = at, actor_class: actor_class}),
+    do: "#{type} at #{at} (#{timeline_actor_copy(actor_class)})."
+
+  defp latest_event_copy(_), do: "No escalation event has been recorded yet."
+
+  defp external_link_label(%{"label" => label, "url" => url}) when is_binary(label) and is_binary(url), do: label
+  defp external_link_label(%{label: label, url: url}) when is_binary(label) and is_binary(url), do: label
+  defp external_link_label(%{"url" => url}) when is_binary(url), do: url
+  defp external_link_label(%{url: url}) when is_binary(url), do: url
+  defp external_link_label(link) when is_binary(link), do: link
+  defp external_link_label(link), do: inspect(link)
+
+  defp external_link_url(%{"url" => url}) when is_binary(url), do: url
+  defp external_link_url(%{url: url}) when is_binary(url), do: url
+  defp external_link_url(link) when is_binary(link), do: link
+  defp external_link_url(_), do: "#"
+
+  defp timeline_entry_badge_class(%{actor_class: :system}), do: "bg-amber-600"
+  defp timeline_entry_badge_class(%{actor_class: :operator}), do: "bg-blue-600"
+  defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "bg-violet-600"
+  defp timeline_entry_badge_class(%{actor_class: :external}), do: "bg-slate-600"
+  defp timeline_entry_badge_class(_), do: "bg-gray-500"
+
+  defp timeline_entry_badge_text(%{actor_class: :system}), do: "SYS"
+  defp timeline_entry_badge_text(%{actor_class: :operator}), do: "OP"
+  defp timeline_entry_badge_text(%{actor_class: :copilot}), do: "AI"
+  defp timeline_entry_badge_text(%{actor_class: :external}), do: "EXT"
+  defp timeline_entry_badge_text(_), do: "EV"
+
+  defp timeline_entry_actor_class(%{actor_class: :system}), do: "bg-amber-100 text-amber-900 border-amber-200"
+  defp timeline_entry_actor_class(%{actor_class: :operator}), do: "bg-blue-100 text-blue-900 border-blue-200"
+  defp timeline_entry_actor_class(%{actor_class: :copilot}), do: "bg-violet-100 text-violet-900 border-violet-200"
+  defp timeline_entry_actor_class(%{actor_class: :external}), do: "bg-slate-100 text-slate-900 border-slate-200"
+  defp timeline_entry_actor_class(_), do: "bg-gray-100 text-gray-900 border-gray-200"
+
+  defp timeline_actor_copy(:system), do: "System"
+  defp timeline_actor_copy(:operator), do: "Operator"
+  defp timeline_actor_copy(:copilot), do: "Copilot"
+  defp timeline_actor_copy(:external), do: "External"
+  defp timeline_actor_copy(_), do: "Evidence"
+
+  defp timeline_entry_title(%{type: "mitigation_executed"}, _presentation), do: "Runbook mitigation executed"
+  defp timeline_entry_title(%{type: "escalation_trigger_requested"}, _presentation), do: "Escalation requested"
+  defp timeline_entry_title(%{type: "escalation_suppressed"}, _presentation), do: "Escalation suppressed"
+  defp timeline_entry_title(%{type: "escalation_executed"}, _presentation), do: "Escalation executed"
+  defp timeline_entry_title(%{type: "escalation_short_circuited"}, _presentation), do: "Escalation short-circuited"
+  defp timeline_entry_title(%{type: "rulestead_flag_change"}, _presentation), do: "Feature flag changed"
+  defp timeline_entry_title(%{type: "note"}, _presentation), do: "Operator note"
+  defp timeline_entry_title(%{type: "status_change"}, _presentation), do: "Incident status changed"
+  defp timeline_entry_title(%{type: "external_link"}, _presentation), do: "External evidence attached"
+  defp timeline_entry_title(%{type: type}, _presentation), do: humanize_type(type)
+
+  defp timeline_entry_body(%{type: "mitigation_executed", payload: payload}, presentation) do
+    actor = payload_value(payload, "actor") || timeline_actor_copy(presentation.actor_class)
+    step_id = payload_value(payload, "step_id") || "unknown-step"
+    "#{actor} executed mitigation step #{step_id}."
+  end
+
+  defp timeline_entry_body(%{type: "escalation_trigger_requested", payload: payload}, _presentation) do
+    actor = payload_value(payload, "actor") || "Operator"
+    reason = payload_value(payload, "reason") || "No reason recorded."
+    "#{actor} requested the next escalation. #{reason}"
+  end
+
+  defp timeline_entry_body(%{type: "escalation_suppressed", payload: payload}, _presentation) do
+    actor = payload_value(payload, "actor") || "Operator"
+    reason = payload_value(payload, "reason") || "No reason recorded."
+    suppressed_until = payload_value(payload, "suppressed_until")
+    "#{actor} suppressed pending escalation until #{suppressed_until}. #{reason}"
+  end
+
+  defp timeline_entry_body(%{type: "escalation_executed", payload: payload}, _presentation) do
+    mode = payload_value(payload, "mode") || "scheduled"
+    policy = payload_value(payload, "policy")
+    "Escalation executed via #{mode}#{if(policy, do: " using #{policy}", else: "")}."
+  end
+
+  defp timeline_entry_body(%{type: "escalation_short_circuited", payload: payload}, _presentation) do
+    reason = payload_value(payload, "reason") || "no bounded reason recorded"
+    "Escalation was short-circuited because #{reason}."
+  end
+
+  defp timeline_entry_body(%{type: "rulestead_flag_change", payload: payload}, _presentation) do
+    actor = payload_value(payload, "actor") || "System"
+    flag = payload_value(payload, "flag") || "unknown"
+    scope = payload_value(payload, "scope")
+    "#{actor} changed flag #{flag}#{if(scope, do: " in scope #{inspect(scope)}", else: "")}."
+  end
+
+  defp timeline_entry_body(%{type: "note", payload: payload}, _presentation),
+    do: payload_value(payload, "text") || "No note text recorded."
+
+  defp timeline_entry_body(%{type: "status_change", payload: payload}, _presentation) do
+    "Incident moved to #{payload_value(payload, "new_state") || "an updated state"}."
+  end
+
+  defp timeline_entry_body(%{type: "external_link", payload: payload}, _presentation) do
+    label = external_link_label(payload)
+    url = external_link_url(payload)
+    "#{label}: #{url}"
+  end
+
+  defp timeline_entry_body(%{type: type}, _presentation),
+    do: "#{humanize_type(type)} was recorded as durable evidence."
+
+  defp payload_value(payload, key) when is_map(payload), do: Map.get(payload, key) || Map.get(payload, String.to_atom(key))
+  defp payload_value(_payload, _key), do: nil
+
+  defp humanize_type(type) when is_binary(type) do
+    type
+    |> String.replace("_", " ")
+    |> String.capitalize()
+  end
 end
-
-
