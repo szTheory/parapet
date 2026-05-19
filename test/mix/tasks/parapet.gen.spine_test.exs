@@ -25,9 +25,22 @@ defmodule Mix.Tasks.Parapet.Gen.SpineTest do
         Rewrite.source!(igniter.rewrite, migration_file)
         |> Rewrite.Source.get(:content)
 
-      assert migration_source =~ "create table(:parapet_incidents, primary_key: false)"
-      assert migration_source =~ "create table(:parapet_timeline_entries, primary_key: false)"
-      assert migration_source =~ "create table(:parapet_tool_audits, primary_key: false)"
+      migration_ast = Code.string_to_quoted!(migration_source)
+
+      assert contains_snippet?(migration_ast, "create(table(:parapet_incidents, primary_key: false))")
+      assert contains_snippet?(migration_ast, "create(table(:parapet_timeline_entries, primary_key: false))")
+      assert contains_snippet?(migration_ast, "create(table(:parapet_tool_audits, primary_key: false))")
+      assert contains_snippet?(migration_ast, "references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)")
+      assert contains_snippet?(migration_ast, "create(index(:parapet_incidents, [:state, :inserted_at]))")
+      assert contains_snippet?(migration_ast, "create(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))")
+      assert contains_snippet?(migration_ast, "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))")
     end
+  end
+
+  defp contains_snippet?(ast, snippet) do
+    ast
+    |> Macro.to_string()
+    |> String.replace(~r/\s+/, " ")
+    |> String.contains?(snippet)
   end
 end
