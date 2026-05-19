@@ -45,6 +45,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
           end
 
           create unique_index(:parapet_incidents, [:correlation_key], where: "state = 'open'")
+          create index(:parapet_incidents, [:state, :inserted_at])
 
           create table(:parapet_timeline_entries, primary_key: false) do
             add :id, :binary_id, primary_key: true
@@ -56,6 +57,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
           end
 
           create index(:parapet_timeline_entries, [:incident_id])
+          create index(:parapet_timeline_entries, [:incident_id, :inserted_at])
 
           create table(:parapet_tool_audits, primary_key: false) do
             add :id, :binary_id, primary_key: true
@@ -64,12 +66,13 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :output, :map, default: %{}
             add :success, :boolean, default: false, null: false
             add :duration_ms, :integer
-            add :timeline_entry_id, references(:parapet_timeline_entries, type: :binary_id, on_delete: :nilify_all)
+            add :timeline_entry_id, references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)
 
             timestamps()
           end
 
           create index(:parapet_tool_audits, [:timeline_entry_id])
+          create index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at])
 
           create table(:parapet_system_events, primary_key: false) do
             add :id, :binary_id, primary_key: true
