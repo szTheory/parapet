@@ -5,6 +5,130 @@ defmodule Parapet.Operator.WorkbenchContractTest do
   alias Parapet.Spine.{Incident, TimelineEntry}
 
   describe "derive/2" do
+    test "derives escalation status, suppression metadata, and next-step facts from durable evidence" do
+      suppressed_until = ~U[2026-05-10 10:20:00Z]
+
+      incident = %Incident{
+        id: "inc-1",
+        state: "open",
+        runbook_data: %{
+          "escalation" => %{
+            "suppressed_until" => suppressed_until,
+            "suppressed_by" => "operator_ui",
+            "suppression_reason" => "Waiting for provider callback",
+            "trigger_requested_at" => ~U[2026-05-10 10:05:00Z]
+          }
+        }
+      }
+
+      entries = [
+        %TimelineEntry{
+          type: "escalation_trigger_requested",
+          payload: %{
+            "actor" => "operator_ui",
+            "reason" => "Escalate if callback does not recover",
+            "mode" => "manual",
+            "pending_trigger" => true
+          },
+          inserted_at: ~U[2026-05-10 10:05:00Z]
+        },
+        %TimelineEntry{
+          type: "escalation_suppressed",
+          payload: %{
+            "actor" => "operator_ui",
+            "reason" => "Waiting for provider callback",
+            "suppressed_until" => suppressed_until
+          },
+          inserted_at: ~U[2026-05-10 10:06:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries)
+
+      assert derived.escalation_summary.status == :suppressed
+      assert derived.escalation_summary.suppression.active? == true
+      assert derived.escalation_summary.suppression.until == suppressed_until
+      assert derived.escalation_summary.suppression.actor == "operator_ui"
+      assert derived.escalation_summary.suppression.reason == "Waiting for provider callback"
+      assert derived.escalation_summary.pending_trigger? == false
+      assert derived.escalation_summary.next_step.kind == :await_suppression_expiry
+      assert derived.escalation_summary.next_step.at == suppressed_until
+      assert derived.escalation_summary.next_step.derived? == true
+      assert derived.escalation_summary.latest_event.type == "escalation_suppressed"
+      assert derived.escalation_summary.latest_event.at == ~U[2026-05-10 10:06:00Z]
+    end
+
+    test "classifies system, operator, and copilot actions explicitly for timeline presentation" do
+      incident = %Incident{id: "inc-1", state: "open"}
+
+      entries = [
+        %TimelineEntry{
+          type: "mitigation_executed",
+          payload: %{"actor" => "system:automation:executor", "step_id" => "retry_delivery"},
+          inserted_at: ~U[2026-05-10 10:00:00Z]
+        },
+        %TimelineEntry{
+          type: "escalation_trigger_requested",
+          payload: %{"actor" => "operator_ui", "reason" => "Escalate now"},
+          inserted_at: ~U[2026-05-10 10:01:00Z]
+        },
+        %TimelineEntry{
+          type: "recommendation",
+          payload: %{"actor" => "ai:copilot", "state" => "pending"},
+          inserted_at: ~U[2026-05-10 10:02:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries)
+
+      assert [
+               %{actor_class: :system, style_variant: :system_action, system_action?: true},
+               %{actor_class: :operator, style_variant: :operator_action, system_action?: false},
+               %{actor_class: :copilot, style_variant: :copilot_action, system_action?: false}
+             ] = derived.timeline_presentations
+    end
+
+    test "keeps chronology timestamps authoritative when summarizing recent system activity" do
+      trigger_requested_at = ~U[2026-05-10 10:00:00Z]
+
+      incident = %Incident{
+        id: "inc-1",
+        state: "open",
+        runbook_data: %{
+          "escalation" => %{
+            "pending_trigger" => true,
+            "triggered_by" => "operator_ui",
+            "trigger_reason" => "Escalate if automation stalls",
+            "trigger_requested_at" => trigger_requested_at
+          }
+        }
+      }
+
+      entries = [
+        %TimelineEntry{
+          type: "escalation_trigger_requested",
+          payload: %{"actor" => "operator_ui", "reason" => "Escalate if automation stalls"},
+          inserted_at: trigger_requested_at
+        },
+        %TimelineEntry{
+          type: "escalation_executed",
+          payload: %{"mode" => "manual", "status" => "success", "policy" => "PagerPolicy"},
+          inserted_at: ~U[2026-05-10 10:03:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries)
+
+      assert derived.escalation_summary.status == :recently_executed
+      assert derived.escalation_summary.pending_trigger? == false
+      assert derived.escalation_summary.latest_event.type == "escalation_executed"
+      assert derived.escalation_summary.latest_event.at == ~U[2026-05-10 10:03:00Z]
+      assert derived.escalation_summary.system_action.status == :executed
+      assert derived.escalation_summary.system_action.at == ~U[2026-05-10 10:03:00Z]
+      assert derived.escalation_summary.system_action.mode == "manual"
+      assert derived.escalation_summary.system_action.derived? == true
+    end
+
     test "prefers the durable incident triage summary for current-state fields" do
       incident = %Incident{
         id: "inc-1",

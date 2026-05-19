@@ -138,6 +138,82 @@ defmodule Parapet.OperatorTest do
       assert detail.derived.fault_plane == "webhook"
       assert detail.derived.evidence_facts == ["Delay bucket gt_15m is present."]
     end
+
+    test "returns escalation-aware derived detail and timeline helpers without hiding canonical evidence" do
+      suppressed_until = ~U[2026-05-10 10:15:00Z]
+
+      incident = %Incident{
+        id: "inc-123",
+        state: "open",
+        runbook_data: %{
+          "title" => "Mailglass Recovery",
+          "triage" => %{
+            "integration" => "mailglass",
+            "symptom" => "callback freshness burn",
+            "fault_plane" => "webhook",
+            "impact" => "Delivery confirmations are delayed.",
+            "next_safe_action" => "Inspect callback ingress.",
+            "confidence" => "high"
+          },
+          "escalation" => %{
+            "suppressed_until" => suppressed_until,
+            "suppressed_by" => "operator_ui",
+            "suppression_reason" => "Waiting for provider callback"
+          }
+        }
+      }
+
+      entries = [
+        %TimelineEntry{
+          incident_id: "inc-123",
+          type: "external_link",
+          payload: %{"label" => "Grafana", "url" => "https://grafana.example.com"},
+          inserted_at: ~U[2026-05-10 10:00:00Z]
+        },
+        %TimelineEntry{
+          incident_id: "inc-123",
+          type: "escalation_suppressed",
+          payload: %{
+            "actor" => "operator_ui",
+            "reason" => "Waiting for provider callback",
+            "suppressed_until" => suppressed_until
+          },
+          inserted_at: ~U[2026-05-10 10:01:00Z]
+        },
+        %TimelineEntry{
+          incident_id: "inc-123",
+          type: "mitigation_executed",
+          payload: %{"actor" => "system:automation:executor", "step_id" => "retry_delivery"},
+          inserted_at: ~U[2026-05-10 10:02:00Z]
+        }
+      ]
+
+      Process.put(:mock_incident, incident)
+      Process.put(:mock_entries, entries)
+
+      detail = Operator.incident_detail("inc-123")
+
+      assert detail.entries == entries
+      assert detail.external_links == [%{"label" => "Grafana", "url" => "https://grafana.example.com"}]
+      assert detail.derived.runbook_title == "Mailglass Recovery"
+      assert detail.derived.escalation_summary.status == :suppressed
+      assert detail.derived.escalation_summary.suppression.until == suppressed_until
+      assert detail.escalation_summary == detail.derived.escalation_summary
+      assert [
+               %{
+                 entry: %TimelineEntry{type: "external_link"},
+                 presentation: %{actor_class: :external, system_action?: false}
+               },
+               %{
+                 entry: %TimelineEntry{type: "escalation_suppressed"},
+                 presentation: %{actor_class: :operator, style_variant: :operator_action}
+               },
+               %{
+                 entry: %TimelineEntry{type: "mitigation_executed"},
+                 presentation: %{actor_class: :system, style_variant: :system_action, system_action?: true}
+               }
+             ] = detail.timeline_entries
+    end
   end
 
   describe "first-class commands" do
