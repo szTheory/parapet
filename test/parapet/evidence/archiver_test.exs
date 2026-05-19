@@ -18,7 +18,7 @@ defmodule Parapet.Evidence.ArchiverTest do
           transactions: 0,
           in_transaction?: false
         }
-      end)
+      end, name: __MODULE__)
     end
 
     def transaction(fun) when is_function(fun, 0) do
@@ -88,13 +88,12 @@ defmodule Parapet.Evidence.ArchiverTest do
     end
 
     defp matching_ids_from_query(query) do
-      state_param = Enum.at(query.wheres, 0).params |> Enum.at(0) |> elem(0)
       cutoff = Enum.at(query.wheres, 1).params |> Enum.at(0) |> elem(0)
 
       Agent.get(__MODULE__, fn state ->
         state.incidents
         |> Enum.filter(fn incident ->
-          incident.state != state_param and DateTime.compare(incident.inserted_at, cutoff) == :lt
+          incident.state != "open" and DateTime.compare(incident.inserted_at, cutoff) == :lt
         end)
         |> Enum.map(& &1.id)
       end)
