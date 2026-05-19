@@ -6,7 +6,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
 
   describe "derive/2" do
     test "derives escalation status, suppression metadata, and next-step facts from durable evidence" do
-      suppressed_until = ~U[2026-05-10 10:20:00Z]
+      suppressed_until = DateTime.utc_now() |> DateTime.add(1_200, :second) |> DateTime.truncate(:second)
 
       incident = %Incident{
         id: "inc-1",
@@ -30,7 +30,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
             "mode" => "manual",
             "pending_trigger" => true
           },
-          inserted_at: ~U[2026-05-10 10:05:00Z]
+          inserted_at: DateTime.add(suppressed_until, -120, :second)
         },
         %TimelineEntry{
           type: "escalation_suppressed",
@@ -39,7 +39,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
             "reason" => "Waiting for provider callback",
             "suppressed_until" => suppressed_until
           },
-          inserted_at: ~U[2026-05-10 10:06:00Z]
+          inserted_at: DateTime.add(suppressed_until, -60, :second)
         }
       ]
 
@@ -55,7 +55,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert derived.escalation_summary.next_step.at == suppressed_until
       assert derived.escalation_summary.next_step.derived? == true
       assert derived.escalation_summary.latest_event.type == "escalation_suppressed"
-      assert derived.escalation_summary.latest_event.at == ~U[2026-05-10 10:06:00Z]
+      assert derived.escalation_summary.latest_event.at == DateTime.add(suppressed_until, -60, :second)
     end
 
     test "classifies system, operator, and copilot actions explicitly for timeline presentation" do

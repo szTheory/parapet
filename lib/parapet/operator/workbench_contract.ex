@@ -25,7 +25,9 @@ defmodule Parapet.Operator.WorkbenchContract do
     :runbook_title,
     :runbook_description,
     :runbook_steps,
-    :active_preview
+    :active_preview,
+    :escalation_summary,
+    :timeline_presentations
   ]
 
   @doc """
@@ -33,6 +35,7 @@ defmodule Parapet.Operator.WorkbenchContract do
   Accepts optional action_items for exact targeting hints.
   """
   def derive(%Incident{} = incident, entries, action_items \\ []) when is_list(entries) do
+    timeline_presentations = Enum.map(entries, &timeline_presentation/1)
     sorted_entries = Enum.sort_by(entries, & &1.inserted_at, {:desc, DateTime})
 
     triage_summary = Incident.triage_summary(incident) || %{}
@@ -74,7 +77,9 @@ defmodule Parapet.Operator.WorkbenchContract do
       runbook_title: runbook_title,
       runbook_description: runbook_description,
       runbook_steps: derive_runbook_steps(raw_steps, sorted_entries, action_items),
-      active_preview: find_active_preview(sorted_entries)
+      active_preview: find_active_preview(sorted_entries),
+      escalation_summary: derive_escalation_summary(incident, sorted_entries),
+      timeline_presentations: timeline_presentations
     }
   end
 
@@ -225,4 +230,185 @@ defmodule Parapet.Operator.WorkbenchContract do
     # in case the string isn't an existing atom
     ArgumentError -> :none
   end
+
+  defp derive_escalation_summary(%Incident{} = incident, sorted_entries) do
+    escalation_state = escalation_command_state(incident)
+    latest_event = latest_escalation_event(sorted_entries)
+    suppression = suppression_projection(escalation_state)
+    pending_trigger? = pending_trigger?(escalation_state, latest_event, suppression)
+    system_action = derive_system_action(sorted_entries)
+
+    %{
+      status: escalation_status(suppression, pending_trigger?, latest_event),
+      pending_trigger?: pending_trigger?,
+      suppression: suppression,
+      next_step: derive_next_step(suppression, pending_trigger?, escalation_state, latest_event),
+      latest_event: project_latest_event(latest_event),
+      system_action: system_action
+    }
+  end
+
+  defp escalation_command_state(%Incident{runbook_data: runbook_data}) when is_map(runbook_data) do
+    case Map.get(runbook_data, "escalation") || Map.get(runbook_data, :escalation) do
+      escalation when is_map(escalation) -> stringify_keys(escalation)
+      _ -> %{}
+    end
+  end
+
+  defp escalation_command_state(_incident), do: %{}
+
+  defp latest_escalation_event(entries) do
+    find_latest(entries, [
+      "escalation_trigger_requested",
+      "escalation_suppressed",
+      "escalation_short_circuited",
+      "escalation_executed"
+    ])
+  end
+
+  defp suppression_projection(escalation_state) do
+    suppressed_until = to_datetime(Map.get(escalation_state, "suppressed_until"))
+    active? = match?(%DateTime{}, suppressed_until) and DateTime.compare(suppressed_until, DateTime.utc_now()) == :gt
+
+    %{
+      active?: active?,
+      until: suppressed_until,
+      actor: Map.get(escalation_state, "suppressed_by"),
+      reason: Map.get(escalation_state, "suppression_reason")
+    }
+  end
+
+  defp pending_trigger?(escalation_state, latest_event, suppression) do
+    pending_trigger? = Map.get(escalation_state, "pending_trigger") == true
+    trigger_requested_at = to_datetime(Map.get(escalation_state, "trigger_requested_at"))
+
+    blocked_by_newer_event? =
+      match?(%DateTime{}, trigger_requested_at) and match?(%{inserted_at: %DateTime{}}, latest_event) and
+        DateTime.compare(latest_event.inserted_at, trigger_requested_at) in [:eq, :gt] and
+        latest_event.type in ["escalation_executed", "escalation_short_circuited", "escalation_suppressed"]
+
+    pending_trigger? and not suppression.active? and not blocked_by_newer_event?
+  end
+
+  defp escalation_status(%{active?: true}, _pending_trigger?, _latest_event), do: :suppressed
+  defp escalation_status(_suppression, true, _latest_event), do: :manual_trigger_requested
+  defp escalation_status(_suppression, _pending_trigger?, %{type: "escalation_executed"}), do: :recently_executed
+
+  defp escalation_status(_suppression, _pending_trigger?, %{type: "escalation_short_circuited"}) do
+    :recently_short_circuited
+  end
+
+  defp escalation_status(_suppression, _pending_trigger?, _latest_event), do: :idle
+
+  defp derive_next_step(%{active?: true, until: suppressed_until}, _pending_trigger?, _state, _latest_event) do
+    %{kind: :await_suppression_expiry, at: suppressed_until, derived?: true}
+  end
+
+  defp derive_next_step(_suppression, true, escalation_state, _latest_event) do
+    %{kind: :await_worker_execution, at: to_datetime(Map.get(escalation_state, "trigger_requested_at")), derived?: true}
+  end
+
+  defp derive_next_step(_suppression, _pending_trigger?, _state, latest_event) do
+    %{kind: :monitor_timeline, at: if(latest_event, do: latest_event.inserted_at), derived?: true}
+  end
+
+  defp project_latest_event(nil), do: nil
+
+  defp project_latest_event(entry) do
+    presentation = timeline_presentation(entry)
+
+    %{
+      type: entry.type,
+      at: entry.inserted_at,
+      actor_class: presentation.actor_class,
+      mode: event_payload_value(entry, "mode"),
+      reason: event_payload_value(entry, "reason")
+    }
+  end
+
+  defp derive_system_action(entries) do
+    system_entry =
+      Enum.find(entries, fn entry ->
+        timeline_presentation(entry).system_action?
+      end)
+
+    case system_entry do
+      nil ->
+        %{status: :none, at: nil, mode: nil, derived?: true, recent?: false}
+
+      %{type: "escalation_short_circuited"} = entry ->
+        %{
+          status: :short_circuited,
+          at: entry.inserted_at,
+          mode: event_payload_value(entry, "mode"),
+          derived?: true,
+          recent?: true
+        }
+
+      entry ->
+        %{
+          status: :executed,
+          at: entry.inserted_at,
+          mode: event_payload_value(entry, "mode") || fallback_system_mode(entry.type),
+          derived?: true,
+          recent?: true
+        }
+    end
+  end
+
+  defp fallback_system_mode("mitigation_executed"), do: "runbook"
+  defp fallback_system_mode(_type), do: nil
+
+  defp timeline_presentation(entry) do
+    actor = event_payload_value(entry, "actor")
+
+    cond do
+      entry.type == "external_link" ->
+        %{actor_class: :external, style_variant: :external_reference, system_action?: false}
+
+      explicit_system_event?(entry) or system_actor?(actor) ->
+        %{actor_class: :system, style_variant: :system_action, system_action?: true}
+
+      copilot_actor?(actor) ->
+        %{actor_class: :copilot, style_variant: :copilot_action, system_action?: false}
+
+      operator_actor?(actor) ->
+        %{actor_class: :operator, style_variant: :operator_action, system_action?: false}
+
+      true ->
+        %{actor_class: :evidence, style_variant: :neutral_evidence, system_action?: false}
+    end
+  end
+
+  defp explicit_system_event?(%{type: type}),
+    do: type in ["escalation_executed", "escalation_short_circuited"]
+
+  defp system_actor?(actor) when is_binary(actor), do: String.starts_with?(actor, "system:")
+  defp system_actor?(_actor), do: false
+
+  defp copilot_actor?(actor) when is_binary(actor) do
+    String.starts_with?(actor, "ai:") or String.starts_with?(actor, "copilot:")
+  end
+
+  defp copilot_actor?(_actor), do: false
+
+  defp operator_actor?(actor) when is_binary(actor), do: actor != ""
+  defp operator_actor?(_actor), do: false
+
+  defp event_payload_value(%{payload: payload}, key) when is_map(payload) do
+    Map.get(payload, key) || Map.get(payload, String.to_atom(key))
+  end
+
+  defp event_payload_value(_entry, _key), do: nil
+
+  defp to_datetime(%DateTime{} = value), do: value
+
+  defp to_datetime(value) when is_binary(value) do
+    case DateTime.from_iso8601(value) do
+      {:ok, datetime, _offset} -> datetime
+      _ -> nil
+    end
+  end
+
+  defp to_datetime(_value), do: nil
 end
