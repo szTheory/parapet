@@ -14,6 +14,7 @@ defmodule Parapet.Operator do
   @active_queue_states ["open", "investigating"]
   @default_queue_page_size 30
   @max_queue_page_size 100
+  @queue_page_telemetry_event [:parapet, :operator, :queue, :page]
 
   @doc """
   Returns an Ecto.Query for open action items, sorted by inserted_at ascending.
@@ -43,6 +44,7 @@ defmodule Parapet.Operator do
   Invalid cursor or direction params fall back to the first page.
   """
   def list_incident_queue(opts \\ []) do
+    started_at = System.monotonic_time()
     options = normalize_queue_options(opts)
     query = build_queue_page_query(options)
     incidents = Evidence.repo().all(query)
@@ -54,7 +56,7 @@ defmodule Parapet.Operator do
 
     queue_rows = Enum.map(visible_items, &WorkbenchContract.queue_row/1)
 
-    %{
+    page = %{
       scope: options.scope,
       direction: options.direction,
       page_size: options.page_size,
@@ -64,6 +66,10 @@ defmodule Parapet.Operator do
       next_cursor: next_cursor_for(options, visible_items, has_more?),
       previous_cursor: previous_cursor_for(options, visible_items, has_more?)
     }
+
+    emit_queue_page_telemetry(options, length(visible_items), started_at)
+
+    page
   end
 
   @doc """
@@ -252,6 +258,33 @@ defmodule Parapet.Operator do
     "#{DateTime.to_iso8601(updated_at)}|#{id}"
     |> Base.url_encode64(padding: false)
   end
+
+  defp emit_queue_page_telemetry(options, visible_count, started_at) do
+    duration_native = System.monotonic_time() - started_at
+
+    :telemetry.execute(
+      @queue_page_telemetry_event,
+      %{
+        duration_native: duration_native,
+        duration_ms: System.convert_time_unit(duration_native, :native, :millisecond)
+      },
+      %{
+        scope: options.scope,
+        direction: options.direction,
+        page_size_bucket: page_size_bucket(options.page_size),
+        result_size_bucket: result_size_bucket(visible_count)
+      }
+    )
+  end
+
+  defp page_size_bucket(page_size) when page_size <= 30, do: "1-30"
+  defp page_size_bucket(_page_size), do: "31-100"
+
+  defp result_size_bucket(0), do: "0"
+  defp result_size_bucket(result_size) when result_size < 30, do: "1-29"
+  defp result_size_bucket(30), do: "30"
+  defp result_size_bucket(result_size) when result_size < 100, do: "31-99"
+  defp result_size_bucket(_result_size), do: "100+"
 
   @doc """
   Executes an audited `mark_investigating` command on an incident.
