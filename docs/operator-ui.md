@@ -58,6 +58,39 @@ mix parapet.doctor
 
 If the doctor detects that `OperatorLive` or `OperatorDetailLive` are mounted outside of an authenticated scope, it will report a warning (`Unsecured operator UI LiveView found`).
 
+## Phase 3 Performance Proof Lane
+
+Phase 3 keeps the generated incident queue bounded and operator-paced under large-installation load.
+
+- The default queue remains active-only (`open` and `investigating`).
+- Queue refresh is explicit. Background changes should surface a visible refresh affordance instead of silently reordering the list while an operator is reading it.
+- Performance proof is layered: bounded queue telemetry in `Parapet.Operator`, deterministic queue tests, and an opt-in advisory benchmark lane.
+
+### Advisory 50k+ Benchmark
+
+Run the advisory proof lane with:
+
+```bash
+mix run bench/operator_ui_perf.exs
+```
+
+What the script does:
+
+- Bootstraps a deterministic in-memory dataset of exactly `50,120` incidents.
+- Uses `50,000` active incidents plus `120` resolved incidents so the active queue and resolved history both exist without changing the default queue scope.
+- Measures the bounded `Parapet.Operator.list_incident_queue/1` fetch for one `30`-row page.
+- Compiles the generated `OperatorLive` and `OperatorComponents` templates, mounts the generated LiveView path adopters use, and measures the first render for that same bounded page.
+- Verifies the rendered first page still shows `30` active rows, excludes resolved incidents, and reports that additional pages remain.
+
+What success looks like:
+
+- The script exits `0`.
+- Output includes `queue.visible_rows=30` and `render.visible_rows=30`.
+- Output includes finite `queue_fetch_ms=` and `first_render_ms=` summaries.
+- Output includes `advisory=true` and `merge_gate=disabled`, confirming this lane is reproducible but not part of the default `mix test` merge gate.
+
+This lane is intentionally advisory. It is for reproducible operator-UI proof at scale, not a default CI blocker.
+
 ## Evidence-First Design
 
 The Parapet operator workbench adheres to strict evidence-first design principles (D-05, D-07-D-12, D-17-D-19):
@@ -73,13 +106,14 @@ Phase 4 extends the generated detail view with escalation-aware operator surfaci
 
 The generated detail page should render:
 
-1. A summary-first escalation status block that answers current state, next derived step, suppression state, and whether the system already acted.
+1. A summary-first escalation status block that answers current state, next derived step, the active escalation chain, time-until-next-escalation when durable truth supports it, suppression state, and whether the system already acted.
 2. The canonical timeline directly underneath that summary, with typed entries that make system automation, operator actions, and external evidence visibly distinct.
 3. Bounded manual controls only after the summary and chronology are visible.
 
 ### Durable Escalation Truth
 
 - Escalation status in the UI is a derived projection over durable incident state and timeline evidence.
+- The active escalation chain and countdown are read-only projections over bounded durable fields such as current step and next escalation timestamp.
 - The canonical timeline remains the authoritative sequence of what happened.
 - System-executed mitigations and escalation actions stay inside that single chronology; there is no second automation narrative.
 
@@ -87,6 +121,7 @@ The generated detail page should render:
 
 - `Trigger Next Escalation` records operator intent through the public `Parapet.Operator` API.
 - `Suppress Pending Escalation` records a durable, expiring suppression window through the same audited seam.
+- Escalation controls should only be offered while the incident is still open; investigating and resolved incidents remain read-oriented.
 - Suppression is not scheduler surgery, direct Oban job manipulation, or hidden UI-only state. Workers remain the final truth gate.
 - Generated LiveView code should refresh `Parapet.Operator.incident_detail/1` after those actions rather than maintain its own escalation state machine.
 
