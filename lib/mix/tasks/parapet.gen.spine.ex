@@ -45,7 +45,8 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
           end
 
           create unique_index(:parapet_incidents, [:correlation_key], where: "state = 'open'")
-          create index(:parapet_incidents, [:state, :inserted_at])
+          create index(:parapet_incidents, [:updated_at, :id], where: "state in ('open', 'investigating')")
+          create index(:parapet_incidents, [:updated_at, :id], where: "state = 'resolved'")
 
           create table(:parapet_timeline_entries, primary_key: false) do
             add :id, :binary_id, primary_key: true

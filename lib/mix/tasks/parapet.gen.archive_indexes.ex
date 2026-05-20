@@ -27,7 +27,8 @@ defmodule Mix.Tasks.Parapet.Gen.ArchiveIndexes do
                    references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)
           end
 
-          create index(:parapet_incidents, [:state, :inserted_at])
+          create index(:parapet_incidents, [:updated_at, :id], where: "state in ('open', 'investigating')")
+          create index(:parapet_incidents, [:updated_at, :id], where: "state = 'resolved'")
           create index(:parapet_timeline_entries, [:incident_id, :inserted_at])
           create index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at])
         end
@@ -35,7 +36,8 @@ defmodule Mix.Tasks.Parapet.Gen.ArchiveIndexes do
         def down do
           drop index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at])
           drop index(:parapet_timeline_entries, [:incident_id, :inserted_at])
-          drop index(:parapet_incidents, [:state, :inserted_at])
+          drop index(:parapet_incidents, [:updated_at, :id], where: "state = 'resolved'")
+          drop index(:parapet_incidents, [:updated_at, :id], where: "state in ('open', 'investigating')")
 
           drop constraint(:parapet_tool_audits, "parapet_tool_audits_timeline_entry_id_fkey")
 
