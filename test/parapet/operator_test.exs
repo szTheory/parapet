@@ -12,6 +12,7 @@ defmodule Parapet.OperatorTest do
       source = query.from |> Map.fetch!(:source) |> elem(1)
 
       case source do
+        Parapet.Spine.Incident -> Process.get(:mock_incidents, [])
         Parapet.Spine.TimelineEntry -> Process.get(:mock_entries, [])
         Parapet.Spine.ActionItem -> Process.get(:mock_action_items, [])
         _ -> []
@@ -41,10 +42,18 @@ defmodule Parapet.OperatorTest do
           {:cont, {:ok, Map.put(acc, name, Ecto.Changeset.apply_changes(changeset))}}
 
         {name, {:insert, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
-          {:cont, {:ok, Map.put(acc, name, Ecto.Changeset.apply_changes(changeset) |> Map.put(:id, Ecto.UUID.generate()))}}
+          {:cont,
+           {:ok,
+            Map.put(
+              acc,
+              name,
+              Ecto.Changeset.apply_changes(changeset) |> Map.put(:id, Ecto.UUID.generate())
+            )}}
 
         {name, {:insert, fun, _opts}}, {:ok, acc} ->
-          struct = fun.(acc) |> Ecto.Changeset.apply_changes() |> Map.put(:id, Ecto.UUID.generate())
+          struct =
+            fun.(acc) |> Ecto.Changeset.apply_changes() |> Map.put(:id, Ecto.UUID.generate())
+
           {:cont, {:ok, Map.put(acc, name, struct)}}
 
         {name, {:run, fun}}, {:ok, acc} ->
@@ -58,6 +67,7 @@ defmodule Parapet.OperatorTest do
 
   setup do
     Application.put_env(:parapet, :repo, DummyRepo)
+    Process.put(:mock_incidents, [])
     Process.put(:mock_entries, [])
     Process.put(:mock_action_items, [])
     Process.put(:mock_incident, nil)
@@ -74,6 +84,34 @@ defmodule Parapet.OperatorTest do
       assert %Ecto.Query{} = query
       assert query_str =~ "order_by:"
       assert query_str =~ "updated_at"
+    end
+
+    test "list_incident_queue/1 loads a bounded active-only page" do
+      now = ~U[2026-05-10 10:00:00Z]
+
+      Process.put(:mock_incidents, [
+        %Incident{id: "inc-3", state: "open", updated_at: now, title: "Newest"},
+        %Incident{id: "inc-2", state: "investigating", updated_at: now, title: "Current"},
+        %Incident{id: "inc-1", state: "open", updated_at: ~U[2026-05-10 09:59:00Z], title: "Older"}
+      ])
+
+      page = Operator.list_incident_queue(page_size: 2)
+
+      assert_received {:repo_all, query}
+
+      query_str = inspect(query)
+
+      assert query_str =~ "state in [\"open\", \"investigating\"]"
+      assert query_str =~ "updated_at"
+      assert query_str =~ "id"
+      assert page.scope == :active
+      assert page.page_size == 2
+      assert page.direction == :next
+      assert Enum.map(page.items, & &1.id) == ["inc-3", "inc-2"]
+      assert page.has_next_page? == true
+      assert page.has_previous_page? == false
+      assert is_binary(page.next_cursor)
+      assert is_nil(page.previous_cursor)
     end
 
     test "action_items_query returns only open action items in insertion order" do
@@ -133,14 +171,22 @@ defmodule Parapet.OperatorTest do
 
       assert detail.incident == incident
       assert detail.entries == entries
-      assert detail.external_links == [%{"label" => "Grafana", "url" => "https://grafana.example.com"}]
+
+      assert detail.external_links == [
+               %{"label" => "Grafana", "url" => "https://grafana.example.com"}
+             ]
+
       assert detail.derived.symptom == "callback freshness burn"
       assert detail.derived.fault_plane == "webhook"
       assert detail.derived.evidence_facts == ["Delay bucket gt_15m is present."]
     end
 
     test "returns escalation-aware derived detail and timeline helpers without hiding canonical evidence" do
-      suppressed_until = DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.truncate(:second)
+      suppressed_until =
+        DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.truncate(:second)
+
+      next_escalation_at =
+        DateTime.utc_now() |> DateTime.add(1_800, :second) |> DateTime.truncate(:second)
 
       incident = %Incident{
         id: "inc-123",
@@ -158,7 +204,19 @@ defmodule Parapet.OperatorTest do
           "escalation" => %{
             "suppressed_until" => suppressed_until,
             "suppressed_by" => "operator_ui",
-            "suppression_reason" => "Waiting for provider callback"
+            "suppression_reason" => "Waiting for provider callback",
+            "next_escalation_at" => next_escalation_at,
+            "current_step_id" => "sms",
+            "chain" => [
+              %{
+                "id" => "slack",
+                "label" => "Slack page",
+                "delay" => "0m",
+                "status" => "completed"
+              },
+              %{"id" => "sms", "label" => "SMS escalation", "delay" => "15m"},
+              %{"id" => "phone_tree", "label" => "Phone tree", "delay" => "30m"}
+            ]
           }
         }
       }
@@ -194,11 +252,21 @@ defmodule Parapet.OperatorTest do
       detail = Operator.incident_detail("inc-123")
 
       assert detail.entries == entries
-      assert detail.external_links == [%{"label" => "Grafana", "url" => "https://grafana.example.com"}]
+
+      assert detail.external_links == [
+               %{"label" => "Grafana", "url" => "https://grafana.example.com"}
+             ]
+
       assert detail.derived.runbook_title == "Mailglass Recovery"
       assert detail.derived.escalation_summary.status == :suppressed
       assert detail.derived.escalation_summary.suppression.until == suppressed_until
+      assert detail.derived.escalation_summary.time_until_next_escalation.at == suppressed_until
+
+      assert [%{status: :completed}, %{status: :current}, %{status: :pending}] =
+               detail.derived.escalation_summary.escalation_chain
+
       assert detail.escalation_summary == detail.derived.escalation_summary
+
       assert [
                %{
                  entry: %TimelineEntry{type: "external_link"},
@@ -210,7 +278,11 @@ defmodule Parapet.OperatorTest do
                },
                %{
                  entry: %TimelineEntry{type: "mitigation_executed"},
-                 presentation: %{actor_class: :system, style_variant: :system_action, system_action?: true}
+                 presentation: %{
+                   actor_class: :system,
+                   style_variant: :system_action,
+                   system_action?: true
+                 }
                }
              ] = detail.timeline_entries
     end
@@ -232,10 +304,16 @@ defmodule Parapet.OperatorTest do
       %{payload: payload, incident: %Incident{id: Ecto.UUID.generate(), state: "open"}}
     end
 
-    test "mark_investigating preserves the audited operator command seam", %{payload: payload, incident: incident} do
+    test "mark_investigating preserves the audited operator command seam", %{
+      payload: payload,
+      incident: incident
+    } do
       assert {:ok, result} = Operator.mark_investigating(incident, payload)
       assert %Incident{state: "investigating"} = result.incident
-      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "investigating"}} = result.timeline_entry
+
+      assert %TimelineEntry{type: "status_change", payload: %{"new_state" => "investigating"}} =
+               result.timeline_entry
+
       assert %ToolAudit{tool_name: "operator_mark_investigating"} = result.tool_audit
     end
 
@@ -300,13 +378,35 @@ defmodule Parapet.OperatorTest do
       assert %ToolAudit{tool_name: "operator_suppress_pending_escalation"} = result.tool_audit
     end
 
+    test "manual escalation commands reject invalid incident states", %{payload: payload} do
+      investigating = %Incident{id: Ecto.UUID.generate(), state: "investigating"}
+      resolved = %Incident{id: Ecto.UUID.generate(), state: "resolved"}
+      expires_at = DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.truncate(:second)
+
+      assert {:error, :invalid_incident_state} =
+               Operator.trigger_next_escalation(investigating, payload)
+
+      assert {:error, :invalid_incident_state} =
+               Operator.suppress_pending_escalation(investigating, expires_at, payload)
+
+      assert {:error, :invalid_incident_state} =
+               Operator.trigger_next_escalation(resolved, payload)
+
+      assert {:error, :invalid_incident_state} =
+               Operator.suppress_pending_escalation(resolved, expires_at, payload)
+    end
+
     test "manual escalation commands reject invalid payloads and windows", %{payload: payload} do
       incident = %Incident{id: Ecto.UUID.generate(), state: "open"}
       invalid_payload = %ActionPayload{actor: nil}
       past_expiry = DateTime.utc_now() |> DateTime.add(-60, :second) |> DateTime.truncate(:second)
-      too_far_expiry = DateTime.utc_now() |> DateTime.add(86_401, :second) |> DateTime.truncate(:second)
 
-      assert {:error, :invalid_payload} = Operator.trigger_next_escalation(incident, invalid_payload)
+      too_far_expiry =
+        DateTime.utc_now() |> DateTime.add(86_401, :second) |> DateTime.truncate(:second)
+
+      assert {:error, :invalid_payload} =
+               Operator.trigger_next_escalation(incident, invalid_payload)
+
       assert {:error, :invalid_suppression_window} =
                Operator.suppress_pending_escalation(incident, past_expiry, payload)
 
@@ -318,7 +418,7 @@ defmodule Parapet.OperatorTest do
   describe "recovery execution" do
     defmodule MockRunbook do
       use Parapet.Runbook
-      title "Mock Runbook"
+      title("Mock Runbook")
       step(:retry, capability: :retry_async_item, target_kind: "async_item")
     end
 
