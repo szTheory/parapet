@@ -105,6 +105,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
     end
   end
 
+  def handle_info(:parapet_queue_changed, socket) do
+    {:noreply, assign(socket, :queue_refresh_available?, true)}
+  end
+
+  def handle_info({:parapet_queue_changed, _payload}, socket) do
+    {:noreply, assign(socket, :queue_refresh_available?, true)}
+  end
+
   def render(assigns) do
     ~H"""
     <div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
