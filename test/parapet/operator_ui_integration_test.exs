@@ -46,6 +46,28 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "md:hidden",
              "Mobile specific elements (like back button) should hide on desktop"
     end
+
+    test "generated queue exposes explicit refresh, paging, and history affordances" do
+      live_content = File.read!("priv/templates/parapet.gen.ui/operator_live.ex.eex")
+      components_content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+      content = live_content <> "\n" <> components_content
+
+      assert content =~ "New incidents or queue changes are available."
+      assert content =~ "Load latest changes"
+      assert content =~ "History"
+      assert content =~ "Previous"
+      assert content =~ "Next"
+    end
+
+    test "generated queue rows render bounded triage fields instead of raw ids only" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      assert content =~ "incident.secondary_line"
+      assert content =~ "incident.updated_at_label"
+      assert content =~ "incident.attention_chip"
+      assert content =~ "incident.severity"
+    end
+
     test "UI stays generator-first and host-owned" do
       # Parapet must not define its own Plug.Router or Phoenix.Router for the UI.
       # Let's verify no router modules exist in Parapet core.

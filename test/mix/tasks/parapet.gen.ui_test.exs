@@ -34,8 +34,21 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "Parapet.Operator.incident_detail(id)"
       assert operator_live_source =~ "def handle_params"
       assert operator_live_source =~ "stream("
+      assert operator_live_source =~ "History"
+      assert operator_live_source =~ "Previous"
+      assert operator_live_source =~ "Next"
+      assert operator_live_source =~ "Load latest changes"
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
+
+      operator_components_source =
+        Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_components.ex")
+        |> Rewrite.Source.get(:content)
+
+      assert operator_components_source =~ "incident.secondary_line"
+      assert operator_components_source =~ "incident.updated_at_label"
+      assert operator_components_source =~ "incident.attention_chip"
+      assert operator_components_source =~ "incident.severity"
     end
 
     test "emits authenticated-scope router guidance" do
