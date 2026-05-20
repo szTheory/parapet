@@ -2,6 +2,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   @moduledoc false
   use <%= inspect(@web_module) %>, :live_view
 
+  import Ecto.Query
   import <%= inspect(@web_module) %>.Parapet.OperatorComponents
 
   @default_page_size 30
@@ -33,7 +34,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
 
   def handle_params(params, _uri, socket) do
     queue_params = queue_params(params)
-    queue_page = Parapet.Operator.list_incident_queue(queue_params)
+    queue_page = load_queue_page(queue_params)
 
     selected =
       if id = params["id"] do
@@ -249,6 +250,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   defp normalized_status("resolved"), do: "resolved"
   defp normalized_status(_status), do: "active"
 
+  defp load_queue_page(%{"status" => "resolved"} = queue_params), do: resolved_history_page(queue_params)
+  defp load_queue_page(queue_params), do: Parapet.Operator.list_incident_queue(queue_params)
+
   defp queue_scope_label("resolved"), do: "Resolved History"
   defp queue_scope_label(_status), do: "Active Only"
 
@@ -300,4 +304,104 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
 
   defp pagination_link_class(false),
     do: "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
+
+  defp resolved_history_page(queue_params) do
+    direction = queue_direction(queue_params)
+    cursor = decode_queue_cursor(queue_params["cursor"])
+
+    incidents =
+      Parapet.Spine.Incident
+      |> where([incident], incident.state == "resolved")
+      |> apply_history_cursor(direction, cursor)
+      |> apply_history_order(direction)
+      |> limit(^(Map.get(queue_params, "page_size", @default_page_size) + 1))
+      |> <%= inspect(@repo_module) %>.all()
+
+    {visible_items, has_more?} =
+      incidents
+      |> maybe_reverse_history_items(direction)
+      |> split_queue_page(Map.get(queue_params, "page_size", @default_page_size))
+
+    %{
+      scope: :resolved,
+      direction: direction,
+      items: Enum.map(visible_items, &queue_stream_item/1),
+      has_next_page?: history_has_next_page?(direction, has_more?, visible_items, cursor),
+      has_previous_page?: history_has_previous_page?(direction, has_more?, visible_items, cursor),
+      next_cursor: history_next_cursor(direction, visible_items, has_more?, cursor),
+      previous_cursor: history_previous_cursor(direction, visible_items, has_more?, cursor),
+      page_size: Map.get(queue_params, "page_size", @default_page_size)
+    }
+  end
+
+  defp queue_direction(%{"direction" => "previous"}), do: :previous
+  defp queue_direction(_queue_params), do: :next
+
+  defp decode_queue_cursor(nil), do: nil
+
+  defp decode_queue_cursor(cursor) when is_binary(cursor) do
+    with {:ok, decoded} <- Base.url_decode64(cursor, padding: false),
+         [updated_at_raw, incident_id] <- String.split(decoded, "|", parts: 2),
+         {:ok, updated_at, 0} <- DateTime.from_iso8601(updated_at_raw) do
+      %{updated_at: updated_at, id: incident_id}
+    else
+      _ -> nil
+    end
+  end
+
+  defp apply_history_cursor(query, _direction, nil), do: query
+
+  defp apply_history_cursor(query, :next, %{updated_at: updated_at, id: incident_id}) do
+    where(
+      query,
+      [incident],
+      incident.updated_at < ^updated_at or
+        (incident.updated_at == ^updated_at and incident.id < ^incident_id)
+    )
+  end
+
+  defp apply_history_cursor(query, :previous, %{updated_at: updated_at, id: incident_id}) do
+    where(
+      query,
+      [incident],
+      incident.updated_at > ^updated_at or
+        (incident.updated_at == ^updated_at and incident.id > ^incident_id)
+    )
+  end
+
+  defp apply_history_order(query, :previous), do: order_by(query, [incident], [asc: incident.updated_at, asc: incident.id])
+  defp apply_history_order(query, _direction), do: order_by(query, [incident], [desc: incident.updated_at, desc: incident.id])
+
+  defp maybe_reverse_history_items(items, :previous), do: Enum.reverse(items)
+  defp maybe_reverse_history_items(items, _direction), do: items
+
+  defp split_queue_page(items, page_size) do
+    visible_items = Enum.take(items, page_size)
+    {visible_items, length(items) > page_size}
+  end
+
+  defp history_has_next_page?(:next, has_more?, _items, _cursor), do: has_more?
+  defp history_has_next_page?(:previous, _has_more?, _items, nil), do: false
+  defp history_has_next_page?(:previous, _has_more?, items, _cursor), do: items != []
+
+  defp history_has_previous_page?(:next, _has_more?, _items, nil), do: false
+  defp history_has_previous_page?(:next, _has_more?, items, _cursor), do: items != []
+  defp history_has_previous_page?(:previous, has_more?, _items, _cursor), do: has_more?
+
+  defp history_next_cursor(:next, items, true, _cursor), do: encode_queue_cursor(List.last(items))
+  defp history_next_cursor(:previous, _items, _has_more?, nil), do: nil
+  defp history_next_cursor(:previous, items, _has_more?, _cursor), do: encode_queue_cursor(List.last(items))
+  defp history_next_cursor(_direction, _items, _has_more?, _cursor), do: nil
+
+  defp history_previous_cursor(:next, _items, _has_more?, nil), do: nil
+  defp history_previous_cursor(:next, items, _has_more?, _cursor), do: encode_queue_cursor(List.first(items))
+  defp history_previous_cursor(:previous, items, true, _cursor), do: encode_queue_cursor(List.first(items))
+  defp history_previous_cursor(_direction, _items, _has_more?, _cursor), do: nil
+
+  defp encode_queue_cursor(nil), do: nil
+
+  defp encode_queue_cursor(%{updated_at: %DateTime{} = updated_at, id: incident_id}) do
+    "#{DateTime.to_iso8601(updated_at)}|#{incident_id}"
+    |> Base.url_encode64(padding: false)
+  end
 end
