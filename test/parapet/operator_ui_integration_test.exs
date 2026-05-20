@@ -9,16 +9,15 @@ defmodule Parapet.OperatorUIIntegrationTest do
   end
 
   describe "UI generator integration" do
-    test "generated UI templates align with Parapet.Operator actions" do
-      # The UI template should assume the existence of Parapet.Operator.queue_query
-      # or Parapet.Operator.incident_detail, not old/fake functions.
-
+    test "generated UI templates align with bounded Parapet.Operator queue actions" do
       template_path = "priv/templates/parapet.gen.ui/operator_live.ex.eex"
       content = File.read!(template_path)
 
-      # We expect the generator to tell the user to use the correct API:
-      assert content =~ "Parapet.Operator.queue_query"
+      assert content =~ "Parapet.Operator.list_incident_queue"
       assert content =~ "Parapet.Operator.incident_detail(id)"
+      refute content =~ "Repo.all(Parapet.Operator.queue_query())"
+      assert content =~ "def handle_params"
+      assert content =~ "stream("
     end
 
     test "doctor check enforces authenticated mount for generated UI" do
@@ -48,6 +47,19 @@ defmodule Parapet.OperatorUIIntegrationTest do
              "Mobile specific elements (like back button) should hide on desktop"
     end
 
+    test "generated queue template exposes operator-paced refresh and paging affordances" do
+      live_content = File.read!("priv/templates/parapet.gen.ui/operator_live.ex.eex")
+      components_content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      affordance_content = live_content <> "\n" <> components_content
+
+      assert affordance_content =~ "New incidents or queue changes are available."
+      assert affordance_content =~ "Load latest changes"
+      assert affordance_content =~ "History"
+      assert affordance_content =~ "Previous"
+      assert affordance_content =~ "Next"
+    end
+
     test "UI stays generator-first and host-owned" do
       # Parapet must not define its own Plug.Router or Phoenix.Router for the UI.
       # Let's verify no router modules exist in Parapet core.
@@ -64,6 +76,8 @@ defmodule Parapet.OperatorUIIntegrationTest do
       content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
 
       assert content =~ "Escalation Status"
+      assert content =~ "Escalation Chain"
+      assert content =~ "Time Until Next Escalation"
       assert content =~ "@detail.escalation_summary"
       assert content =~ "@detail.timeline_entries"
 
@@ -86,6 +100,9 @@ defmodule Parapet.OperatorUIIntegrationTest do
 
       assert components_content =~ "Trigger Next Escalation"
       assert components_content =~ "Suppress Pending Escalation"
+
+      assert components_content =~
+               "Escalation controls are available only while the incident is open."
 
       assert index_of(components_content, "Escalation Status") <
                index_of(components_content, "Trigger Next Escalation"),

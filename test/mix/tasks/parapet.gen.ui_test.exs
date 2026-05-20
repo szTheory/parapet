@@ -29,8 +29,11 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
         |> Rewrite.Source.get(:content)
 
       assert operator_live_source =~ "defmodule TestWeb.Parapet.OperatorLive do"
-      assert operator_live_source =~ "Test.Repo.all(Parapet.Operator.queue_query())"
+      assert operator_live_source =~ "Parapet.Operator.list_incident_queue"
+      refute operator_live_source =~ "Test.Repo.all(Parapet.Operator.queue_query())"
       assert operator_live_source =~ "Parapet.Operator.incident_detail(id)"
+      assert operator_live_source =~ "def handle_params"
+      assert operator_live_source =~ "stream("
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
     end
