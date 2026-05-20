@@ -101,7 +101,7 @@ defmodule Parapet.OperatorTest do
 
       query_str = inspect(query)
 
-      assert query_str =~ "state in [\"open\", \"investigating\"]"
+      assert query_str =~ "state in ^[\"open\", \"investigating\"]"
       assert query_str =~ "updated_at"
       assert query_str =~ "id"
       assert page.scope == :active

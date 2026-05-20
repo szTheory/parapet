@@ -11,6 +11,10 @@ defmodule Parapet.Operator do
 
   alias Parapet.Operator.WorkbenchContract
 
+  @active_queue_states ["open", "investigating"]
+  @default_queue_page_size 30
+  @max_queue_page_size 100
+
   @doc """
   Returns an Ecto.Query for open action items, sorted by inserted_at ascending.
   """
@@ -32,6 +36,32 @@ defmodule Parapet.Operator do
         desc: i.updated_at
       ]
     )
+  end
+
+  @doc """
+  Returns a bounded, active-only incident queue page suitable for operator browsing.
+  Invalid cursor or direction params fall back to the first page.
+  """
+  def list_incident_queue(opts \\ []) do
+    options = normalize_queue_options(opts)
+    query = build_queue_page_query(options)
+    incidents = Evidence.repo().all(query)
+
+    {visible_items, has_more?} =
+      incidents
+      |> maybe_reverse_queue_items(options.direction)
+      |> split_queue_page(options.page_size)
+
+    %{
+      scope: options.scope,
+      direction: options.direction,
+      page_size: options.page_size,
+      items: visible_items,
+      has_next_page?: has_next_page?(options, has_more?, visible_items),
+      has_previous_page?: has_previous_page?(options, has_more?, visible_items),
+      next_cursor: next_cursor_for(options, visible_items, has_more?),
+      previous_cursor: previous_cursor_for(options, visible_items, has_more?)
+    }
   end
 
   @doc """
@@ -61,6 +91,7 @@ defmodule Parapet.Operator do
       )
 
     derived = WorkbenchContract.derive(incident, entries, action_items)
+
     timeline_entries =
       entries
       |> Enum.zip(derived.timeline_presentations || [])
@@ -84,6 +115,140 @@ defmodule Parapet.Operator do
     entries
     |> Enum.filter(&(&1.type == "external_link"))
     |> Enum.map(& &1.payload)
+  end
+
+  defp normalize_queue_options(opts) when is_list(opts), do: opts |> Enum.into(%{}) |> normalize_queue_options()
+
+  defp normalize_queue_options(opts) when is_map(opts) do
+    page_size = normalize_page_size(Map.get(opts, :page_size) || Map.get(opts, "page_size"))
+
+    with {:ok, direction} <- normalize_queue_direction(Map.get(opts, :direction) || Map.get(opts, "direction")),
+         {:ok, cursor} <- normalize_queue_cursor(Map.get(opts, :cursor) || Map.get(opts, "cursor")) do
+      %{
+        scope: :active,
+        direction: direction,
+        page_size: page_size,
+        cursor: cursor
+      }
+    else
+      :error ->
+        default_queue_options(page_size)
+    end
+  end
+
+  defp normalize_queue_options(_opts), do: default_queue_options(@default_queue_page_size)
+
+  defp default_queue_options(page_size) do
+    %{
+      scope: :active,
+      direction: :next,
+      page_size: page_size,
+      cursor: nil
+    }
+  end
+
+  defp normalize_page_size(page_size) when is_integer(page_size) do
+    page_size
+    |> max(1)
+    |> min(@max_queue_page_size)
+  end
+
+  defp normalize_page_size(page_size) when is_binary(page_size) do
+    case Integer.parse(page_size) do
+      {value, ""} -> normalize_page_size(value)
+      _ -> @default_queue_page_size
+    end
+  end
+
+  defp normalize_page_size(_page_size), do: @default_queue_page_size
+
+  defp normalize_queue_direction(nil), do: {:ok, :next}
+  defp normalize_queue_direction(:next), do: {:ok, :next}
+  defp normalize_queue_direction(:previous), do: {:ok, :previous}
+  defp normalize_queue_direction("next"), do: {:ok, :next}
+  defp normalize_queue_direction("previous"), do: {:ok, :previous}
+  defp normalize_queue_direction(_direction), do: :error
+
+  defp normalize_queue_cursor(nil), do: {:ok, nil}
+
+  defp normalize_queue_cursor(cursor) when is_binary(cursor) do
+    with {:ok, decoded} <- Base.url_decode64(cursor, padding: false),
+         [updated_at_raw, id] <- String.split(decoded, "|", parts: 2),
+         {:ok, updated_at, 0} <- DateTime.from_iso8601(updated_at_raw),
+         true <- id != "" do
+      {:ok, %{updated_at: updated_at, id: id}}
+    else
+      _ -> :error
+    end
+  end
+
+  defp normalize_queue_cursor(_cursor), do: :error
+
+  defp build_queue_page_query(%{direction: direction, cursor: cursor, page_size: page_size}) do
+    Incident
+    |> where([i], i.state in ^@active_queue_states)
+    |> apply_queue_cursor(direction, cursor)
+    |> apply_queue_order(direction)
+    |> limit(^page_size + 1)
+  end
+
+  defp apply_queue_cursor(query, _direction, nil), do: query
+
+  defp apply_queue_cursor(query, :next, %{updated_at: updated_at, id: id}) do
+    where(
+      query,
+      [i],
+      i.updated_at < ^updated_at or (i.updated_at == ^updated_at and i.id < ^id)
+    )
+  end
+
+  defp apply_queue_cursor(query, :previous, %{updated_at: updated_at, id: id}) do
+    where(
+      query,
+      [i],
+      i.updated_at > ^updated_at or (i.updated_at == ^updated_at and i.id > ^id)
+    )
+  end
+
+  defp apply_queue_order(query, :next) do
+    order_by(query, [i], [desc: i.updated_at, desc: i.id])
+  end
+
+  defp apply_queue_order(query, :previous) do
+    order_by(query, [i], [asc: i.updated_at, asc: i.id])
+  end
+
+  defp maybe_reverse_queue_items(items, :previous), do: Enum.reverse(items)
+  defp maybe_reverse_queue_items(items, _direction), do: items
+
+  defp split_queue_page(items, page_size) do
+    visible_items = Enum.take(items, page_size)
+    {visible_items, length(items) > page_size}
+  end
+
+  defp has_next_page?(%{direction: :next}, has_more?, _items), do: has_more?
+  defp has_next_page?(%{direction: :previous, cursor: nil}, _has_more?, _items), do: false
+  defp has_next_page?(%{direction: :previous}, _has_more?, items), do: items != []
+
+  defp has_previous_page?(%{direction: :next, cursor: nil}, _has_more?, _items), do: false
+  defp has_previous_page?(%{direction: :next}, _has_more?, items), do: items != []
+  defp has_previous_page?(%{direction: :previous}, has_more?, _items), do: has_more?
+
+  defp next_cursor_for(%{direction: :next}, items, true), do: encode_queue_cursor(List.last(items))
+  defp next_cursor_for(%{direction: :previous, cursor: nil}, _items, _has_more?), do: nil
+  defp next_cursor_for(%{direction: :previous}, items, _has_more?), do: encode_queue_cursor(List.last(items))
+  defp next_cursor_for(_options, _items, _has_more?), do: nil
+
+  defp previous_cursor_for(%{direction: :next, cursor: nil}, _items, _has_more?), do: nil
+  defp previous_cursor_for(%{direction: :next}, items, _has_more?), do: encode_queue_cursor(List.first(items))
+  defp previous_cursor_for(%{direction: :previous}, items, true), do: encode_queue_cursor(List.first(items))
+  defp previous_cursor_for(_options, _items, _has_more?), do: nil
+
+  defp encode_queue_cursor(nil), do: nil
+
+  defp encode_queue_cursor(%{updated_at: %DateTime{} = updated_at, id: id}) when is_binary(id) do
+    "#{DateTime.to_iso8601(updated_at)}|#{id}"
+    |> Base.url_encode64(padding: false)
   end
 
   @doc """
@@ -265,6 +430,11 @@ defmodule Parapet.Operator do
   Records an explicit operator request to trigger the next escalation.
   Persists only bounded current-state metadata and leaves execution to the worker.
   """
+  def trigger_next_escalation(%Incident{state: state}, _payload)
+      when state in ["investigating", "resolved"] do
+    {:error, :invalid_incident_state}
+  end
+
   def trigger_next_escalation(%Incident{} = incident, %ActionPayload{} = payload) do
     if valid_payload?(payload) do
       escalation_data =
@@ -305,6 +475,15 @@ defmodule Parapet.Operator do
   @doc """
   Records a temporary suppression window for pending escalation execution.
   """
+  def suppress_pending_escalation(
+        %Incident{state: state},
+        _suppressed_until,
+        _payload
+      )
+      when state in ["investigating", "resolved"] do
+    {:error, :invalid_incident_state}
+  end
+
   def suppress_pending_escalation(
         %Incident{} = incident,
         %DateTime{} = suppressed_until,
@@ -406,7 +585,8 @@ defmodule Parapet.Operator do
            step <- Enum.find(schema.steps, &(&1.id == step_id_atom)),
            {:ok, step} <- validate_step_exists(step),
            capability_id <- step.capability,
-           capability when not is_nil(capability) <- Parapet.Capabilities.get_recovery(capability_id) do
+           capability when not is_nil(capability) <-
+             Parapet.Capabilities.get_recovery(capability_id) do
         preview_data = compute_preview(capability, incident, step)
 
         timeline_attrs = %{
@@ -438,7 +618,12 @@ defmodule Parapet.Operator do
   Confirms and executes a recovery action.
   Validates the preview_token and requires an idempotency_key in the payload.
   """
-  def confirm_runbook_step(%Incident{} = incident, step_id, preview_token, %ActionPayload{} = payload) do
+  def confirm_runbook_step(
+        %Incident{} = incident,
+        step_id,
+        preview_token,
+        %ActionPayload{} = payload
+      ) do
     if valid_payload?(payload) do
       with {:ok, module} <- extract_module(incident.runbook_data),
            {:ok, step_id_atom} <- parse_step_id(step_id),
@@ -447,7 +632,8 @@ defmodule Parapet.Operator do
            step <- Enum.find(schema.steps, &(&1.id == step_id_atom)),
            {:ok, step} <- validate_step_exists(step),
            capability_id <- step.capability,
-           capability when not is_nil(capability) <- Parapet.Capabilities.get_recovery(capability_id),
+           capability when not is_nil(capability) <-
+             Parapet.Capabilities.get_recovery(capability_id),
            {:ok, preview_entry} <- find_recent_preview(incident.id, step_id_atom, preview_token) do
         if DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) == :gt do
           # Execute the capability
@@ -617,7 +803,8 @@ defmodule Parapet.Operator do
     end
   end
 
-  defp escalation_command_state(%Incident{runbook_data: runbook_data}) when is_map(runbook_data) do
+  defp escalation_command_state(%Incident{runbook_data: runbook_data})
+       when is_map(runbook_data) do
     case Map.get(runbook_data, "escalation") || Map.get(runbook_data, :escalation) do
       escalation when is_map(escalation) -> normalize_map_keys(escalation)
       _ -> %{}
