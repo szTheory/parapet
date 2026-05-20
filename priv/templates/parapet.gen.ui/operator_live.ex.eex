@@ -50,9 +50,17 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
        selected_incident: selected,
        visible_incidents: visible_incidents,
        queue_page: queue_page,
-       queue_params: visible_queue_params(queue_params, queue_page)
+       queue_params: visible_queue_params(queue_params, queue_page),
+       queue_refresh_available?: false
      )
      |> stream(:incidents, visible_incidents, reset: true)}
+  end
+
+  def handle_event("queue_refresh", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:queue_refresh_available?, false)
+     |> push_patch(to: queue_path(socket, %{"cursor" => nil, "direction" => "next"}))}
   end
 
   def handle_event("acknowledge", %{"id" => id}, socket) do
@@ -103,14 +111,62 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
         <div class="p-4 border-b border-gray-200 bg-gray-50">
           <.critical_journeys journeys={@journeys} />
         </div>
-        <div class="p-4 border-b border-gray-200">
-          <h2 class="text-lg font-semibold">Incident Queue</h2>
+        <div class="p-4 border-b border-gray-200 bg-stone-50">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                <%%= queue_scope_label(@queue_params["status"]) %>
+              </p>
+              <h2 class="mt-2 text-lg font-semibold text-stone-900">Incident Queue</h2>
+              <p class="mt-1 text-sm text-stone-600"><%%= queue_window_copy(@queue_page, @visible_incidents) %></p>
+            </div>
+            <.link
+              patch={queue_path(@queue_params, %{"status" => "resolved", "cursor" => nil, "direction" => "next", "id" => nil})}
+              class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
+            >
+              History
+            </.link>
+          </div>
         </div>
+        <%%= if @queue_refresh_available? do %>
+          <div class="border-b border-stone-200 bg-stone-100 px-4 py-3">
+            <p class="text-sm font-medium text-stone-800">New incidents or queue changes are available.</p>
+            <button
+              type="button"
+              phx-click="queue_refresh"
+              class="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
+            >
+              Load latest changes
+            </button>
+          </div>
+        <%% end %>
         <div class="flex-1 overflow-y-auto border-b border-gray-200">
           <.incident_list
             incidents={@visible_incidents}
             selected={selected_queue_incident(@selected_incident)}
+            queue_params={@queue_params}
           />
+        </div>
+        <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-stone-50 px-4 py-3">
+          <.link
+            patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+            class={[
+              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              pagination_link_class(@queue_page.has_previous_page?)
+            ]}
+          >
+            Previous
+          </.link>
+          <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced queue</p>
+          <.link
+            patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+            class={[
+              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              pagination_link_class(@queue_page.has_next_page?)
+            ]}
+          >
+            Next
+          </.link>
         </div>
 
         <div class="p-4 border-b border-gray-200 bg-gray-50">
@@ -193,6 +249,18 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   defp normalized_status("resolved"), do: "resolved"
   defp normalized_status(_status), do: "active"
 
+  defp queue_scope_label("resolved"), do: "Resolved History"
+  defp queue_scope_label(_status), do: "Active Only"
+
+  defp queue_window_copy(_queue_page, visible_incidents) do
+    visible_count = Enum.count(visible_incidents)
+
+    cond do
+      visible_count == 0 -> "No incidents in this queue window."
+      true -> "#{visible_count} incidents visible in this queue window."
+    end
+  end
+
   defp empty_queue_page do
     %{
       items: [],
@@ -203,6 +271,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
       has_previous_page?: false,
       page_size: @default_page_size
     }
+  end
+
+  defp queue_page_path(queue_params, nil, _direction), do: queue_path(queue_params, %{})
+
+  defp queue_page_path(queue_params, cursor, direction) do
+    queue_path(queue_params, %{"cursor" => cursor, "direction" => direction, "id" => nil})
   end
 
   defp queue_path(%{assigns: assigns}, extra_params) do
@@ -220,4 +294,10 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
       _ -> "/parapet?" <> URI.encode_query(params)
     end
   end
+
+  defp pagination_link_class(true),
+    do: "border-stone-300 bg-white text-stone-900 hover:border-teal-700 hover:text-teal-700"
+
+  defp pagination_link_class(false),
+    do: "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
 end

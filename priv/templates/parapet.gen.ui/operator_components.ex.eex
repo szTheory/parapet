@@ -4,29 +4,55 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
 
   attr :incidents, :list, required: true
   attr :selected, :map, default: nil
+  attr :queue_params, :map, default: %{}
   def incident_list(assigns) do
     ~H"""
-    <div class="divide-y divide-gray-200">
+    <div class="divide-y divide-stone-200">
       <%%= for incident <- @incidents do %>
-        <.link 
-          navigate={"/parapet/#{incident.id}"} 
-          class={["block p-4 hover:bg-gray-50", @selected && @selected.id == incident.id && "bg-blue-50 border-l-4 border-blue-500"]}
+        <.link
+          patch={queue_item_path(@queue_params, incident)}
+          aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
+          class={[
+            "block border-l-4 px-4 py-3 transition-colors",
+            queue_row_class(@selected, incident)
+          ]}
         >
-          <div class="flex justify-between items-start mb-1">
-            <span class="font-medium text-gray-900 truncate"><%%= incident.title %></span>
-            <span class={["px-2 py-1 text-xs font-medium rounded-full", state_color(incident.state)]}>
-              <%%= incident.state %>
-            </span>
-          </div>
-          <div class="text-sm text-gray-500 truncate">
-            <%%= incident.id %>
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-2">
+                <span class={["px-2 py-1 text-xs font-semibold rounded-full", state_color(incident.state)]}>
+                  <%%= incident.state %>
+                </span>
+                <%%= if incident.severity do %>
+                  <span class={["px-2 py-1 text-xs font-semibold rounded-full border", severity_color(incident.severity)]}>
+                    <%%= incident.severity %>
+                  </span>
+                <%% end %>
+                <%%= if incident.attention_chip do %>
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full border border-amber-200 bg-amber-50 text-amber-900">
+                    <%%= incident.attention_chip %>
+                  </span>
+                <%% end %>
+              </div>
+              <p class="mt-2 truncate text-sm font-semibold text-stone-900"><%%= incident.title %></p>
+              <%%= if incident.secondary_line do %>
+                <p class="mt-1 truncate text-sm text-stone-600"><%%= incident.secondary_line %></p>
+              <%% end %>
+            </div>
+            <div class="shrink-0 text-right">
+              <p class="text-xs font-medium uppercase tracking-wide text-stone-500">Updated</p>
+              <p class="mt-1 text-sm text-stone-700"><%%= incident.updated_at_label %></p>
+            </div>
           </div>
         </.link>
       <%% end %>
-      
+
       <%%= if Enum.empty?(@incidents) do %>
-        <div class="p-4 text-center text-gray-500 text-sm">
-          No active incidents
+        <div class="px-4 py-6 text-center">
+          <p class="text-sm font-semibold text-stone-800">No active incidents</p>
+          <p class="mt-2 text-sm text-stone-500">
+            Open and investigating incidents will appear here. Use History to review resolved incidents without disrupting the active queue.
+          </p>
         </div>
       <%% end %>
     </div>
@@ -68,6 +94,34 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         </div>
 
         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+          <%%= if @detail.escalation_summary.escalation_chain do %>
+            <div class="rounded-md border border-amber-100 bg-white/80 p-3 sm:col-span-2">
+              <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Escalation Chain</dt>
+              <dd class="mt-2">
+                <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
+                  <%%= for step <- @detail.escalation_summary.escalation_chain do %>
+                    <li class="flex items-center justify-between rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2">
+                      <div>
+                        <p class="text-sm font-medium text-amber-950"><%%= step.label %></p>
+                        <%%= if step.delay do %>
+                          <p class="text-xs text-amber-800 mt-0.5">After <%%= step.delay %></p>
+                        <%% end %>
+                      </div>
+                      <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
+                        <%%= escalation_chain_status_copy(step.status) %>
+                      </span>
+                    </li>
+                  <%% end %>
+                </ol>
+              </dd>
+            </div>
+          <%% end %>
+          <%%= if @detail.escalation_summary.time_until_next_escalation do %>
+            <div class="rounded-md border border-amber-100 bg-white/80 p-3 sm:col-span-2">
+              <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Time Until Next Escalation</dt>
+              <dd class="mt-1 text-amber-950"><%%= countdown_copy(@detail.escalation_summary.time_until_next_escalation) %></dd>
+            </div>
+          <%% end %>
           <div class="rounded-md border border-amber-100 bg-white/80 p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Next Step</dt>
             <dd class="mt-1 text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
@@ -268,7 +322,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                       <%%# show time if available %>
                     </div>
                   <%% _ -> %>
-                    <%# No button for guidance %>
+                  <% # No button for guidance %>
                 <%% end %>
               </div>
             </div>
@@ -359,12 +413,16 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <div class="bg-white border border-gray-200 rounded-md p-4">
         <h4 class="text-sm font-medium text-gray-900 mb-2">Escalation Controls</h4>
         <p class="text-xs text-gray-500 mb-3">Use bounded controls only after reviewing current status and the canonical timeline.</p>
-        <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors mb-2">
-          Trigger Next Escalation
-        </button>
-        <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class="w-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 font-medium py-2 px-4 rounded text-sm transition-colors">
-          Suppress Pending Escalation
-        </button>
+        <%%= if escalation_controls_enabled?(@detail.incident) do %>
+          <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors mb-2">
+            Trigger Next Escalation
+          </button>
+          <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class="w-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 font-medium py-2 px-4 rounded text-sm transition-colors">
+            Suppress Pending Escalation
+          </button>
+        <%% else %>
+          <p class="text-sm text-gray-600">Escalation controls are available only while the incident is open.</p>
+        <%% end %>
       </div>
 
       <div class="bg-white border border-gray-200 rounded-md p-4">
@@ -446,10 +504,36 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp journey_color(:down), do: "bg-red-100 text-red-800"
   defp journey_color(_), do: "bg-gray-100 text-gray-800"
 
+  defp queue_item_path(queue_params, incident) do
+    params =
+      queue_params
+      |> Map.merge(%{"id" => incident.id})
+      |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
+
+    case params do
+      [] -> "/parapet"
+      _ -> "/parapet?" <> URI.encode_query(params)
+    end
+  end
+
+  defp queue_row_class(selected, incident) do
+    if selected && selected.id == incident.id do
+      "border-l-teal-700 bg-teal-50/80 hover:bg-teal-50"
+    else
+      "border-l-transparent bg-stone-50/40 hover:bg-stone-100"
+    end
+  end
+
   defp state_color("open"), do: "bg-red-100 text-red-800"
   defp state_color("acknowledged"), do: "bg-yellow-100 text-yellow-800"
   defp state_color("resolved"), do: "bg-green-100 text-green-800"
   defp state_color(_), do: "bg-gray-100 text-gray-800"
+
+  defp severity_color("critical"), do: "border-rose-200 bg-rose-50 text-rose-900"
+  defp severity_color("high"), do: "border-orange-200 bg-orange-50 text-orange-900"
+  defp severity_color("medium"), do: "border-amber-200 bg-amber-50 text-amber-900"
+  defp severity_color("low"), do: "border-emerald-200 bg-emerald-50 text-emerald-900"
+  defp severity_color(_), do: "border-stone-200 bg-stone-100 text-stone-700"
 
   defp escalation_status_copy(:suppressed), do: "Pending escalation is durably suppressed until the recorded window expires."
   defp escalation_status_copy(:manual_trigger_requested), do: "An operator requested the next escalation and the worker has not written the outcome yet."
@@ -468,6 +552,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
 
   defp escalation_next_step_copy(%{kind: :await_worker_execution, at: %DateTime{} = at}),
     do: "Await worker execution for the pending escalation request recorded at #{at}."
+
+  defp escalation_next_step_copy(%{kind: :await_next_escalation, at: %DateTime{} = at}),
+    do: "Await the next scheduled escalation step at #{at}."
 
   defp escalation_next_step_copy(%{kind: :monitor_timeline, at: %DateTime{} = at}),
     do: "Monitor the canonical timeline. Latest escalation evidence landed at #{at}."
@@ -492,6 +579,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     do: "#{type} at #{at} (#{timeline_actor_copy(actor_class)})."
 
   defp latest_event_copy(_), do: "No escalation event has been recorded yet."
+
+  defp countdown_copy(%{seconds: seconds, at: %DateTime{} = at}) when is_integer(seconds) and seconds > 0 do
+    "Approximately #{humanize_seconds(seconds)} until the next escalation checkpoint (#{at})."
+  end
+
+  defp countdown_copy(_), do: "No countdown is currently available from durable evidence."
 
   defp external_link_label(%{"label" => label, "url" => url}) when is_binary(label) and is_binary(url), do: label
   defp external_link_label(%{label: label, url: url}) when is_binary(label) and is_binary(url), do: label
@@ -528,6 +621,22 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp timeline_actor_copy(:copilot), do: "Copilot"
   defp timeline_actor_copy(:external), do: "External"
   defp timeline_actor_copy(_), do: "Evidence"
+
+  defp escalation_chain_status_copy(:completed), do: "Complete"
+  defp escalation_chain_status_copy(:current), do: "Current"
+  defp escalation_chain_status_copy(_), do: "Pending"
+
+  defp escalation_chain_status_class(:completed),
+    do: "bg-green-100 text-green-900 border-green-200"
+
+  defp escalation_chain_status_class(:current),
+    do: "bg-amber-100 text-amber-900 border-amber-200"
+
+  defp escalation_chain_status_class(_),
+    do: "bg-gray-100 text-gray-900 border-gray-200"
+
+  defp escalation_controls_enabled?(%{state: "open"}), do: true
+  defp escalation_controls_enabled?(_incident), do: false
 
   defp timeline_entry_title(%{type: "mitigation_executed"}, _presentation), do: "Runbook mitigation executed"
   defp timeline_entry_title(%{type: "escalation_trigger_requested"}, _presentation), do: "Escalation requested"
@@ -601,4 +710,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     |> String.replace("_", " ")
     |> String.capitalize()
   end
+
+  defp humanize_seconds(seconds) when seconds < 60, do: "#{seconds}s"
+  defp humanize_seconds(seconds) when seconds < 3_600, do: "#{div(seconds, 60)}m"
+  defp humanize_seconds(seconds), do: "#{div(seconds, 3_600)}h #{div(rem(seconds, 3_600), 60)}m"
 end
