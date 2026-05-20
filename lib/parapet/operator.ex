@@ -52,11 +52,13 @@ defmodule Parapet.Operator do
       |> maybe_reverse_queue_items(options.direction)
       |> split_queue_page(options.page_size)
 
+    queue_rows = Enum.map(visible_items, &WorkbenchContract.queue_row/1)
+
     %{
       scope: options.scope,
       direction: options.direction,
       page_size: options.page_size,
-      items: visible_items,
+      items: queue_rows,
       has_next_page?: has_next_page?(options, has_more?, visible_items),
       has_previous_page?: has_previous_page?(options, has_more?, visible_items),
       next_cursor: next_cursor_for(options, visible_items, has_more?),

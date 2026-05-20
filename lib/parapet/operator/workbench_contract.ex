@@ -56,7 +56,10 @@ defmodule Parapet.Operator.WorkbenchContract do
 
     runbook_data = incident.runbook_data || %{}
     runbook_title = Map.get(runbook_data, "title") || Map.get(runbook_data, :title)
-    runbook_description = Map.get(runbook_data, "description") || Map.get(runbook_data, :description)
+
+    runbook_description =
+      Map.get(runbook_data, "description") || Map.get(runbook_data, :description)
+
     raw_steps = Map.get(runbook_data, "steps") || Map.get(runbook_data, :steps) || []
 
     %__MODULE__{
@@ -80,6 +83,26 @@ defmodule Parapet.Operator.WorkbenchContract do
       active_preview: find_active_preview(sorted_entries),
       escalation_summary: derive_escalation_summary(incident, sorted_entries),
       timeline_presentations: timeline_presentations
+    }
+  end
+
+  @doc """
+  Projects a bounded queue row from the durable incident record only.
+  Queue rows intentionally omit detail-only evidence and timeline-rich fields.
+  """
+  def queue_row(%Incident{} = incident) do
+    triage = incident |> Incident.triage_summary() |> stringify_keys()
+    runbook_data = stringify_keys(incident.runbook_data || %{})
+
+    %{
+      incident_id: incident.id,
+      state: incident.state,
+      title: queue_title(incident, triage),
+      severity: Map.get(triage, "severity") || Map.get(runbook_data, "severity"),
+      secondary_line: queue_secondary_line(triage, runbook_data),
+      updated_at: incident.updated_at,
+      updated_at_label: queue_updated_at_label(incident.updated_at),
+      attention_chip: queue_attention_chip(runbook_data)
     }
   end
 
@@ -237,18 +260,23 @@ defmodule Parapet.Operator.WorkbenchContract do
     suppression = suppression_projection(escalation_state)
     pending_trigger? = pending_trigger?(escalation_state, latest_event, suppression)
     system_action = derive_system_action(sorted_entries)
+    escalation_chain = derive_escalation_chain(escalation_state)
+    next_step = derive_next_step(suppression, pending_trigger?, escalation_state, latest_event)
 
     %{
       status: escalation_status(suppression, pending_trigger?, latest_event),
       pending_trigger?: pending_trigger?,
       suppression: suppression,
-      next_step: derive_next_step(suppression, pending_trigger?, escalation_state, latest_event),
+      next_step: next_step,
+      escalation_chain: escalation_chain,
+      time_until_next_escalation: derive_time_until_next_escalation(next_step),
       latest_event: project_latest_event(latest_event),
       system_action: system_action
     }
   end
 
-  defp escalation_command_state(%Incident{runbook_data: runbook_data}) when is_map(runbook_data) do
+  defp escalation_command_state(%Incident{runbook_data: runbook_data})
+       when is_map(runbook_data) do
     case Map.get(runbook_data, "escalation") || Map.get(runbook_data, :escalation) do
       escalation when is_map(escalation) -> stringify_keys(escalation)
       _ -> %{}
@@ -268,7 +296,10 @@ defmodule Parapet.Operator.WorkbenchContract do
 
   defp suppression_projection(escalation_state) do
     suppressed_until = to_datetime(Map.get(escalation_state, "suppressed_until"))
-    active? = match?(%DateTime{}, suppressed_until) and DateTime.compare(suppressed_until, DateTime.utc_now()) == :gt
+
+    active? =
+      match?(%DateTime{}, suppressed_until) and
+        DateTime.compare(suppressed_until, DateTime.utc_now()) == :gt
 
     %{
       active?: active?,
@@ -283,16 +314,23 @@ defmodule Parapet.Operator.WorkbenchContract do
     trigger_requested_at = to_datetime(Map.get(escalation_state, "trigger_requested_at"))
 
     blocked_by_newer_event? =
-      match?(%DateTime{}, trigger_requested_at) and match?(%{inserted_at: %DateTime{}}, latest_event) and
+      match?(%DateTime{}, trigger_requested_at) and
+        match?(%{inserted_at: %DateTime{}}, latest_event) and
         DateTime.compare(latest_event.inserted_at, trigger_requested_at) in [:eq, :gt] and
-        latest_event.type in ["escalation_executed", "escalation_short_circuited", "escalation_suppressed"]
+        latest_event.type in [
+          "escalation_executed",
+          "escalation_short_circuited",
+          "escalation_suppressed"
+        ]
 
     pending_trigger? and not suppression.active? and not blocked_by_newer_event?
   end
 
   defp escalation_status(%{active?: true}, _pending_trigger?, _latest_event), do: :suppressed
   defp escalation_status(_suppression, true, _latest_event), do: :manual_trigger_requested
-  defp escalation_status(_suppression, _pending_trigger?, %{type: "escalation_executed"}), do: :recently_executed
+
+  defp escalation_status(_suppression, _pending_trigger?, %{type: "escalation_executed"}),
+    do: :recently_executed
 
   defp escalation_status(_suppression, _pending_trigger?, %{type: "escalation_short_circuited"}) do
     :recently_short_circuited
@@ -300,17 +338,111 @@ defmodule Parapet.Operator.WorkbenchContract do
 
   defp escalation_status(_suppression, _pending_trigger?, _latest_event), do: :idle
 
-  defp derive_next_step(%{active?: true, until: suppressed_until}, _pending_trigger?, _state, _latest_event) do
+  defp derive_next_step(
+         %{active?: true, until: suppressed_until},
+         _pending_trigger?,
+         _state,
+         _latest_event
+       ) do
     %{kind: :await_suppression_expiry, at: suppressed_until, derived?: true}
   end
 
   defp derive_next_step(_suppression, true, escalation_state, _latest_event) do
-    %{kind: :await_worker_execution, at: to_datetime(Map.get(escalation_state, "trigger_requested_at")), derived?: true}
+    %{
+      kind: :await_worker_execution,
+      at: to_datetime(Map.get(escalation_state, "trigger_requested_at")),
+      derived?: true
+    }
   end
 
-  defp derive_next_step(_suppression, _pending_trigger?, _state, latest_event) do
-    %{kind: :monitor_timeline, at: if(latest_event, do: latest_event.inserted_at), derived?: true}
+  defp derive_next_step(_suppression, _pending_trigger?, escalation_state, latest_event) do
+    next_escalation_at = to_datetime(Map.get(escalation_state, "next_escalation_at"))
+
+    if match?(%DateTime{}, next_escalation_at) do
+      %{kind: :await_next_escalation, at: next_escalation_at, derived?: true}
+    else
+      %{
+        kind: :monitor_timeline,
+        at: if(latest_event, do: latest_event.inserted_at),
+        derived?: true
+      }
+    end
   end
+
+  defp derive_escalation_chain(escalation_state) do
+    current_step_id =
+      Map.get(escalation_state, "current_step_id") ||
+        Map.get(escalation_state, "next_step_id") ||
+        Map.get(escalation_state, "active_step")
+
+    steps =
+      escalation_state
+      |> Map.get("chain", [])
+      |> List.wrap()
+      |> Enum.map(&project_escalation_chain_step(&1, current_step_id))
+
+    if steps == [], do: nil, else: steps
+  end
+
+  defp project_escalation_chain_step(step, current_step_id) when is_map(step) do
+    step = stringify_keys(step)
+    id = Map.get(step, "id") || Map.get(step, "key") || Map.get(step, "label")
+    status = project_chain_status(step, id, current_step_id)
+
+    %{
+      id: id,
+      label: Map.get(step, "label") || humanize_chain_id(id),
+      delay: Map.get(step, "delay") || Map.get(step, "after"),
+      status: status
+    }
+  end
+
+  defp project_escalation_chain_step(step, current_step_id)
+       when is_binary(step) or is_atom(step) do
+    project_escalation_chain_step(%{"id" => to_string(step)}, current_step_id)
+  end
+
+  defp project_escalation_chain_step(step, _current_step_id) do
+    %{
+      id: inspect(step),
+      label: inspect(step),
+      delay: nil,
+      status: :pending
+    }
+  end
+
+  defp project_chain_status(step, id, current_step_id) do
+    cond do
+      is_binary(Map.get(step, "status")) ->
+        Map.get(step, "status") |> normalize_chain_status()
+
+      present_step_id?(id) and present_step_id?(current_step_id) and id == current_step_id ->
+        :current
+
+      true ->
+        :pending
+    end
+  end
+
+  defp normalize_chain_status("completed"), do: :completed
+  defp normalize_chain_status("sent"), do: :completed
+  defp normalize_chain_status("active"), do: :current
+  defp normalize_chain_status("current"), do: :current
+  defp normalize_chain_status("pending"), do: :pending
+  defp normalize_chain_status(_), do: :pending
+
+  defp derive_time_until_next_escalation(%{at: %DateTime{} = at, kind: kind})
+       when kind in [:await_suppression_expiry, :await_next_escalation] do
+    seconds = DateTime.diff(at, DateTime.utc_now(), :second)
+
+    if seconds > 0 do
+      %{seconds: seconds, at: at, derived?: true}
+    else
+      nil
+    end
+  end
+
+  defp derive_time_until_next_escalation(_next_step), do: nil
 
   defp project_latest_event(nil), do: nil
 
@@ -411,4 +543,93 @@ defmodule Parapet.Operator.WorkbenchContract do
   end
 
   defp to_datetime(_value), do: nil
+
+  defp queue_title(%Incident{title: title}, %{"symptom" => symptom})
+       when is_binary(symptom) and symptom != "" and is_binary(title) and title != "" do
+    symptom
+  end
+
+  defp queue_title(_incident, %{"symptom" => symptom}) when is_binary(symptom) and symptom != "" do
+    symptom
+  end
+
+  defp queue_title(%Incident{title: title}, _triage) when is_binary(title) and title != "" do
+    title
+  end
+
+  defp queue_title(%Incident{id: id}, _triage), do: id
+
+  defp queue_secondary_line(triage, runbook_data) do
+    triage
+    |> queue_secondary_parts(runbook_data)
+    |> Enum.take(2)
+    |> Enum.join(" • ")
+    |> case do
+      "" -> nil
+      value -> value
+    end
+  end
+
+  defp queue_secondary_parts(triage, runbook_data) do
+    [
+      Map.get(triage, "integration"),
+      Map.get(triage, "fault_plane"),
+      Map.get(triage, "affected_journey") || Map.get(runbook_data, "affected_journey"),
+      Map.get(triage, "queue")
+    ]
+    |> Enum.filter(&(is_binary(&1) and &1 != ""))
+  end
+
+  defp queue_attention_chip(runbook_data) do
+    cond do
+      is_map(Map.get(runbook_data, "correlated_change")) -> "Correlated change"
+      approval_pending?(runbook_data) -> "Approval pending"
+      escalation_waiting?(runbook_data) -> "Escalation waiting"
+      true -> nil
+    end
+  end
+
+  defp approval_pending?(runbook_data) do
+    case Map.get(runbook_data, "approval") do
+      %{"state" => "pending"} -> true
+      _ -> Map.get(runbook_data, "approval_state") == "pending"
+    end
+  end
+
+  defp escalation_waiting?(runbook_data) do
+    case Map.get(runbook_data, "escalation") do
+      escalation when is_map(escalation) ->
+        escalation = stringify_keys(escalation)
+        Map.get(escalation, "pending_trigger") == true or
+          is_binary(Map.get(escalation, "current_step_id")) or
+          match?(%DateTime{}, to_datetime(Map.get(escalation, "next_escalation_at")))
+
+      _ ->
+        false
+    end
+  end
+
+  defp queue_updated_at_label(%DateTime{} = updated_at) do
+    seconds = max(DateTime.diff(DateTime.utc_now(), updated_at, :second), 0)
+
+    cond do
+      seconds < 60 -> "#{seconds}s ago"
+      seconds < 3_600 -> "#{div(seconds, 60)}m ago"
+      true -> "#{div(seconds, 3_600)}h ago"
+    end
+  end
+
+  defp queue_updated_at_label(_updated_at), do: "Updated recently"
+
+  defp present_step_id?(value) when is_binary(value), do: value != ""
+  defp present_step_id?(_value), do: false
+
+  defp humanize_chain_id(nil), do: "Unknown step"
+
+  defp humanize_chain_id(value) when is_binary(value) do
+    value
+    |> String.replace("_", " ")
+    |> String.replace("-", " ")
+    |> String.capitalize()
+  end
 end
