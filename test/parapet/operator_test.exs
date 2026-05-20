@@ -90,7 +90,16 @@ defmodule Parapet.OperatorTest do
       now = ~U[2026-05-10 10:00:00Z]
 
       Process.put(:mock_incidents, [
-        %Incident{id: "inc-3", state: "open", updated_at: now, title: "Newest"},
+        %Incident{
+          id: "inc-3",
+          state: "open",
+          updated_at: now,
+          title: "Newest",
+          runbook_data: %{
+            "triage" => %{"integration" => "mailglass", "symptom" => "Delivery burn"},
+            "approval" => %{"state" => "pending"}
+          }
+        },
         %Incident{id: "inc-2", state: "investigating", updated_at: now, title: "Current"},
         %Incident{id: "inc-1", state: "open", updated_at: ~U[2026-05-10 09:59:00Z], title: "Older"}
       ])
@@ -107,11 +116,25 @@ defmodule Parapet.OperatorTest do
       assert page.scope == :active
       assert page.page_size == 2
       assert page.direction == :next
-      assert Enum.map(page.items, & &1.id) == ["inc-3", "inc-2"]
+      assert Enum.map(page.items, & &1.incident_id) == ["inc-3", "inc-2"]
       assert page.has_next_page? == true
       assert page.has_previous_page? == false
       assert is_binary(page.next_cursor)
       assert is_nil(page.previous_cursor)
+
+      assert [
+               %{
+                 incident_id: "inc-3",
+                 state: "open",
+                 title: "Delivery burn",
+                 secondary_line: "mailglass",
+                 attention_chip: "Approval pending"
+               },
+               %{
+                 incident_id: "inc-2",
+                 state: "investigating"
+               }
+             ] = page.items
     end
 
     test "action_items_query returns only open action items in insertion order" do
