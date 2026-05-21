@@ -22,4 +22,5 @@
 ## Boundaries
 
 - Keep this guidance narrow: it centralizes planning posture and escalation thresholds only.
+- Escalate only within the existing locked scope above; do not invent new governance or approval gates here.
 - Do not treat this file as authority to widen product scope, milestone status claims, or runtime guarantees.
