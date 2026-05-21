@@ -1,5 +1,9 @@
 # Phase 5: Multi-Node Safety Verification Validation
 
+## Reconciled Post-Verification Note
+
+This validation surface was reconciled post-verification after `.planning/v0.9-phases/5/VERIFICATION.md` landed as the canonical closure proof. The validation map records covered proof lanes, but validation is not the closure-grade proof artifact for Phase 5.
+
 ## Nyquist Validation Coverage
 
 | Requirement | Verification Method | Status |
