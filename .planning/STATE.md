@@ -1,20 +1,36 @@
+---
+gsd_state_version: 1.0
+milestone: v0.9
+milestone_name: "Performance, Scale & DX"
+status: in_progress
+stopped_at: "Phase 9 reconciled; fresh milestone audit pending"
+last_updated: "2026-05-21T22:29:03Z"
+last_activity: "2026-05-21 -- Phase 9 reconciliation complete; v0.9 is re-audit-ready"
+progress:
+  total_phases: 9
+  completed_phases: 9
+  total_plans: 19
+  completed_plans: 16
+  percent: 100
+---
+
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-18)
+See: .planning/PROJECT.md (updated 2026-05-19)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Ready for v0.8 Escalation & Auto-Remediation milestone planning.
+**Current focus:** Phase 9 reconciled the live milestone trackers and historical audit bridge. The remaining milestone-close action is a fresh `$gsd-audit-milestone` rerun.
 
 ## Current Position
 
-Phase: 1
-Plan: 1
-Status: Ready for Phase 1 execution
-Last activity: 2026-05-18 - Phase 1 plan verified
+Phase: 9 — COMPLETE
+Plan: 4 of 4
+Status: Reconciled; fresh audit pending
+Last activity: 2026-05-21 -- Phase 9 reconciliation complete; v0.9 is re-audit-ready
 
-Progress: [          ] 0%
+Progress: [██████████] 100%
 
 ## Accumulated Context
 
@@ -28,28 +44,15 @@ None.
 
 ## Decisions Made
 
-- Decided on Phase 3 architecture: Parapet will emit standard `[:parapet, :audit, :*]` telemetry events, define `Parapet.Audit.Writer` and `Parapet.Audit.Reader` behaviors configured via Application config, and bypass internal Ecto writes when deferred storage is enabled (falling back to Threadline).
-- Used DummyRepo approach for isolated Ecto testing in Scoria adapter without hitting real DB.
-- Updated Igniter implementation to use modern arity 1 `igniter/1` callbacks for tasks.
-- Excluded Resolvable protocol implementations from public API docs check.
-- Wrapped OpenTelemetry calls in safe `Code.ensure_loaded?` and `rescue` blocks to prevent crashes when OTel is not present.
-- Ensured `trace_id` is only appended to `metadata` and never `tags` to prevent cardinality explosion in Prometheus.
-- Used Application.get_env/3 in EEx templates for dynamic trace URL resolution with a fallback.
-- Updated Enum.empty?(external_links) check in UI to account for the presence of trace_id to prevent empty state messages from rendering alongside trace links.
-- Used `Code.ensure_loaded?(Threadline)` to check for Threadline dependency safely before routing.
-- Adapted `to_threadline_shape` to support maps to accommodate telemetry payloads.
-- Added telemetry event handler for `[:parapet, :audit, :created]` events.
-- Added shared async/delivery metric families plus a bounded `Parapet.SLO.SliceSpec` seam for provider-owned reliability slices.
-- Added explicit `Parapet.SLO.MailglassDelivery`, `Parapet.SLO.ChimewayDelivery`, and `Parapet.SLO.RindleAsync` provider catalogs.
-- Reworked `mix parapet.gen.prometheus` into a provider-first generator that writes split recording and alert artifacts plus a compatibility aggregate.
-- Added bounded Phase 6 triage summaries under `incident.runbook_data["triage"]` plus append-only `triage_snapshot` chronology for async and delivery incidents.
-- Replaced generic workbench derivation with a durable evidence-backed triage contract and chronology-first incident detail ordering.
-- Narrowed `ActionItem` to incident-linked exact follow-up work with bounded kinds for concrete async and delivery objects.
-- We defaulted preview_only and requires_preview to false for backward compatibility with existing simple mitigations.
-- The generator copies fixed templates to create host-owned modules instead of using dynamic workflow DSLs.
+- Decided to focus v0.9 on Performance, Scale & DX based on the MILESTONE-ARC.md arc.
+- Decided to unify the installation path under a single `mix parapet.install` wizard.
+- Decided to tackle TSDB safety proactively by providing a `mix parapet.doctor cardinality` sub-command and compile-time label limits.
+- Decided to solve Ecto evidence bloat using a built-in `mix parapet.archive` task and an Oban cron template rather than inventing a cold-storage engine.
+- Decided to preserve `.planning/v0.9-MILESTONE-AUDIT.md` as the historical `gaps_found` artifact while adding a narrow bridge to later proof and reconciliation evidence.
+- Decided to centralize the repo's recommendation-first, assumptions-mode, low-escalation doctrine in a repo-root `AGENTS.md`.
 
 ## Session Continuity
 
-Last session: 2026-05-18
-Stopped at: Phase 7 Plan 1 execution wrap-up
+Last session: 2026-05-21
+Stopped at: Phase 9 reconciled; fresh milestone audit pending
 Resume file: None
