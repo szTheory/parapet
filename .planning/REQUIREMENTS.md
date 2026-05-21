@@ -1,55 +1,57 @@
-# v0.8 Requirements: Deterministic Escalation & Bounded Mitigation
+# v0.9 Requirements: Performance, Scale & DX
 
 ## Overview
-Milestone v0.8 focuses on moving Parapet from an observability and alerting layer into a deterministic, safe, and host-owned active reliability system. When an incident triggers, it should escalate durably if unacknowledged, and safe, predefined mitigations should execute automatically to protect SLOs, without relying on unpredictable autonomous AI agents.
+Milestone v0.9 shifts focus from feature breadth to operational depth. With the core SRE primitives, Operator UI, and integrations in place, the system must now prove it can handle high scale without degrading the host application. This means protecting the TSDB from cardinality explosions, protecting the Postgres DB from evidence bloat, and streamlining the developer experience for new adoptions.
 
 ## Architectural Deep Dive & Trade-offs
 
-Per the overarching project mandate to provide a "perfect set of recommendations" rooted in idiomatic Elixir and robust SRE practices:
+### 1. TSDB Safety & Cardinality Control
+- **The Problem:** The most common failure mode for observability tools is exploding the TSDB (e.g. Prometheus) with unbound label cardinality, causing OOMs or massive bills.
+- **Approach:** We already have strict label regexes. We will add a static analysis tool (`mix parapet.doctor cardinality`) that parses all Parapet configurations and flags any potential dynamic labels (e.g., user IDs) that might leak into the TSDB.
 
-### 1. Durable Escalation Routing
-- **The Problem:** An alert creates an Incident in Ecto. A notification goes to Slack. If no human acknowledges it within 10 minutes, what happens?
-- **Approach A: OTP `Process.send_after` / GenServer state:** Extremely fast, zero dependencies. **Cons:** Ephemeral. If the node restarts, escalations are wiped out, violating SRE durability expectations.
-- **Approach B: External vendor (PagerDuty) state:** Offloads the problem. **Cons:** Violates Parapet's goal of being a host-owned SRE substrate.
-- **Approach C: Oban Scheduled Jobs (Recommendation):** Since Parapet already uses Oban, scheduling an `EscalationWorker` for `+10 minutes` is idiomatic, durable, and survives restarts/deploys.
-- **Decision:** Use **Oban** for a durable `Parapet.Escalation` policy engine. When an incident is created, an Oban job is inserted. If the incident is acknowledged before the job runs, the job simply exits gracefully.
+### 2. Evidence Pruning & Database Scale
+- **The Problem:** Tool audits, timeline entries, and incidents accumulate. Over years, this will bloat the host application's primary Postgres instance.
+- **Approach:** Introduce `Parapet.Evidence.Archiver`. We will not invent a custom cold-storage engine; instead, we will provide a built-in mix task (`mix parapet.archive`) and an Oban cron job template to automatically prune or compress resolved incidents older than a configurable threshold (e.g. 90 days). Indexes will also be optimized for large datasets.
 
-### 2. Auto-Remediation vs. Bounded Mitigation
-- **The Problem:** An SLO burn rate spikes because a specific external API is failing. We want to auto-toggle a fallback flag.
-- **Approach A: Autonomous LLM Agent:** Flexible. **Cons:** Violates Parapet's core brand identity ("Avoid: autonomous remediation"). AI should not mutate production state unbounded.
-- **Approach B: Deterministic Bounded Mitigation (Recommendation):** Parapet already has `Parapet.Runbook`. We introduce an `auto_execute_on: "alert_name"` field. When the alert fires, the system impersonates a "System Operator" and invokes the exact `Parapet.Operator` API. This results in a fully audited `ToolAudit` record, is 100% reversible, and completely bounded by the developer's code.
-- **Decision:** **Bounded Runbooks**. A human developer writes the code, Parapet pulls the trigger safely, and evidence is generated.
-
-### 3. Mitigation Circuit Breakers (Guardrails)
-- **The Problem:** An auto-mitigation fires, but the SLO keeps burning. It fires again. We need to prevent flap-loops.
-- **Approach A: ETS Counters:** Fast, but ephemeral.
-- **Approach B: Ecto `ToolAudit` lookbacks (Recommendation):** Since mitigations go through `Parapet.Operator` and write `ToolAudit` records, the circuit breaker can simply query Ecto: "Has this exact runbook step been executed > 2 times in the last hour?" If yes, open the circuit and escalate to a human.
-- **Decision:** Ecto-backed circuit breakers leveraging existing `ToolAudit` evidence. Zero new moving parts, complete durability.
+### 3. Generator Ergonomics (DX)
+- **The Problem:** Adopters currently have to run `spine`, `ui`, and `grafana` generators separately, remembering the correct order.
+- **Approach:** Introduce `mix parapet.install`. It acts as an interactive wizard (using `Igniter`), orchestrating the sub-generators and verifying dependencies to ensure a flawless "Day 1" experience.
 
 ## System Requirements
 
-### ESC-01: Durable Escalation Policies
-- [ ] System provides a `Parapet.Escalation.Policy` behavior for defining severity-based routing (e.g., `SEV-1 -> Slack #alerts -> 5m -> PagerDuty / SMS`).
-- [ ] System leverages Oban to schedule durable escalation steps upon incident creation.
-- [ ] System automatically cancels or gracefully short-circuits scheduled escalations if the `Incident` transitions to `acknowledged` or `resolved`.
-- [ ] System adds timeline entries when an incident escalates to the next tier.
+### PERF-01: TSDB Cardinality Protection
+- [x] System provides a `mix parapet.doctor cardinality` sub-command to statically analyze metrics configurations and flag unsafe label patterns.
+- [x] System strictly limits the number of labels per metric at compile-time to prevent accidental TSDB explosion.
 
-### AUT-01: Bounded Runbook Execution
-- [ ] System extends `Parapet.Runbook` DSL to support `auto_execute_on: "alert_name"`.
-- [ ] System safely executes the designated runbook step via the `Parapet.Operator` API under a reserved `:system` identity.
-- [ ] System durably logs the execution as a `ToolAudit` and a `TimelineEntry` so human operators see exactly what the system did.
+### SCALE-01: Database Pruning & Indexing
+- [x] System provides optimized Ecto migrations to add composite indexes to `Incident`, `TimelineEntry`, and `ToolAudit` for fast querying at >100k rows.
+- [x] System provides a `Parapet.Evidence.Archiver` module and `mix parapet.archive` task to safely soft-delete or export resolved incidents older than a configurable window.
+- [x] Operator UI Incident list utilizes efficient pagination or cursor-based scrolling to prevent large payload rendering issues.
 
-### CIR-01: Ecto-Backed Circuit Breakers
-- [ ] System implements a circuit breaker that queries `ToolAudit` before auto-executing a runbook.
-- [ ] System prevents execution if the runbook has fired more than a configurable threshold (e.g., `max_executions: 2, within: :1_hour`).
-- [ ] System automatically escalates the incident and adds a timeline entry if the circuit breaker opens ("Auto-mitigation suppressed due to flap detection").
+### DX-01: Unified Install Path
+- [x] System provides `mix parapet.install` as a unified, interactive starting point that sequentially runs necessary sub-generators.
+- [x] System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations).
 
-### UI-01: Escalation & Mitigation UI
-- [ ] System Operator UI displays the active escalation chain and time-until-next-escalation on the Incident detail page.
-- [ ] System Operator UI highlights "System-Executed" mitigations distinctly from human-executed ones.
-- [ ] System Operator UI provides a manual "Trigger Next Escalation" panic button.
+### SCALE-02: Multi-Node Consistency
+- [x] System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions when multiple nodes attempt auto-mitigation simultaneously.
 
 ## Acceptance Criteria
-- [ ] An alert fires, waits 5 minutes, and correctly dispatches a secondary higher-severity notification via an Oban worker.
-- [ ] A developer defines an `auto_execute` runbook; when the corresponding alert fires, the system executes it, writes an audit log, and stops the SLO burn.
-- [ ] The system refuses to auto-execute the same runbook a third time within an hour and pages a human instead.
+- [x] A developer can run `mix parapet.install` and get the spine and default Prometheus artifacts in one guided flow, with the optional operator UI offered explicitly when LiveView is present.
+- [x] Running `mix parapet.archive --days 90` successfully moves/clears old evidence without violating foreign key constraints.
+- [x] The Operator UI loads instantly with 50,000 generated incident records, proving pagination and index effectiveness.
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| PERF-01.a | Phase 6 | Verified |
+| PERF-01.b | Phase 6 | Verified |
+| SCALE-01.a | Phase 2 | Verified |
+| SCALE-01.b | Phase 2 | Verified |
+| SCALE-01.c | Phase 7 | Verified |
+| DX-01.a | Phase 8 | Verified |
+| DX-01.b | Phase 8 | Verified |
+| SCALE-02 | Phase 5 | Verified |
+| AC-01 | Phase 8 | Verified |
+| AC-02 | Phase 2 | Verified |
+| AC-03 | Phase 7 | Verified |
