@@ -1,7 +1,7 @@
 ---
 phase: 11
 slug: harden-multi-node-proof-rerunnability
-status: active
+status: complete
 nyquist_compliant: true
 wave_0_complete: true
 created: 2026-05-22
@@ -42,8 +42,8 @@ created: 2026-05-22
 | 11-01-02 | 01 | 1 | `SCALE-02` | T-11-02 | Peer canary either runs successfully across BEAMs or is skipped when unsupported with a truthful reason that says distributed Erlang unavailable. | smoke | `mix test test/parapet/automation/executor_cluster_smoke_test.exs` | ✅ | ✅ green |
 | 11-02-01 | 02 | 2 | `SCALE-02` | T-11-05 | Verification and validation artifacts describe the DB-backed contention suite as closure-grade proof and the peer canary as environment-conditional corroboration. | docs | `rg -n "closure-grade proof|contention suite|environment-conditional|skipped when unsupported|distributed Erlang unavailable" .planning/v0.9-phases/5/VERIFICATION.md .planning/v0.9-phases/5/05-VALIDATION.md .planning/v0.9-phases/5/05-02-SUMMARY.md .planning/v0.9-phases/11/VERIFICATION.md` | ✅ | ✅ green |
 | 11-02-02 | 02 | 2 | certainty boundary | T-11-06 | Doctor remains advisory and does not become a distributed-correctness proof lane. | unit/integration | `rg -n "doctor remains advisory|advisory only|cannot prove distributed correctness" .planning/v0.9-phases/5/05-VALIDATION.md .planning/phases/11-harden-multi-node-proof-rerunnability/11-VALIDATION.md && mix test test/mix/tasks/parapet.doctor_test.exs` | ✅ | ✅ green |
-| 11-03-01 | 03 | 3 | `SCALE-02` | T-11-09 | Active requirement traceability promotes `SCALE-02` to verified only after the corrected proof chain exists. | docs | `rg -n "\\| SCALE-02 \\| Phase 11 \\| Verified \\|" .planning/REQUIREMENTS.md` | ✅ | ⬜ pending |
-| 11-03-02 | 03 | 3 | milestone truth | T-11-10 / T-11-11 | The roadmap Phase 11 closure points to the corrected proof artifacts and keeps the historical audit separate from a fresh rerun. | docs | `rg -n "11-01-PLAN\\.md|11-02-PLAN\\.md|11-03-PLAN\\.md|v0\\.9-phases/11/VERIFICATION\\.md|v0\\.9-phases/5/VERIFICATION\\.md|environment-conditional|historical gap artifact|fresh .*audit rerun" .planning/ROADMAP.md` | ✅ | ⬜ pending |
+| 11-03-01 | 03 | 3 | `SCALE-02` | T-11-09 | Active requirement traceability promotes `SCALE-02` to verified only after the corrected proof chain exists. | docs | `rg -n "\\| SCALE-02 \\| Phase 11 \\| Verified \\|" .planning/REQUIREMENTS.md` | ✅ | ✅ green |
+| 11-03-02 | 03 | 3 | milestone truth | T-11-10 / T-11-11 | The roadmap Phase 11 closure points to the corrected proof artifacts and keeps the historical audit separate from a fresh rerun. | docs | `rg -n "11-01-PLAN\\.md|11-02-PLAN\\.md|11-03-PLAN\\.md|v0\\.9-phases/11/VERIFICATION\\.md|v0\\.9-phases/5/VERIFICATION\\.md|environment-conditional|historical gap artifact|fresh .*audit rerun" .planning/ROADMAP.md` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠ flaky*
 
@@ -74,4 +74,4 @@ created: 2026-05-22
 - [x] Feedback latency < 30s
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** active
+**Approval:** complete

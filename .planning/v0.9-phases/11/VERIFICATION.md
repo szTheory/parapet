@@ -40,6 +40,7 @@ human_verification: []
 | --- | --- | --- | --- |
 | 11-01 | `.planning/phases/11-harden-multi-node-proof-rerunnability/11-01-SUMMARY.md` | ✓ VERIFIED | Peer-node smoke lane now has an explicit supported-versus-skipped contract and rerunnable targeted proof command. |
 | 11-02 | `.planning/phases/11-harden-multi-node-proof-rerunnability/11-02-SUMMARY.md` | ✓ VERIFIED | Phase 5 and Phase 11 proof artifacts now describe the same closure-grade contention proof and conditional peer-canary corroboration. |
+| 11-03 | `.planning/phases/11-harden-multi-node-proof-rerunnability/11-03-SUMMARY.md` | ✓ VERIFIED | `SCALE-02` traceability and the Phase 11 roadmap closure now point at the corrected proof chain while keeping the historical audit rerun separate. |
 
 ### Requirements Coverage
 

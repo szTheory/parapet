@@ -96,7 +96,7 @@ Plans:
 ### Phase 11: Harden Multi-Node Proof Rerunnability
 **Goal:** Make the multi-node proof lane honest, bounded, and rerunnable in environments without distributed Erlang.
 **Requirements:** `SCALE-02`
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 Plans:
 - [x] 11-01-PLAN.md — Harden the peer-node smoke lane with an explicit supported-versus-skipped test harness contract.
 - [x] 11-02-PLAN.md — Reconcile Phase 5 and Phase 11 proof artifacts to the conditional-canary verification hierarchy.
