@@ -96,10 +96,16 @@ Plans:
 ### Phase 11: Harden Multi-Node Proof Rerunnability
 **Goal:** Make the multi-node proof lane honest, bounded, and rerunnable in environments without distributed Erlang.
 **Requirements:** `SCALE-02`
+**Plans:** 2/3 plans executed
+Plans:
+- [x] 11-01-PLAN.md — Harden the peer-node smoke lane with an explicit supported-versus-skipped test harness contract.
+- [x] 11-02-PLAN.md — Reconcile Phase 5 and Phase 11 proof artifacts to the conditional-canary verification hierarchy.
+- [x] 11-03-PLAN.md — Promote the corrected `SCALE-02` proof chain into roadmap and requirements truth surfaces.
 **Gap Closure:** Closes the audit requirement, integration, and flow gaps around the Phase 5 concurrency proof.
-- Make the peer-node smoke lane degrade cleanly when distributed Erlang is unavailable instead of failing hard with `:nodistribution`.
+- Make the peer-node smoke lane skip cleanly when distributed Erlang is unavailable instead of failing hard with `:nodistribution`.
 - Preserve a closure-grade proof path for multi-node safety that remains explicit about its environment contract.
 - Reconcile Phase 5 verification so the milestone claim matches executable behavior in this environment class.
+**Closure:** Verified by `.planning/v0.9-phases/11/VERIFICATION.md`, the corrected `.planning/v0.9-phases/5/VERIFICATION.md`, and the verified `SCALE-02` row in `.planning/REQUIREMENTS.md`; the peer-node canary is environment-conditional, and `.planning/v0.9-MILESTONE-AUDIT.md` remains a historical gap artifact until a fresh `$gsd-audit-milestone` rerun replaces it.
 
 ### Phase 12: Backfill Closure-Phase Verification Surfaces
 **Goal:** Satisfy the workflow's phase-proof model for reconciliation phases without widening product scope.
