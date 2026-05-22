@@ -9,6 +9,29 @@
 | v0.3 | 4 / 12 | 1 | 6667 | 12 plans / 1 day |
 | v0.4 | 4 / 9 | 3 | 7847 | 9 plans / 3 days |
 | v0.7 | 4 / 12 | 1 | 13401 | 12 plans / 1 day |
+| v0.8 | 4 / 8 | 1 | ~13900 | 8 plans / 1 day |
+
+## Milestone: v0.8 — Deterministic Escalation & Bounded Mitigation
+
+**Shipped:** 2026-05-19
+**Phases:** 4 | **Plans:** 8
+
+### What Was Built
+Built a durable Oban-backed escalation engine, implemented system-identity execution for bounded runbooks, added Ecto-backed circuit breakers to prevent flap-loop mitigations, and extended the Operator UI to visualize escalation chains.
+
+### What Worked
+- **System Identity:** Utilizing a strict URN identity (`system:automation:executor`) for auto-mitigations made it trivial to separate human vs. system actions in the Operator UI.
+- **Circuit Breakers via Evidence:** Querying the `ToolAudit` log to determine flap-loops was extremely effective and avoided adding new persistence tables for breaker state.
+
+### What Was Inefficient
+- N/A - Test-driven development ensured a smooth implementation path.
+
+### Patterns Established
+- **Bounded Auto-Execution:** Strictly requiring `auto_execute: true` in the DSL and executing via Oban jobs to avoid blocking alert ingestion.
+- **Escalation Short-Circuiting:** Safely cancelling pending escalations when incidents are acknowledged or resolved.
+
+### Key Lessons
+- Providing deterministic auto-mitigation using existing primitives (Oban, Ecto) proves that an SRE platform can be self-healing without relying on autonomous AI agents.
 
 ## Milestone: v0.7 — Async & Delivery Reliability
 

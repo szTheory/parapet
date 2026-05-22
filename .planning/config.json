@@ -3,10 +3,13 @@
   "parallelization": true,
   "workflow": {
     "research": true,
+    "research_before_questions": true,
+    "discuss_mode": "assumptions",
     "plan_checker": true,
     "verifier": true,
     "auto_advance": true,
-    "skip_discuss": false
+    "skip_discuss": false,
+    "_auto_chain_active": false
   },
   "granularity": "coarse"
 }

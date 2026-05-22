@@ -79,3 +79,32 @@ Plans:
 - Update Phase 5 validation wording so it reflects already-completed verification evidence rather than planned checks.
 - Leave v0.9 in a re-audit-ready state for `$gsd-audit-milestone`.
 **Closure:** Reconciled to a verified, re-audit-ready posture. Existing proof now lives in `.planning/v0.9-phases/1/VERIFICATION.md`, `.planning/v0.9-phases/3/VERIFICATION.md`, `.planning/v0.9-phases/4/VERIFICATION.md`, and `.planning/v0.9-phases/5/VERIFICATION.md`; a fresh milestone audit is still pending via `$gsd-audit-milestone`.
+
+### Phase 10: Tighten Archive Retention Semantics
+**Goal:** Bring archival behavior back into line with the milestone contract so active work never gets pruned.
+**Requirements:** `SCALE-01.b`, `AC-02`
+**Plans:** 2/2 plans complete
+Plans:
+- [x] 10-01-PLAN.md — Repair the resolved-only archive predicate and regression-test every archive entry surface without changing the public CLI contract.
+- [x] 10-02-PLAN.md — Reconcile Phase 2 and Phase 10 verification artifacts plus roadmap/requirements truth to the repaired archive contract.
+**Gap Closure:** Closes the audit requirement, integration, and flow gaps around archive retention semantics.
+- Restrict `mix parapet.archive` to archival states the milestone contract allows, leaving active `investigating` incidents in the operator queue.
+- Update the archive tests and verification evidence so the accepted behavior is explicit and rerunnable.
+- Re-verify Phase 2 closure evidence against the corrected archive contract.
+**Closure:** Verified by `.planning/v0.9-phases/10/VERIFICATION.md`, the corrected `.planning/v0.9-phases/2/VERIFICATION.md`, and the verified `SCALE-01.b` / `AC-02` rows in `.planning/REQUIREMENTS.md`; a fresh `$gsd-audit-milestone` rerun is still separate and still pending.
+
+### Phase 11: Harden Multi-Node Proof Rerunnability
+**Goal:** Make the multi-node proof lane honest, bounded, and rerunnable in environments without distributed Erlang.
+**Requirements:** `SCALE-02`
+**Gap Closure:** Closes the audit requirement, integration, and flow gaps around the Phase 5 concurrency proof.
+- Make the peer-node smoke lane degrade cleanly when distributed Erlang is unavailable instead of failing hard with `:nodistribution`.
+- Preserve a closure-grade proof path for multi-node safety that remains explicit about its environment contract.
+- Reconcile Phase 5 verification so the milestone claim matches executable behavior in this environment class.
+
+### Phase 12: Backfill Closure-Phase Verification Surfaces
+**Goal:** Satisfy the workflow's phase-proof model for reconciliation phases without widening product scope.
+**Requirements:** milestone closure readiness
+**Gap Closure:** Closes the audit integration gap between Phases 6-9 and the milestone proof model.
+- Add phase-local `VERIFICATION.md` artifacts for Phases 6-9 that point to the proof surfaces those phases reconciled.
+- Align the closure-phase evidence chain so roadmap, requirements, validation, and verification surfaces tell the same story.
+- Leave v0.9 ready for a fresh `$gsd-audit-milestone` rerun once Phases 10-12 complete.

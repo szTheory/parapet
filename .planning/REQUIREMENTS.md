@@ -33,11 +33,11 @@ Milestone v0.9 shifts focus from feature breadth to operational depth. With the 
 - [x] System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations).
 
 ### SCALE-02: Multi-Node Consistency
-- [x] System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions when multiple nodes attempt auto-mitigation simultaneously.
+- [ ] System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions when multiple nodes attempt auto-mitigation simultaneously.
 
 ## Acceptance Criteria
 - [x] A developer can run `mix parapet.install` and get the spine and default Prometheus artifacts in one guided flow, with the optional operator UI offered explicitly when LiveView is present.
-- [x] Running `mix parapet.archive --days 90` successfully moves/clears old evidence without violating foreign key constraints.
+- [x] Running `mix parapet.archive --days 90` successfully moves/clears old evidence without violating foreign key constraints while leaving active `investigating` work untouched.
 - [x] The Operator UI loads instantly with 50,000 generated incident records, proving pagination and index effectiveness.
 
 ## Traceability
@@ -47,11 +47,11 @@ Milestone v0.9 shifts focus from feature breadth to operational depth. With the 
 | PERF-01.a | Phase 6 | Verified |
 | PERF-01.b | Phase 6 | Verified |
 | SCALE-01.a | Phase 2 | Verified |
-| SCALE-01.b | Phase 2 | Verified |
+| SCALE-01.b | Phase 10 | Verified |
 | SCALE-01.c | Phase 7 | Verified |
 | DX-01.a | Phase 8 | Verified |
 | DX-01.b | Phase 8 | Verified |
-| SCALE-02 | Phase 5 | Verified |
+| SCALE-02 | Phase 11 | Pending |
 | AC-01 | Phase 8 | Verified |
-| AC-02 | Phase 2 | Verified |
+| AC-02 | Phase 10 | Verified |
 | AC-03 | Phase 7 | Verified |

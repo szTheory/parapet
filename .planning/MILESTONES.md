@@ -124,3 +124,20 @@ None. All v0.6 requirements defined and satisfied. Tests pass locally.
 
 ### Known Gaps
 None. All v0.7 requirements defined and satisfied. Tests pass locally.
+
+## v0.8 Deterministic Escalation & Bounded Mitigation
+
+**Date:** 2026-05-19
+**Stats:**
+- Phases: 1-4
+- Plans: 8
+- Total LOC: ~13900 (Elixir/EEx)
+
+### Accomplishments
+1. Built a durable Oban-backed escalation engine (`Parapet.Escalation.Worker`) that routes incidents to next tiers unless acknowledged or resolved.
+2. Implemented system-identity (`:system`) execution for Bounded Runbooks to safely perform auto-mitigations using `Parapet.Operator` API.
+3. Created an Ecto-backed `CircuitBreaker` leveraging `ToolAudit` histories to prevent mitigation flap-loops.
+4. Updated the LiveView Operator UI to visualize escalation chains and distinctively style system-executed mitigations with manual trigger overrides.
+
+### Known Gaps
+None. All v0.8 requirements defined and satisfied. Tests pass locally.

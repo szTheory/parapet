@@ -229,12 +229,12 @@ Oban documents that `perform/1` receives an `Oban.Job` and that `args` always ha
 **Deprecated/outdated:**
 - Treating Phase 2 verification's "old non-open incidents" claim as the current truth is outdated because the active milestone audit now marks `SCALE-01.b` and `AC-02` unsatisfied for that exact reason. [VERIFIED: .planning/v0.9-phases/2/VERIFICATION.md] [VERIFIED: .planning/v0.9-MILESTONE-AUDIT.md]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the retention cutoff remain based on `inserted_at`, or should it move to `updated_at`?**
    - What we know: the current implementation archives by `inserted_at`, and neither the roadmap nor requirements explicitly override that field choice. [VERIFIED: lib/parapet/evidence/archiver.ex] [VERIFIED: .planning/ROADMAP.md] [VERIFIED: .planning/REQUIREMENTS.md]
    - What's unclear: "older than a configurable window" could plausibly mean "not updated recently" in some operator mental models. [ASSUMED]
-   - Recommendation: keep `inserted_at` for Phase 10 unless the user explicitly broadens scope; the current defect is about state eligibility, not time semantics. If maintainers want "inactive since last update", treat that as a separate contract change. [VERIFIED: AGENTS.md] [VERIFIED: recommendation synthesis]
+   - Resolution: keep `inserted_at` for Phase 10. The current defect is state eligibility, not time semantics, and broadening to `updated_at` would be a separate contract change outside the locked scope for this phase. If maintainers want "inactive since last update", treat that as follow-on work. [VERIFIED: AGENTS.md] [VERIFIED: recommendation synthesis]
 
 ## Environment Availability
 

@@ -8,9 +8,9 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
-## Current Milestone: Complete
+## Current Milestone: v0.9 Performance, Scale & DX
 
-**Goal:** Ready for next milestone planning.
+**Goal:** Validate TSDB safety, generator ergonomics, and large-installation behavior. Shift the focus from feature breadth to operational depth, ensuring Parapet scales elegantly without bloating the host application's TSDB or Postgres instances.
 
 ## Requirements
 
@@ -68,10 +68,24 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ System expands `Rindle` integration with out-of-the-box SLIs for long-running media jobs, webhook delays, and async funnel health — v0.7
 - ✓ System surfaces async and delivery incidents in the Operator UI with enough context to distinguish provider drift from internal queue backlog — v0.7
 - ✓ System provides built-in runbook templates for stalled async work, including dead-letter handling and safe retry flows — v0.7
+- ✓ System provides a `Parapet.Escalation.Policy` behavior and Oban workers for durable severity-based routing — v0.8
+- ✓ System automatically cancels or gracefully short-circuits scheduled escalations if the incident is acknowledged or resolved — v0.8
+- ✓ System extends `Parapet.Runbook` DSL to support `auto_execute_on: "alert_name"` for bounded mitigations — v0.8
+- ✓ System safely executes runbook steps under a `:system` identity and durably logs `ToolAudit` and `TimelineEntry` records — v0.8
+- ✓ System implements Ecto-backed circuit breakers querying `ToolAudit` to prevent flap-loop mitigations and escalate instead — v0.8
+- ✓ System Operator UI displays the active escalation chain and highlights "System-Executed" mitigations distinctly from human-executed ones — v0.8
+- ✓ System Operator UI provides manual controls to trigger next escalations — v0.8
 
 ### Active
 
-None.
+- [ ] System provides a `mix parapet.doctor cardinality` sub-command to statically analyze metrics configurations and flag unsafe label patterns — v0.9
+- [ ] System strictly limits the number of labels per metric at compile-time to prevent accidental TSDB explosion — v0.9
+- [ ] System provides optimized Ecto migrations to add composite indexes to `Incident`, `TimelineEntry`, and `ToolAudit` for fast querying at >100k rows — v0.9
+- [ ] System provides a `Parapet.Evidence.Archiver` module and `mix parapet.archive` task to safely soft-delete or export resolved incidents older than a configurable window — v0.9
+- [ ] Operator UI Incident list utilizes efficient pagination or cursor-based scrolling to prevent large payload rendering issues — v0.9
+- [ ] System provides `mix parapet.install` as a unified, interactive starting point that sequentially runs necessary sub-generators — v0.9
+- [ ] System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations) — v0.9
+- [ ] System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions — v0.9
 
 ### Out of Scope
 
@@ -92,6 +106,7 @@ Shipped v0.4 adding complete AI observability integration for Scoria (Eval-Drive
 Shipped v0.5 adding Synthetic Probes, deepened Accrue/Sigra integrations, and a read-only MCP server.
 Shipped v0.6 adding trace exemplars, Rulestead change correlation, and Threadline compliance sync.
 Shipped v0.7 adding Async & Delivery Reliability, including Chimeway, Mailglass, Rindle SLIs, fault-domain triage enrichment, and host-owned recovery runbooks.
+Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parapet can take safe action using Oban policies and circuit breakers without relying on autonomous AI agents.
 
 ## Constraints
 
@@ -125,6 +140,9 @@ Shipped v0.7 adding Async & Delivery Reliability, including Chimeway, Mailglass,
 | Dual-track Async/Delivery telemetry | Provides normalized event semantics for diverse external providers | ✓ Good |
 | Host-owned runbook modules | Promotes safe, inspectable, and version-controlled mitigation workflows over opaque DSLs | ✓ Good |
 | Triage snapshot chronology | Elevates evidence-backed classification above ad hoc UI derivation | ✓ Good |
+| Async Runbook auto-execution | Prevents alert ingestion blocking by triggering `Parapet.Automation.Executor` via Oban | ✓ Good |
+| Opt-in Auto-execution | Strictly requires `auto_execute: true` in `step/2` macro DSL for bounded safety | ✓ Good |
+| Strict URN system identity | Logs `system:automation:executor` in audits/timelines for clear Operator UI styling | ✓ Good |
 
 ## Evolution
 
@@ -144,4 +162,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-18 for v0.7 milestone completion*
+*Last updated: 2026-05-19 for v0.8 milestone completion*
