@@ -19,7 +19,7 @@ Move the automation executor onto the DB-backed claim contract and prove that co
 4. Marked the winning claim row `executed` after the mitigation transaction succeeds so the durable claim state matches the operator evidence.
 5. Updated the fast seam tests in `test/parapet/automation/executor_test.exs` to assert claim-service delegation, executed-claim marking, typed short-circuit evidence, and typed conflict evidence.
 6. Added `test/parapet/automation/executor_concurrency_test.exs` as the real Postgres contention proof: two concurrent executor attempts, one executed claim/effect path, one conflict no-op, one audit row.
-7. Added `test/parapet/automation/executor_cluster_smoke_test.exs` as a narrow multi-BEAM canary using one `:peer` node sharing the same Postgres truth, asserting the same one-winner durable end state across nodes.
+7. Added `test/parapet/automation/executor_cluster_smoke_test.exs` as a narrow multi-BEAM canary using one `:peer` node sharing the same Postgres truth. Phase 11 hardened that lane so it is environment-conditional and now states explicitly when the peer-node canary was skipped because distributed Erlang is unavailable in this environment.
 
 ## Verification Commands and Results
 
@@ -37,6 +37,6 @@ Result: passed (`2 tests, 0 failures`).
 
 ## Deviations
 
-None. The multi-node canary stayed intentionally narrow and DB-first, and the real Postgres contention suite remains the primary proof surface.
+None. The multi-node canary stayed intentionally narrow, the DB-backed contention suite remains the closure-grade proof, and the peer lane is no longer described as an unconditional always-on proof surface.
 
 ## Self-Check: PASSED
