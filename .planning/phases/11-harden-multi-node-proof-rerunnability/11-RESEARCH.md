@@ -13,8 +13,8 @@
 - **D-01:** Keep the closure-grade proof for `SCALE-02` anchored in the real Postgres-backed contention suite.
 - **D-02:** Treat the multi-BEAM `:peer` lane as a narrow canary, not as an always-on required proof surface in every environment class.
 
-### Smoke lane degradation
-- **D-03:** Replace the current hard failure at distributed-node bootstrap with an explicit bounded skip or equivalent non-failing degradation when distributed Erlang is unavailable.
+### Smoke lane skip semantics
+- **D-03:** Replace the current hard failure at distributed-node bootstrap with an explicit bounded skip when distributed Erlang is unavailable.
 - **D-04:** The canary must be honest about its environment contract and must not pretend to have exercised peer-node behavior when the environment cannot support it.
 
 ### Verification reconciliation
@@ -26,7 +26,7 @@
 - **D-08:** Preserve the existing certainty boundary: doctor reports live or static facts and explicit uncertainty, while executable tests remain the proof surface.
 
 ### the agent's Discretion
-- Exact skip/degradation mechanism in the test lane, provided it is explicit, bounded, and non-misleading.
+- Exact skip mechanism in the test lane, provided it is explicit, bounded, and non-misleading.
 - Exact verification wording and artifact phrasing, provided the proof hierarchy and environment contract stay clear.
 - Exact helper extraction or test harness refactoring, provided the runtime product contract does not widen.
 
@@ -58,7 +58,7 @@ That failure is environment-stateful, not a code-level concurrency regression. O
 
 OTP also documents that `:peer` supports alternative control connections such as `standard_io`, and a local experiment confirmed `:peer.start_link(%{connection: :standard_io})` works even when `Node.alive?()` is `false`. However, that path still needs explicit code-path bootstrap for Parapet modules and would materially reshape the current canary seam, so it is a viable future hardening option but not the narrowest Phase 11 plan. [CITED: https://www.erlang.org/doc/apps/stdlib/peer.html] [VERIFIED: elixir -e 'case :peer.start_link(%{name: :peer.random_name(), connection: :standard_io}) do ... end'] [VERIFIED: mix run -e '... :peer.call(peer, :code, :add_paths, [:code.get_path()]) ...']
 
-**Primary recommendation:** Keep the DB-backed contention test as the closure lane, add an explicit distribution-readiness preflight plus bounded skip/non-failing degradation to the peer canary, and rewrite Phase 5 verification/validation text so it describes the canary as conditional rather than universal. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md] [VERIFIED: .planning/ROADMAP.md] [VERIFIED: .planning/v0.9-phases/5/VERIFICATION.md]
+**Primary recommendation:** Keep the DB-backed contention test as the closure lane, add an explicit distribution-readiness preflight plus bounded skip semantics to the peer canary, and rewrite Phase 5 verification/validation text so it describes the canary as conditional rather than universal. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md] [VERIFIED: .planning/ROADMAP.md] [VERIFIED: .planning/v0.9-phases/5/VERIFICATION.md]
 
 ## Architectural Responsibility Map
 
@@ -66,7 +66,7 @@ OTP also documents that `:peer` supports alternative control connections such as
 |------------|-------------|----------------|-----------|
 | Durable winner/loser concurrency proof for `SCALE-02` | Database / Storage | API / Backend | The guarantee comes from `ActionClaim` uniqueness and claim-time gating against the real Repo, which is what the passing contention suite exercises. [VERIFIED: lib/parapet/automation/claim_service.ex] [VERIFIED: test/parapet/automation/executor_concurrency_test.exs] |
 | Peer-node smoke verification | API / Backend | Browser / Client | The canary exercises `Parapet.Automation.Executor.perform/1` across BEAMs; no browser tier is involved. [VERIFIED: lib/parapet/automation/executor.ex] [VERIFIED: test/parapet/automation/executor_cluster_smoke_test.exs] |
-| Distribution-readiness detection and skip semantics | Test Harness | API / Backend | The bounded degradation belongs in the test/helper layer, not in product runtime code or doctor. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md] [VERIFIED: lib/mix/tasks/parapet.doctor.ex] |
+| Distribution-readiness detection and skip semantics | Test Harness | API / Backend | The bounded skip contract belongs in the test/helper layer, not in product runtime code or doctor. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md] [VERIFIED: lib/mix/tasks/parapet.doctor.ex] |
 | Operator-facing certainty boundary | Documentation / Verification Artifacts | API / Backend | The runtime contract stays unchanged; the work is to align verification text with executable behavior and existing advisory doctor semantics. [VERIFIED: .planning/v0.9-phases/5/VERIFICATION.md] [VERIFIED: .planning/v0.9-phases/5/05-VALIDATION.md] [VERIFIED: lib/mix/tasks/parapet.doctor.ex] |
 
 ## Standard Stack
@@ -265,12 +265,12 @@ assert Enum.count(results, fn
 
 All material claims in this research were verified from the codebase, runtime probes, or official docs. No user confirmation is required for hidden assumptions at planning time. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-RESEARCH.md] [VERIFIED: mix test test/parapet/automation/executor_cluster_smoke_test.exs] [CITED: https://www.erlang.org/doc/apps/stdlib/peer.html]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should Phase 11 stop at bounded skip, or also adopt `:peer` alternative control as extra hardening?**
-   - What we know: `:peer.start_link(%{connection: :standard_io})` works locally without `Node.start/2`, and Parapet modules become callable after explicit `:code.add_paths`. [CITED: https://www.erlang.org/doc/apps/stdlib/peer.html] [VERIFIED: elixir -e 'case :peer.start_link(%{name: :peer.random_name(), connection: :standard_io}) do ... end'] [VERIFIED: mix run -e '... :peer.call(peer, :code, :add_paths, [:code.get_path()]) ...']
-   - What's unclear: whether Phase 11 should pay the extra refactor cost to adapt message/assertion flow and keep the lane semantically “peer-node” rather than “distribution smoke.” [VERIFIED: test/parapet/automation/executor_cluster_smoke_test.exs]
-   - Recommendation: do not make this the primary plan item; keep it as an optional follow-on only if the bounded-skip implementation ends up too narrow for the desired proof story. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md]
+   - Resolution: Phase 11 should stop at truthful skip semantics for unsupported environments and defer `:peer` alternative control (`connection: :standard_io`) to a follow-on hardening phase if it is still wanted later. [VERIFIED: .planning/phases/11-harden-multi-node-proof-rerunnability/11-CONTEXT.md]
+   - Rationale: the locked scope is to make the current proof lane honest, bounded, and rerunnable without widening runtime guarantees. Explicit skip semantics are the narrowest change that closes the current `:nodistribution` gap while keeping the DB-backed contention suite as the closure-grade proof. [VERIFIED: .planning/ROADMAP.md] [VERIFIED: .planning/v0.9-MILESTONE-AUDIT.md]
+   - Deferred option: `:peer.start_link(%{connection: :standard_io})` remains technically viable and locally verified, but it requires extra bootstrap and assertion refactoring that is beyond the minimum Phase 11 fix. [CITED: https://www.erlang.org/doc/apps/stdlib/peer.html] [VERIFIED: elixir -e 'case :peer.start_link(%{name: :peer.random_name(), connection: :standard_io}) do ... end'] [VERIFIED: mix run -e '... :peer.call(peer, :code, :add_paths, [:code.get_path()]) ...']
 
 ## Environment Availability
 
@@ -288,7 +288,7 @@ All material claims in this research were verified from the codebase, runtime pr
 
 **Missing dependencies with fallback:**
 
-- No binary is missing, but ambient `epmd` readiness is not stable enough to treat the current canary as unconditionally rerunnable; the required fallback is an explicit skip/degradation path. [VERIFIED: mix test test/parapet/automation/executor_cluster_smoke_test.exs] [VERIFIED: command -v epmd && epmd -names]
+- No binary is missing, but ambient `epmd` readiness is not stable enough to treat the current canary as unconditionally rerunnable; the required fallback is an explicit skip path. [VERIFIED: mix test test/parapet/automation/executor_cluster_smoke_test.exs] [VERIFIED: command -v epmd && epmd -names]
 
 ## Validation Architecture
 

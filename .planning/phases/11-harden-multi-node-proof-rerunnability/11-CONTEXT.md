@@ -6,7 +6,7 @@
 <domain>
 ## Phase Boundary
 
-Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in environments without distributed Erlang. This phase covers the peer-node smoke lane degradation path, the proof hierarchy for `SCALE-02`, and reconciliation of verification surfaces so milestone claims match executable behavior. It does not widen Parapet's runtime guarantees, replace the DB-first contention proof with a distributed-only contract, or promote `mix parapet.doctor` into a distributed-correctness proof surface.
+Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in environments without distributed Erlang. This phase covers the peer-node smoke lane skip path, the proof hierarchy for `SCALE-02`, and reconciliation of verification surfaces so milestone claims match executable behavior. It does not widen Parapet's runtime guarantees, replace the DB-first contention proof with a distributed-only contract, or promote `mix parapet.doctor` into a distributed-correctness proof surface.
 
 </domain>
 
@@ -17,8 +17,8 @@ Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in enviro
 - **D-01:** Keep the closure-grade proof for `SCALE-02` anchored in the real Postgres-backed contention suite.
 - **D-02:** Treat the multi-BEAM `:peer` lane as a narrow canary, not as an always-on required proof surface in every environment class.
 
-### Smoke lane degradation
-- **D-03:** Replace the current hard failure at distributed-node bootstrap with an explicit bounded skip or equivalent non-failing degradation when distributed Erlang is unavailable.
+### Smoke lane skip semantics
+- **D-03:** Replace the current hard failure at distributed-node bootstrap with an explicit bounded skip when distributed Erlang is unavailable.
 - **D-04:** The canary must be honest about its environment contract and must not pretend to have exercised peer-node behavior when the environment cannot support it.
 
 ### Verification reconciliation
@@ -30,7 +30,7 @@ Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in enviro
 - **D-08:** Preserve the existing certainty boundary: doctor reports live or static facts and explicit uncertainty, while executable tests remain the proof surface.
 
 ### the agent's Discretion
-- Exact skip/degradation mechanism in the test lane, provided it is explicit, bounded, and non-misleading.
+- Exact skip mechanism in the test lane, provided it is explicit, bounded, and non-misleading.
 - Exact verification wording and artifact phrasing, provided the proof hierarchy and environment contract stay clear.
 - Exact helper extraction or test harness refactoring, provided the runtime product contract does not widen.
 
@@ -42,7 +42,7 @@ Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in enviro
 **Downstream agents MUST read these before planning or implementing.**
 
 ### Phase scope and milestone truth
-- `.planning/ROADMAP.md` — Phase 11 scope, requirement target, and the explicit `:nodistribution` degradation goal.
+- `.planning/ROADMAP.md` — Phase 11 scope, requirement target, and the explicit `:nodistribution` skip goal.
 - `.planning/REQUIREMENTS.md` — `SCALE-02` traceability and current pending status.
 - `.planning/STATE.md` — current milestone position and readiness to plan Phase 11.
 - `.planning/v0.9-MILESTONE-AUDIT.md` — exact rerunnability gap, environment failure mode, and milestone-close implications.
@@ -73,7 +73,7 @@ Make the Phase 5 multi-node proof lane honest, bounded, and rerunnable in enviro
 
 ### Reusable Assets
 - `test/parapet/automation/executor_concurrency_test.exs`: already proves one-winner claim semantics without requiring distributed Erlang and should remain the primary closure lane.
-- `test/parapet/automation/executor_cluster_smoke_test.exs`: already contains the narrow peer canary flow and is the right seam to make degradation explicit instead of fatal.
+- `test/parapet/automation/executor_cluster_smoke_test.exs`: already contains the narrow peer canary flow and is the right seam to make skip semantics explicit instead of fatal.
 - `test/support/concurrency_case.ex` and `test/support/concurrency_bootstrap.ex`: provide the reusable real-Repo harness that keeps the proof DB-first and rerunnable.
 - `lib/parapet/automation/claim_service.ex`: already centralizes the DB-backed ownership contract that the proof surfaces are validating.
 
