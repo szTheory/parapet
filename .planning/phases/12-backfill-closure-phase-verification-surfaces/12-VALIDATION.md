@@ -19,8 +19,8 @@ created: 2026-05-23
 |----------|-------|
 | **Framework** | shell assertions + `python3` |
 | **Config file** | n/a |
-| **Quick run command** | `test -f` and `rg` checks against `.planning/v0.9-phases/{6,7,8,9}/VERIFICATION.md` |
-| **Full suite command** | run all per-plan verification commands plus one `python3` cross-file consistency check |
+| **Quick run command** | `test -f` and `rg` checks against `.planning/v0.9-phases/{6,7,8,9}/VERIFICATION.md` plus the active Phase 3/7/12 proof surfaces |
+| **Full suite command** | run all per-plan verification commands plus the four-report `python3` consistency check and the active Phase 3 -> Phase 7 -> Phase 12 coherence check |
 | **Estimated runtime** | < 10 seconds |
 
 ---
@@ -43,6 +43,7 @@ created: 2026-05-23
 | 12-03-01 | 03 | 1 | milestone closure readiness | T-12-03 | Phase 8 gains a canonical verification report that indexes the underlying Phase 4 proof and preserves the fresh-host/manual boundary honestly | file assertion | `test -f .planning/v0.9-phases/8/VERIFICATION.md && rg -n "Phase 4:|08-VALIDATION|ROADMAP.md|REQUIREMENTS.md|fresh-host|VERIFICATION.md" .planning/v0.9-phases/8/VERIFICATION.md` | ✅ | ⬜ pending |
 | 12-04-01 | 04 | 2 | milestone closure readiness | T-12-04 | Phase 9 gains a canonical verification report that indexes the reconciled tracker, audit-bridge, and doctrine surfaces without implying a new audit pass | file assertion | `test -f .planning/v0.9-phases/9/VERIFICATION.md && rg -n "05-VALIDATION|ROADMAP.md|REQUIREMENTS.md|STATE.md|v0.9-MILESTONE-AUDIT.md|AGENTS.md" .planning/v0.9-phases/9/VERIFICATION.md` | ✅ | ⬜ pending |
 | 12-04-02 | 04 | 2 | milestone closure readiness | T-12-05 | All four new verification files exist and each uses the canonical verified report posture | cross-file assertion | `python3` consistency check across `.planning/v0.9-phases/{6,7,8,9}/VERIFICATION.md` | ✅ | ⬜ pending |
+| 12-04-03 | 04 | 2 | milestone closure readiness | T-14-03 | The active Phase 3 -> Phase 7 -> Phase 12 proof chain cites the named `generated resolve-flow proof lane` coherently and rejects forbidden audit-complete wording | cross-file assertion | `python3` coherence check across `.planning/v0.9-phases/3/{VERIFICATION.md,03-VALIDATION.md}`, `.planning/v0.9-phases/7/{VERIFICATION.md,07-VALIDATION.md}`, and `.planning/phases/12-backfill-closure-phase-verification-surfaces/{12-VERIFICATION.md,12-VALIDATION.md}` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠ flaky*
 
@@ -58,7 +59,7 @@ created: 2026-05-23
 
 | Behavior | Requirement | Why Manual | Test Instructions |
 |----------|-------------|------------|-------------------|
-| Phase 12 wording stays honest about "verification backfill" versus "milestone audit passed" | milestone closure readiness | This is a proof-honesty judgment, not just a grep | Read all four new `VERIFICATION.md` files together with `.planning/v0.9-MILESTONE-AUDIT.md` and confirm they claim only the missing phase-local verification surfaces were backfilled, not that a fresh audit already passed. |
+| Phase 12 wording stays honest about "verification backfill" versus "milestone audit complete" | milestone closure readiness | This is a proof-honesty judgment, not just a grep | Read all four new `VERIFICATION.md` files together with `.planning/v0.9-MILESTONE-AUDIT.md` and confirm they claim only the missing phase-local verification surfaces were backfilled, not that a fresh audit completion already happened. |
 
 ---
 

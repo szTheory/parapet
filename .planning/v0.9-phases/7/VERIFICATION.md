@@ -19,8 +19,8 @@ human_verification: []
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | Phase 7 already created the canonical runtime-proof artifact for the underlying operator UI performance work, including the repaired generated queue resolve lane. | ✓ VERIFIED | `.planning/v0.9-phases/3/VERIFICATION.md` remains the canonical Phase 3 verification report, and it now cites `test/parapet/generated_operator_live_paging_test.exs` plus the source-contract tests as the exact proof that queue-side resolve leaves the active queue and appears in resolved history through `Parapet.Operator.resolve_incident/2`. |
-| 2 | Phase 7 also reconciled the direct validation and traceability surfaces that depend on that repaired proof. | ✓ VERIFIED | `.planning/v0.9-phases/7/07-VALIDATION.md` defines the closure sampling contract, `.planning/v0.9-phases/3/03-VALIDATION.md` now calls out the generated resolve regression lane explicitly, and `.planning/ROADMAP.md` plus `.planning/REQUIREMENTS.md` record the direct closure outcomes for `SCALE-01.c` and `AC-03`. |
+| 1 | Phase 7 already indexes the canonical runtime-proof artifact for the underlying operator UI performance work, including the named `generated resolve-flow proof lane`. | ✓ VERIFIED | `.planning/v0.9-phases/3/VERIFICATION.md` remains the canonical Phase 3 verification report, and it now cites `test/parapet/generated_operator_live_paging_test.exs` plus the source-contract tests as the exact proof that queue-side resolve leaves the active queue and appears in resolved history through `Parapet.Operator.resolve_incident/2`. |
+| 2 | Phase 7 also reconciled the direct validation and traceability surfaces that depend on that named Phase 3 lane without re-proving runtime behavior. | ✓ VERIFIED | `.planning/v0.9-phases/7/07-VALIDATION.md` defines the closure sampling contract, `.planning/v0.9-phases/3/03-VALIDATION.md` now calls out the `generated resolve-flow proof lane` explicitly, and `.planning/ROADMAP.md` plus `.planning/REQUIREMENTS.md` record the direct closure outcomes for `SCALE-01.c` and `AC-03`. |
 | 3 | The Phase 7 execution narrative is preserved in the existing phase summaries rather than being restated as new primary proof. | ✓ VERIFIED | `.planning/v0.9-phases/7/07-01-SUMMARY.md` records the rerun evidence that produced `.planning/v0.9-phases/3/VERIFICATION.md`, while `.planning/v0.9-phases/7/07-02-SUMMARY.md` records the narrow reconciliation of `03-VALIDATION.md`, `REQUIREMENTS.md`, and `ROADMAP.md`. |
 | 4 | Phase 7 now has its own canonical phase-local verification surface without implying a fresh milestone audit rerun already passed. | ✓ VERIFIED | `.planning/v0.9-phases/7/VERIFICATION.md` now exists as the closure-grade proof index for Phase 7, and its wording keeps the fresh milestone audit rerun as separate work. |
 
@@ -32,23 +32,23 @@ human_verification: []
 | --- | --- | --- | --- |
 | Phase 7 report exists as a canonical local proof artifact | `test -f .planning/v0.9-phases/7/VERIFICATION.md` | File exists | ✓ PASS |
 | Standard verification-report shell is present | `rg -n '^## Goal Achievement|^### Observable Truths|^### Behavioral Spot-Checks|^### Plan Output Check|^### Requirements Coverage|^### Human Verification Required|^### Gaps Summary' .planning/v0.9-phases/7/VERIFICATION.md` | All required sections found | ✓ PASS |
-| Proof links point at the intended closure chain | `rg -n 'Phase 3:|\\.planning/v0\\.9-phases/3/VERIFICATION\\.md|\\.planning/v0\\.9-phases/3/03-VALIDATION\\.md|generated_operator_live_paging_test|resolve|07-VALIDATION|07-01-SUMMARY|07-02-SUMMARY|ROADMAP\\.md|REQUIREMENTS\\.md' .planning/v0.9-phases/7/VERIFICATION.md` | Canonical proof inputs and direct reconciliation surfaces cited, including the repaired resolve lane | ✓ PASS |
+| Proof links point at the intended closure chain | `rg -n 'generated resolve-flow proof lane|\\.planning/v0\\.9-phases/3/VERIFICATION\\.md|\\.planning/v0\\.9-phases/3/03-VALIDATION\\.md|generated_operator_live_paging_test|operator_ui_integration_test|parapet\\.gen\\.ui_test|07-VALIDATION|07-01-SUMMARY|07-02-SUMMARY|ROADMAP\\.md|REQUIREMENTS\\.md' .planning/v0.9-phases/7/VERIFICATION.md` | Canonical proof inputs and direct reconciliation surfaces cited, including the named Phase 3 lane | ✓ PASS |
 | Audit-boundary wording stays explicit | `rg -n 'fresh milestone audit rerun remains separate work|milestone audit rerun remains separate work' .planning/v0.9-phases/7/VERIFICATION.md` | Fresh audit rerun is explicitly left as separate work | ✓ PASS |
 
 ### Plan Output Check
 
 | Plan | Summary | Status | Notes |
 | --- | --- | --- | --- |
-| 07-01 | `.planning/v0.9-phases/7/07-01-SUMMARY.md` | ✓ VERIFIED | Fresh Phase 3 proof was rerun and captured in `.planning/v0.9-phases/3/VERIFICATION.md`, which now explicitly includes the repaired generated queue resolve runtime lane indexed here. |
+| 07-01 | `.planning/v0.9-phases/7/07-01-SUMMARY.md` | ✓ VERIFIED | Fresh Phase 3 proof was rerun and captured in `.planning/v0.9-phases/3/VERIFICATION.md`, which now explicitly includes the named `generated resolve-flow proof lane` indexed here. |
 | 07-02 | `.planning/v0.9-phases/7/07-02-SUMMARY.md` | ✓ VERIFIED | The direct reconciliation surfaces were updated narrowly: `.planning/v0.9-phases/3/03-VALIDATION.md`, `.planning/REQUIREMENTS.md`, and `.planning/ROADMAP.md`. |
 
 ### Requirements Coverage
 
 | Requirement | Status | Evidence |
 | --- | --- | --- |
-| `milestone closure readiness` | ✓ SATISFIED | Phase 7 now has the missing phase-local `VERIFICATION.md` artifact required by the workflow proof model, and it indexes the exact proof chain the closure phase created. |
-| Proof hierarchy preservation | ✓ SATISFIED | This report cites `.planning/v0.9-phases/3/VERIFICATION.md` as the canonical runtime proof, `.planning/v0.9-phases/3/03-VALIDATION.md` and `.planning/v0.9-phases/7/07-VALIDATION.md` as supporting validation surfaces, and Phase 7 summaries as historical execution narrative for the repaired generated resolve proof chain. |
-| Traceability honesty | ✓ SATISFIED | `.planning/ROADMAP.md` and `.planning/REQUIREMENTS.md` remain the direct truth surfaces Phase 7 reconciled, the canonical Phase 3 proof now explicitly includes the generated resolve regression lane, and the fresh milestone audit rerun remains separate work. |
+| `milestone closure readiness` | ✓ SATISFIED | Phase 7 now has the missing phase-local `VERIFICATION.md` artifact required by the workflow proof model, and it indexes the exact Phase 3 `generated resolve-flow proof lane` chain the closure phase created. |
+| Proof hierarchy preservation | ✓ SATISFIED | This report cites `.planning/v0.9-phases/3/VERIFICATION.md` as the canonical runtime proof, `.planning/v0.9-phases/3/03-VALIDATION.md` and `.planning/v0.9-phases/7/07-VALIDATION.md` as supporting validation surfaces, and Phase 7 summaries as historical execution narrative for the named `generated resolve-flow proof lane`. |
+| Traceability honesty | ✓ SATISFIED | `.planning/ROADMAP.md` and `.planning/REQUIREMENTS.md` remain the direct truth surfaces Phase 7 reconciled, the canonical Phase 3 proof now explicitly includes the `generated resolve-flow proof lane`, and the fresh milestone audit rerun remains separate work. |
 
 ### Human Verification Required
 
@@ -56,7 +56,7 @@ None. The missing work in this scope was the absence of a Phase 7-local verifica
 
 ### Gaps Summary
 
-The missing Phase 7 phase-local verification blocker is closed: `.planning/v0.9-phases/7/VERIFICATION.md` now indexes the canonical Phase 3 proof, the repaired generated queue resolve runtime lane, the Phase 7 validation map, and the direct roadmap/requirements reconciliation surfaces. A fresh milestone audit rerun remains separate work and is not implied by this backfilled closure artifact.
+The missing Phase 7 phase-local verification blocker is closed: `.planning/v0.9-phases/7/VERIFICATION.md` now indexes the canonical Phase 3 proof, the named `generated resolve-flow proof lane`, the Phase 7 validation map, and the direct roadmap/requirements reconciliation surfaces. A fresh milestone audit rerun remains separate work and is not implied by this backfilled closure artifact.
 
 ---
 
