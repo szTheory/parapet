@@ -280,17 +280,15 @@ assert html =~ "Active incident 1"
 
 All material claims in this research were verified in the current session or cited from official documentation. No user confirmation is required for assumption-only claims. [VERIFIED: research session outputs]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should the resolve runtime proof live inside `generated_operator_live_paging_test.exs` or a nearby generated-UI test file?**
-   - What we know: The phase context allows either location as long as it stays in the existing quick-run lane. [VERIFIED: .planning/phases/13-repair-generated-operator-resolve-flow/13-CONTEXT.md]
-   - What's unclear: Whether extending the current fake repo in place stays readable enough once write-path and resolved-history support are added. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs]
-   - Recommendation: Prefer extending `test/parapet/generated_operator_live_paging_test.exs` first, because it already compiles generated sources and owns the queue-state rendering helpers; split only if the fake repo becomes materially harder to understand. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs] [VERIFIED: test/parapet/evidence_test.exs]
+   - Resolution: Keep the runtime proof in `test/parapet/generated_operator_live_paging_test.exs` for Phase 13.
+   - Reason: It already compiles generated sources, owns the queue-state rendering helpers, and can absorb the minimal write-path and resolved-history support needed for this regression without adding a new harness. Split only if implementation reveals a concrete readability problem, not preemptively. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs] [VERIFIED: test/parapet/evidence_test.exs] [VERIFIED: .planning/phases/13-repair-generated-operator-resolve-flow/13-CONTEXT.md]
 
 2. **Does Phase 13 need to pull resolved-history reads behind `Parapet.Operator` now?**
-   - What we know: The generated resolved-history branch still performs direct repo/cursor logic in the template, and the milestone audit calls that out separately. [VERIFIED: priv/templates/parapet.gen.ui/operator_live.ex.eex] [VERIFIED: .planning/v0.9-MILESTONE-AUDIT.md]
-   - What's unclear: Whether the runtime resolve proof can be expressed cleanly without first refactoring that branch. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs]
-   - Recommendation: Do not widen Phase 13 unless the proof becomes impractical; the seam cleanup is explicitly deferred and should remain follow-up work by default. [VERIFIED: .planning/phases/13-repair-generated-operator-resolve-flow/13-CONTEXT.md]
+   - Resolution: No. Keep resolved-history seam cleanup deferred and out of Phase 13 scope unless the repaired runtime proof proves impossible without it.
+   - Reason: The milestone audit identifies that branch as separate technical debt, and the locked phase boundary says not to widen the phase beyond the broken resolve lifecycle and proof gap by default. [VERIFIED: priv/templates/parapet.gen.ui/operator_live.ex.eex] [VERIFIED: .planning/v0.9-MILESTONE-AUDIT.md] [VERIFIED: .planning/phases/13-repair-generated-operator-resolve-flow/13-CONTEXT.md]
 
 ## Environment Availability
 
