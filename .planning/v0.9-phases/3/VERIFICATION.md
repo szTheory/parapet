@@ -20,7 +20,7 @@ human_verification: []
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
 | 1 | `Parapet.Operator.list_incident_queue/1` is the bounded public queue seam and emits low-cardinality queue-page telemetry. | ✓ VERIFIED | `lib/parapet/operator.ex` bounds page size to `30` by default, caps it at `100`, keeps the active queue ordered by `updated_at` and `id`, and emits `page_size_bucket` / `result_size_bucket` telemetry. |
-| 2 | The generated LiveView path renders only the current page and preserves explicit paging/history/refresh semantics instead of loading the full queue. | ✓ VERIFIED | `test/parapet/generated_operator_live_paging_test.exs`, `test/parapet/operator_ui_integration_test.exs`, and `test/mix/tasks/parapet.gen.ui_test.exs` prove bounded current-page rendering and the generated queue affordances. |
+| 2 | The generated LiveView path renders only the current page, preserves explicit paging/history/refresh semantics, and routes queue-side `"Resolve"` through the real operator lifecycle seam. | ✓ VERIFIED | `test/parapet/generated_operator_live_paging_test.exs` now proves queue-side resolve removes an incident from the active queue and makes it visible in resolved history, while `test/parapet/operator_ui_integration_test.exs` and `test/mix/tasks/parapet.gen.ui_test.exs` prove the generated queue seam calls `Parapet.Operator.resolve_incident/2` instead of drifting back to `record_note/3`. |
 | 3 | The 50,120-record proof lane remains reproducible and honest: bounded rows are visible, extra pages exist, and the benchmark is advisory rather than a merge gate. | ✓ VERIFIED | `bench/operator_ui_perf.exs` and `docs/operator-ui.md` define the advisory lane; this session re-ran it and observed `queue.visible_rows=30`, `render.visible_rows=30`, `advisory=true`, and `merge_gate=disabled`. |
 
 **Score:** 3/3 truths verified
@@ -30,7 +30,7 @@ human_verification: []
 | Behavior | Command | Result | Status |
 | --- | --- | --- | --- |
 | Queue seam and telemetry proof | `mix test test/parapet/operator/queue_pagination_test.exs` | 4 tests, 0 failures | ✓ PASS |
-| Generated runtime bounded-page proof | `mix test test/parapet/generated_operator_live_paging_test.exs` | 1 test, 0 failures | ✓ PASS |
+| Generated runtime bounded-page and resolve-lifecycle proof | `mix test test/parapet/generated_operator_live_paging_test.exs` | 2 tests, 0 failures | ✓ PASS |
 | Generated source-contract and integration proof | `mix test test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` | 12 tests, 0 failures | ✓ PASS |
 | Advisory 50,120-record benchmark lane | `mix run bench/operator_ui_perf.exs` | `dataset.total_incidents=50120`, `queue.visible_rows=30`, `render.visible_rows=30`, `advisory=true`, `merge_gate=disabled` | ✓ PASS |
 
@@ -46,7 +46,7 @@ human_verification: []
 
 | Requirement | Status | Evidence |
 | --- | --- | --- |
-| `SCALE-01.c` operator queue paging proof | ✓ SATISFIED | Queue pagination tests plus generated UI tests passed in this session, proving bounded active-page fetch and current-page rendering. |
+| `SCALE-01.c` operator queue paging proof | ✓ SATISFIED | Queue pagination tests plus generated UI tests passed in this session, proving bounded active-page fetch, generated queue seam correctness, and the repaired queue resolve lifecycle from active queue to resolved history. |
 | `AC-03` 50k operator UI proof | ✓ SATISFIED | `mix run bench/operator_ui_perf.exs` re-ran successfully with the expected bounded-row and advisory markers. |
 | Phase 3 proof posture | ✓ SATISFIED | `docs/operator-ui.md` documents the benchmark as reproducible and advisory, matching the observed output and avoiding fake SLA claims. |
 
@@ -56,7 +56,7 @@ None. The Phase 3 closure gap was missing captured proof, not missing manual app
 
 ### Gaps Summary
 
-No known Phase 3 execution gaps remain within the operator UI performance scope. The proof stays intentionally bounded: it demonstrates current-page rendering and advisory measurements on the reproducible 50,120-record lane, not a universal latency SLA across all hardware or deployment shapes.
+No known Phase 3 execution gaps remain within the operator UI performance scope. The proof stays intentionally bounded: it demonstrates current-page rendering, the repaired generated queue resolve lifecycle, and advisory measurements on the reproducible 50,120-record lane, not a universal latency SLA across all hardware or deployment shapes.
 
 ---
 

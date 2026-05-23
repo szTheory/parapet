@@ -29,6 +29,7 @@ created: 2026-05-20
 
 - `.planning/v0.9-phases/3/VERIFICATION.md` is now the closure-grade proof artifact for this phase.
 - This validation contract remains the sampling map, but proof closure for `SCALE-01.c` and `AC-03` is recorded in `VERIFICATION.md` with fresh rerun results from 2026-05-21.
+- The targeted generated-runtime lane and source-contract lane now also guard the queue-side `"Resolve"` seam: runtime proof covers active-to-resolved lifecycle behavior, while source-contract proof guards `Parapet.Operator.resolve_incident/2`.
 
 ---
 
@@ -47,7 +48,7 @@ created: 2026-05-20
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 03-01-01 | 01 | 1 | SCALE-01.c | T-03-01 / T-03-02 | Queue params are bounded, active-only by default, and deterministic under ties | unit/integration | `mix test test/parapet/operator/queue_pagination_test.exs` | ✅ | ✅ green |
 | 03-01-02 | 01 | 1 | SCALE-01.c | T-03-03 | Generated migrations and fresh-install schema ship active-queue and resolved-history incident indexes aligned to `updated_at`/`id` browsing | generator integration | Implementation anchored in `.planning/v0.9-phases/3/03-01-SUMMARY.md` and validated by the bounded queue proof in `.planning/v0.9-phases/3/VERIFICATION.md` | ✅ | ✅ green |
-| 03-02-01 | 02 | 2 | SCALE-01.c | T-03-04 / T-03-05 / T-03-06 | Generated LiveView loads only one page, validates params, and streams bounded rows without silent reordering | generator integration | `mix test test/parapet/generated_operator_live_paging_test.exs` and `mix test test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` | ✅ | ✅ green |
+| 03-02-01 | 02 | 2 | SCALE-01.c | T-03-04 / T-03-05 / T-03-06 | Generated LiveView loads only one page, validates params, streams bounded rows without silent reordering, and proves queue-side `"Resolve"` moves an incident from the active queue into resolved history through `Parapet.Operator.resolve_incident/2` | generator integration | `mix test test/parapet/generated_operator_live_paging_test.exs` and `mix test test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` | ✅ | ✅ green |
 | 03-03-01 | 03 | 3 | AC-03 | T-03-07 / T-03-08 / T-03-09 | Perf proof emits low-cardinality telemetry and captures a reproducible 50k+ benchmark lane | advisory perf | `mix run bench/operator_ui_perf.exs` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠ flaky*
@@ -58,8 +59,8 @@ created: 2026-05-20
 
 - [x] `test/parapet/operator/queue_pagination_test.exs` — covers active-only scope, deterministic `updated_at`/`id` keyset boundaries, and invalid cursor fallback
 - [x] Generator/index proof landed during Phase 3 Plan 01 and remains captured in `.planning/v0.9-phases/3/03-01-SUMMARY.md`
-- [x] `test/parapet/operator_ui_integration_test.exs` — asserts the generated UI no longer uses mount-time full-queue loading and does use `handle_params/3` plus bounded queue affordances
-- [x] `test/parapet/generated_operator_live_paging_test.exs` — proves bounded current-page rendering plus URL-driven cursor navigation
+- [x] `test/parapet/operator_ui_integration_test.exs` — asserts the generated UI no longer uses mount-time full-queue loading, does use `handle_params/3` plus bounded queue affordances, and keeps queue resolve on `Parapet.Operator.resolve_incident/2`
+- [x] `test/parapet/generated_operator_live_paging_test.exs` — proves bounded current-page rendering, URL-driven cursor navigation, and the queue resolve lifecycle from active queue to resolved history
 - [x] `bench/operator_ui_perf.exs` — advisory 50k+ queue fetch + first-render benchmark harness, re-run on 2026-05-21
 
 ---
