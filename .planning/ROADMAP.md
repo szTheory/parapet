@@ -41,7 +41,9 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. An adopter can read a root `CHANGELOG.md` covering v0.1–v0.9 retroactively and ongoing releases.
   3. The CHANGELOG body is owned by Release Please (humans commit at most a header-only stub); retroactive history lives outside the changelog body so it never conflicts with generation.
   4. `CHANGELOG*` is in the Hex `files:` whitelist so the changelog ships with the package.
-**Plans**: TBD
+**Plans**: 2 plans
+  - [ ] 15-01-PLAN.md — Create CHANGELOG.md stub, docs/HISTORY.md, and the Release Please config + manifest pair (Wave 1)
+  - [ ] 15-02-PLAN.md — Populate mix.exs metadata + docs: extras, bump to 0.10.0, switch workflow to manifest mode (Wave 2)
 
 ### Phase 16: SLO Starter Packs & Low-Traffic Guardrails
 **Goal**: An adopter can register a coherent first set of SLOs in one line without hand-writing PromQL, with low-traffic safety baked in — the code surfaces that later docs will name.
@@ -84,7 +86,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 15. Packaging Credibility Gate | v0.10 | 0/TBD | Not started | - |
+| 15. Packaging Credibility Gate | v0.10 | 0/2 | Not started | - |
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 0/TBD | Not started | - |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 0/TBD | Not started | - |
 | 18. Adoption & Authoring Docs | v0.10 | 0/TBD | Not started | - |
