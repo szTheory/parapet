@@ -124,6 +124,10 @@ Plans:
 ### Phase 13: Repair Generated Operator Resolve Flow
 **Goal:** Restore the generated operator resolve path so the Phase 3 runtime lifecycle and acceptance story are true again.
 **Requirements:** `SCALE-01.c`, `AC-03`
+**Plans:** 2 plans
+Plans:
+- [ ] 13-01-PLAN.md — Rewire generated queue resolve to `Parapet.Operator.resolve_incident/2` and prove the lifecycle change in the existing quick lane.
+- [ ] 13-02-PLAN.md — Reconcile Phase 3 and Phase 7 proof surfaces plus operator UI docs to the repaired resolve lane.
 **Gap Closure:** Closes the audit requirement, integration, and flow gaps caused by the broken generated resolve action.
 - Update the generated operator LiveView `"resolve"` event to call `Parapet.Operator.resolve_incident/2` instead of recording a note.
 - Re-run the generated operator UI proof lanes that cover active-queue to resolved-history/archive transitions.
