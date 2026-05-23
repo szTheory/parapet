@@ -552,14 +552,16 @@ Note: the action namespace changed from `google-github-actions/release-please-ac
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should `.tool-versions` be added to align the publish workflow with CI?**
+   - **RESOLVED: Out of scope per D-10 — no publish in Phase 15.** Defer to the phase that wires actual publishing.
    - What we know: CI workflow hardcodes `elixir-version: '1.19.0'` / `otp-version: '27.2'`. The oarlock reference uses `version-file: .tool-versions` in its publish workflow.
    - What's unclear: Whether parapet needs a `.tool-versions` file at all for Phase 15 (no publish step in this phase per D-10).
    - Recommendation: Out of scope for Phase 15 (D-10 explicitly excludes publish). Defer to the phase that wires actual publishing.
 
 2. **Should the stale `origin/release-please--branches--main` branch be deleted?**
+   - **RESOLVED: Do not delete manually — release-please force-updates it on next push to main.**
    - What we know: The branch has a stale 1.0.0 Release PR commit. Once the new config/manifest land on main and RP re-runs, it will force-update this branch.
    - What's unclear: Whether the force-update is automatic or requires manual branch deletion.
    - Recommendation: Don't delete manually. Release Please force-pushes its PR branch on each run. The first push to main after the workflow update will regenerate the branch with the correct 0.10.0 PR.
