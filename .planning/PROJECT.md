@@ -12,7 +12,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
 
-**Next:** Planning the next milestone via `/gsd:new-milestone` (fresh requirements + roadmap).
+**Next:** v0.10 Adopter Success — in planning (requirements → roadmap).
+
+## Current Milestone: v0.10 Adopter Success
+
+**Goal:** Make Parapet's already-built capabilities adoptable by a stranger — close the gap between feature-complete and adoption-complete — without expanding feature surface.
+
+**Target features:**
+- Adoption funnel: runnable demo, one-page end-to-end getting-started, hex package metadata + `links:` (repo/docs/issues), `CHANGELOG.md`, troubleshooting/FAQ, and per-integration setup guides (including surfacing the already-built Accrue/Rulestead/Threadline/Sigra integrations)
+- SLO authoring guidance: opinionated starter SLO packs by app type, good-vs-bad journey-slicing examples, and low-traffic-safe alerting guidance so adopters don't hand-write raw PromQL
+- Common recovery depth: richer prebuilt, preview-first, bounded runbook templates for recurring async/delivery failures (dead-letter, provider outage, stalled jobs, callback delay)
+
+**Out of this milestone:** API/telemetry freeze is deferred to v1.0 (per `MILESTONE-ARC.md`), so recovery and SLO surfaces land complete before they are locked.
 
 ## Requirements
 
@@ -88,9 +99,9 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- Empty after v0.9 completion. Next milestone requirements defined via /gsd:new-milestone. -->
+<!-- v0.10 Adopter Success — requirements defined in .planning/REQUIREMENTS.md -->
 
-(None — defining next milestone via `/gsd:new-milestone`)
+(Defining v0.10 Adopter Success requirements — see `.planning/REQUIREMENTS.md`)
 
 ### Out of Scope
 
@@ -177,4 +188,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-23 after v0.9 milestone completion*
+*Last updated: 2026-05-23 — started v0.10 Adopter Success milestone*

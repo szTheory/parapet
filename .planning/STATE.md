@@ -1,17 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v0.9
-milestone_name: Performance, Scale & DX
-status: shipped
-stopped_at: v0.9 milestone archived and tagged
-last_updated: "2026-05-23T13:30:00Z"
-last_activity: 2026-05-23 -- v0.9 milestone completed (archived, tagged v0.9)
+milestone: v0.10
+milestone_name: Adopter Success
+status: planning
+last_updated: "2026-05-23T19:20:17.613Z"
+last_activity: 2026-05-23
 progress:
-  total_phases: 14
-  completed_phases: 14
-  total_plans: 36
-  completed_plans: 36
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -25,11 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-23)
 
 ## Current Position
 
-Milestone: v0.9 Performance, Scale & DX — SHIPPED 2026-05-23 (audit passed, tagged v0.9)
-Archived: milestones/v0.9-ROADMAP.md, milestones/v0.9-REQUIREMENTS.md, milestones/v0.9-MILESTONE-AUDIT.md, milestones/v0.9-phases/
-Status: Milestone complete — ready to start next milestone
-
-Progress: [██████████] 100%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-23 — Milestone v0.10 started
 
 ## Accumulated Context
 
