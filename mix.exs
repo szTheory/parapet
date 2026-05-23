@@ -1,18 +1,25 @@
 defmodule Parapet.MixProject do
   use Mix.Project
 
+  @source_url "https://github.com/szTheory/parapet"
+  @version "0.10.0"
+
   def project do
     [
       app: :parapet,
-      version: "0.1.0",
+      version: @version,
       elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      package: [
-        files: ~w(lib priv .formatter.exs mix.exs README* docs),
-        licenses: ["MIT"],
-        links: %{}
-      ],
+
+      # Hex
+      description: "An opinionated SRE reliability layer for Phoenix/Elixir SaaS — turn existing telemetry into user-journey SLOs, deploy correlation, incident evidence, and operator-grade runbooks.",
+      source_url: @source_url,
+      package: package(),
+
+      # Docs
+      docs: docs(),
+
       deps: deps(),
       aliases: aliases(),
       dialyzer: [plt_add_apps: [:mix, :ex_unit]]
@@ -29,6 +36,40 @@ defmodule Parapet.MixProject do
 
   defp elixirc_paths(:test), do: ["test/support", "lib"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp package do
+    [
+      files: ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* docs),
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => @source_url,
+        "HexDocs" => "https://hexdocs.pm/parapet",
+        "Issues" => "#{@source_url}/issues",
+        "Changelog" => "https://hexdocs.pm/parapet/changelog.html"
+      }
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: @source_url,
+      source_ref: "v#{@version}",
+      extras: [
+        "README.md",
+        "CHANGELOG.md",
+        "docs/HISTORY.md",
+        "docs/adopter-flows.md",
+        "docs/operator-ui.md",
+        "docs/slo-reference.md",
+        "docs/telemetry.md"
+      ],
+      skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
+      groups_for_extras: [
+        Guides: ~r/docs\//
+      ]
+    ]
+  end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
