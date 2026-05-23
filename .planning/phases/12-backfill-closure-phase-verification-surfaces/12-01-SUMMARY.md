@@ -53,7 +53,7 @@ Each task was committed atomically:
 
 1. **Task 1: Create the canonical Phase 6 verification report** - `e84a93f` (docs)
 
-**Plan metadata:** `PENDING` (docs; created after summary verification)
+Plan metadata for this plan was committed separately after summary verification.
 
 ## Files Created/Modified
 
