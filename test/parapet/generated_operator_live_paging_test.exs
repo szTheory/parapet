@@ -23,7 +23,8 @@ end
 defmodule Test.Repo do
   use Agent
 
-  alias Parapet.Spine.{ActionItem, Incident, TimelineEntry}
+  alias Parapet.Operator.WorkbenchContract
+  alias Parapet.Spine.{ActionItem, Incident, TimelineEntry, ToolAudit}
 
   def start_link(_opts) do
     Agent.start_link(fn -> %{incidents: [], entries: %{}, action_items: []} end, name: __MODULE__)
@@ -32,7 +33,7 @@ defmodule Test.Repo do
   def seed!(attrs) do
     Agent.update(__MODULE__, fn _state ->
       %{
-        incidents: Map.fetch!(attrs, :incidents),
+        incidents: Map.fetch!(attrs, :incidents) |> Enum.map(&enrich_incident/1),
         entries: Map.get(attrs, :entries, %{}),
         action_items: Map.get(attrs, :action_items, [])
       }
@@ -43,12 +44,21 @@ defmodule Test.Repo do
     query
     |> inspect()
     |> then(fn query_text ->
+      resolved_query? = resolved_query?(query)
+
       Agent.get(__MODULE__, fn state ->
-        state.incidents
-        |> Enum.filter(&(&1.state in ["open", "investigating"]))
-        |> apply_cursor(query_text)
-        |> apply_order(query_text)
-        |> Enum.take(limit_from(query_text))
+        incidents =
+          state.incidents
+          |> filter_incidents(query_text, resolved_query?)
+          |> apply_cursor(query_text)
+          |> apply_order(query_text)
+          |> Enum.take(limit_from(query_text))
+
+        if resolved_query? do
+          Enum.map(incidents, &WorkbenchContract.queue_row/1)
+        else
+          incidents
+        end
       end)
     end)
   end
@@ -72,8 +82,63 @@ defmodule Test.Repo do
     end)
   end
 
+  def insert(changeset, _opts \\ []) do
+    if changeset.valid? do
+      struct =
+        changeset
+        |> Ecto.Changeset.apply_changes()
+        |> ensure_id()
+
+      persist_insert(struct)
+      {:ok, struct}
+    else
+      {:error, changeset}
+    end
+  end
+
+  def update(changeset, _opts \\ []) do
+    if changeset.valid? do
+      struct =
+        changeset
+        |> Ecto.Changeset.apply_changes()
+        |> enrich_incident()
+
+      Agent.update(__MODULE__, fn state ->
+        %{state | incidents: replace_incident(state.incidents, struct)}
+      end)
+
+      {:ok, struct}
+    else
+      {:error, changeset}
+    end
+  end
+
+  def transaction(%Ecto.Multi{} = multi) do
+    multi
+    |> Ecto.Multi.to_list()
+    |> Enum.reduce_while({:ok, %{}}, fn operation, {:ok, acc} ->
+      case execute_multi_op(operation, acc) do
+        {:ok, name, result} -> {:cont, {:ok, Map.put(acc, name, result)}}
+        {:error, name, reason} -> {:halt, {:error, name, reason, acc}}
+      end
+    end)
+  end
+
   defp timeline_incident_id([%{params: [{incident_id, _}]}, _]), do: incident_id
   defp timeline_incident_id([%{params: [{incident_id, _}]}]), do: incident_id
+
+  defp filter_incidents(incidents, query_text, resolved_query?) do
+    cond do
+      resolved_query? ->
+        Enum.filter(incidents, &(&1.state == "resolved"))
+
+      String.contains?(query_text, "state in ^[\"open\", \"investigating\"]") ->
+        Enum.filter(incidents, &(&1.state in ["open", "investigating"]))
+
+      true ->
+        incidents
+    end
+  end
 
   defp apply_order(incidents, query_text) do
     sorter =
@@ -123,10 +188,78 @@ defmodule Test.Repo do
   end
 
   defp limit_from(query_text) do
-    %{"page_size" => page_size} =
-      Regex.named_captures(~r/limit: \^(?<page_size>\d+) \+ 1/, query_text)
+    cond do
+      captures = Regex.named_captures(~r/limit: \^(?<page_size>\d+) \+ 1/, query_text) ->
+        String.to_integer(captures["page_size"]) + 1
 
-    String.to_integer(page_size) + 1
+      captures = Regex.named_captures(~r/limit: \^(?<limit>\d+)/, query_text) ->
+        String.to_integer(captures["limit"])
+
+      true ->
+        31
+    end
+  end
+
+  defp resolved_query?(%Ecto.Query{wheres: wheres}) do
+    Enum.any?(wheres, fn %{params: params} ->
+      Enum.any?(params, fn
+        {"resolved", _meta} -> true
+        _other -> false
+      end)
+    end)
+  end
+
+  defp execute_multi_op({name, {:update, changeset, _opts}}, _acc) do
+    case update(changeset) do
+      {:ok, struct} -> {:ok, name, struct}
+      {:error, changeset} -> {:error, name, changeset}
+    end
+  end
+
+  defp execute_multi_op({name, {:insert, changeset_or_fun, _opts}}, acc) do
+    changeset =
+      if is_function(changeset_or_fun, 1),
+        do: changeset_or_fun.(acc),
+        else: changeset_or_fun
+
+    case insert(changeset) do
+      {:ok, struct} -> {:ok, name, struct}
+      {:error, changeset} -> {:error, name, changeset}
+    end
+  end
+
+  defp execute_multi_op({name, {:run, fun}}, acc) do
+    case fun.(__MODULE__, acc) do
+      {:ok, result} -> {:ok, name, result}
+      {:error, reason} -> {:error, name, reason}
+    end
+  end
+
+  defp ensure_id(%{id: nil} = struct), do: %{struct | id: Ecto.UUID.generate()}
+  defp ensure_id(struct), do: struct
+
+  defp persist_insert(%TimelineEntry{} = entry) do
+    Agent.update(__MODULE__, fn state ->
+      updated_entries = Map.update(state.entries, entry.incident_id, [entry], &[entry | &1])
+      %{state | entries: updated_entries}
+    end)
+  end
+
+  defp persist_insert(%ToolAudit{}), do: :ok
+  defp persist_insert(_struct), do: :ok
+
+  defp enrich_incident(%Incident{} = incident) do
+    incident
+    |> Map.merge(WorkbenchContract.queue_row(incident))
+    |> Map.put(:incident_id, incident.id)
+  end
+
+  defp enrich_incident(other), do: other
+
+  defp replace_incident(incidents, updated_incident) do
+    Enum.map(incidents, fn incident ->
+      if incident.id == updated_incident.id, do: updated_incident, else: incident
+    end)
   end
 end
 
@@ -206,6 +339,36 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
     refute html =~ "Active incident 1"
     refute html =~ "Resolved incident 61"
     assert count_visible_titles(html) == 30
+  end
+
+  test "generated operator live resolves an active incident into resolved history",
+       %{live_module: live_module} do
+    socket = configured_socket(live_module, URI.parse("http://example.com/parapet"))
+
+    {:ok, socket} = live_module.mount(%{}, %{}, socket)
+    {:noreply, socket} = live_module.handle_params(%{}, "http://example.com/parapet", socket)
+
+    assert render_live(live_module, socket) =~ ">Active incident 1<"
+
+    {:noreply, socket} = live_module.handle_event("resolve", %{"id" => "inc-001"}, socket)
+
+    {:noreply, socket} = live_module.handle_params(%{}, "http://example.com/parapet", socket)
+    active_html = render_live(live_module, socket)
+
+    refute active_html =~ ">Active incident 1<"
+    assert active_html =~ ">Active incident 31<"
+
+    {:noreply, socket} =
+      live_module.handle_params(
+        %{"status" => "resolved"},
+        "http://example.com/parapet?status=resolved",
+        socket
+      )
+
+    resolved_html = render_live(live_module, socket)
+
+    assert resolved_html =~ ">Active incident 1<"
+    assert Test.Repo.get!(Incident, "inc-001").state == "resolved"
   end
 
   defp seeded_incidents do
