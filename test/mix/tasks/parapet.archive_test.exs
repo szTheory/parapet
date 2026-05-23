@@ -49,7 +49,7 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
 
       state.incidents
       |> Enum.filter(fn incident ->
-        incident.state != "open" and DateTime.compare(incident.inserted_at, cutoff) == :lt
+        incident.state == "resolved" and DateTime.compare(incident.inserted_at, cutoff) == :lt
       end)
       |> Stream.map(& &1)
     end
@@ -80,22 +80,24 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
       Path.join(System.tmp_dir!(), "parapet-archive-task-#{System.unique_integer([:positive])}.jsonl")
 
     old_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(120)}
+    old_investigating = %Incident{id: Ecto.UUID.generate(), state: "investigating", inserted_at: days_ago(120)}
     recent_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(10)}
 
     Application.put_env(:parapet, :repo, FakeRepo)
-    start_supervised!({FakeRepo, [old_incident, recent_incident]})
+    start_supervised!({FakeRepo, [old_incident, old_investigating, recent_incident]})
 
     on_exit(fn ->
       Application.delete_env(:parapet, :repo)
       File.rm(archive_path)
     end)
 
-    %{archive_path: archive_path, archived_id: old_incident.id}
+    %{archive_path: archive_path, archived_id: old_incident.id, investigating_id: old_investigating.id}
   end
 
   test "parses CLI args, fetches repo from config, invokes the archiver, and prints JSON", %{
     archive_path: archive_path,
-    archived_id: archived_id
+    archived_id: archived_id,
+    investigating_id: investigating_id
   } do
     assert :ok = Archive.run(["--days", "90", "--path", archive_path])
 
@@ -108,6 +110,7 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
     assert snapshot.transactions == 1
     assert snapshot.stream_opts == [[max_rows: 100]]
     assert File.exists?(archive_path)
+    assert Enum.any?(snapshot.incidents, &(&1.id == investigating_id and &1.state == "investigating"))
   end
 
   test "uses default days and path when no flags are provided" do

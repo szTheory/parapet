@@ -2,10 +2,11 @@ defmodule Parapet.Automation.ExecutorTest do
   use ExUnit.Case, async: false
 
   alias Parapet.Automation.Executor
-  alias Parapet.Spine.Incident
+  alias Parapet.Spine.{ActionClaim, Incident}
 
   defmodule DummyRepo do
     def get(Incident, "not-found"), do: nil
+
     def get(Incident, id) do
       %Incident{
         id: id,
@@ -17,6 +18,11 @@ defmodule Parapet.Automation.ExecutorTest do
     def insert(changeset, _opts \\ []) do
       send(self(), {:insert, changeset.data.__struct__, changeset})
       {:ok, Ecto.Changeset.apply_changes(changeset)}
+    end
+
+    def insert!(changeset, opts \\ []) do
+      {:ok, result} = insert(changeset, opts)
+      result
     end
 
     def transaction(multi) do
@@ -50,9 +56,48 @@ defmodule Parapet.Automation.ExecutorTest do
     end
   end
 
+  defmodule WinningClaimService do
+    def claim_action(opts) do
+      send(self(), {:claim_action, opts})
+
+      {:won,
+       %ActionClaim{
+         id: "claim-1",
+         incident_id: opts[:incident_id],
+         action_kind: opts[:action_kind],
+         action_key: opts[:action_key],
+         status: "claimed",
+         idempotency_key: opts[:idempotency_key]
+       }}
+    end
+
+    def mark_executed(claim, _opts \\ []) do
+      send(self(), {:mark_executed, claim})
+      %{claim | status: "executed"}
+    end
+  end
+
+  defmodule ShortCircuitClaimService do
+    def claim_action(opts) do
+      send(self(), {:claim_action, opts})
+      {:short_circuited, %ActionClaim{id: "claim-1", status: "short_circuited"}, "circuit_breaker_tripped"}
+    end
+
+    def mark_executed(_claim, _opts \\ []), do: raise("should not mark executed")
+  end
+
+  defmodule ConflictClaimService do
+    def claim_action(opts) do
+      send(self(), {:claim_action, opts})
+      {:conflicted, %ActionClaim{id: "claim-1", status: "claimed"}}
+    end
+
+    def mark_executed(_claim, _opts \\ []), do: raise("should not mark executed")
+  end
+
   defmodule MockRunbook do
     use Parapet.Runbook
-    
+
     step(:auto_step,
       type: :mitigation,
       auto_execute: true
@@ -66,40 +111,80 @@ defmodule Parapet.Automation.ExecutorTest do
 
   setup do
     Application.put_env(:parapet, :repo, DummyRepo)
-    
+
     on_exit(fn ->
       Application.delete_env(:parapet, :repo)
+      Application.delete_env(:parapet, :automation_claim_service)
+      Application.delete_env(:parapet, :escalation_policy)
     end)
+
     :ok
   end
 
-  test "perform/1 executes the mitigation via Operator under system identity" do
+  test "perform/1 claims before executing and marks the winning claim executed" do
+    Application.put_env(:parapet, :automation_claim_service, WinningClaimService)
+
     job = %Oban.Job{args: %{"incident_id" => "inc-1", "step_id" => "auto_step"}}
     assert :ok = Executor.perform(job)
 
+    assert_received {:claim_action, claim_opts}
+    assert claim_opts[:incident_id] == "inc-1"
+    assert claim_opts[:action_kind] == "automation"
+    assert claim_opts[:action_key] == "auto_step"
+    assert claim_opts[:breaker_step_id] == "auto_step"
+    assert claim_opts[:idempotency_key] == "auto_exec_inc-1_auto_step"
+
     assert_received :mitigated
-    
+    assert_received {:mark_executed, %ActionClaim{idempotency_key: "auto_exec_inc-1_auto_step"}}
+
     assert_received {:transaction, ops}
-    
-    # Find the timeline_entry op in the transaction ops
-    {_name, {:run, run_fun}} = Enum.find(ops, fn {name, _op} -> name == :timeline_entry end)
-    
-    # The run_fun is an internal Ecto function for insert with a callback.
-    # In older Ecto, it might be {:insert, fun, _opts}.
-    # We can just check that run_fun or the generated changeset has what we need.
-    # Alternatively, we know run_fun takes (repo, changes_so_far).
-    # Let's extract the changeset by calling the callback if it's an insert fun.
-    
-    # But wait, in Ecto, `Ecto.Multi.insert(:timeline_entry, fun)` actually adds a `{:run, ...}` that calls Repo.insert.
-    # The simplest way is to mock Repo.insert to send us the changeset!
-    
+
+    {_name, {:run, _run_fun}} = Enum.find(ops, fn {name, _op} -> name == :timeline_entry end)
+
     assert_received {:insert, Parapet.Spine.TimelineEntry, changeset}
-    
     payload = Ecto.Changeset.get_field(changeset, :payload)
-    
+
     assert payload["actor"] == "system:automation:executor"
     assert payload["step_id"] == "auto_step"
     assert payload["result"] == ":mitigated"
+  end
+
+  test "perform/1 records a typed short-circuit outcome and enqueues escalation on breaker refusal" do
+    Application.put_env(:parapet, :automation_claim_service, ShortCircuitClaimService)
+    Application.put_env(:parapet, :escalation_policy, SuccessPolicy)
+
+    job = %Oban.Job{args: %{"incident_id" => "inc-1", "step_id" => "auto_step"}}
+    assert {:discard, "Circuit breaker tripped for step auto_step"} = Executor.perform(job)
+
+    assert_received {:claim_action, claim_opts}
+    assert claim_opts[:idempotency_key] == "auto_exec_inc-1_auto_step"
+
+    assert_received {:insert, Parapet.Spine.TimelineEntry, changeset}
+    assert Ecto.Changeset.get_field(changeset, :type) == "automation_short_circuited"
+
+    assert Ecto.Changeset.get_field(changeset, :payload) == %{
+             "step_id" => "auto_step",
+             "reason" => "circuit_breaker_tripped"
+           }
+
+    assert_received {:insert, Oban.Job, job_changeset}
+    assert Ecto.Changeset.get_field(job_changeset, :worker) == "Parapet.Escalation.Worker"
+  end
+
+  test "perform/1 records a typed conflict outcome when another worker already owns the claim" do
+    Application.put_env(:parapet, :automation_claim_service, ConflictClaimService)
+
+    job = %Oban.Job{args: %{"incident_id" => "inc-1", "step_id" => "auto_step"}}
+
+    assert {:discard, "Automation claim conflicted for step auto_step"} = Executor.perform(job)
+
+    assert_received {:claim_action, claim_opts}
+    assert claim_opts[:idempotency_key] == "auto_exec_inc-1_auto_step"
+
+    assert_received {:insert, Parapet.Spine.TimelineEntry, changeset}
+    assert Ecto.Changeset.get_field(changeset, :type) == "automation_claim_conflicted"
+    assert Ecto.Changeset.get_field(changeset, :payload) == %{"step_id" => "auto_step"}
+    refute_received :mitigated
   end
 
   test "perform/1 returns error when incident is not found" do

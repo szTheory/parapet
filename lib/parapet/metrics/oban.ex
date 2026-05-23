@@ -1,5 +1,6 @@
 if Code.ensure_loaded?(Oban) do
   defmodule Parapet.Metrics.Oban do
+    use Parapet.Metrics.Validator
     @moduledoc """
     Defines Prometheus distributions and counters for Oban jobs conditionally.
     """

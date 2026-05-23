@@ -6,7 +6,8 @@ defmodule Parapet.Operator.WorkbenchContractTest do
 
   describe "derive/2" do
     test "derives escalation status, suppression metadata, and next-step facts from durable evidence" do
-      suppressed_until = DateTime.utc_now() |> DateTime.add(1_200, :second) |> DateTime.truncate(:second)
+      suppressed_until =
+        DateTime.utc_now() |> DateTime.add(1_200, :second) |> DateTime.truncate(:second)
 
       incident = %Incident{
         id: "inc-1",
@@ -16,7 +17,18 @@ defmodule Parapet.Operator.WorkbenchContractTest do
             "suppressed_until" => suppressed_until,
             "suppressed_by" => "operator_ui",
             "suppression_reason" => "Waiting for provider callback",
-            "trigger_requested_at" => ~U[2026-05-10 10:05:00Z]
+            "trigger_requested_at" => ~U[2026-05-10 10:05:00Z],
+            "current_step_id" => "sms",
+            "chain" => [
+              %{
+                "id" => "slack",
+                "label" => "Slack page",
+                "delay" => "0m",
+                "status" => "completed"
+              },
+              %{"id" => "sms", "label" => "SMS escalation", "delay" => "15m"},
+              %{"id" => "phone_tree", "label" => "Phone tree", "delay" => "30m"}
+            ]
           }
         }
       }
@@ -54,8 +66,18 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert derived.escalation_summary.next_step.kind == :await_suppression_expiry
       assert derived.escalation_summary.next_step.at == suppressed_until
       assert derived.escalation_summary.next_step.derived? == true
+      assert derived.escalation_summary.time_until_next_escalation.at == suppressed_until
+
+      assert [
+               %{id: "slack", status: :completed},
+               %{id: "sms", status: :current},
+               %{id: "phone_tree", status: :pending}
+             ] = derived.escalation_summary.escalation_chain
+
       assert derived.escalation_summary.latest_event.type == "escalation_suppressed"
-      assert derived.escalation_summary.latest_event.at == DateTime.add(suppressed_until, -60, :second)
+
+      assert derived.escalation_summary.latest_event.at ==
+               DateTime.add(suppressed_until, -60, :second)
     end
 
     test "classifies system, operator, and copilot actions explicitly for timeline presentation" do
@@ -129,6 +151,41 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert derived.escalation_summary.system_action.derived? == true
     end
 
+    test "projects the next scheduled escalation checkpoint when durable timing exists" do
+      next_escalation_at =
+        DateTime.utc_now() |> DateTime.add(1_800, :second) |> DateTime.truncate(:second)
+
+      incident = %Incident{
+        id: "inc-2",
+        state: "open",
+        runbook_data: %{
+          "escalation" => %{
+            "next_escalation_at" => next_escalation_at,
+            "current_step_id" => "sms",
+            "chain" => [
+              %{
+                "id" => "slack",
+                "label" => "Slack page",
+                "delay" => "0m",
+                "status" => "completed"
+              },
+              %{"id" => "sms", "label" => "SMS escalation", "delay" => "15m"},
+              %{"id" => "phone_tree", "label" => "Phone tree", "delay" => "30m"}
+            ]
+          }
+        }
+      }
+
+      derived = WorkbenchContract.derive(incident, [])
+
+      assert derived.escalation_summary.next_step.kind == :await_next_escalation
+      assert derived.escalation_summary.next_step.at == next_escalation_at
+      assert derived.escalation_summary.time_until_next_escalation.at == next_escalation_at
+
+      assert [%{status: :completed}, %{status: :current}, %{status: :pending}] =
+               derived.escalation_summary.escalation_chain
+    end
+
     test "prefers the durable incident triage summary for current-state fields" do
       incident = %Incident{
         id: "inc-1",
@@ -183,7 +240,10 @@ defmodule Parapet.Operator.WorkbenchContractTest do
             "impact" => "Queued work is aging.",
             "next_safe_action" => "Inspect queue depth.",
             "confidence" => "medium",
-            "evidence_facts" => ["Queue critical_jobs is aging.", "Delay bucket gt_10m is present."]
+            "evidence_facts" => [
+              "Queue critical_jobs is aging.",
+              "Delay bucket gt_10m is present."
+            ]
           },
           inserted_at: ~U[2026-05-10 10:05:00Z]
         }
@@ -197,7 +257,12 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert derived.impact == "Queued work is aging."
       assert derived.next_safe_action == "Inspect queue depth."
       assert derived.confidence == "medium"
-      assert derived.evidence_facts == ["Queue critical_jobs is aging.", "Delay bucket gt_10m is present."]
+
+      assert derived.evidence_facts == [
+               "Queue critical_jobs is aging.",
+               "Delay bucket gt_10m is present."
+             ]
+
       assert derived.classification_updated_at == ~U[2026-05-10 10:05:00Z]
     end
 
@@ -248,14 +313,24 @@ defmodule Parapet.Operator.WorkbenchContractTest do
           "description" => "Recovery steps for Mailglass",
           "steps" => [
             %{id: "step-1", label: "Check status", preview_only: true},
-            %{id: "step-2", label: "Retry delivery", requires_preview: true, target_kind: "suppressed_delivery"},
+            %{
+              id: "step-2",
+              label: "Retry delivery",
+              requires_preview: true,
+              target_kind: "suppressed_delivery"
+            },
             %{id: "step-3", label: "Direct mitigation", requires_preview: false}
           ]
         }
       }
 
       action_items = [
-        %{id: "ai-1", kind: "suppressed_delivery", title: "Suppressed delivery for item X", external_id: "ext-1"}
+        %{
+          id: "ai-1",
+          kind: "suppressed_delivery",
+          title: "Suppressed delivery for item X",
+          external_id: "ext-1"
+        }
       ]
 
       entries = [

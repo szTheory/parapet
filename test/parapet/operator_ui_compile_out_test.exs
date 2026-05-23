@@ -28,8 +28,11 @@ defmodule Parapet.OperatorUICompileOutTest do
       assert content =~ "handle_event(\"suppress_pending_escalation\""
       assert content =~ "Parapet.Operator.trigger_next_escalation"
       assert content =~ "Parapet.Operator.suppress_pending_escalation"
+      assert content =~ "Parapet.Operator.resolve_incident"
       assert content =~ "%Parapet.Operator.ActionPayload{"
       assert content =~ "assign(incident: Parapet.Operator.incident_detail(id))"
+      assert content =~ "Integer.parse(minutes)"
+      refute content =~ "String.to_integer(minutes)"
     end
 
     test "operator UI docs describe the evidence-first escalation posture" do

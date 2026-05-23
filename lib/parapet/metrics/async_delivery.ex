@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.AsyncDelivery do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Shared Telemetry.Metrics catalog and PromQL selector helpers for Phase 5
   async and delivery reliability slices.

@@ -32,7 +32,12 @@ defmodule Parapet.Integrations.Rulestead do
 
         case repo.insert(changeset) do
           {:ok, _} ->
-            :telemetry.execute([:parapet, :rulestead, :flag_change], %{}, metadata)
+            safe_metadata =
+              metadata
+              |> Map.put(:ruleset, metadata[:ruleset_id])
+              |> Map.delete(:ruleset_id)
+
+            :telemetry.execute([:parapet, :rulestead, :flag_change], %{}, safe_metadata)
             :ok
 
           {:error, error} ->

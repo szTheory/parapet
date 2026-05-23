@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.HTTP do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Defines Prometheus counters and distributions for HTTP requests.
   """

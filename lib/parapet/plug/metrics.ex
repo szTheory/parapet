@@ -45,11 +45,16 @@ defmodule Parapet.Plug.Metrics do
   end
 
   defp get_trace_id do
-    if Code.ensure_loaded?(:opentelemetry) and function_exported?(OpenTelemetry.Tracer, :current_span_ctx, 0) do
-      span_ctx = OpenTelemetry.Tracer.current_span_ctx()
+    tracer = OpenTelemetry.Tracer
+    span = OpenTelemetry.Span
+
+    if Code.ensure_loaded?(tracer) and Code.ensure_loaded?(span) and
+         function_exported?(tracer, :current_span_ctx, 0) and
+         function_exported?(span, :hex_trace_id, 1) do
+      span_ctx = apply(tracer, :current_span_ctx, [])
 
       if span_ctx != :undefined do
-        OpenTelemetry.Span.hex_trace_id(span_ctx)
+        apply(span, :hex_trace_id, [span_ctx])
       end
     end
   rescue

@@ -1,4 +1,4 @@
-if Code.ensure_loaded?(Oban) do
+if Code.ensure_loaded?(Oban.Worker) do
   defmodule Parapet.Evidence.ArchiveWorker do
     @moduledoc """
     Optional Oban worker for scheduling Parapet evidence archival.

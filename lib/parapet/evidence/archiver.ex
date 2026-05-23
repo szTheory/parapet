@@ -1,6 +1,6 @@
 defmodule Parapet.Evidence.Archiver do
   @moduledoc """
-  Archives old, non-open incidents to a JSONL file and deletes them from the primary database.
+  Archives old, resolved incidents to a JSONL file and deletes them from the primary database.
   """
 
   import Ecto.Query, only: [from: 2]
@@ -44,7 +44,7 @@ defmodule Parapet.Evidence.Archiver do
   defp archive_query(queryable, cutoff) do
     from(
       incident in queryable,
-      where: incident.state != "open",
+      where: incident.state == "resolved",
       where: incident.inserted_at < ^cutoff
     )
   end

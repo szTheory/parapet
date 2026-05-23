@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.Ecto do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Defines Prometheus distributions for Ecto queries.
   """

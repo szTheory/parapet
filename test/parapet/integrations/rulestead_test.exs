@@ -93,6 +93,7 @@ defmodule Parapet.Integrations.RulesteadTest do
 
       assert_receive {:telemetry_executed, _measurements, received_metadata}
       assert received_metadata.flag_name == "feature_y"
+      assert received_metadata.ruleset == "rs_999"
 
       :telemetry.detach(handler_id)
     end

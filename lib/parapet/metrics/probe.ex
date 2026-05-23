@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.Probe do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Defines Prometheus distributions and counters for synthetic probes.
   """

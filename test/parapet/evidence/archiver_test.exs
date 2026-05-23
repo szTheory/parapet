@@ -93,7 +93,7 @@ defmodule Parapet.Evidence.ArchiverTest do
       Agent.get(__MODULE__, fn state ->
         state.incidents
         |> Enum.filter(fn incident ->
-          incident.state != "open" and DateTime.compare(incident.inserted_at, cutoff) == :lt
+          incident.state == "resolved" and DateTime.compare(incident.inserted_at, cutoff) == :lt
         end)
         |> Enum.map(& &1.id)
       end)
@@ -143,7 +143,7 @@ defmodule Parapet.Evidence.ArchiverTest do
       %Incident{
         id: Ecto.UUID.generate(),
         title: "Old investigating incident",
-        description: "archive me too",
+        description: "remain active",
         state: "investigating",
         inserted_at: days_ago(31),
         updated_at: days_ago(31)
@@ -184,11 +184,11 @@ defmodule Parapet.Evidence.ArchiverTest do
       File.rm(path)
     end)
 
-    %{archive_path: path, archive_ids: [old_resolved.id, old_investigating.id]}
+    %{archive_path: path, archived_id: old_resolved.id, investigating_id: old_investigating.id}
   end
 
-  test "archives resolved or investigating incidents older than retention, preloads nested evidence, and deletes archived rows",
-       %{archive_path: archive_path, archive_ids: archive_ids} do
+  test "archives only resolved incidents older than retention, preloads nested evidence, and leaves old investigating incidents active",
+       %{archive_path: archive_path, archived_id: archived_id, investigating_id: investigating_id} do
     assert {:ok, :ok} = Archiver.archive(FakeRepo, archive_path, 30)
 
     archive_path
@@ -196,8 +196,8 @@ defmodule Parapet.Evidence.ArchiverTest do
     |> String.split("\n", trim: true)
     |> Enum.map(&Jason.decode!/1)
     |> then(fn lines ->
-      assert Enum.map(lines, & &1["id"]) == archive_ids
-      assert Enum.map(lines, & &1["state"]) == ["resolved", "investigating"]
+      assert Enum.map(lines, & &1["id"]) == [archived_id]
+      assert Enum.map(lines, & &1["state"]) == ["resolved"]
 
       [first | _] = lines
       assert hd(first["timeline_entries"])["tool_audits"] != []
@@ -205,13 +205,14 @@ defmodule Parapet.Evidence.ArchiverTest do
 
     snapshot = FakeRepo.snapshot()
 
-    assert snapshot.archived_ids == archive_ids
-    assert length(snapshot.delete_calls) == 2
-    assert snapshot.preloads == [[timeline_entries: :tool_audits], [timeline_entries: :tool_audits]]
+    assert snapshot.archived_ids == [archived_id]
+    assert snapshot.delete_calls == [[archived_id]]
+    assert snapshot.preloads == [[timeline_entries: :tool_audits]]
     assert [%{opts: [max_rows: 1]}] = snapshot.stream_calls
+    assert Enum.any?(snapshot.incidents, &(&1.id == investigating_id and &1.state == "investigating"))
 
     remaining_states = Enum.map(snapshot.incidents, & &1.state)
-    assert Enum.sort(remaining_states) == ["open", "resolved"]
+    assert Enum.sort(remaining_states) == ["investigating", "open", "resolved"]
   end
 
   defp days_ago(days) do

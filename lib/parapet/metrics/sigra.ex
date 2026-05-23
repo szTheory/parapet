@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.Sigra do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Prometheus metric definitions for Sigra.
   """

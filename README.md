@@ -30,14 +30,31 @@ def deps do
 end
 ```
 
-Then install and configure Parapet with:
+Then install and configure Parapet with the single Day-1 entrypoint:
 
 ```bash
 mix deps.get
 mix parapet.install
 ```
 
-This will automatically wire Parapet into your Phoenix Endpoint and create a default SLO configuration file.
+`mix parapet.install` composes the core paved road in order:
+
+1. Generates the Parapet evidence spine
+2. Scaffolds the host-owned instrumenter and wires `Parapet.Plug.Metrics`
+3. Generates Prometheus recording and alert rules
+4. Prints a concise summary and points you to `mix parapet.doctor`
+
+Optional surfaces remain explicit opt-ins:
+
+```bash
+mix parapet.install --with-ui
+mix parapet.install --skip-ui
+mix parapet.install --with-mailglass --with-chimeway
+```
+
+The installer can generate host-owned activation code such as `Parapet.attach(adapters: [...])` and `config :parapet, providers: [...]`, but it does **not** add optional dependencies to `mix.exs`.
+
+If you want the shortest explanation of what Parapet is trying to help an adopter do, read [Parapet Adopter Flows](docs/adopter-flows.md).
 
 ## The Operator Loop: Zero to First Alert
 
@@ -62,10 +79,31 @@ end
 
 ### 2. Validate your configuration
 
-Run the Parapet Doctor to ensure your configuration is secure and complete. The doctor ensures all your SLOs have runbooks and that your Prometheus metrics endpoint is authenticated.
+Run the Parapet Doctor immediately after install. It validates the install surface, SLO posture, and cluster-sensitive risks without pretending static analysis is enough on its own.
 
 ```bash
 mix parapet.doctor
+```
+
+Doctor statuses are:
+
+- `info`: healthy or informational
+- `warn`: risk or ambiguity
+- `error`: concrete contradiction or unsafe setup
+- `skip`: not applicable or unavailable
+
+Local runs fail only on `error`. CI can raise the threshold to fail on `warn` too:
+
+```bash
+mix parapet.doctor --ci
+mix parapet.doctor --threshold warn
+mix parapet.doctor --threshold error
+```
+
+For live cluster facts, run:
+
+```bash
+mix parapet.doctor cluster
 ```
 
 ### 3. Generate Prometheus Artifacts
@@ -90,7 +128,7 @@ This writes the dashboard JSON and provisioning YAML to `priv/parapet/grafana/`.
 
 ### 5. Operator UI Workbench
 
-Parapet can generate an optional, evidence-first LiveView operator workbench directly inside your host application. This UI is used for initiating mitigations and tracking immutable timeline events.
+Parapet can generate an optional, evidence-first LiveView operator workbench directly inside your host application. This UI is not part of the default install path unless you opt in with `mix parapet.install --with-ui`, and it remains host-owned.
 
 For instructions on generating the UI and securing its routes, see the [Operator UI Guide](docs/operator-ui.md).
 
@@ -135,15 +173,33 @@ Then, trigger a deploy marker via a webhook or internal API to annotate your Gra
 
 ### Optional Async And Delivery Integrations
 
-Parapet's Phase 4 async and delivery contract is host-owned and explicit. To enable the built-in adapters, opt in through `Parapet.attach/1`:
+Parapet's async and delivery contract is host-owned and explicit. To enable the built-in adapters, opt in through `Parapet.attach/1`:
 
 ```elixir
 Parapet.attach(adapters: [:mailglass, :chimeway, :rindle])
 ```
 
+If you also want the built-in SLO providers, register them explicitly in config:
+
+```elixir
+config :parapet,
+  providers: [
+    Parapet.SLO.MailglassDelivery,
+    Parapet.SLO.ChimewayDelivery,
+    Parapet.SLO.RindleAsync
+  ]
+```
+
 These adapters emit bounded public telemetry families such as `[:parapet, :delivery, :provider_feedback]` and `[:parapet, :async, :backlog]`. Exact identifiers are kept in `metadata.refs`, not top-level labels.
 
 For the full contract, safe metadata rules, and event-family semantics, see [docs/telemetry.md](docs/telemetry.md).
+
+## Learn The Flows
+
+- [Parapet Adopter Flows](docs/adopter-flows.md)
+- [Operator UI Guide](docs/operator-ui.md)
+- [SLO Reference](docs/slo-reference.md)
+- [Telemetry Contract](docs/telemetry.md)
 
 For more detailed information, check the [Documentation](https://hexdocs.pm/parapet).
 

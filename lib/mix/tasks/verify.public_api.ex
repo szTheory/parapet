@@ -41,6 +41,7 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
     (String.starts_with?(name, "Parapet.") or name == "Parapet") and
       not String.starts_with?(name, "Parapet.Internal.") and
+      not String.starts_with?(name, "Parapet.TestSupport.") and
       not String.contains?(name, ".Resolvable.")
   end
 

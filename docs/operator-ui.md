@@ -14,7 +14,19 @@ Phase 6 extends that boundary with fault-domain triage for async and delivery in
 
 ## Installation
 
-Run the generator from the root of your project:
+The UI remains optional. If you want the installer to compose it for you, use:
+
+```bash
+mix parapet.install --with-ui
+```
+
+If you prefer to keep the core install path but explicitly suppress the UI branch in automation, use:
+
+```bash
+mix parapet.install --skip-ui
+```
+
+You can also run the generator directly from the root of your project:
 
 ```bash
 mix parapet.gen.ui
@@ -27,7 +39,7 @@ This will scaffold three files into your `lib/my_app_web/live/parapet/` director
 
 ### Mounting the Operator UI
 
-The generated files belong to your application. Parapet does **not** provide its own authentication system. You must mount the operator routes inside your application's authenticated scope to ensure the UI is secured according to your app's existing authorization policies.
+The generated files belong to your application. The UI is only relevant when Phoenix LiveView is present, and Parapet does **not** provide its own authentication system. You must mount the operator routes inside your application's authenticated scope to ensure the UI is secured according to your app's existing authorization policies.
 
 Update your `router.ex` to include the Parapet routes within a protected area:
 
@@ -48,7 +60,7 @@ end
 
 ## Security and Verification
 
-The Parapet Doctor includes a dedicated check to verify that your operator UI is securely mounted. 
+The Parapet Doctor includes a dedicated check to verify that your operator UI is securely mounted.
 
 Run the doctor task to ensure the UI is not exposed publicly:
 
@@ -56,7 +68,21 @@ Run the doctor task to ensure the UI is not exposed publicly:
 mix parapet.doctor
 ```
 
-If the doctor detects that `OperatorLive` or `OperatorDetailLive` are mounted outside of an authenticated scope, it will report a warning (`Unsecured operator UI LiveView found`).
+If the doctor detects that `OperatorLive` or `OperatorDetailLive` are mounted outside of an authenticated scope, it reports a `warn` finding (`Unsecured operator UI LiveView found`).
+
+Local doctor runs fail only on `error`, while CI can treat warnings as blocking:
+
+```bash
+mix parapet.doctor --ci
+```
+
+For live cluster facts around the same install, use:
+
+```bash
+mix parapet.doctor cluster
+```
+
+That runtime mode reports evidence-backed live facts, but it still does not prove distributed correctness on its own.
 
 ## Phase 3 Performance Proof Lane
 
@@ -67,7 +93,7 @@ Phase 3 keeps the generated incident queue bounded and operator-paced under larg
 - Queue-side `Resolve` is a real lifecycle transition through `Parapet.Operator.resolve_incident/2`, not a UI-only note shortcut.
 - Phase 3 remains the canonical runtime proof owner for this seam through the named `generated resolve-flow proof lane`.
 - Performance proof is layered: bounded queue telemetry in `Parapet.Operator`, deterministic queue tests, and an opt-in advisory benchmark lane.
-+- The `generated resolve-flow proof lane` stays in the targeted `mix test test/parapet/generated_operator_live_paging_test.exs test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` lane rather than a heavier browser harness.
+- The `generated resolve-flow proof lane` stays in the targeted `mix test test/parapet/generated_operator_live_paging_test.exs test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` lane rather than a heavier browser harness.
 
 ### Advisory 50k+ Benchmark
 

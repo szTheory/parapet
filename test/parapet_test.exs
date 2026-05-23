@@ -128,5 +128,13 @@ defmodule ParapetTest do
       assert_receive {:telemetry_event, [:parapet, :async, :stage], _measurements,
                       %{integration: :rindle}}
     end
+
+    test "keeps optional deps compile out clean when mailglass and chimeway are enabled explicitly" do
+      assert {:ok, [:mailglass, :chimeway]} ==
+               Parapet.attach(adapters: [:mailglass, :chimeway])
+
+      assert Code.ensure_loaded?(Parapet.Integrations.Mailglass)
+      assert Code.ensure_loaded?(Parapet.Integrations.Chimeway)
+    end
   end
 end

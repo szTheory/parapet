@@ -2,7 +2,7 @@ defmodule Mix.Tasks.Parapet.Archive do
   @shortdoc "Archives old Parapet evidence to JSONL."
 
   @moduledoc """
-  Archives non-open incidents older than the retention window to a JSONL file.
+  Archives resolved incidents older than the retention window to a JSONL file.
 
   ## Examples
 

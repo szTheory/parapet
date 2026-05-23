@@ -1,7 +1,7 @@
-defmodule Parapet.Probe.ObanScheduler do
-  if Code.ensure_loaded?(Oban) do
+if Code.ensure_loaded?(Oban.Worker) do
+  defmodule Parapet.Probe.ObanScheduler do
     @moduledoc """
-    Oban worker for scheduling synthetic probes without retries.
+    Optional Oban worker for scheduling synthetic probes without retries.
     """
     use Oban.Worker, max_attempts: 1
 

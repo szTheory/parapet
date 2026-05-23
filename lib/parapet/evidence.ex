@@ -58,9 +58,11 @@ defmodule Parapet.Evidence do
   end
 
   defp maybe_enqueue_escalation(multi) do
-    if Code.ensure_loaded?(Oban) and Application.get_env(:parapet, :escalation_policy) do
+    worker = Parapet.Escalation.Worker
+
+    if Code.ensure_loaded?(worker) and Application.get_env(:parapet, :escalation_policy) do
       Ecto.Multi.insert(multi, :escalation_job, fn %{incident: incident} ->
-        Parapet.Escalation.Worker.new(%{"incident_id" => incident.id})
+        apply(worker, :new, [%{"incident_id" => incident.id}])
       end)
     else
       multi

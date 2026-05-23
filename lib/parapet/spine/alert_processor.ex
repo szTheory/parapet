@@ -86,19 +86,22 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp correlate_recent_events(incident) do
     time_threshold = DateTime.add(DateTime.utc_now(), -60, :minute)
-    
-    query = 
-      from e in Parapet.Spine.SystemEvent,
+
+    query =
+      from(e in Parapet.Spine.SystemEvent,
         where: e.inserted_at >= ^time_threshold
-        
+      )
+
     events = Evidence.repo().all(query)
-    
+
     Enum.each(events, fn event ->
-      changeset = TimelineEntry.changeset(%TimelineEntry{}, %{
-        incident_id: incident.id,
-        type: event.type,
-        payload: event.payload
-      })
+      changeset =
+        TimelineEntry.changeset(%TimelineEntry{}, %{
+          incident_id: incident.id,
+          type: event.type,
+          payload: event.payload
+        })
+
       Evidence.repo().insert(changeset)
     end)
   end
@@ -201,10 +204,14 @@ defmodule Parapet.Spine.AlertProcessor do
   end
 
   defp build_incident_changeset(nil, attrs), do: Incident.changeset(%Incident{}, attrs)
-  defp build_incident_changeset(%Incident{} = incident, attrs), do: Incident.changeset(incident, attrs)
+
+  defp build_incident_changeset(%Incident{} = incident, attrs),
+    do: Incident.changeset(incident, attrs)
 
   defp put_incident(multi, nil, changeset), do: Ecto.Multi.insert(multi, :incident, changeset)
-  defp put_incident(multi, _incident, changeset), do: Ecto.Multi.update(multi, :incident, changeset)
+
+  defp put_incident(multi, _incident, changeset),
+    do: Ecto.Multi.update(multi, :incident, changeset)
 
   defp maybe_insert_triage_snapshot(multi, false, _snapshot) do
     Ecto.Multi.run(multi, :triage_snapshot, fn _repo, _changes -> {:ok, nil} end)
@@ -222,21 +229,27 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp maybe_enqueue_automations(multi, existing_incident) do
     if is_nil(existing_incident) do
+      worker = Parapet.Automation.Executor
+      oban = Oban
+
       Ecto.Multi.run(multi, :enqueue_automations, fn _repo, %{incident: incident} ->
-        steps = get_in(incident.runbook_data || %{}, ["steps"]) || get_in(incident.runbook_data || %{}, [:steps]) || []
-        
+        steps =
+          get_in(incident.runbook_data || %{}, ["steps"]) ||
+            get_in(incident.runbook_data || %{}, [:steps]) || []
+
         Enum.each(steps, fn step ->
           auto_exec = Map.get(step, "auto_execute") || Map.get(step, :auto_execute) || false
-          
-          if auto_exec do
+
+          if auto_exec and Code.ensure_loaded?(worker) and Code.ensure_loaded?(oban) and
+               function_exported?(oban, :insert!, 1) do
             step_id = Map.get(step, "id") || Map.get(step, :id)
-            
+
             %{incident_id: incident.id, step_id: to_string(step_id)}
-            |> Parapet.Automation.Executor.new()
-            |> Oban.insert!()
+            |> then(&apply(worker, :new, [&1]))
+            |> then(&apply(oban, :insert!, [&1]))
           end
         end)
-        
+
         {:ok, :enqueued}
       end)
     else
@@ -269,7 +282,9 @@ defmodule Parapet.Spine.AlertProcessor do
   end
 
   defp build_triage_snapshot(nil), do: nil
-  defp build_triage_snapshot(summary), do: Map.put(summary, "evidence_facts", derive_evidence_facts(summary))
+
+  defp build_triage_snapshot(summary),
+    do: Map.put(summary, "evidence_facts", derive_evidence_facts(summary))
 
   defp derive_title(alert, triage_summary, default_alertname) do
     annotations = Map.get(alert, "annotations", %{})
@@ -321,22 +336,40 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp derive_evidence_facts(summary) do
     [
-      fact_if_present(summary["fault_plane"], &"Fault plane classified as #{&1} from bounded alert metadata."),
+      fact_if_present(
+        summary["fault_plane"],
+        &"Fault plane classified as #{&1} from bounded alert metadata."
+      ),
       fact_if_present(summary["queue"], &"Queue #{&1} is part of the observed symptom surface."),
-      fact_if_present(summary["pipeline_stage"], &"Pipeline stage #{&1} was present on the alert."),
-      fact_if_present(summary["delay_bucket"], &"Delay bucket #{&1} indicates bounded freshness impact."),
-      fact_if_present(summary["failure_class"], &"Failure class #{&1} is already classified upstream.")
+      fact_if_present(
+        summary["pipeline_stage"],
+        &"Pipeline stage #{&1} was present on the alert."
+      ),
+      fact_if_present(
+        summary["delay_bucket"],
+        &"Delay bucket #{&1} indicates bounded freshness impact."
+      ),
+      fact_if_present(
+        summary["failure_class"],
+        &"Failure class #{&1} is already classified upstream."
+      )
     ]
     |> Enum.reject(&is_nil/1)
     |> Enum.take(4)
   end
 
   defp merge_runbook_data(nil, runbook_data), do: runbook_data
-  defp merge_runbook_data(%Incident{} = incident, runbook_data), do: Map.merge(incident.runbook_data || %{}, runbook_data)
 
-  defp summary_changed?(current_summary, new_summary), do: normalize_map(current_summary) != normalize_map(new_summary)
+  defp merge_runbook_data(%Incident{} = incident, runbook_data),
+    do: Map.merge(incident.runbook_data || %{}, runbook_data)
+
+  defp summary_changed?(current_summary, new_summary),
+    do: normalize_map(current_summary) != normalize_map(new_summary)
+
   defp normalize_map(nil), do: %{}
-  defp normalize_map(map) when is_map(map), do: Enum.into(map, %{}, fn {key, value} -> {to_string(key), value} end)
+
+  defp normalize_map(map) when is_map(map),
+    do: Enum.into(map, %{}, fn {key, value} -> {to_string(key), value} end)
 
   defp triage_summary?(summary), do: is_map(summary) and Map.has_key?(summary, "fault_plane")
 

@@ -15,8 +15,12 @@ defmodule Parapet.Notifier do
   end
 
   def dispatch(incident, adapter, opts) do
-    # Check if Oban is loaded.
-    if Code.ensure_loaded?(Oban) and
+    oban = Oban
+    worker = Parapet.Notifier.ObanWorker
+
+    if Code.ensure_loaded?(oban) and
+         Code.ensure_loaded?(worker) and
+         function_exported?(oban, :insert, 1) and
          Application.get_env(:parapet, :use_oban_for_notifications, true) do
       args = %{
         "incident_id" => incident.id,
@@ -24,7 +28,9 @@ defmodule Parapet.Notifier do
         "opts" => inspect(opts)
       }
 
-      Parapet.Notifier.ObanWorker.new(args) |> Oban.insert()
+      worker
+      |> apply(:new, [args])
+      |> then(&apply(oban, :insert, [&1]))
     else
       Task.start(fn ->
         deliver_and_audit(incident, adapter, opts)

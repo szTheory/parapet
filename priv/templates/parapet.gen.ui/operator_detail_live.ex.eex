@@ -39,7 +39,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       action_type: :resolve
     }
     
-    case Parapet.Operator.record_note(incident, "Resolved", payload) do
+    case Parapet.Operator.resolve_incident(incident, payload) do
       {:ok, _result} ->
         {:noreply, push_navigate(socket, to: "/parapet/#{id}")}
       {:error, _reason} ->
@@ -70,27 +70,33 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
 
   def handle_event("suppress_pending_escalation", %{"id" => id, "minutes" => minutes}, socket) do
     incident = <%= inspect(@repo_module) %>.get!(Parapet.Spine.Incident, id)
-    suppress_until =
-      DateTime.utc_now()
-      |> DateTime.add(String.to_integer(minutes) * 60, :second)
-      |> DateTime.truncate(:second)
+    with {minutes, ""} <- Integer.parse(minutes),
+         true <- minutes > 0 do
+      suppress_until =
+        DateTime.utc_now()
+        |> DateTime.add(minutes * 60, :second)
+        |> DateTime.truncate(:second)
 
-    payload = %Parapet.Operator.ActionPayload{
-      actor: "operator_ui",
-      reason: "Temporarily suppressed pending escalation from UI",
-      correlation_id: Ecto.UUID.generate(),
-      action_type: :suppress_pending_escalation
-    }
+      payload = %Parapet.Operator.ActionPayload{
+        actor: "operator_ui",
+        reason: "Temporarily suppressed pending escalation from UI",
+        correlation_id: Ecto.UUID.generate(),
+        action_type: :suppress_pending_escalation
+      }
 
-    case Parapet.Operator.suppress_pending_escalation(incident, suppress_until, payload) do
-      {:ok, _result} ->
-        {:noreply,
-         socket
-         |> put_flash(:info, "Escalation suppression recorded")
-         |> assign(incident: Parapet.Operator.incident_detail(id))}
+      case Parapet.Operator.suppress_pending_escalation(incident, suppress_until, payload) do
+        {:ok, _result} ->
+          {:noreply,
+           socket
+           |> put_flash(:info, "Escalation suppression recorded")
+           |> assign(incident: Parapet.Operator.incident_detail(id))}
 
-      {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to suppress escalation: #{inspect(reason)}")}
+        {:error, reason} ->
+          {:noreply, put_flash(socket, :error, "Failed to suppress escalation: #{inspect(reason)}")}
+      end
+    else
+      _ ->
+        {:noreply, put_flash(socket, :error, "Invalid suppression window")}
     end
   end
 

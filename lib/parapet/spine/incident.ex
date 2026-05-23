@@ -20,6 +20,18 @@ defmodule Parapet.Spine.Incident do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
+  @type t :: %__MODULE__{
+          id: Ecto.UUID.t() | nil,
+          title: String.t() | nil,
+          description: String.t() | nil,
+          state: String.t() | nil,
+          correlation_key: String.t() | nil,
+          trace_id: String.t() | nil,
+          runbook_data: map() | nil,
+          inserted_at: DateTime.t() | nil,
+          updated_at: DateTime.t() | nil
+        }
+
   schema "parapet_incidents" do
     field(:title, :string)
     field(:description, :string)

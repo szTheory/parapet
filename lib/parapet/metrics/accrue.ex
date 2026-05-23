@@ -1,4 +1,5 @@
 defmodule Parapet.Metrics.Accrue do
+  use Parapet.Metrics.Validator
   @moduledoc """
   Prometheus metric definitions for Accrue.
   """
