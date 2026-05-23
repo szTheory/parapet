@@ -70,27 +70,33 @@ Explicit exclusions (anti-features from research + milestone-arc decision) to pr
 
 ## Traceability
 
-Populated during roadmap creation. Each requirement maps to exactly one phase.
+Each requirement maps to exactly one phase. v0.10 continues phase numbering from v0.9 (which ended at Phase 14), so v0.10 phases are 15–18.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADOPT-01 | — | Pending |
-| ADOPT-02 | — | Pending |
-| ADOPT-03 | — | Pending |
-| ADOPT-04 | — | Pending |
-| ADOPT-05 | — | Pending |
-| SLO-01 | — | Pending |
-| SLO-02 | — | Pending |
-| SLO-03 | — | Pending |
-| SLO-04 | — | Pending |
-| RCV-01 | — | Pending |
-| RCV-02 | — | Pending |
+| ADOPT-01 | Phase 15 | Pending |
+| ADOPT-02 | Phase 15 | Pending |
+| ADOPT-03 | Phase 18 | Pending |
+| ADOPT-04 | Phase 18 | Pending |
+| ADOPT-05 | Phase 18 | Pending |
+| SLO-01 | Phase 16 | Pending |
+| SLO-02 | Phase 16 | Pending |
+| SLO-03 | Phase 18 | Pending |
+| SLO-04 | Phase 18 | Pending |
+| RCV-01 | Phase 17 | Pending |
+| RCV-02 | Phase 17 | Pending |
 
 **Coverage:**
 - v0.10 requirements: 11 total (+ 4 acceptance criteria)
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 11 ⚠️ (resolved by roadmap)
+- Mapped to phases: 11 ✓ (Phases 15-18)
+- Unmapped: 0 ✓
+
+Acceptance criteria are cross-cutting verification, not separate phases:
+- AC-01 spans Phases 15, 16, 18 (ADOPT-01/02/03 + SLO-01)
+- AC-02 spans Phases 16, 18 (SLO-01/02/03)
+- AC-03 verified within Phase 17 (RCV-01/02)
+- AC-04 verified within Phase 18 (ADOPT-05)
 
 ---
 *Requirements defined: 2026-05-23 — milestone v0.10 Adopter Success*
-*Last updated: 2026-05-23 after initial definition*
+*Last updated: 2026-05-23 — traceability populated by roadmap (Phases 15-18, 11/11 mapped)*
