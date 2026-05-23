@@ -274,12 +274,11 @@ Source: `test/parapet/operator_ui_integration_test.exs`. [VERIFIED: test/parapet
 
 All claims in this research were verified or cited in this session; no user confirmation is required before planning. [VERIFIED: research session evidence]
 
-## Open Questions
+## Open Questions (Resolved)
 
 1. **Should the tests themselves be renamed to include the exact phrase `generated resolve-flow proof lane`?**
-   - What we know: The runtime and source-contract coverage already exist and pass. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs] [VERIFIED: test/parapet/operator_ui_integration_test.exs] [VERIFIED: test/mix/tasks/parapet.gen.ui_test.exs] [VERIFIED: local `mix test` run 2026-05-23]
-   - What's unclear: The locked context requires the lane to be clearly named, but it does not require renaming test case titles if proof-surface wording is already sufficient. [VERIFIED: .planning/phases/14-backstop-generated-operator-ui-closure-proof/14-CONTEXT.md]
-   - Recommendation: Prefer naming the lane in Phase 3 / Phase 7 / Phase 12 / `docs/operator-ui.md` first; rename test descriptions only if grep-based discoverability still feels weak. [VERIFIED: .planning/phases/14-backstop-generated-operator-ui-closure-proof/14-UI-SPEC.md]
+   - Resolution: No, not in Phase 14 by default. The chosen direction is to name the lane explicitly in the Phase 3, Phase 7, and Phase 12 proof surfaces plus `docs/operator-ui.md`, while leaving test titles unchanged unless that pass still leaves discoverability weak. [VERIFIED: .planning/phases/14-backstop-generated-operator-ui-closure-proof/14-CONTEXT.md] [VERIFIED: .planning/phases/14-backstop-generated-operator-ui-closure-proof/14-UI-SPEC.md]
+   - Why this is sufficient: The runtime and source-contract coverage already exist, pass, and are directly referenceable by file path from the proof artifacts, so Phase 14 can close the naming/discoverability gap without widening into test rewrites. [VERIFIED: test/parapet/generated_operator_live_paging_test.exs] [VERIFIED: test/parapet/operator_ui_integration_test.exs] [VERIFIED: test/mix/tasks/parapet.gen.ui_test.exs] [VERIFIED: local `mix test` run 2026-05-23]
 
 ## Validation Architecture
 
