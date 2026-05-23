@@ -17,7 +17,7 @@ The dominant risk per research is drift and package scope-leak, not technical di
 
 ### ADOPT: Adoption Funnel
 
-- [ ] **ADOPT-01**: A stranger evaluating the package on hex.pm sees populated metadata — `links:` (GitHub, HexDocs, Issues), a `:description` sentence, and `source_url` — instead of an empty `links: %{}`. *(mix.exs change; credibility gate that unblocks the rest.)*
+- [x] **ADOPT-01**: A stranger evaluating the package on hex.pm sees populated metadata — `links:` (GitHub, HexDocs, Issues), a `:description` sentence, and `source_url` — instead of an empty `links: %{}`. *(mix.exs change; credibility gate that unblocks the rest.)*
 - [x] **ADOPT-02**: An adopter can read a root `CHANGELOG.md` covering v0.1–v0.9 retroactively and ongoing releases. *(Conventional Commits / Release Please already in use.)*
 - [ ] **ADOPT-03**: A new adopter can follow a single `docs/getting-started.md` from install → first running SLO → first generated alert in under 30 minutes. *(Ends when they see something work, not when all features are explained.)*
 - [ ] **ADOPT-04**: An adopter who hits a first obstacle can find an answer in `docs/troubleshooting.md` (seeded with the 5–7 most predictable questions: blank Prometheus target, doctor warn-vs-error, Oban compile-out, multi-node uniqueness, Fly.io config).
@@ -74,7 +74,7 @@ Each requirement maps to exactly one phase. v0.10 continues phase numbering from
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ADOPT-01 | Phase 15 | Pending |
+| ADOPT-01 | Phase 15 | Complete |
 | ADOPT-02 | Phase 15 | Complete |
 | ADOPT-03 | Phase 18 | Pending |
 | ADOPT-04 | Phase 18 | Pending |

@@ -48,7 +48,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
   - [x] 15-01-PLAN.md — Create CHANGELOG.md stub, docs/HISTORY.md, and the Release Please config + manifest pair (Wave 1)
-  - [ ] 15-02-PLAN.md — Populate mix.exs metadata + docs: extras, bump to 0.10.0, switch workflow to manifest mode (Wave 2)
+  - [x] 15-02-PLAN.md — Populate mix.exs metadata + docs: extras, bump to 0.10.0, switch workflow to manifest mode (Wave 2)
 
 ### Phase 16: SLO Starter Packs & Low-Traffic Guardrails
 
@@ -100,7 +100,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 15. Packaging Credibility Gate | v0.10 | 1/2 | In Progress|  |
+| 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete   | 2026-05-23 |
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 0/TBD | Not started | - |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 0/TBD | Not started | - |
 | 18. Adoption & Authoring Docs | v0.10 | 0/TBD | Not started | - |
