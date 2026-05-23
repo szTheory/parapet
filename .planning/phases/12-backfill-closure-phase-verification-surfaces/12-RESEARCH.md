@@ -272,12 +272,11 @@ Source: Phase 9 locked reference set plus the repo’s existing `python3` assert
 
 All material claims in this research were verified from the current repo or local tool availability during this session. [VERIFIED: codebase grep `AGENTS.md`, `.planning/ROADMAP.md`, `.planning/v0.9-MILESTONE-AUDIT.md`; VERIFIED: local commands `mix --version`, `python3 --version`, `rg --version`]
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Phase 12 also normalize any Nyquist metadata beyond adding `VERIFICATION.md` files?**
-   - What we know: The audit still lists partial Nyquist coverage for Phases 6-9, but the locked Phase 12 scope names only phase-local `VERIFICATION.md` backfill and evidence-chain alignment. [VERIFIED: codebase grep `.planning/v0.9-MILESTONE-AUDIT.md`, `.planning/phases/12-backfill-closure-phase-verification-surfaces/12-CONTEXT.md`]
-   - What's unclear: Whether the planner should touch `06-VALIDATION.md` frontmatter or other Nyquist metadata as part of “align the closure-phase evidence chain,” or leave validation files unchanged unless the new reports expose a direct inconsistency. [VERIFIED: codebase grep `.planning/v0.9-phases/6/06-VALIDATION.md`, `.planning/v0.9-phases/7/07-VALIDATION.md`] 
-   - Recommendation: Default to no validation-file rewrite unless a direct contradiction is required to make the new `VERIFICATION.md` truthful; keep the phase narrow and treat extra Nyquist cleanup as follow-on only if the planner finds an unavoidable mismatch. [VERIFIED: codebase grep `AGENTS.md`, `.planning/phases/12-backfill-closure-phase-verification-surfaces/12-CONTEXT.md`]
+1. **Should Phase 12 also normalize any Nyquist metadata beyond adding `VERIFICATION.md` files? — RESOLVED**
+   - Resolution: No, not by default. Phase 12 should leave `06-VALIDATION.md` through `09-VALIDATION.md` unchanged unless creating the new verification reports exposes a direct contradiction that would make those reports untruthful. [VERIFIED: codebase grep `.planning/v0.9-MILESTONE-AUDIT.md`, `.planning/phases/12-backfill-closure-phase-verification-surfaces/12-CONTEXT.md`, `.planning/v0.9-phases/6/06-VALIDATION.md`, `.planning/v0.9-phases/7/07-VALIDATION.md`]
+   - Why: The locked Phase 12 scope is phase-local `VERIFICATION.md` backfill plus evidence-chain alignment, not general Nyquist cleanup. The narrowest truthful interpretation is to index the existing validation surfaces rather than rewrite them unless a contradiction is unavoidable. [VERIFIED: codebase grep `AGENTS.md`, `.planning/phases/12-backfill-closure-phase-verification-surfaces/12-CONTEXT.md`]
 
 ## Environment Availability
 
