@@ -48,11 +48,11 @@ Milestone v0.9 shifts focus from feature breadth to operational depth. With the 
 | PERF-01.b | Phase 6 | Verified |
 | SCALE-01.a | Phase 2 | Verified |
 | SCALE-01.b | Phase 10 | Verified |
-| SCALE-01.c | Phase 13 | Pending |
+| SCALE-01.c | Phase 14 | Verified |
 | DX-01.a | Phase 8 | Verified |
 | DX-01.b | Phase 8 | Verified |
 | SCALE-02 | Phase 11 | Verified |
 | AC-01 | Phase 8 | Verified |
 | AC-02 | Phase 10 | Verified |
-| AC-03 | Phase 13 | Pending |
-| milestone closure readiness | Phase 14 | Pending |
+| AC-03 | Phase 14 | Verified |
+| milestone closure readiness | Phase 14 | Verified |

@@ -124,19 +124,25 @@ Plans:
 ### Phase 13: Repair Generated Operator Resolve Flow
 **Goal:** Restore the generated operator resolve path so the Phase 3 runtime lifecycle and acceptance story are true again.
 **Requirements:** `SCALE-01.c`, `AC-03`
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 13-01-PLAN.md — Rewire generated queue resolve to `Parapet.Operator.resolve_incident/2` and prove the lifecycle change in the existing quick lane.
-- [ ] 13-02-PLAN.md — Reconcile Phase 3 and Phase 7 proof surfaces plus operator UI docs to the repaired resolve lane.
+- [x] 13-01-PLAN.md — Rewire generated queue resolve to `Parapet.Operator.resolve_incident/2` and prove the lifecycle change in the existing quick lane.
+- [x] 13-02-PLAN.md — Reconcile Phase 3 and Phase 7 proof surfaces plus operator UI docs to the repaired resolve lane.
 **Gap Closure:** Closes the audit requirement, integration, and flow gaps caused by the broken generated resolve action.
 - Update the generated operator LiveView `"resolve"` event to call `Parapet.Operator.resolve_incident/2` instead of recording a note.
 - Re-run the generated operator UI proof lanes that cover active-queue to resolved-history/archive transitions.
 - Reconcile Phase 3 and Phase 7 truth surfaces so the repaired runtime path is reflected in closure artifacts.
+**Closure:** Verified by `.planning/v0.9-phases/3/VERIFICATION.md`, the reconciled `.planning/v0.9-phases/7/VERIFICATION.md`, and the verified `SCALE-01.c` / `AC-03` rows in `.planning/REQUIREMENTS.md`; `.planning/v0.9-MILESTONE-AUDIT.md` remains historical until a fresh milestone audit rerun replaces it.
 
 ### Phase 14: Backstop Generated Operator UI Closure Proof
 **Goal:** Extend the closure-proof chain so future milestone reruns catch generated operator UI runtime regressions.
 **Requirements:** milestone closure readiness
+**Plans:** 2/2 plans complete
+Plans:
+- [x] 14-01-PLAN.md — Promote the generated resolve-flow backstop into the active Phase 3, Phase 7, and Phase 12 proof hierarchy.
+- [x] 14-02-PLAN.md — Reconcile roadmap, requirements, and state to the strengthened generated operator UI closure-proof chain.
 **Gap Closure:** Closes the audit proof-coverage gap across the Phase 3, Phase 7, and Phase 12 closure surfaces.
 - Add explicit proof coverage for the generated resolve action, including a failure if the UI bypasses `Parapet.Operator.resolve_incident/2`.
 - Promote that proof into the Phase 3, Phase 7, and Phase 12 verification and validation hierarchy without widening runtime scope.
 - Reconcile roadmap, requirements, and closure artifacts so milestone readiness depends on the new rerunnable resolve-flow lane.
+**Closure:** Verified by `.planning/v0.9-phases/3/VERIFICATION.md`, `.planning/v0.9-phases/7/VERIFICATION.md`, and `.planning/phases/12-backfill-closure-phase-verification-surfaces/12-VERIFICATION.md`; the strengthened proof chain is current truth for milestone readiness, while `.planning/v0.9-MILESTONE-AUDIT.md` remains a historical audit artifact until a fresh milestone audit rerun replaces it as separate work.
