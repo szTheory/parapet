@@ -65,8 +65,9 @@ Phase 3 keeps the generated incident queue bounded and operator-paced under larg
 - The default queue remains active-only (`open` and `investigating`).
 - Queue refresh is explicit. Background changes should surface a visible refresh affordance instead of silently reordering the list while an operator is reading it.
 - Queue-side `Resolve` is a real lifecycle transition through `Parapet.Operator.resolve_incident/2`, not a UI-only note shortcut.
+- Phase 3 remains the canonical runtime proof owner for this seam through the named `generated resolve-flow proof lane`.
 - Performance proof is layered: bounded queue telemetry in `Parapet.Operator`, deterministic queue tests, and an opt-in advisory benchmark lane.
-- The generated queue resolve proof stays in the targeted `mix test test/parapet/generated_operator_live_paging_test.exs test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` lane rather than a browser E2E harness.
++- The `generated resolve-flow proof lane` stays in the targeted `mix test test/parapet/generated_operator_live_paging_test.exs test/parapet/operator_ui_integration_test.exs test/mix/tasks/parapet.gen.ui_test.exs` lane rather than a heavier browser harness.
 
 ### Advisory 50k+ Benchmark
 
