@@ -10,6 +10,39 @@
 | v0.4 | 4 / 9 | 3 | 7847 | 9 plans / 3 days |
 | v0.7 | 4 / 12 | 1 | 13401 | 12 plans / 1 day |
 | v0.8 | 4 / 8 | 1 | ~13900 | 8 plans / 1 day |
+| v0.9 | 14 / 36 | 5 | ~20274 | 36 plans / 5 days |
+
+## Milestone: v0.9 — Performance, Scale & DX
+
+**Shipped:** 2026-05-23
+**Phases:** 14 | **Plans:** 36
+
+### What Was Built
+Shifted from feature breadth to operational depth: TSDB cardinality protection (doctor sub-command + compile-time label ceiling), database scale (composite indexes + resolved-only archiver + `mix parapet.archive`), responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 orchestrator with multi-node doctor checks, and Ecto-backed multi-node safety (action claims + circuit breakers). Phases 6-14 closed verification gaps surfaced by the first audit.
+
+### What Worked
+- **Proactive safety as a gate, not a guideline:** Enforcing the label ceiling at compile-time (not just docs) made TSDB cardinality protection unbypassable for adopters.
+- **Resolved-only retention as a hard contract:** Re-deriving the archive predicate around "never touch active work" and regression-testing every archive entry surface caught a real data-loss footgun before ship.
+- **Closure-proof chain:** Building a proof that *fails* if the generated UI bypasses `Parapet.Operator.resolve_incident/2` turned a one-time bug fix (Phase 13) into a durable regression guard (Phase 14).
+
+### What Was Inefficient
+- **Audit-driven rework dominated the milestone:** 9 of 14 phases (6-14) were closure/reconciliation work triggered by the first audit's `gaps_found` result. The core five deliverables landed early; most calendar time went to making the proof surfaces honest and rerunnable.
+- **Uncommitted working tree at close:** The audited implementation (validator, circuit breaker, claim service, concurrency harness — 55+ files) was left uncommitted by per-plan execution, requiring a reconciliation commit at milestone close before the tag could mean anything.
+- **Two directory schemes:** v0.9 phases lived under both `.planning/v0.9-phases/` (numbered) and `.planning/phases/` (named), with leftover v0.6/v0.7 dirs contaminating prefixes — confusing `roadmap analyze` and the milestone tooling.
+
+### Patterns Established
+- **Closure phases as first-class:** Appending verification/reconciliation phases (6-14) with their own proof artifacts, rather than silently patching, keeps the milestone audit trail honest.
+- **Environment-conditional proofs:** Multi-node canaries that skip cleanly (vs. fail hard) when distributed Erlang is absent keep the suite green across environment classes without lying about coverage.
+- **Namespace carve-outs for non-shipped code:** Excluding `Parapet.TestSupport.*` from the public-API doc gate (alongside `Parapet.Internal.*`) so test helpers under the project namespace don't trip ship gates.
+
+### Key Lessons
+- A passing per-plan execution does not imply a committed working tree — verify `git status` is clean *before* tagging a milestone, or the tag is hollow.
+- When an audit returns `gaps_found`, treat the closure phases as the real work: budget for the reconciliation, and make each gap produce a rerunnable proof so the next audit can't regress silently.
+- Keep test-support modules either outside the product namespace or explicitly carved out of API gates; an accidental namespace choice can halt the entire suite via `System.halt`.
+
+### Cost Observations
+- Mostly Opus-driven planning + execution across closure phases; heavy reliance on goal-backward verification agents.
+- Notable: the milestone's effort distribution inverted the usual ratio — implementation was fast, proof reconciliation was slow.
 
 ## Milestone: v0.8 — Deterministic Escalation & Bounded Mitigation
 

@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v0.9
 milestone_name: Performance, Scale & DX
-status: completed
-stopped_at: Completed 14-02-PLAN.md
-last_updated: "2026-05-23T13:20:00Z"
-last_activity: 2026-05-23 -- Phase 14 execution completed
+status: shipped
+stopped_at: v0.9 milestone archived and tagged
+last_updated: "2026-05-23T13:30:00Z"
+last_activity: 2026-05-23 -- v0.9 milestone completed (archived, tagged v0.9)
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 13
-  completed_plans: 13
+  total_phases: 14
+  completed_phases: 14
+  total_plans: 36
+  completed_plans: 36
   percent: 100
 ---
 
@@ -18,17 +18,16 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-19)
+See: .planning/PROJECT.md (updated 2026-05-23)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 14 closure-proof backstop is landed; a fresh milestone audit rerun remains separate work.
+**Current focus:** Planning the next milestone via `/gsd:new-milestone` (fresh requirements + roadmap).
 
 ## Current Position
 
-Phase: 14 (backstop-generated-operator-ui-closure-proof) — COMPLETE
-Plan: 2 of 2 complete
-Status: Execution complete
-Last activity: 2026-05-23 -- Phase 14 execution completed
+Milestone: v0.9 Performance, Scale & DX — SHIPPED 2026-05-23 (audit passed, tagged v0.9)
+Archived: milestones/v0.9-ROADMAP.md, milestones/v0.9-REQUIREMENTS.md, milestones/v0.9-MILESTONE-AUDIT.md, milestones/v0.9-phases/
+Status: Milestone complete — ready to start next milestone
 
 Progress: [██████████] 100%
 
@@ -53,6 +52,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-23T12:30:08.910Z
-Stopped at: Completed 14-02-PLAN.md
+Last session: 2026-05-23
+Stopped at: v0.9 milestone completed — archived, requirements reset, tagged v0.9
 Resume file: None
+Next step: `/clear` then `/gsd:new-milestone`

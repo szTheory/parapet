@@ -141,3 +141,26 @@ None. All v0.7 requirements defined and satisfied. Tests pass locally.
 
 ### Known Gaps
 None. All v0.8 requirements defined and satisfied. Tests pass locally.
+
+## v0.9 Performance, Scale & DX
+
+**Date:** 2026-05-23
+**Stats:**
+- Phases: 1-14 (Phases 1-5 core deliverables; Phases 6-14 closure & reconciliation)
+- Plans: 36
+- Total LOC: ~20,274 (Elixir/EEx, lib+priv+test)
+- Timeline: 2026-05-19 → 2026-05-23 (5 days, 88 commits)
+
+### Accomplishments
+1. Shipped proactive TSDB cardinality protection: a `mix parapet.doctor cardinality` static analyzer plus a compile-time `Parapet.Metrics.Validator` enforcing a 10-label ceiling per metric, applied across all built-in metrics and adapter SLIs.
+2. Delivered database scale & pruning: composite indexes for `Incident`/`TimelineEntry`/`ToolAudit` at >100k rows, a `Parapet.Evidence.Archiver` with resolved-only retention, and a `mix parapet.archive` task plus Oban cron worker that never prunes active `investigating` work.
+3. Made the Operator UI responsive under load with bounded queue paging, index-aware Operator queries, and a 50k+ incident benchmark — and repaired the generated resolve flow so the active→resolved lifecycle is true again.
+4. Unified the Day-1 experience under `mix parapet.install`, a deterministic Igniter orchestrator that chains spine/prometheus/ui with explicit opt-in extras, backed by severity-aware multi-node `mix parapet.doctor` checks (e.g., Oban uniqueness).
+5. Proved multi-node safety with Ecto-backed action claims and circuit breakers under concurrency simulation, plus an environment-conditional peer-node canary that skips cleanly without distributed Erlang.
+6. Hardened milestone closure: phases 6-14 backfilled milestone-grade verification surfaces, reconciled planning-artifact drift, tightened archive retention, and added a regression-catching closure-proof chain for the generated operator UI.
+
+### Audit
+Milestone audit `passed` (2026-05-23): 12/12 requirements, 12/12 phases, 7/7 integration, 8/8 flows. See `milestones/v0.9-MILESTONE-AUDIT.md`.
+
+### Known Gaps
+None blocking. Carried-forward tech debt: family-level requirement IDs in some older summary frontmatter (manual cross-check), non-normalized Nyquist validation frontmatter on Phases 1/2/5/6, a manual fresh-host adoption transcript for Phase 4 (vs. automated bootstrap), a non-blocking EEx `<%# ... %>` deprecation warning in the generated UI proof lane, and cross-milestone phase-directory contamination in `.planning/phases/` pending `/gsd:cleanup`.

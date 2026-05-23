@@ -8,9 +8,11 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
-## Current Milestone: v0.9 Performance, Scale & DX
+## Current State
 
-**Goal:** Validate TSDB safety, generator ergonomics, and large-installation behavior. Shift the focus from feature breadth to operational depth, ensuring Parapet scales elegantly without bloating the host application's TSDB or Postgres instances.
+**Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
+
+**Next:** Planning the next milestone via `/gsd:new-milestone` (fresh requirements + roadmap).
 
 ## Requirements
 
@@ -75,17 +77,20 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ System implements Ecto-backed circuit breakers querying `ToolAudit` to prevent flap-loop mitigations and escalate instead — v0.8
 - ✓ System Operator UI displays the active escalation chain and highlights "System-Executed" mitigations distinctly from human-executed ones — v0.8
 - ✓ System Operator UI provides manual controls to trigger next escalations — v0.8
+- ✓ System provides a `mix parapet.doctor cardinality` sub-command to statically analyze metrics configurations and flag unsafe label patterns — v0.9
+- ✓ System strictly limits the number of labels per metric at compile-time to prevent accidental TSDB explosion — v0.9 (max 10 labels/metric)
+- ✓ System provides optimized Ecto migrations to add composite indexes to `Incident`, `TimelineEntry`, and `ToolAudit` for fast querying at >100k rows — v0.9
+- ✓ System provides a `Parapet.Evidence.Archiver` module and `mix parapet.archive` task to safely soft-delete or export resolved incidents older than a configurable window — v0.9 (resolved-only retention; active work never pruned)
+- ✓ Operator UI Incident list utilizes efficient pagination or cursor-based scrolling to prevent large payload rendering issues — v0.9 (bounded queue paging, 50k+ benchmark)
+- ✓ System provides `mix parapet.install` as a unified, interactive starting point that sequentially runs necessary sub-generators — v0.9
+- ✓ System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations) — v0.9
+- ✓ System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions — v0.9 (DB-backed contention proof; environment-conditional peer canary)
 
 ### Active
 
-- [ ] System provides a `mix parapet.doctor cardinality` sub-command to statically analyze metrics configurations and flag unsafe label patterns — v0.9
-- [ ] System strictly limits the number of labels per metric at compile-time to prevent accidental TSDB explosion — v0.9
-- [ ] System provides optimized Ecto migrations to add composite indexes to `Incident`, `TimelineEntry`, and `ToolAudit` for fast querying at >100k rows — v0.9
-- [ ] System provides a `Parapet.Evidence.Archiver` module and `mix parapet.archive` task to safely soft-delete or export resolved incidents older than a configurable window — v0.9
-- [ ] Operator UI Incident list utilizes efficient pagination or cursor-based scrolling to prevent large payload rendering issues — v0.9
-- [ ] System provides `mix parapet.install` as a unified, interactive starting point that sequentially runs necessary sub-generators — v0.9
-- [ ] System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations) — v0.9
-- [ ] System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions — v0.9
+<!-- Empty after v0.9 completion. Next milestone requirements defined via /gsd:new-milestone. -->
+
+(None — defining next milestone via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -107,6 +112,7 @@ Shipped v0.5 adding Synthetic Probes, deepened Accrue/Sigra integrations, and a 
 Shipped v0.6 adding trace exemplars, Rulestead change correlation, and Threadline compliance sync.
 Shipped v0.7 adding Async & Delivery Reliability, including Chimeway, Mailglass, Rindle SLIs, fault-domain triage enrichment, and host-owned recovery runbooks.
 Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parapet can take safe action using Oban policies and circuit breakers without relying on autonomous AI agents.
+Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protection, database scale & pruning (resolved-only archiver), a responsive Operator UI proven against 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Codebase now ~20,274 LOC (Elixir/EEx, lib+priv+test). The milestone took 14 phases — 5 core deliverables plus 9 closure/reconciliation phases that hardened the verification surfaces after the first audit returned `gaps_found`.
 
 ## Constraints
 
@@ -143,6 +149,15 @@ Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parap
 | Async Runbook auto-execution | Prevents alert ingestion blocking by triggering `Parapet.Automation.Executor` via Oban | ✓ Good |
 | Opt-in Auto-execution | Strictly requires `auto_execute: true` in `step/2` macro DSL for bounded safety | ✓ Good |
 | Strict URN system identity | Logs `system:automation:executor` in audits/timelines for clear Operator UI styling | ✓ Good |
+| Compile-time label ceiling on metrics | Makes TSDB cardinality protection unbypassable (max 10 labels/metric via `Parapet.Metrics.Validator`) rather than a documented guideline | ✓ Good |
+| Static cardinality analyzer (`mix parapet.doctor cardinality`) | Flags dynamic/unsafe label patterns before they reach the TSDB | ✓ Good |
+| Built-in archiver over cold-storage engine | `mix parapet.archive` + Oban cron prunes resolved evidence without inventing new infrastructure | ✓ Good |
+| Resolved-only archive retention contract | Active `investigating` work is never pruned — closes a data-loss footgun | ✓ Good |
+| Unified `mix parapet.install` Igniter orchestrator | Deterministic Day-1 path chaining spine/prometheus/ui with explicit opt-in extras | ✓ Good |
+| Ecto-backed action claims + circuit breakers for multi-node safety | DB-level atomic checks prevent cross-node race conditions on auto-mitigation | ✓ Good |
+| Environment-conditional peer-node canary | Skips cleanly without distributed Erlang instead of failing hard with `:nodistribution` | ✓ Good |
+| Closure phases as first-class (Phases 6-14) | Audit-surfaced gaps get their own rerunnable proof artifacts instead of silent patches | ✓ Good |
+| Exclude `Parapet.TestSupport.*` from public-API doc gate | Test-support modules under the project namespace no longer halt the suite | ✓ Good |
 
 ## Evolution
 
@@ -162,4 +177,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-19 for v0.8 milestone completion*
+*Last updated: 2026-05-23 after v0.9 milestone completion*
