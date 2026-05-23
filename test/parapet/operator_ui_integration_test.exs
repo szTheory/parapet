@@ -15,6 +15,9 @@ defmodule Parapet.OperatorUIIntegrationTest do
 
       assert content =~ "Parapet.Operator.list_incident_queue"
       assert content =~ "Parapet.Operator.incident_detail(id)"
+      assert content =~ "handle_event(\"resolve\""
+      assert content =~ "Parapet.Operator.resolve_incident(incident, payload)"
+      refute content =~ "Parapet.Operator.record_note(incident, \"Resolved\", payload)"
       refute content =~ "Repo.all(Parapet.Operator.queue_query())"
       assert content =~ "def handle_params"
       assert content =~ "stream("

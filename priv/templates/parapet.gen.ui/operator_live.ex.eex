@@ -96,7 +96,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
       action_type: :resolve
     }
 
-    case Parapet.Operator.record_note(incident, "Resolved", payload) do
+    case Parapet.Operator.resolve_incident(incident, payload) do
       {:ok, _result} ->
         {:noreply, push_patch(socket, to: queue_path(socket, %{"id" => id}))}
 

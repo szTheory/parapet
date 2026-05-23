@@ -40,6 +40,8 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "Load latest changes"
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
+      assert operator_live_source =~ "Parapet.Operator.resolve_incident(incident, payload)"
+      refute operator_live_source =~ "Parapet.Operator.record_note(incident, \"Resolved\", payload)"
 
       operator_components_source =
         Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_components.ex")
