@@ -33,6 +33,17 @@ defmodule Parapet.Integrations.RulesteadTest do
     assert Enum.any?(handlers, fn h -> h.id == "parapet-rulestead-telemetry" end)
   end
 
+  test "Parapet.attach(adapters: [:rulestead]) activates the handler via the uniform line" do
+    # Detach first to start from a clean state
+    :telemetry.detach("parapet-rulestead-telemetry")
+
+    result = Parapet.attach(adapters: [:rulestead])
+    assert result == {:ok, [:rulestead]}
+
+    handlers = :telemetry.list_handlers([:rulestead, :admin, :ruleset, :published])
+    assert Enum.any?(handlers, fn h -> h.id == "parapet-rulestead-telemetry" end)
+  end
+
   test "firing telemetry inserts a SystemEvent with rulestead_flag_change type" do
     metadata = %{
       flag_name: "feature_x",
@@ -45,7 +56,7 @@ defmodule Parapet.Integrations.RulesteadTest do
     assert_receive {:dummy_repo_insert, changeset}
     assert changeset.data.__struct__ == Parapet.Spine.SystemEvent
     assert Ecto.Changeset.get_field(changeset, :type) == "rulestead_flag_change"
-    
+
     payload = Ecto.Changeset.get_field(changeset, :payload)
     assert payload["flag_name"] == "feature_x"
     assert payload["ruleset_id"] == "rs_123"
@@ -64,17 +75,19 @@ defmodule Parapet.Integrations.RulesteadTest do
   describe "metrics" do
     test "Parapet.Metrics.Rulestead.metrics/0 returns the flag change counter" do
       metrics = Parapet.Metrics.Rulestead.metrics()
+
       assert Enum.any?(metrics, fn metric ->
-        match?(%Telemetry.Metrics.Counter{}, metric) and
-          metric.event_name == [:parapet, :rulestead, :flag_change] and
-          metric.name == [:parapet_rulestead_flag_change_total]
-      end)
+               match?(%Telemetry.Metrics.Counter{}, metric) and
+                 metric.event_name == [:parapet, :rulestead, :flag_change] and
+                 metric.name == [:parapet_rulestead_flag_change_total]
+             end)
     end
 
     test "firing rulestead telemetry causes parapet telemetry to execute" do
       test_pid = self()
-      
+
       handler_id = "test-parapet-rulestead-flag-change"
+
       :telemetry.attach(
         handler_id,
         [:parapet, :rulestead, :flag_change],

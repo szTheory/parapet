@@ -12,8 +12,10 @@ defmodule Parapet do
   @doc """
   Attaches an exception-safe telemetry handler or activates ecosystem integration adapters.
 
-  When a list with `:adapters` is provided, it iterates and conditionally invokes `setup/0`
-  on the corresponding adapter module (e.g., `Parapet.Integrations.Rulestead`).
+  When a list with `:adapters` is provided, it iterates the adapter atoms, resolves the
+  corresponding `Parapet.Integrations.*` module, and invokes `setup/0` on each loaded adapter
+  module. All built-in integration adapters implement the `Parapet.Integration` behaviour, so
+  `setup/0` is uniform across every adapter.
 
   When a map is provided, it delegates to Parapet.Internal.SafeHandler to ensure errors
   in the callback do not propagate back to the execution of the instrumented application code.
