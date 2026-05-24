@@ -1,0 +1,36 @@
+defmodule <%= inspect(@module_prefix) %>.PartialBacklogDrain do
+  use Parapet.Runbook
+
+  title("Partial Backlog Drain")
+  description("Guidance and recovery actions for a queue where a subset of items is stuck while others process normally.")
+
+  step(:identify_stuck_items,
+    label: "Identify Stuck Items",
+    description: "Determine which items in the backlog are not draining and confirm they are a bounded subset.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Filter queue items by status and age. Stuck items will have a last-attempt timestamp older than your processing SLA with no recent progress, while other items in the same queue continue to complete normally.",
+    warning: "Verify the items are genuinely stuck and not simply lower-priority. Retrying healthy items unnecessarily may trigger duplicate side effects if the associated operations are not idempotent."
+  )
+
+  step(:retry_stuck_items,
+    label: "Retry Stuck Items",
+    description: "Preview the bounded set of stuck items and retry them.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :retry_async_item,
+    target_kind: :async_item,
+    requires_preview: true,
+    warning: "Review the preview count before confirming — if the affected set is unexpectedly large, investigate the root cause before retrying to avoid reproducing the same failure at scale."
+  )
+
+  step(:verify_drain,
+    label: "Verify Backlog Is Draining",
+    description: "Confirm the previously stuck items are now processing.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Monitor queue depth and item status in your job backend or APM. Previously stuck items should show progress within one processing cycle. Verify no new items are becoming stuck before closing the incident."
+  )
+end
