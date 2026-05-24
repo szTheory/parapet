@@ -29,7 +29,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 15: Packaging Credibility Gate** - Populated hex.pm metadata and a Release-Please-owned CHANGELOG so the package reads as alive (completed 2026-05-24)
 - [x] **Phase 16: SLO Starter Packs & Low-Traffic Guardrails** - One-line opinionated SLO packs (WebSaaS, DeliverySaaS) built on the existing Provider engine (completed 2026-05-24)
 - [x] **Phase 17: Recovery Depth — Runbook Templates** - Deepen four runbook templates and add three new ones, all preview-first and bounded (completed 2026-05-24)
-- [ ] **Phase 18: Adoption & Authoring Docs** - Getting-started, troubleshooting, SLO authoring, and per-integration guides that name the packs and templates now built
+- [x] **Phase 18: Adoption & Authoring Docs** - Getting-started, troubleshooting, SLO authoring, and per-integration guides that name the packs and templates now built (completed 2026-05-24)
 
 ## Phase Details
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete    | 2026-05-24 |
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 2/2 | Complete    | 2026-05-24 |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete    | 2026-05-24 |
-| 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete   | 2026-05-24 |
+| 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete    | 2026-05-24 |
 
 ---
 
