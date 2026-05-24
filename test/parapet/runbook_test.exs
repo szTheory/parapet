@@ -35,7 +35,8 @@ defmodule Parapet.RunbookTest do
       type: :manual,
       kind: :guidance,
       preview_only: true,
-      guidance: "Go to Grafana..."
+      guidance: "Go to Grafana...",
+      warning: "Check logs before proceeding."
     )
 
     step(:auto_mitigate,
@@ -101,6 +102,7 @@ defmodule Parapet.RunbookTest do
       assert investigate_step.preview_only == true
       assert investigate_step.auto_execute == false
       assert investigate_step.guidance == "Go to Grafana..."
+      assert investigate_step.warning == "Check logs before proceeding."
 
       assert auto_mitigate_step.id == :auto_mitigate
       assert auto_mitigate_step.label == "Auto Mitigate"
