@@ -80,8 +80,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Three additional templates (`retry_storm`, `suppression_drift`, `partial_backlog_drain`) exist at the same depth, each with precondition, scope check, warning, bounded preview-first mitigation, and verification.
   3. The generator copies the new templates with `on_exists: :skip`, preserving the host-ownership contract.
 
-**Plans**: TBD
-**Research flag**: yes — verify the `Parapet.Runbook` DSL surface before writing templates. FEATURES.md states `warning:`/`requires_preview:`/`kind: :guidance` already exist, while SUMMARY.md notes the `warning:` key must land before any template uses it (Elixir silently swallows unknown macro keyword args). Plan-phase MUST confirm the `warning:` key is actually rendered by `Parapet.Runbook.step/2` and the Operator UI detail template before any template references it; if a surgical DSL/foundation addition is needed, it precedes template content within this phase.
+**Plans**: 3 plans (Wave 1: foundation; Wave 2: template content)
+- [ ] 17-01-PLAN.md — Wave 1: `warning:` three-surface foundation (step/2 macro + @doc, WorkbenchContract projection, runbook_card render) + schema & projection regression tests
+- [ ] 17-02-PLAN.md — Wave 2: deepen the four existing templates (`dead_letter`, `callback_delay`, `stalled_executor`, `provider_outage`) to RCV-01 depth
+- [ ] 17-03-PLAN.md — Wave 2: author three new templates (`retry_storm`, `suppression_drift`, `partial_backlog_drain`) + generator wiring (`on_exists: :skip`) + generator-content regression test
+**Research flag**: yes — verify the `Parapet.Runbook` DSL surface before writing templates. FEATURES.md states `warning:`/`requires_preview:`/`kind: :guidance` already exist, while SUMMARY.md notes the `warning:` key must land before any template uses it (Elixir silently swallows unknown macro keyword args). Plan-phase MUST confirm the `warning:` key is actually rendered by `Parapet.Runbook.step/2` and the Operator UI detail template before any template references it; if a surgical DSL/foundation addition is needed, it precedes template content within this phase. RESOLVED at plan time: `warning:` IS silently swallowed (confirmed); plan 17-01 lands the three-surface fix + schema/projection regression tests before any template content.
 
 ### Phase 18: Adoption & Authoring Docs
 
