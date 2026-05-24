@@ -16,6 +16,25 @@ defmodule Parapet.Runbook do
     end
   end
 
+  @doc """
+  Defines a single step in the runbook.
+
+  ## Options
+
+    * `:label` - A short human-readable label for the step (string).
+    * `:description` - A longer description of what this step involves (string).
+    * `:type` - The step type: `:manual` or `:mitigation`.
+    * `:kind` - The step kind: `:guidance` or `:capability`.
+    * `:capability` - The capability id to invoke for capability-backed mitigation steps
+      (one of `:retry_async_item`, `:requeue_dead_letter`, `:request_manual_provider_check`).
+    * `:target_kind` - The kind of action item this step targets (atom or string).
+    * `:requires_preview` - Whether a preview must be confirmed before execution (boolean, default `false`).
+    * `:preview_only` - Whether this step renders as a guidance block with no action button (boolean, default `false`).
+    * `:auto_execute` - Whether this step is eligible for automatic execution on alert ingestion (boolean, default `false`).
+    * `:guidance` - Advisory text rendered as a blue block in the operator UI when the step is in the `:guidance` state (string).
+    * `:warning` - Advisory text rendered as an amber block in the operator UI for any step carrying a precondition or impact warning (string).
+
+  """
   defmacro step(id, opts) do
     quote do
       @steps %{
@@ -29,7 +48,8 @@ defmodule Parapet.Runbook do
         requires_preview: Keyword.get(unquote(opts), :requires_preview, false),
         preview_only: Keyword.get(unquote(opts), :preview_only, false),
         auto_execute: Keyword.get(unquote(opts), :auto_execute, false),
-        guidance: unquote(opts)[:guidance]
+        guidance: unquote(opts)[:guidance],
+        warning: unquote(opts)[:warning]
       }
     end
   end
