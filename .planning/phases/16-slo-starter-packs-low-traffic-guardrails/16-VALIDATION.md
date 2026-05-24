@@ -49,7 +49,7 @@ created: 2026-05-24
 | TBD | — | 1 | SLO-01 | T-flap | Each WebSaaS slice has non-zero `min_total_rate`; generator output contains denominator guard `> <min_total_rate>` | integration | same | ❌ W0 | ⬜ pending |
 | TBD | — | 0 | SLO-02 | — | N/A | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ❌ W0 | ⬜ pending |
 | TBD | — | 1 | SLO-02 | — | `DeliverySaaS.slos/0` returns WebSaaS 3 + Mailglass + Chimeway slices when stubs present | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ❌ W0 | ⬜ pending |
-| TBD | — | 1 | SLO-02 | T-compileout | `DeliverySaaS.slos/0` drops delivery slices cleanly when Mailglass/Chimeway absent (only 3 WebSaaS slices remain) | unit | same | ❌ W0 | ⬜ pending |
+| TBD | — | 1 | SLO-02 | T-compileout | `DeliverySaaS.delivery_slices(absent_atom, absent_atom)` returns `[]` (BEHAVIORAL absent-branch test, not a structural grep) — so `WebSaaS.slos() ++ delivery_slices(absent, absent)` yields only the 3 WebSaaS slices | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ❌ W0 | ⬜ pending |
 | TBD | — | 1 | SLO-02 | T-drift | Delivery slices delegate to `MailglassDelivery.slos()` / `ChimewayDelivery.slos()` — no duplicated SliceSpec names | unit | same | ❌ W0 | ⬜ pending |
 | TBD | — | 1 | SLO-01, SLO-02 | — | New pack modules are fully documented (`mix verify.public_api` / `mix docs --warnings-as-errors` passes) | integration | `mix verify.public_api` | depends on impl | ⬜ pending |
 

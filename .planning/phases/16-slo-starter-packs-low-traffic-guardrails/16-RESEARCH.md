@@ -484,7 +484,7 @@ defmodule Parapet.SLO.StarterPack.WebSaaS do
         good_source_metric: "parapet_http_request_count",
         good_matchers: [status_class: ["2xx", "3xx"]],
         total_source_metric: "parapet_http_request_count",
-        total_matchers: [],
+        total_matchers: [status_class: ["2xx", "3xx", "4xx", "5xx"]],
         objective: 99.5,
         alert_class: :ticket,
         runbook: "https://parapet.dev/runbooks/http-availability",
@@ -498,7 +498,7 @@ defmodule Parapet.SLO.StarterPack.WebSaaS do
         good_source_metric: "parapet_journey_login_count",
         good_matchers: [outcome: :success],
         total_source_metric: "parapet_journey_login_count",
-        total_matchers: [],
+        total_matchers: [outcome: [:success, :failure]],
         objective: 99.9,
         alert_class: :page,
         runbook: "https://parapet.dev/runbooks/login-journey",
@@ -512,7 +512,7 @@ defmodule Parapet.SLO.StarterPack.WebSaaS do
         good_source_metric: "parapet_oban_jobs_total",
         good_matchers: [state: "success"],
         total_source_metric: "parapet_oban_jobs_total",
-        total_matchers: [],
+        total_matchers: [state: ["success", "failure", "cancelled", "discarded"]],
         objective: 99.0,
         alert_class: :ticket,
         runbook: "https://parapet.dev/runbooks/oban-job-success",
@@ -524,7 +524,7 @@ defmodule Parapet.SLO.StarterPack.WebSaaS do
 end
 ```
 
-**Notes on `total_matchers: []`:** `AsyncDelivery.selector/2` with empty matchers renders just the metric name (no `{...}` braces) — e.g., `"parapet_http_request_count"`. This is correct PromQL for "all series of this metric". Confirmed at `async_delivery.ex:119-121`.
+**Notes on non-empty `total_matchers`:** `SliceSpec.validate!` REJECTS an empty `total_matchers` list for `:ratio` slices (`slice_spec.ex:127-129`), so each slice enumerates its denominator explicitly (HTTP status classes, login outcomes, Oban terminal states — the RESOLVED values above). `AsyncDelivery.selector/2` renders a list-valued matcher as a PromQL regex match — e.g., `status_class=~"2xx|3xx|4xx|5xx"`. Confirmed at `async_delivery.ex:200-208`.
 
 **Notes on `good_matchers: [status_class: ["2xx", "3xx"]]`:** The list-value path in `render_selector` produces `status_class=~"2xx|3xx"` — a PromQL regex match. Confirmed at `async_delivery.ex:200-208`.
 
@@ -734,22 +734,26 @@ SKIPPED — This phase is pure code addition in an existing Elixir library proje
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **HTTP total_matchers constraint**
+> All three total_matchers questions are resolved. The chosen values are LOCKED and are the
+> enumerated values the plans (`16-01`, `16-02`) and the WebSaaS code block above use. Empty
+> `total_matchers` is forbidden by `SliceSpec.validate!` (`slice_spec.ex:127-129`).
+
+1. **HTTP total_matchers constraint** — **RESOLVED**
    - What we know: `SliceSpec.validate!` rejects empty `total_matchers` for non-diagnostic slices (`slice_spec.ex:127-129`).
    - What's unclear: The cleanest total matcher for "all HTTP requests" without enumerating all routes.
-   - **Recommendation:** Use `total_matchers: [status_class: ["2xx", "3xx", "4xx", "5xx"]]`. This covers all responses emitted by the plug and is stable — status classes don't change.
+   - **Resolution (chosen):** `total_matchers: [status_class: ["2xx", "3xx", "4xx", "5xx"]]`. This covers all responses emitted by the plug and is stable — status classes don't change.
 
-2. **LoginJourney total_matchers constraint**
+2. **LoginJourney total_matchers constraint** — **RESOLVED**
    - What we know: Same validator issue. Login metric tags are only `:outcome`.
    - What's unclear: Whether to enumerate `[outcome: [:success, :failure]]` or use a regex.
-   - **Recommendation:** Use `total_matchers: [outcome: [:success, :failure]]` — the only two outcomes emitted by `Integrations.Sigra`.
+   - **Resolution (chosen):** `total_matchers: [outcome: [:success, :failure]]` — the only two outcomes emitted by `Integrations.Sigra`.
 
-3. **Oban total_matchers constraint**
+3. **Oban total_matchers constraint** — **RESOLVED**
    - What we know: Oban metric tags are `:worker`, `:queue`, `:state`. Total = all jobs.
    - What's unclear: Full enumeration of Oban state values.
-   - **Recommendation:** Use `total_matchers: [state: ["success", "failure", "cancelled", "discarded"]]` — standard Oban terminal states. Or investigate if `queue` can serve as a non-empty total matcher: `total_matchers: [queue: :.+]` (regex).
+   - **Resolution (chosen):** `total_matchers: [state: ["success", "failure", "cancelled", "discarded"]]` — the standard Oban terminal states. (The `queue` regex alternative was rejected in favor of the explicit terminal-state enumeration for clarity and stability.)
 
 ---
 
