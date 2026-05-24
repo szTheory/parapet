@@ -27,8 +27,8 @@ The dominant risk per research is drift and package scope-leak, not technical di
 
 - [x] **SLO-01**: A WebSaaS adopter can register a coherent first set of SLOs in one line via `Parapet.SLO.StarterPack.WebSaaS` (HTTP availability, LoginJourney, Oban job success) with documented default objectives and human-terms rationale.
 - [x] **SLO-02**: A delivery-sending adopter can extend the WebSaaS set via `Parapet.SLO.StarterPack.DeliverySaaS` (adds MailglassDelivery + ChimewayDelivery slices), registering delivery slices **only when those providers are configured** (compiles out cleanly otherwise).
-- [ ] **SLO-03**: An adopter unsure how to slice SLOs can read `docs/slo-authoring-guide.md` with concrete good-vs-bad journey-slicing examples and a decision tree ("does this failure directly prevent a user task? → journey SLO").
-- [ ] **SLO-04**: An adopter running a low-traffic service finds a named "Low-Traffic and Low-Volume Services" section documenting the denominator guard (`and sum(rate(total[1h])) > N`), synthetic-probe fallback, and extended-window/lower-sensitivity approach — and the explicitly-named anti-pattern of lowering the objective to silence noise. *(Guidance + generated-rule commentary; no engine code.)*
+- [x] **SLO-03**: An adopter unsure how to slice SLOs can read `docs/slo-authoring-guide.md` with concrete good-vs-bad journey-slicing examples and a decision tree ("does this failure directly prevent a user task? → journey SLO").
+- [x] **SLO-04**: An adopter running a low-traffic service finds a named "Low-Traffic and Low-Volume Services" section documenting the denominator guard (`and sum(rate(total[1h])) > N`), synthetic-probe fallback, and extended-window/lower-sensitivity approach — and the explicitly-named anti-pattern of lowering the objective to silence noise. *(Guidance + generated-rule commentary; no engine code.)*
 
 ### RCV: Recovery Depth
 
@@ -81,8 +81,8 @@ Each requirement maps to exactly one phase. v0.10 continues phase numbering from
 | ADOPT-05 | Phase 18 | Complete |
 | SLO-01 | Phase 16 | Complete |
 | SLO-02 | Phase 16 | Complete |
-| SLO-03 | Phase 18 | Pending |
-| SLO-04 | Phase 18 | Pending |
+| SLO-03 | Phase 18 | Complete |
+| SLO-04 | Phase 18 | Complete |
 | RCV-01 | Phase 17 | Complete |
 | RCV-02 | Phase 17 | Complete |
 
