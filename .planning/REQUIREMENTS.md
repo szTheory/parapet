@@ -32,7 +32,7 @@ The dominant risk per research is drift and package scope-leak, not technical di
 
 ### RCV: Recovery Depth
 
-- [ ] **RCV-01**: An operator opening any of the four existing runbook templates (`dead_letter`, `callback_delay`, `stalled_executor`, `provider_outage`) finds real depth — preconditions (`kind: :guidance`), a scoped preview step (`requires_preview: true`), at least one `warning:` annotation, a bounded mitigation, and a post-action verification step — not a 1–2 step stub. *(Uses existing `Parapet.Runbook` DSL.)*
+- [x] **RCV-01**: An operator opening any of the four existing runbook templates (`dead_letter`, `callback_delay`, `stalled_executor`, `provider_outage`) finds real depth — preconditions (`kind: :guidance`), a scoped preview step (`requires_preview: true`), at least one `warning:` annotation, a bounded mitigation, and a post-action verification step — not a 1–2 step stub. *(Uses existing `Parapet.Runbook` DSL.)*
 - [ ] **RCV-02**: An operator has three additional prebuilt templates at the same depth — `retry_storm`, `suppression_drift`, and `partial_backlog_drain` — each with precondition, scope check, warning, bounded preview-first mitigation, and verification.
 
 ## Acceptance Criteria
@@ -83,7 +83,7 @@ Each requirement maps to exactly one phase. v0.10 continues phase numbering from
 | SLO-02 | Phase 16 | Complete |
 | SLO-03 | Phase 18 | Pending |
 | SLO-04 | Phase 18 | Pending |
-| RCV-01 | Phase 17 | Pending |
+| RCV-01 | Phase 17 | Complete |
 | RCV-02 | Phase 17 | Pending |
 
 **Coverage:**
