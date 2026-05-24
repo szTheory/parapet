@@ -96,7 +96,27 @@ exception flagged below: see Open Question on the Rulestead activation API).
   `slo-reference.md:27-42`.
 - **D-11:** Each integration guide follows ONE consistent structure: Prerequisites/optional-dep
   → what it unlocks (SLO slices *or* metrics, honestly per D-08/D-09) → activation line
-  (corrected per D-07) → config keys → 2-3 troubleshooting answers.
+  (uniform per D-16) → config keys → 2-3 troubleshooting answers.
+- **D-16 (OQ-1 RESOLVED → option (b)+(d), 2026-05-24):** Make integration activation uniform
+  and crash-proof in code so all four guides can honestly show the same
+  `Parapet.attach(adapters: [...])` line — this SUPERSEDES D-07's "Rulestead guide shows
+  `Parapet.Integrations.Rulestead.attach()` directly" instruction. The code carve-out
+  (explicitly permitted by the phase boundary) comprises: (1) add `def setup, do: attach()` to
+  `lib/parapet/integrations/rulestead.ex` (Rulestead is the SOLE outlier — research confirmed all
+  7 others already expose `setup/0`); (2) introduce a `Parapet.Integration` behaviour with
+  `@callback setup() :: any()` (match existing return shapes) and declare `@behaviour
+  Parapet.Integration` + `@impl true` on ALL eight integration modules (Sigra, Accrue, Threadline,
+  Chimeway, Mailglass, Rindle, Scoria, Rulestead) so a missing/mis-named callback is a COMPILE
+  error — mirrors Parapet's own `Parapet.Notifier`/`Parapet.Probe`/`Parapet.SLO.Provider`
+  behaviour idiom and the project DNA "prefer adapters and behaviors for integrations" /
+  "compile-time validation where possible"; (3) fix the `Parapet.attach/1` `@doc` (it claims it
+  "invokes `setup/0`" — now true everywhere); (4) tests: a behaviour-conformance test + a
+  `Parapet.attach(adapters: [:rulestead])` activation test in the established
+  `test/parapet/integrations/*` style; (5) CHANGELOG `### Fixed` (Rulestead activation crash) +
+  `### Added` (`Parapet.Integration` behaviour). Purely additive (safe minor bump); rejected
+  alternatives: doc-only (leaves a live crash in the 30-min path) and a `function_exported?/3`
+  tolerant dispatcher (the "obscures runtime behavior" footgun the DNA warns against, since
+  Parapet owns every integration module).
 
 ### SLO-Authoring Low-Traffic Guidance (SLO-03, SLO-04)
 - **D-12:** The "Low-Traffic and Low-Volume Services" section MUST describe the EXACT engine
@@ -139,13 +159,12 @@ exception flagged below: see Open Question on the Rulestead activation API).
   follow whatever the existing docs already use (default: bullet tree, no new tooling).
 
 ### Open Questions for Planning
-- **OQ-1 (Rulestead activation, D-07):** Planning decides between (a) doc-only — the Rulestead
-  guide shows `Parapet.Integrations.Rulestead.attach()` and the other three show
-  `Parapet.attach(adapters: [...])`; or (b) a surgical one-line `setup/0` delegate added to
-  `rulestead.ex` so the uniform attach line works everywhere. (a) keeps the phase docs-only and
-  is the default; (b) makes the docs consistent at the cost of touching code — only if planning
-  judges the inconsistency too costly for adopters. Either way, no doc may ship the crashing
-  `Parapet.attach(adapters: [:rulestead])` call.
+- **OQ-1 (Rulestead activation) — RESOLVED 2026-05-24 → option (b)+(d). See D-16.** Decision:
+  fix activation in code (Rulestead `setup/0` delegate + a compile-enforced `Parapet.Integration`
+  behaviour across all 8 integrations) so every guide shows the uniform
+  `Parapet.attach(adapters: [...])` line. Backed by deep research (Elixir/OTel idiom = `setup/0`
+  + `@behaviour`; Parapet's own behaviour pattern; "explicit over magic" DNA). No doc ships the
+  crashing call; the doc-only and tolerant-dispatcher alternatives were rejected.
 - **OQ-2 (Fly.io boundary, D-15.5):** The Fly.io troubleshooting answer authoritatively covers
   the Parapet side (deploy hook, `/metrics` exposure) but must link out for Fly-internal scrape
   config rather than assert platform specifics.
