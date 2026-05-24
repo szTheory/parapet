@@ -4,7 +4,7 @@ Accrue is a billing and subscription library. When you attach the Accrue integra
 
 ## Prerequisites
 
-- `accrue` installed in your host app (optional dep — Parapet detects it via `Code.ensure_loaded?`)
+- `accrue` installed in your host app (optional dep — if it is absent, Accrue never emits the telemetry events the adapter listens for, so the attached handlers stay dormant and harmless; Parapet does not probe for the `accrue` library itself)
 - Parapet installed and configured (`mix parapet.install`)
 
 ## What it unlocks

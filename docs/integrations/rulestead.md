@@ -4,7 +4,7 @@ Rulestead is a feature-flag and ruleset management library. When you attach the 
 
 ## Prerequisites
 
-- `rulestead` installed in your host app (optional dep — Parapet detects it via `Code.ensure_loaded?`)
+- `rulestead` installed in your host app (optional dep — if it is absent, Rulestead never emits the ruleset-published event the adapter listens for, so the attached handler stays dormant and harmless; Parapet does not probe for the `rulestead` library itself)
 - Parapet installed and configured (`mix parapet.install`)
 
 ## What it unlocks
