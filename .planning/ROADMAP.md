@@ -26,7 +26,7 @@ v0.10 closes the gap between "feature-complete" and "adoptable by a stranger" on
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 15: Packaging Credibility Gate** - Populated hex.pm metadata and a Release-Please-owned CHANGELOG so the package reads as alive
+- [x] **Phase 15: Packaging Credibility Gate** - Populated hex.pm metadata and a Release-Please-owned CHANGELOG so the package reads as alive (completed 2026-05-24)
 - [ ] **Phase 16: SLO Starter Packs & Low-Traffic Guardrails** - One-line opinionated SLO packs (WebSaaS, DeliverySaaS) built on the existing Provider engine
 - [ ] **Phase 17: Recovery Depth — Runbook Templates** - Deepen four runbook templates and add three new ones, all preview-first and bounded
 - [ ] **Phase 18: Adoption & Authoring Docs** - Getting-started, troubleshooting, SLO authoring, and per-integration guides that name the packs and templates now built
@@ -100,7 +100,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete   | 2026-05-23 |
+| 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete    | 2026-05-24 |
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 0/TBD | Not started | - |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 0/TBD | Not started | - |
 | 18. Adoption & Authoring Docs | v0.10 | 0/TBD | Not started | - |
