@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v0.10
 milestone_name: Adopter Success
 status: verifying
-stopped_at: Phase 16 context gathered (assumptions mode)
-last_updated: "2026-05-24T11:14:12.882Z"
+stopped_at: Phase 17 context gathered (assumptions mode)
+last_updated: "2026-05-24T11:56:54.845Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 4
@@ -94,7 +94,7 @@ Items acknowledged and carried forward (not in the v0.10 roadmap):
 
 ## Session Continuity
 
-Last session: 2026-05-24T11:02:48.564Z
-Stopped at: Phase 16 context gathered (assumptions mode)
-Resume file: None
+Last session: 2026-05-24T11:56:54.842Z
+Stopped at: Phase 17 context gathered (assumptions mode)
+Resume file: .planning/phases/17-recovery-depth-runbook-templates/17-CONTEXT.md
 Next step: `/gsd:plan-phase 15`
