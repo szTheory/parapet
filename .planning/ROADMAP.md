@@ -62,8 +62,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Every pack slice uses only low-cardinality labels (no `id`/`trace`/`path`/`user` keys) and sets a non-zero low-traffic denominator guard so packs do not flap on low-traffic services.
   4. The new pack modules pass the existing public-API verification (`verify.public_api`) and participate in multi-burn-rate rule generation with zero Generator changes.
 
-**Plans**: TBD
-**Research flag**: yes — verify HTTP `SliceSpec` selector format during planning (does `AsyncDelivery.selector/2` handle HTTP `status_code` label matchers, or does the pack need a small HTTP selector helper?). Run `/gsd:plan-phase --research-phase` only if the selector code-read reveals a gap.
+**Plans**: 2 plans
+
+  - [ ] 16-01-PLAN.md — Build `Parapet.SLO.StarterPack.WebSaaS` (3 SliceSpecs: HTTP availability, login journey, Oban job-success) pinned to real emitted metrics, with documented objectives + LabelPolicy/denominator-guard tests (Wave 1)
+  - [ ] 16-02-PLAN.md — Build `Parapet.SLO.StarterPack.DeliverySaaS` composing WebSaaS + conditionally-loaded, delegated Mailglass/Chimeway delivery slices (Wave 2)
+
+**Research flag**: RESOLVED — `AsyncDelivery.selector/2` renders any binary metric name + label matchers generically (D-04), so no HTTP selector helper is needed; HTTP matches on the `status_class` tag (not the `status_code` measurement, D-05). No `--research-phase` run required.
 
 ### Phase 17: Recovery Depth — Runbook Templates
 
@@ -101,7 +105,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete    | 2026-05-24 |
-| 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 0/TBD | Not started | - |
+| 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 0/2 | Planned | - |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 0/TBD | Not started | - |
 | 18. Adoption & Authoring Docs | v0.10 | 0/TBD | Not started | - |
 
