@@ -10,20 +10,11 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
+**Shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
 
-**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a deliberate `0.10.0` first publish. Phase 16 SLO Starter Packs & Low-Traffic Guardrails complete (2026-05-24): `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` give adopters one-line SLO registration (no hand-written PromQL) with low-cardinality, low-traffic-safe slices — the code surfaces Phase 18 docs will name. Phase 17 Recovery Depth — Runbook Templates complete (2026-05-24): a `warning:` step annotation now renders end-to-end through the `Parapet.Runbook` DSL → projection → operator UI (it was previously silently swallowed), the four existing runbook templates are deepened to trustworthy depth (precondition, scoped preview, warning, bounded mitigation, verification), and three new templates (`retry_storm`, `suppression_drift`, `partial_backlog_drain`) ship at the same depth — all host-owned via the generator's `on_exists: :skip` contract. Phase 18 Adoption & Authoring Docs complete (2026-05-24): seven new guides — `getting-started` (cold start to first generated alert in <30 min, zero raw PromQL), `troubleshooting` (five predictable obstacles), `slo-authoring-guide` (journey-slicing decision tree + low-traffic guardrails), and per-integration guides for Sigra/Accrue/Rulestead/Threadline — that accurately name the Phase 15-17 surfaces, plus a `Parapet.Integration` behaviour that makes integration activation uniform and crash-proof (fixing the Rulestead `attach/0` defect so every adapter activates via the same `Parapet.attach(adapters: […])` line). **All v0.10 phases (15-18) are now complete — the milestone is ready for audit.**
+**Previously shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements).
 
-## Current Milestone: v0.10 Adopter Success
-
-**Goal:** Make Parapet's already-built capabilities adoptable by a stranger — close the gap between feature-complete and adoption-complete — without expanding feature surface.
-
-**Target features:**
-- Adoption funnel: runnable demo, one-page end-to-end getting-started, hex package metadata + `links:` (repo/docs/issues), `CHANGELOG.md`, troubleshooting/FAQ, and per-integration setup guides (including surfacing the already-built Accrue/Rulestead/Threadline/Sigra integrations)
-- SLO authoring guidance: opinionated starter SLO packs by app type, good-vs-bad journey-slicing examples, and low-traffic-safe alerting guidance so adopters don't hand-write raw PromQL
-- Common recovery depth: richer prebuilt, preview-first, bounded runbook templates for recurring async/delivery failures (dead-letter, provider outage, stalled jobs, callback delay)
-
-**Out of this milestone:** API/telemetry freeze is deferred to v1.0 (per `MILESTONE-ARC.md`), so recovery and SLO surfaces land complete before they are locked.
+**Next:** Planning the next milestone via `/gsd:new-milestone`. The API / telemetry freeze remains deferred to v1.0 (per `MILESTONE-ARC.md`); a runnable demo app (DEMO-01) is deferred to v0.10.x. One release-mechanics follow-up is tracked: the `release-as: "0.10.0"` pin stays until the v0.10.0 release PR merges and tags v0.10.0.
 
 ## Requirements
 
@@ -108,9 +99,16 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- v0.10 Adopter Success — all phases (15-18) complete; milestone ready for audit. -->
+<!-- v0.10 Adopter Success shipped and archived 2026-05-24. No active milestone — define the next via /gsd:new-milestone. -->
 
-All v0.10 Adopter Success phases are complete and verified. Deferred to v0.10.x: a runnable demo app (DEMO-01). Next: run the milestone audit (`/gsd:audit-milestone`) before archiving v0.10 and opening the next milestone.
+None — v0.10 Adopter Success is shipped and archived (all 11 requirements Validated above). The next milestone's requirements will be defined via `/gsd:new-milestone`.
+
+Carried forward for consideration in a future milestone:
+
+- **DEMO-01** (v0.10.x): runnable demo app under `examples/demo_app/` + CI green check — deferred to validate that docs alone reduce onboarding friction first.
+- **SLO-W1** (v1.0+): interactive `mix parapet.gen.slo` wizard.
+- **SLO-B1** (v1.0+): cross-integration SLO slice bundles.
+- **API / telemetry freeze** (v1.0): lock recovery and SLO surfaces once proven in adoption.
 
 ### Out of Scope
 
@@ -133,6 +131,7 @@ Shipped v0.6 adding trace exemplars, Rulestead change correlation, and Threadlin
 Shipped v0.7 adding Async & Delivery Reliability, including Chimeway, Mailglass, Rindle SLIs, fault-domain triage enrichment, and host-owned recovery runbooks.
 Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parapet can take safe action using Oban policies and circuit breakers without relying on autonomous AI agents.
 Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protection, database scale & pruning (resolved-only archiver), a responsive Operator UI proven against 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Codebase now ~20,274 LOC (Elixir/EEx, lib+priv+test). The milestone took 14 phases — 5 core deliverables plus 9 closure/reconciliation phases that hardened the verification surfaces after the first audit returned `gaps_found`.
+Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime deps, Ecto schemas, or Oban queues) over 4 phases / 12 plans in ~2 days — hex.pm metadata + Release-Please CHANGELOG, one-line SLO starter packs, an end-to-end `warning:` runbook surface with deepened + new preview-first templates, and seven adoption guides backed by a uniform `Parapet.Integration` activation behaviour. ~764 LOC of source change + ~697 lines of docs. First audit returned `tech_debt`; a same-day closure pass resolved the adopter-facing items, and the milestone audit `passed`.
 
 ## Constraints
 
@@ -178,6 +177,14 @@ Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protecti
 | Environment-conditional peer-node canary | Skips cleanly without distributed Erlang instead of failing hard with `:nodistribution` | ✓ Good |
 | Closure phases as first-class (Phases 6-14) | Audit-surfaced gaps get their own rerunnable proof artifacts instead of silent patches | ✓ Good |
 | Exclude `Parapet.TestSupport.*` from public-API doc gate | Test-support modules under the project namespace no longer halt the suite | ✓ Good |
+| Release-Please-owned CHANGELOG body + retroactive `docs/HISTORY.md` | Human-edited history never conflicts with generated changelog entries; retroactive v0.1–v0.9 history lives outside the changelog body | ✓ Good |
+| Opinionated SLO starter packs over auto-generated targets | One-line `WebSaaS`/`DeliverySaaS` packs with documented objectives beat silent auto-targets that become false safety guarantees | ✓ Good |
+| Provider-gated delivery slices (`Code.ensure_loaded?` on parameterized atoms) | DeliverySaaS delivery slices register only when Mailglass/Chimeway are configured, compiling out cleanly otherwise | ✓ Good |
+| Non-zero denominator guard on every pack slice (`min_total_rate`) | Low-traffic services don't flap; packs stay trustworthy without per-adopter tuning | ✓ Good |
+| `warning:` as a first-class rendered runbook step annotation | Elixir silently swallows unknown macro keyword args — the surface had to be wired DSL→projection→UI before any template could rely on it | ✓ Good |
+| Guidance-only runbooks where no allowlisted capability fits | `retry_storm`/`suppression_drift` stay advisory rather than executing mitigations that worsen the failure (e.g., retrying a storm) | ✓ Good |
+| `Parapet.Integration` behaviour for uniform activation | Every adapter activates via the same `Parapet.attach(adapters: […])` line, crash-proof; fixes the Rulestead `attach/0` defect | ✓ Good |
+| Code surfaces land before the docs that name them | Phase 16/17 code shipped before Phase 18 docs, so guides never reference uncompilable code | ✓ Good |
 
 ## Evolution
 
@@ -197,4 +204,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 — completed Phase 17 (Recovery Depth — Runbook Templates) of v0.10 Adopter Success*
+*Last updated: 2026-05-24 after v0.10 Adopter Success milestone*

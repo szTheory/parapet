@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v0.10
 milestone_name: Adopter Success
-status: verifying
-stopped_at: Phase 18 context gathered (assumptions mode)
-last_updated: "2026-05-24T18:01:16.287Z"
-last_activity: 2026-05-24
+status: Awaiting next milestone
+stopped_at: Milestone v0.10 complete and archived
+last_updated: "2026-05-24T18:32:15.175Z"
+last_activity: 2026-05-24 — Milestone v0.10 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -18,19 +18,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-23)
+See: .planning/PROJECT.md (updated 2026-05-24 after v0.10)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 18 — adoption-authoring-docs
+**Current focus:** Planning the next milestone (`/gsd:new-milestone`)
 
 ## Current Position
 
-Phase: 18
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-05-24
-
-Progress: [░░░░░░░░░░] 0%
+Phase: Milestone v0.10 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-05-24 — Milestone v0.10 completed and archived
 
 ## Performance Metrics
 
@@ -67,31 +65,17 @@ Progress: [░░░░░░░░░░] 0%
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [v0.10 roadmap]: Land hex.pm metadata + CHANGELOG (ADOPT-01/02) first as a low-cost credibility gate that unblocks all downstream adoption work.
-- [v0.10 roadmap]: Build code surfaces (SLO packs, deepened runbook templates) before the docs that name them, so docs never reference uncompilable code.
-- [v0.10 roadmap]: Treat the `warning:` DSL surface as a research flag on the recovery phase — plan-phase verifies `Parapet.Runbook.step/2` actually renders `warning:` before any template uses it (Elixir silently swallows unknown macro keyword args).
-- [v0.10 roadmap]: Coarse granularity → 4 cohesive phases instead of the 6 research-suggested; the deferred demo (DEMO-01) and SLO wizard are out of scope.
-- [Phase ?]: Avoids RESEARCH pitfall #5 where Hex ignores description inside package/0
-- [Phase ?]: Prevents mix verify.public_api failures on Release-Please-generated commit-hash links in CHANGELOG.md
-- [Phase ?]: action-input mode ignores release-please-config.json; manifest mode reads config-file + manifest-file, preventing accidental 1.0.0 release
-- [Phase ?]: callback_delay uses guidance-only mitigation since no allowlisted capability fits callback-delay remediation (D-06 constraint)
-- [Phase 17-03]: retry_storm is guidance-only (RESEARCH D-07 correction) — executing :retry_async_item on storming items worsens worker exhaustion
-- [Phase 17-03]: partial_backlog_drain wires :retry_async_item with target_kind: :async_item, requires_preview: true — exact semantic fit for stuck-subset retry
-- [Phase 17-03]: suppression_drift is guidance-only — no allowlisted capability addresses escalation suppression state management
-- [Phase ?]: ExDoc path flattening is expected behavior, not a bug
+Decisions are logged in PROJECT.md Key Decisions table. v0.10's decisions were
+folded into that table at milestone close; the full per-phase record lives in
+`milestones/v0.10-ROADMAP.md`. No decisions are pending for the next milestone.
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-- [Phase 16]: HTTP `SliceSpec` selector format is the one open code question — verify `AsyncDelivery.selector/2` handles HTTP `status_code` matchers or add a small HTTP selector helper. Run `--research-phase` only if the code-read reveals a gap.
-- [Phase 17]: Cross-file tension — FEATURES.md says `warning:`/`requires_preview:`/`kind: :guidance` already exist; SUMMARY.md says `warning:` must land before templates use it. Resolve by verifying the live DSL surface before writing template content.
-- [Phase 18]: Threadline is "conceptual interoperability" — its integration guide must be honest about what is actually wired vs aspirational. Low-traffic guidance thresholds are SRE-community consensus, not canonical — validate against Parapet's actual generated rule shapes during authoring.
+None open — all v0.10 phase blockers were resolved before close (the `warning:` DSL surface was verified and wired, the HTTP `SliceSpec` selector question was resolved via `AsyncDelivery.selector/2` matching `status_class`, and the Threadline guide ships honest about conceptual-only interop). One release-mechanics follow-up is tracked, not blocking: remove the `release-as: "0.10.0"` pin only after the v0.10.0 release PR merges and tags v0.10.0.
 
 ## Deferred Items
 
@@ -106,7 +90,11 @@ Items acknowledged and carried forward (not in the v0.10 roadmap):
 
 ## Session Continuity
 
-Last session: 2026-05-24T17:54:14.747Z
-Stopped at: Phase 18 context gathered (assumptions mode)
+Last session: 2026-05-24 — v0.10 milestone completed and archived
+Stopped at: Milestone v0.10 complete
 Resume file: None
-Next step: `/gsd:plan-phase 15`
+Next step: `/gsd:new-milestone`
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd:new-milestone
