@@ -62,7 +62,14 @@ defmodule Parapet.MixProject do
         "docs/adopter-flows.md",
         "docs/operator-ui.md",
         "docs/slo-reference.md",
-        "docs/telemetry.md"
+        "docs/telemetry.md",
+        "docs/getting-started.md",
+        "docs/troubleshooting.md",
+        "docs/slo-authoring-guide.md",
+        "docs/integrations/sigra.md",
+        "docs/integrations/accrue.md",
+        "docs/integrations/rulestead.md",
+        "docs/integrations/threadline.md"
       ],
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       groups_for_extras: [
