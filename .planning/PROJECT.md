@@ -12,7 +12,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
 
-**Next:** v0.10 Adopter Success — in planning (requirements → roadmap).
+**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a version strategy that pins the first publish to a deliberate `0.10.0`.
 
 ## Current Milestone: v0.10 Adopter Success
 
@@ -96,6 +96,8 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ System provides `mix parapet.install` as a unified, interactive starting point that sequentially runs necessary sub-generators — v0.9
 - ✓ System's `mix parapet.doctor` checks for correct multi-node configuration (e.g., verifying Oban uniqueness settings for escalations) — v0.9
 - ✓ System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions — v0.9 (DB-backed contention proof; environment-conditional peer canary)
+- ✓ hex.pm package metadata populated — `links:` (GitHub/HexDocs/Issues + Changelog), `:description`, `source_url`, and a `docs:` extras block — v0.10 Phase 15 (ADOPT-01)
+- ✓ Root `CHANGELOG.md` (Release-Please-owned header-only stub) + retroactive `docs/HISTORY.md` covering v0.1–v0.9, with `CHANGELOG*` in the Hex `files:` whitelist — v0.10 Phase 15 (ADOPT-02)
 
 ### Active
 
@@ -188,4 +190,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-23 — started v0.10 Adopter Success milestone*
+*Last updated: 2026-05-24 — completed Phase 15 (Packaging Credibility Gate) of v0.10 Adopter Success*
