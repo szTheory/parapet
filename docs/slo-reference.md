@@ -42,6 +42,18 @@ config :parapet,
 
 These providers return bounded `Parapet.SLO.SliceSpec` structs. The generator owns the PromQL shape so built-ins stay low-cardinality and symptom-first.
 
+## Starter Packs
+
+Starter packs are opinionated, one-line SLO bundles for common application shapes. They are provider modules like any other — register them in `config :parapet, providers: [...]` and run `mix parapet.gen.prometheus`. Each slice is pinned to a real emitted Prometheus series, ships a documented default objective in human terms, and is overridable.
+
+- `Parapet.SLO.StarterPack.WebSaaS` — first-SLO pack for Phoenix SaaS teams (three slices):
+  - `web_saas_http_availability` — source `parapet_http_request_count`, 99.5% objective, `:ticket` alert class
+  - `web_saas_login_journey` — source `parapet_journey_login_count`, 99.9% objective, `:page` alert class
+  - `web_saas_oban_job_success` — source `parapet_oban_jobs_total`, 99.0% objective, `:ticket` alert class
+- `Parapet.SLO.StarterPack.DeliverySaaS` — extends WebSaaS for delivery-sending teams. Composes the three WebSaaS slices above with the `Parapet.SLO.MailglassDelivery` and `Parapet.SLO.ChimewayDelivery` catalogs. Delivery slices register **only when the corresponding host library is loaded** (guarded by `Code.ensure_loaded?(Mailglass)` / `Code.ensure_loaded?(Chimeway)`), so the pack compiles out cleanly to just the three WebSaaS slices when delivery providers are absent.
+
+All starter-pack slices use the default `min_total_rate: 0.01` denominator guard. See the [SLO authoring guide](docs/slo-authoring-guide.md) for how to read, anchor on, and override these defaults.
+
 ## Generated Artifacts
 
 Run:
