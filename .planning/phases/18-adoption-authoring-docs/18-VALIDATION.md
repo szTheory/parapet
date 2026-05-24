@@ -1,9 +1,9 @@
 ---
 phase: 18
 slug: adoption-authoring-docs
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: planned
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-24
 ---
 
@@ -44,11 +44,14 @@ created: 2026-05-24
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 18-NN-NN | NN | N | ADOPT-03 | — | N/A (docs) | docs-build | `mix docs --warnings-as-errors` | ❌ W0 | ⬜ pending |
-| 18-NN-NN | NN | N | ADOPT-04 | — | N/A (docs) | grep | anti-drift suite | ❌ W0 | ⬜ pending |
-| 18-NN-NN | NN | N | ADOPT-05 | — | N/A (docs) | docs-build + grep | `mix docs --warnings-as-errors` | ❌ W0 | ⬜ pending |
-| 18-NN-NN | NN | N | SLO-03 | — | N/A (docs) | grep | anti-drift suite | ❌ W0 | ⬜ pending |
-| 18-NN-NN | NN | N | SLO-04 | — | N/A (docs) | grep | anti-drift suite | ❌ W0 | ⬜ pending |
+| 18-02-01 | 02 | 1 | ADOPT-03 | T-18-02-* | N/A (docs) | grep + docs-build | getting-started anti-drift greps; `mix docs --warnings-as-errors` (W3) | ✅ | ⬜ pending |
+| 18-02-02 | 02 | 1 | ADOPT-04 | T-18-02-* | N/A (docs) | grep | troubleshooting five-seed greps | ✅ | ⬜ pending |
+| 18-03-01 | 03 | 1 | SLO-03 | T-18-03-* | N/A (docs) | grep | decision-tree litmus + WebSaaS slice greps | ✅ | ⬜ pending |
+| 18-03-02 | 03 | 1 | SLO-04 | T-18-03-* | N/A (docs) | grep | min_total_rate 0.01 + six-window greps | ✅ | ⬜ pending |
+| 18-04-01 | 04 | 2 | ADOPT-05 | T-18-04-* | N/A (docs) | grep | sigra/accrue activation + no-"SLO slice" greps | ✅ | ⬜ pending |
+| 18-04-02 | 04 | 2 | ADOPT-05 | T-18-04-* | N/A (docs) | grep | rulestead/threadline activation + OQ-3 greps | ✅ | ⬜ pending |
+| 18-05-01 | 05 | 3 | ADOPT-03/04/05, SLO-03/04 | T-18-05-01 | N/A (docs) | grep | extras-registration count == 7 | ✅ | ⬜ pending |
+| 18-05-02 | 05 | 3 | ADOPT-03/04/05, SLO-03/04 | T-18-05-01 | N/A (docs) | docs-build + test | `mix docs --warnings-as-errors`; `mix test`; `mix verify.public_api` | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -131,4 +134,4 @@ ls doc/getting-started.html doc/troubleshooting.html doc/slo-authoring-guide.htm
 - [ ] Feedback latency < 60s
 - [ ] `nyquist_compliant: true` set in frontmatter once the planner wires task IDs
 
-**Approval:** pending
+**Approval:** planner-assigned (task IDs wired 2026-05-24)
