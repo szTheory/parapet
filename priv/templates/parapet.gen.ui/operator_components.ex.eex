@@ -296,6 +296,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                   </div>
                 <%% end %>
 
+                <%%= if step.warning do %>
+                  <div class="mt-2 p-2 bg-amber-50 border border-amber-100 rounded text-xs text-amber-800">
+                    <%%= step.warning %>
+                  </div>
+                <%% end %>
+
                 <%%= if length(step.targeting_hints) > 0 do %>
                   <div class="mt-2 flex flex-wrap gap-1">
                     <%%= for hint <- step.targeting_hints do %>
