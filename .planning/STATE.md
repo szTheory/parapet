@@ -4,13 +4,13 @@ milestone: v0.10
 milestone_name: Adopter Success
 status: executing
 stopped_at: Phase 17 context gathered (assumptions mode)
-last_updated: "2026-05-24T15:26:04.595Z"
+last_updated: "2026-05-24T15:31:17.351Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 4
   completed_phases: 2
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
   percent: 50
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-23)
 ## Current Position
 
 Phase: 17 (recovery-depth-runbook-templates) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-05-24
 
@@ -56,6 +56,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 15 P02 | 5 | 2 tasks | 2 files |
 | Phase 16 P02 | 4 | 2 tasks | 2 files |
 | Phase 17 P01 | 2 | 3 tasks | 5 files |
+| Phase 17 P02 | 8 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Avoids RESEARCH pitfall #5 where Hex ignores description inside package/0
 - [Phase ?]: Prevents mix verify.public_api failures on Release-Please-generated commit-hash links in CHANGELOG.md
 - [Phase ?]: action-input mode ignores release-please-config.json; manifest mode reads config-file + manifest-file, preventing accidental 1.0.0 release
+- [Phase ?]: callback_delay uses guidance-only mitigation since no allowlisted capability fits callback-delay remediation (D-06 constraint)
 
 ### Pending Todos
 
@@ -95,7 +97,7 @@ Items acknowledged and carried forward (not in the v0.10 roadmap):
 
 ## Session Continuity
 
-Last session: 2026-05-24T15:26:04.592Z
+Last session: 2026-05-24T15:31:17.348Z
 Stopped at: Phase 17 context gathered (assumptions mode)
 Resume file: None
 Next step: `/gsd:plan-phase 15`
