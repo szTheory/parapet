@@ -38,7 +38,7 @@
 - Runnable demo app (`examples/demo_app/`, DEMO-01) — deferred to v0.10.x.
 - `mix parapet.gen.slo` wizard (SLO-W1) and cross-integration SLO bundles (SLO-B1) — deferred to v1.0+.
 - Integration guides for Chimeway/Mailglass/Rindle/Scoria — already in `slo-reference.md`.
-- A real `setup/0` delegate on Rulestead — only if planning chooses OQ-1 option (b).
+- A real `setup/0` delegate on Rulestead — NO LONGER DEFERRED: OQ-1 resolved to (b)+(d), implemented in 18-01 (D-16).
 </user_constraints>
 
 <phase_requirements>

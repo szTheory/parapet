@@ -237,8 +237,10 @@ Fly.io's own scrape config, OQ-2 — link out, don't assert.)
   generated alert" getting-started milestone.
 
 ### Watch-outs
-- **Rulestead-attach crash (D-07):** `Parapet.attach(adapters: [:rulestead])` raises
-  `UndefinedFunctionError` — Rulestead has `attach/0`, not `setup/0`. Highest-impact drift risk.
+- **Rulestead-attach crash (D-07 — RESOLVED by D-16/18-01):** `Parapet.attach(adapters: [:rulestead])`
+  used to raise `UndefinedFunctionError` (Rulestead had `attach/0`, not `setup/0`). 18-01 adds the
+  `setup/0` delegate + the `Parapet.Integration` behaviour, so the uniform line now works. Residual
+  drift risk inverts: do NOT special-case Rulestead's activation or document it as crashing.
 - **Threadline/Accrue have no SLO slice modules (D-08/D-09):** documenting "unlocks SLO slices"
   for them would describe metrics that don't exist — the exact drift STATE.md flagged.
 - **Legacy `:slos` env (D-04):** showing it in getting-started silently degrades the adopter to
@@ -272,8 +274,8 @@ Fly.io's own scrape config, OQ-2 — link out, don't assert.)
   deferred to v1.0+.
 - **Integration guides for Chimeway/Mailglass/Rindle/Scoria** — not in this phase; already
   covered by `slo-reference.md`. Revisit if adopters ask for standalone guides.
-- **A real `setup/0` delegate on Rulestead** to make the uniform attach line work everywhere —
-  only if planning chooses OQ-1 option (b); otherwise the doc-only correction stands.
+- ~~A real `setup/0` delegate on Rulestead~~ — NO LONGER DEFERRED: OQ-1 resolved to option (b)+(d),
+  implemented in 18-01 (D-16).
 
 ### Reviewed Todos (not folded)
 None — no pending todos matched Phase 18.
