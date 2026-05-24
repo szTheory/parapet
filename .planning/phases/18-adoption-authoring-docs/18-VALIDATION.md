@@ -44,6 +44,9 @@ created: 2026-05-24
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| 18-01-01 | 01 | 1 | ADOPT-05 | T-18-01-* | compile-time integration contract | compile | `mix compile --warnings-as-errors` | ✅ | ⬜ pending |
+| 18-01-02 | 01 | 1 | ADOPT-05 | T-18-01-* | Rulestead activates without raising | test | `mix test test/parapet/integrations/integration_behaviour_test.exs test/parapet/integrations/rulestead_test.exs` | ✅ | ⬜ pending |
+| 18-01-03 | 01 | 1 | ADOPT-05 | T-18-01-* | CHANGELOG renders | docs-build | `mix verify.public_api` | ✅ | ⬜ pending |
 | 18-02-01 | 02 | 1 | ADOPT-03 | T-18-02-* | N/A (docs) | grep + docs-build | getting-started anti-drift greps; `mix docs --warnings-as-errors` (W3) | ✅ | ⬜ pending |
 | 18-02-02 | 02 | 1 | ADOPT-04 | T-18-02-* | N/A (docs) | grep | troubleshooting five-seed greps | ✅ | ⬜ pending |
 | 18-03-01 | 03 | 1 | SLO-03 | T-18-03-* | N/A (docs) | grep | decision-tree litmus + WebSaaS slice greps | ✅ | ⬜ pending |
@@ -77,9 +80,10 @@ Run these after authoring (script in a Wave 0 helper or run manually):
 grep -c "docs/getting-started\|docs/troubleshooting\|docs/slo-authoring-guide\|docs/integrations" mix.exs
 # Expected: 7
 
-# 2. No doc ships the crashing Rulestead attach form (D-07):
-grep -rn "attach(adapters: \[:rulestead\])" docs/
-# Expected: 0 results
+# 2. Rulestead activation is the UNIFORM line, never framed as a crash (D-16 SUPERSEDES D-07):
+grep -q "Parapet.attach(adapters: \[:rulestead\])" docs/integrations/rulestead.md   # present: the valid uniform line
+grep -rn "Parapet.Integrations.Rulestead.attach()" docs/                            # Expected: 0 (no special-case form)
+grep -rniE "rulestead.*(raises|UndefinedFunctionError)|(raises|UndefinedFunctionError).*rulestead" docs/   # Expected: 0 (no crash framing)
 
 # 3. Getting-started uses providers:, never the legacy degraded :slos env (D-04):
 grep -rn "config :parapet, :slos" docs/getting-started.md

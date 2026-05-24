@@ -17,7 +17,7 @@
 - **D-04:** Document the real cold-start sequence: add `:parapet` dep → `mix parapet.install` → `config :parapet, providers: [Parapet.SLO.StarterPack.WebSaaS]` → `mix parapet.gen.prometheus` → `mix parapet.doctor`. Must use `config :parapet, providers: [...]`, NOT the legacy `:slos` env.
 - **D-05:** State explicitly that the adopter writes zero raw PromQL.
 - **D-06:** Set the login-slice data-prerequisite honestly: login-journey slice needs `parapet_journey_login_count` which Sigra emits; the `min_total_rate` guard prevents flapping but "no data" must not be read as "green."
-- **D-07 (CORRECTNESS):** `Parapet.attach(adapters: [...])` is BROKEN for Rulestead — Rulestead exposes only `attach/0`, and `Parapet.attach/1` hard-codes `apply(module, :setup, [])`. Rulestead guide MUST show `Parapet.Integrations.Rulestead.attach()` directly.
+- **D-07 (AS-FOUND, now SUPERSEDED by D-16):** `Parapet.attach(adapters: [...])` WAS broken for Rulestead — Rulestead exposes only `attach/0`, and `Parapet.attach/1` hard-codes `apply(module, :setup, [])`. **OQ-1 was resolved to option (b)+(d): plan 18-01 adds `def setup, do: attach()` to `rulestead.ex` + a `Parapet.Integration` behaviour, so the uniform `Parapet.attach(adapters: [:rulestead])` line now WORKS and ALL four guides use it. Do NOT have the Rulestead guide show `Parapet.Integrations.Rulestead.attach()`.**
 - **D-08:** Threadline: inbound audit ingestion fully wired; outbound guarded by `Code.ensure_loaded?(Threadline)`. No Threadline SLO slice or metrics module.
 - **D-09:** Accrue has metrics but no SLO slice module.
 - **D-10:** Scope is exactly the four named integrations (Sigra, Accrue, Rulestead, Threadline).
@@ -391,11 +391,11 @@ Every integration guide follows this exact shape:
 ## Activation
 
 ```elixir
-# Sigra / Accrue / Threadline — uniform Parapet.attach works:
+# All four — uniform Parapet.attach works (Rulestead included, after 18-01's setup/0 delegate, D-16):
 Parapet.attach(adapters: [:sigra])
-
-# Rulestead — use the module directly (Parapet.attach does not work here):
-Parapet.Integrations.Rulestead.attach()
+Parapet.attach(adapters: [:accrue])
+Parapet.attach(adapters: [:rulestead])
+Parapet.attach(adapters: [:threadline])
 ```
 
 ## Config keys
@@ -423,7 +423,7 @@ parapet:web_saas_login_journey:error_ratio:5m > 0.0144 and parapet:web_saas_logi
 
 ### Anti-Patterns to Avoid
 
-- **Documenting `Parapet.attach(adapters: [:rulestead])`:** This crashes with `UndefinedFunctionError`. The Rulestead guide must show `Parapet.Integrations.Rulestead.attach()`.
+- **Showing `Parapet.Integrations.Rulestead.attach()` or framing the uniform line as a crash (D-16):** After 18-01 the uniform `Parapet.attach(adapters: [:rulestead])` is the CORRECT line for all four guides. Do NOT special-case Rulestead's activation or document it as crashing.
 - **Claiming Accrue or Rulestead "unlock SLO slices":** Neither has an SLO slice module. They emit metrics; adopters build their own slices from those metrics if desired.
 - **Showing `config :parapet, :slos, [...]` (legacy path):** This results in single-warning-only alerts, not multi-burn-rate. The getting-started doc must use `config :parapet, providers: [...]`.
 - **Claiming `mix parapet.install` automatically adds the WebSaaS provider:** It does not. The adopter adds `config :parapet, providers: [Parapet.SLO.StarterPack.WebSaaS]` manually after install.
@@ -453,15 +453,13 @@ Not applicable — this is a greenfield docs phase with no rename/refactor/migra
 
 ## Common Pitfalls
 
-### Pitfall 1: Rulestead activation crash
+### Pitfall 1: Rulestead activation crash — RESOLVED by D-16 (kept for history)
 
-**What goes wrong:** Author writes `Parapet.attach(adapters: [:rulestead])` (consistent with the other three guides) — this raises `UndefinedFunctionError: Parapet.Integrations.Rulestead.setup/0 is undefined`.
+> **SUPERSEDED:** OQ-1 was resolved to option (b)+(d). Plan 18-01 fixes the code FIRST (Rulestead `setup/0` delegate + `Parapet.Integration` behaviour), so the pitfall below no longer applies — the uniform line is now the CORRECT activation line for Rulestead. Do NOT treat `Parapet.attach(adapters: [:rulestead])` in the Rulestead guide as drift; it is the intended uniform line. The remaining drift risk inverts: showing `Parapet.Integrations.Rulestead.attach()` or framing the uniform line as a crash IS the drift.
 
-**Why it happens:** Rulestead exposes `attach/0`, not `setup/0`. The `Parapet.attach/1` adapter dispatcher hard-codes `apply(module, :setup, [])`.
+**What WAS wrong (pre-fix):** `Parapet.attach(adapters: [:rulestead])` raised `UndefinedFunctionError: Parapet.Integrations.Rulestead.setup/0 is undefined` because Rulestead exposed `attach/0`, not `setup/0`, and `Parapet.attach/1` hard-codes `apply(module, :setup, [])`.
 
-**How to avoid:** The Rulestead guide must show `Parapet.Integrations.Rulestead.attach()` directly. If OQ-1 option (b) is chosen, add `def setup, do: attach()` to rulestead.ex first, then the uniform API works.
-
-**Warning signs:** Any review that finds `Parapet.attach(adapters: [:rulestead])` in the Rulestead guide — that's the crash-inducing drift.
+**The fix (18-01):** `def setup, do: attach()` on Rulestead + a compile-enforced `Parapet.Integration` behaviour. After 18-01, the uniform API works for all eight integrations.
 
 ---
 
@@ -534,11 +532,10 @@ config :parapet, providers: [Parapet.SLO.StarterPack.WebSaaS]
 parapet:web_saas_login_journey:error_ratio:5m > 0.0144 and parapet:web_saas_login_journey:total_rate:5m > 0.01
 ```
 
-### Rulestead activation (the ONLY safe form)
+### Rulestead activation (uniform form, after 18-01's setup/0 delegate — D-16)
 ```elixir
-# Source: lib/parapet/integrations/rulestead.ex:12
-# Do NOT use Parapet.attach(adapters: [:rulestead]) — raises UndefinedFunctionError
-Parapet.Integrations.Rulestead.attach()
+# Source: lib/parapet/integrations/rulestead.ex (def setup, do: attach() added by 18-01)
+Parapet.attach(adapters: [:rulestead])
 ```
 
 ### Sigra/Accrue/Threadline activation (uniform form works)
@@ -586,7 +583,7 @@ bin/<app_name> rpc "Parapet.Deploy.mark(version: \"$RELEASE_VERSION\")"
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **OQ-1: Rulestead one-line delegate (D-07)**
    - What we know: `Parapet.attach(adapters: [:rulestead])` crashes. The fix is `def setup, do: attach()` in `rulestead.ex` — one line, low risk.
@@ -651,9 +648,9 @@ The dominant risk for this phase is documentation drift. The following checks sh
 grep -c "docs/getting-started\|docs/troubleshooting\|docs/slo-authoring-guide\|docs/integrations" mix.exs
 # Expected: 7
 
-# 2. No doc claims Parapet.attach(adapters: [:rulestead])
-grep -r "attach(adapters: \[:rulestead\])" docs/
-# Expected: 0 results (this form CRASHES)
+# 2. Rulestead activation is the uniform line, never framed as a crash (D-16 supersedes D-07):
+grep -q "Parapet.attach(adapters: \[:rulestead\])" docs/integrations/rulestead.md  # present (valid uniform line, works after 18-01)
+grep -r "Parapet.Integrations.Rulestead.attach()" docs/  # Expected: 0 (no special-case form)
 
 # 3. Getting-started uses providers: not :slos
 grep -r "config :parapet, :slos" docs/getting-started.md
