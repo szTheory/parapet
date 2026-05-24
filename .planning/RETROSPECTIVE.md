@@ -11,6 +11,38 @@
 | v0.7 | 4 / 12 | 1 | 13401 | 12 plans / 1 day |
 | v0.8 | 4 / 8 | 1 | ~13900 | 8 plans / 1 day |
 | v0.9 | 14 / 36 | 5 | ~20274 | 36 plans / 5 days |
+| v0.10 | 4 / 12 | 2 | ~21038 | 12 plans / 2 days (docs-heavy) |
+
+## Milestone: v0.10 — Adopter Success
+
+**Shipped:** 2026-05-24
+**Phases:** 4 | **Plans:** 12
+
+### What Was Built
+A credibility-gate milestone that made the feature-complete v0.9 system adoptable by a stranger, with no new runtime deps, Ecto schemas, or Oban queues: populated hex.pm metadata + a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface with four deepened + three new preview-first templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a uniform, crash-proof `Parapet.Integration` activation behaviour.
+
+### What Worked
+- **Code before docs, enforced by phase ordering:** Landing the SLO packs (Phase 16) and runbook templates (Phase 17) before the docs that name them (Phase 18) meant no guide ever referenced uncompilable code — the dominant milestone risk (drift) was structurally avoided.
+- **Verifying the DSL surface before relying on it:** Treating `warning:` as a research flag and confirming Elixir was silently swallowing the unknown macro keyword arg *before* any template used it turned a latent no-op into a wired DSL→projection→UI surface with regression tests.
+- **Advisor-mode gray-area research:** Resolving OQ-1 (Rulestead activation) to a code fix + compile-enforced `Parapet.Integration` behaviour — rather than shipping a doc that demonstrates a crashing call — came from researching the Elixir/OTel idiom up front.
+
+### What Was Inefficient
+- **First audit returned `tech_debt`, requiring a same-day closure pass:** Adopter-facing cross-reference drift (slo-reference omitted the new starter packs) and an inaccurate `Code.ensure_loaded?` detection claim in the integration guides slipped through phase verification and had to be reconciled before close.
+- **Auto-extracted accomplishments were unusable:** The milestone CLI's SUMMARY-derived accomplishment list pulled raw header fragments ("dead_letter.ex.eex", "Wave 0 prerequisite files…"), requiring a full manual rewrite of the MILESTONES.md entry.
+
+### Patterns Established
+- **Behaviour-enforced uniform activation:** A `@behaviour` declared across all eight adapters makes `Parapet.attach(adapters: […])` uniform and crash-proof, so every integration guide can show the identical activation line.
+- **Guidance-only runbooks where no safe capability fits:** `retry_storm`/`suppression_drift` stay advisory rather than executing mitigations that would worsen the failure — depth without overreach.
+- **Honest cross-references as an audit target:** Doc-to-doc links (guide → reference catalog) are now an explicit audit check, since a broken cross-ref is invisible to compile/test gates.
+
+### Key Lessons
+- For a docs/adoption milestone, the real risk is *drift between docs and code*, not technical difficulty — order phases so code lands first, and audit cross-references as first-class, because no test catches a guide that links to a catalog missing its own entries.
+- One-time release-mechanics pins (`release-as: "0.10.0"`) have a precise removal trigger (after the release PR merges and tags) — tie the removal to the tag, not to a phase number, or risk a wrong first-version computation.
+- A keyword arg silently swallowed by an Elixir macro is invisible until something renders it — verify new DSL surfaces end-to-end before downstream content depends on them.
+
+### Cost Observations
+- Opus-driven planning + execution; small source footprint (~764 LOC change) but doc-heavy (~697 lines), so effort concentrated in authoring and cross-artifact coherence rather than implementation.
+- Notable: the closure pass was cheap because the audit enumerated the exact gaps — the fixes were targeted doc edits plus one flaky-test repair, not rework.
 
 ## Milestone: v0.9 — Performance, Scale & DX
 
