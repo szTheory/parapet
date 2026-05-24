@@ -106,7 +106,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] 18-02-PLAN.md — getting-started.md and troubleshooting.md (ADOPT-03/04)
 - [x] 18-03-PLAN.md — slo-authoring-guide.md decision tree + low-traffic section (SLO-03/04)
 - [x] 18-04-PLAN.md — four integration guides under docs/integrations/ (ADOPT-05)
-- [ ] 18-05-PLAN.md — register docs in mix.exs extras + full anti-drift/docs-build gate (D-01)
+- [x] 18-05-PLAN.md — register docs in mix.exs extras + full anti-drift/docs-build gate (D-01)
 
 ## Progress
 
@@ -118,7 +118,7 @@ Phases execute in numeric order: 15 → 16 → 17 → 18
 | 15. Packaging Credibility Gate | v0.10 | 2/2 | Complete    | 2026-05-24 |
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 2/2 | Complete    | 2026-05-24 |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete    | 2026-05-24 |
-| 18. Adoption & Authoring Docs | v0.10 | 4/5 | In Progress|  |
+| 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete   | 2026-05-24 |
 
 ---
 
