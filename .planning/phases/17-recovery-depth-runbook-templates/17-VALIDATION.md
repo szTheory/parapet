@@ -1,10 +1,11 @@
 ---
 phase: 17
 slug: recovery-depth-runbook-templates
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-24
+validated: 2026-05-24
 ---
 
 # Phase 17 — Validation Strategy
@@ -40,12 +41,12 @@ created: 2026-05-24
 
 | Layer | Wave | Requirement | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |-------|------|-------------|-----------------|-----------|-------------------|-------------|--------|
-| DSL/schema | 1 | RCV-01 | `__runbook_schema__/0` exposes `warning` | unit | `mix test test/parapet/runbook_test.exs` | ✅ extend ~`:57-112` | ⬜ pending |
-| Projection | 1 | RCV-01 | `WorkbenchContract.derive_runbook_steps/3` carries `warning` (highest silent-drop risk) | unit | `mix test test/parapet/operator/workbench_contract_test.exs` | ✅ extend ~`:308-369` | ⬜ pending |
-| UI render | 1 | RCV-01 / AC-03 | `runbook_card` renders a step-level warning block (amber/red), not via runtime `preview_panel` | manual smoke | open Operator UI against a deepened template | ❌ manual-only | ⬜ pending |
-| Template content (existing ×4) | 2 | RCV-01 | each deepened template file contains its `warning:` line + precondition + scoped preview + verification | unit | `mix test test/mix/tasks/parapet.gen.runbooks_test.exs` | ✅ extend ~`:8-48` | ⬜ pending |
-| Template content (new ×3) | 2 | RCV-02 | `retry_storm`, `suppression_drift`, `partial_backlog_drain` files generated at depth, copied with `on_exists: :skip` | unit | `mix test test/mix/tasks/parapet.gen.runbooks_test.exs` | ✅ extend same test | ⬜ pending |
-| Capability allowlist | 2 | RCV-02 | no new `capability:` ids; wired mitigations reuse only the three real capabilities (`retry_storm` is guidance-only — RESEARCH correction) | unit | `mix test test/parapet/capabilities_test.exs` | ✅ guards `:8-12` / `:35-37` | ⬜ pending |
+| DSL/schema | 1 | RCV-01 | `__runbook_schema__/0` exposes `warning` | unit | `mix test test/parapet/runbook_test.exs` | ✅ extend ~`:57-112` | ✅ green |
+| Projection | 1 | RCV-01 | `WorkbenchContract.derive_runbook_steps/3` carries `warning` (highest silent-drop risk) | unit | `mix test test/parapet/operator/workbench_contract_test.exs` | ✅ extend ~`:308-369` | ✅ green |
+| UI render | 1 | RCV-01 / AC-03 | `runbook_card` renders a step-level warning block (amber/red), not via runtime `preview_panel` | manual smoke | open Operator UI against a deepened template | ❌ manual-only | 🔵 manual |
+| Template content (existing ×4) | 2 | RCV-01 | each deepened template file contains its `warning:` line + precondition + scoped preview + verification | unit | `mix test test/mix/tasks/parapet.gen.runbooks_test.exs` | ✅ extend ~`:8-48` | ✅ green |
+| Template content (new ×3) | 2 | RCV-02 | `retry_storm`, `suppression_drift`, `partial_backlog_drain` files generated at depth, copied with `on_exists: :skip` | unit | `mix test test/mix/tasks/parapet.gen.runbooks_test.exs` | ✅ extend same test | ✅ green |
+| Capability allowlist | 2 | RCV-02 | no new `capability:` ids; wired mitigations reuse only the three real capabilities (`retry_storm` is guidance-only — RESEARCH correction) | unit | `mix test test/parapet/capabilities_test.exs` | ✅ guards `:8-12` / `:35-37` | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -55,9 +56,9 @@ created: 2026-05-24
 
 All three regression layers extend **existing** test files — no new test files needed:
 
-- [ ] `test/parapet/runbook_test.exs` — extend `DummyRunbook` with a `warning:` step, assert `__runbook_schema__()` exposes `warning` (RCV-01 DSL layer; mirror existing pattern ~`:57-112`).
-- [ ] `test/parapet/operator/workbench_contract_test.exs` — extend the `runbook_data` step fixture with a `warning:` key, assert the projected step map includes `warning` (RCV-01 projection layer; the layer most likely to silently drop it — extend ~`:308-369`).
-- [ ] `test/mix/tasks/parapet.gen.runbooks_test.exs` — add file-path + content assertions for the three new templates and the `warning:` line on deepened templates (RCV-01/RCV-02 generator layer; extend ~`:8-48`).
+- [x] `test/parapet/runbook_test.exs` — extend `DummyRunbook` with a `warning:` step, assert `__runbook_schema__()` exposes `warning` (RCV-01 DSL layer; mirror existing pattern ~`:57-112`).
+- [x] `test/parapet/operator/workbench_contract_test.exs` — extend the `runbook_data` step fixture with a `warning:` key, assert the projected step map includes `warning` (RCV-01 projection layer; the layer most likely to silently drop it — extend ~`:308-369`).
+- [x] `test/mix/tasks/parapet.gen.runbooks_test.exs` — add file-path + content assertions for the three new templates and the `warning:` line on deepened templates (RCV-01/RCV-02 generator layer; extend ~`:8-48`).
 
 ---
 
@@ -71,11 +72,36 @@ All three regression layers extend **existing** test files — no new test files
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 5s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 5s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** validated 2026-05-24
+
+---
+
+## Validation Audit 2026-05-24
+
+Retroactive Nyquist audit (State A) during the milestone v0.10 audit. RCV-01 and RCV-02 are
+covered by the three-layer regression contract — schema (`runbook_test.exs`), projection
+(`workbench_contract_test.exs`), and generator content (`parapet.gen.runbooks_test.exs`) —
+which exists specifically because the `warning:` failure mode is invisible at compile time
+(Elixir silently swallows unknown macro keyword args). All three layers re-ran green at audit
+time (14 tests, 0 failures; full suite 311/0).
+
+One manual-only item remains by design: the AC-03 visual confirmation that the amber
+`warning:` block renders distinctly in the Operator UI. It is not automatable (pixel-level
+render) and is already recorded in Manual-Only and in 17-VERIFICATION.md — not a
+requirement-coverage gap.
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+| Manual-only (by design) | 1 |
+
+The gsd-nyquist-auditor was not spawned (no MISSING/PARTIAL gaps to fill).

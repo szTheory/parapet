@@ -1,10 +1,11 @@
 ---
 phase: 15
 slug: packaging-credibility-gate
-status: draft
-nyquist_compliant: false
-wave_0_complete: false
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-23
+validated: 2026-05-24
 ---
 
 # Phase 15 — Validation Strategy
@@ -47,9 +48,9 @@ created: 2026-05-23
 |-------------|----------|-----------|-------------------|-------------|
 | ADOPT-01 | `mix hex.build` tarball carries populated `links:`, `description`, `source_url` | smoke | `mix hex.build && tar -tzf parapet-0.10.0.tar \| grep mix.exs` | ✅ (mix.exs modified) |
 | ADOPT-01 | `mix verify.public_api` stays green after `docs:` block + extras added | unit | `mix verify.public_api` | ✅ existing alias |
-| ADOPT-02 | Header-only `CHANGELOG.md` stub committed at repo root | manual | `test -f CHANGELOG.md` | ❌ Wave 0 |
+| ADOPT-02 | Header-only `CHANGELOG.md` stub committed at repo root | manual | `test -f CHANGELOG.md` | ✅ green |
 | ADOPT-02 | `CHANGELOG*` glob present in Hex `files:` whitelist | smoke | `mix hex.build` (dry inspect tarball) | ✅ (mix.exs modified) |
-| ADOPT-02 | `docs/HISTORY.md` ships in package (docs/ already whitelisted) | smoke | `mix hex.build && tar -tzf parapet-0.10.0.tar \| grep HISTORY` | ❌ Wave 0 |
+| ADOPT-02 | `docs/HISTORY.md` ships in package (docs/ already whitelisted) | smoke | `mix hex.build && tar -tzf parapet-0.10.0.tar \| grep HISTORY` | ✅ green |
 
 *Status legend: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -60,10 +61,10 @@ created: 2026-05-23
 These artifacts must exist **before** `mix.exs` adds them to `extras:`, or `mix docs`
 (`mix verify.public_api`) errors on missing extra files:
 
-- [ ] `CHANGELOG.md` — header-only stub; required before it can be an ex_doc extra
-- [ ] `docs/HISTORY.md` — retroactive v0.1–v0.9 milestone history; required before it can be an extra
-- [ ] `release-please-config.json` — required before the workflow can reference it via `config-file`
-- [ ] `.release-please-manifest.json` — required before the workflow can reference it via `manifest-file`
+- [x] `CHANGELOG.md` — header-only stub; required before it can be an ex_doc extra
+- [x] `docs/HISTORY.md` — retroactive v0.1–v0.9 milestone history; required before it can be an extra
+- [x] `release-please-config.json` — required before the workflow can reference it via `config-file`
+- [x] `.release-please-manifest.json` — required before the workflow can reference it via `manifest-file`
 
 **Ordering constraint (BLOCKING):** Create `CHANGELOG.md` and `docs/HISTORY.md` BEFORE
 modifying `mix.exs` to add them to `extras:`. If `mix verify.public_api` runs between the
@@ -82,11 +83,35 @@ extras addition and the files existing, it fails because ex_doc errors on missin
 
 ## Validation Sign-Off
 
-- [ ] All tasks have an automated verify or a Wave 0 dependency
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references (CHANGELOG.md, docs/HISTORY.md, config + manifest JSON)
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 30s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have an automated verify or a Wave 0 dependency
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references (CHANGELOG.md, docs/HISTORY.md, config + manifest JSON)
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** validated 2026-05-24
+
+---
+
+## Validation Audit 2026-05-24
+
+Retroactive Nyquist audit (State A) during the milestone v0.10 audit. Phase 15 ships no
+runtime code; its requirements (ADOPT-01, ADOPT-02) are verified by build assertions, not
+ExUnit. All automated gates re-ran green at audit time:
+
+| Gate | Command | Result |
+|------|---------|--------|
+| Docs build | `mix verify.public_api` | exit 0 |
+| Package metadata | `mix hex.build` | tarball built; populated links/description/source_url |
+| Changelog ships | tarball inspect | `CHANGELOG.md` + `docs/HISTORY.md` present in package |
+| Wave 0 files | `test -f` | all 4 present |
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+No test files generated — coverage is build-assertion based and complete. The
+gsd-nyquist-auditor was not spawned (no MISSING/PARTIAL gaps to fill).
