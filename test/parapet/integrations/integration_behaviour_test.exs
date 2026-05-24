@@ -26,6 +26,9 @@ defmodule Parapet.Integrations.IntegrationBehaviourTest do
   describe "Parapet.Integration behaviour conformance" do
     test "all eight integration modules export setup/0" do
       for mod <- @integration_modules do
+        # Ensure the module is loaded before checking exported functions
+        Code.ensure_loaded!(mod)
+
         assert function_exported?(mod, :setup, 0),
                "Expected #{inspect(mod)} to export setup/0, but it does not"
       end

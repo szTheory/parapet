@@ -4,11 +4,14 @@ defmodule Parapet.Integrations.Sigra do
   Listens to Sigra telemetry events and translates them into standard Parapet login and signup journey metrics.
   """
 
+  @behaviour Parapet.Integration
+
   require Logger
 
   @doc """
   Attaches telemetry handlers for Sigra login and signup events.
   """
+  @impl true
   def setup do
     :telemetry.attach_many(
       "parapet-sigra-auth",

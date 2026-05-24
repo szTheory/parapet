@@ -5,6 +5,8 @@ defmodule Parapet.Integrations.Scoria do
   while stripping high-cardinality metadata and creating incidents for severe errors.
   """
 
+  @behaviour Parapet.Integration
+
   require Logger
 
   @safe_labels [:model, :provider, :tool_name]
@@ -12,6 +14,7 @@ defmodule Parapet.Integrations.Scoria do
   @doc """
   Attaches telemetry handlers for Scoria events.
   """
+  @impl true
   def setup do
     # Attach Phase 1 SRE telemetry
     :telemetry.attach(

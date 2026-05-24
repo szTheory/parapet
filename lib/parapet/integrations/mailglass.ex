@@ -5,6 +5,8 @@ defmodule Parapet.Integrations.Mailglass do
   Parapet delivery telemetry contract.
   """
 
+  @behaviour Parapet.Integration
+
   alias Parapet.Telemetry.AsyncDelivery
 
   require Logger
@@ -19,6 +21,7 @@ defmodule Parapet.Integrations.Mailglass do
   @doc """
   Attaches telemetry handlers for Mailglass delivery events.
   """
+  @impl true
   def setup do
     :telemetry.detach(@handler_id)
 

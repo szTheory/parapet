@@ -5,6 +5,8 @@ defmodule Parapet.Integrations.Rindle do
   Parapet async telemetry contract.
   """
 
+  @behaviour Parapet.Integration
+
   alias Parapet.Telemetry.AsyncDelivery
 
   require Logger
@@ -23,6 +25,7 @@ defmodule Parapet.Integrations.Rindle do
   @doc """
   Attaches telemetry handlers for Rindle async lifecycle events.
   """
+  @impl true
   def setup do
     :telemetry.detach(@handler_id)
 
@@ -144,13 +147,19 @@ defmodule Parapet.Integrations.Rindle do
 
   defp maybe_put_duration(measurements, source) do
     case Map.get(source, :duration_ms) || Map.get(source, :duration) do
-      value when is_integer(value) and value >= 0 -> Map.put(measurements, :duration_ms, value)
-      value when is_float(value) and value >= 0 -> Map.put(measurements, :duration_ms, round(value))
-      _ -> measurements
+      value when is_integer(value) and value >= 0 ->
+        Map.put(measurements, :duration_ms, value)
+
+      value when is_float(value) and value >= 0 ->
+        Map.put(measurements, :duration_ms, round(value))
+
+      _ ->
+        measurements
     end
   end
 
-  defp maybe_put_delay(measurements, family, source, fallback) when family in [:backlog, :callback] do
+  defp maybe_put_delay(measurements, family, source, fallback)
+       when family in [:backlog, :callback] do
     case delay_value(source, fallback) do
       value when is_integer(value) and value >= 0 -> Map.put(measurements, :delay_ms, value)
       value when is_float(value) and value >= 0 -> Map.put(measurements, :delay_ms, round(value))

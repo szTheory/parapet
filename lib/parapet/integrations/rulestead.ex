@@ -3,8 +3,18 @@ defmodule Parapet.Integrations.Rulestead do
   Telemetry adapter for buffering Rulestead flag changes natively inside Parapet's spine.
   """
 
+  @behaviour Parapet.Integration
+
   require Logger
   alias Parapet.Spine.SystemEvent
+
+  @doc """
+  Activates the Rulestead integration via `Parapet.attach/1`.
+
+  Delegates to `attach/0`, which attaches the telemetry handler for Rulestead flag mutations.
+  """
+  @impl true
+  def setup, do: attach()
 
   @doc """
   Attaches telemetry handlers to buffer Rulestead flag mutations.
@@ -41,7 +51,10 @@ defmodule Parapet.Integrations.Rulestead do
             :ok
 
           {:error, error} ->
-            Logger.warning("[Parapet.Integrations.Rulestead] Failed to insert SystemEvent: #{inspect(error)}")
+            Logger.warning(
+              "[Parapet.Integrations.Rulestead] Failed to insert SystemEvent: #{inspect(error)}"
+            )
+
             :ok
         end
       else
@@ -52,7 +65,10 @@ defmodule Parapet.Integrations.Rulestead do
     end
   rescue
     e ->
-      Logger.error("[Parapet.Integrations.Rulestead] Error in telemetry handler: #{Exception.message(e)}")
+      Logger.error(
+        "[Parapet.Integrations.Rulestead] Error in telemetry handler: #{Exception.message(e)}"
+      )
+
       :ok
   end
 

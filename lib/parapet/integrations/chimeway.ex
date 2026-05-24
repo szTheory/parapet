@@ -5,6 +5,8 @@ defmodule Parapet.Integrations.Chimeway do
   Parapet delivery telemetry contract.
   """
 
+  @behaviour Parapet.Integration
+
   alias Parapet.Telemetry.AsyncDelivery
 
   require Logger
@@ -14,6 +16,7 @@ defmodule Parapet.Integrations.Chimeway do
   @doc """
   Attaches telemetry handlers for Chimeway events.
   """
+  @impl true
   def setup do
     :telemetry.detach(@handler_id)
 

@@ -4,11 +4,14 @@ defmodule Parapet.Integrations.Accrue do
   Listens to Accrue telemetry events and translates them into standard Parapet billing journey metrics.
   """
 
+  @behaviour Parapet.Integration
+
   require Logger
 
   @doc """
   Attaches telemetry handlers for Accrue billing events.
   """
+  @impl true
   def setup do
     :telemetry.attach(
       "parapet-accrue-billing-processed",

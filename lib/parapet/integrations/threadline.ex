@@ -4,11 +4,14 @@ defmodule Parapet.Integrations.Threadline do
   Maps audit data between Threadline and Parapet.
   """
 
+  @behaviour Parapet.Integration
+
   require Logger
 
   @doc """
   Attaches telemetry handlers for Threadline audit events and Parapet audit events.
   """
+  @impl true
   def setup do
     :telemetry.attach(
       "parapet-threadline-audit",
