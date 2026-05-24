@@ -81,6 +81,11 @@ defmodule Parapet.SLO.StarterPack.DeliverySaaSTest do
 
   # D-09 always-loadable guarantee: module is always defined regardless of host libs.
   test "DeliverySaaS module is defined and slos/0 is exported (always-loadable, D-09)" do
+    # Force the module to load before function_exported?/3: that guard returns false
+    # for a not-yet-loaded module even when the function exists, which made this test
+    # fail intermittently when it ran before any other code path had loaded the module.
+    # Code.ensure_loaded? also directly asserts the "module is defined" half of the claim.
+    assert Code.ensure_loaded?(DeliverySaaS)
     assert function_exported?(DeliverySaaS, :slos, 0)
   end
 end
