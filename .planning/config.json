@@ -11,8 +11,5 @@
     "skip_discuss": false,
     "_auto_chain_active": false
   },
-  "granularity": "coarse",
-  "preferences": {
-    "vendor_philosophy": "opinionated"
-  }
+  "granularity": "coarse"
 }
