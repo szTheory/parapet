@@ -150,6 +150,7 @@ defmodule Parapet.Operator.WorkbenchContract do
         capability: Map.get(step, "capability"),
         target_kind: target_kind,
         guidance: Map.get(step, "guidance"),
+        warning: Map.get(step, "warning"),
         state: state,
         executed_at: if(executed_entry, do: executed_entry.inserted_at),
         targeting_hints: targeting_hints
