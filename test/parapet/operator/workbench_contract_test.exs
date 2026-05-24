@@ -312,7 +312,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
           "title" => "Mailglass Recovery",
           "description" => "Recovery steps for Mailglass",
           "steps" => [
-            %{id: "step-1", label: "Check status", preview_only: true},
+            %{id: "step-1", label: "Check status", preview_only: true, warning: "test warning text"},
             %{
               id: "step-2",
               label: "Retry delivery",
@@ -355,6 +355,7 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert s1.id == "step-1"
       assert s1.state == :guidance
       assert s1.targeting_hints == []
+      assert s1.warning == "test warning text"
 
       assert s2.id == "step-2"
       assert s2.state == :previewable
