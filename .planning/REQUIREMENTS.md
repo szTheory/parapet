@@ -26,7 +26,7 @@ The dominant risk per research is drift and package scope-leak, not technical di
 ### SLO: SLO Authoring Guidance
 
 - [x] **SLO-01**: A WebSaaS adopter can register a coherent first set of SLOs in one line via `Parapet.SLO.StarterPack.WebSaaS` (HTTP availability, LoginJourney, Oban job success) with documented default objectives and human-terms rationale.
-- [ ] **SLO-02**: A delivery-sending adopter can extend the WebSaaS set via `Parapet.SLO.StarterPack.DeliverySaaS` (adds MailglassDelivery + ChimewayDelivery slices), registering delivery slices **only when those providers are configured** (compiles out cleanly otherwise).
+- [x] **SLO-02**: A delivery-sending adopter can extend the WebSaaS set via `Parapet.SLO.StarterPack.DeliverySaaS` (adds MailglassDelivery + ChimewayDelivery slices), registering delivery slices **only when those providers are configured** (compiles out cleanly otherwise).
 - [ ] **SLO-03**: An adopter unsure how to slice SLOs can read `docs/slo-authoring-guide.md` with concrete good-vs-bad journey-slicing examples and a decision tree ("does this failure directly prevent a user task? → journey SLO").
 - [ ] **SLO-04**: An adopter running a low-traffic service finds a named "Low-Traffic and Low-Volume Services" section documenting the denominator guard (`and sum(rate(total[1h])) > N`), synthetic-probe fallback, and extended-window/lower-sensitivity approach — and the explicitly-named anti-pattern of lowering the objective to silence noise. *(Guidance + generated-rule commentary; no engine code.)*
 
@@ -80,7 +80,7 @@ Each requirement maps to exactly one phase. v0.10 continues phase numbering from
 | ADOPT-04 | Phase 18 | Pending |
 | ADOPT-05 | Phase 18 | Pending |
 | SLO-01 | Phase 16 | Complete |
-| SLO-02 | Phase 16 | Pending |
+| SLO-02 | Phase 16 | Complete |
 | SLO-03 | Phase 18 | Pending |
 | SLO-04 | Phase 18 | Pending |
 | RCV-01 | Phase 17 | Pending |
