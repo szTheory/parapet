@@ -1,0 +1,35 @@
+defmodule <%= inspect(@module_prefix) %>.SuppressionDrift do
+  use Parapet.Runbook
+
+  title("Suppression Drift Investigation")
+  description("Guidance for identifying and correcting escalation suppression windows that have drifted or accumulated beyond intended periods.")
+
+  step(:identify_drifted_suppressions,
+    label: "Identify Drifted Suppression Windows",
+    description: "Find suppressions that are still active but have exceeded their expected duration.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Query the suppression records for open windows older than your policy maximum. Compare current time against each window's intended expiry. Cross-reference with active incidents to identify which are being silently suppressed.",
+    warning: "Suppressions older than expected may be silently blocking incident escalations — do not dismiss this runbook without reviewing the full suppression list, as impacted incidents will not have escalated to on-call."
+  )
+
+  step(:clear_stale_suppressions,
+    label: "Clear Stale Suppression Windows",
+    description: "Remove or expire suppression windows that have drifted beyond policy.",
+    type: :mitigation,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "For each stale suppression, expire or delete the record using your host application's admin tooling or a targeted database update. Document each change with a note referencing this incident for the audit trail.",
+    warning: "Clearing a suppression may immediately trigger escalation for the affected incident — ensure on-call is aware and ready to respond before proceeding."
+  )
+
+  step(:verify_escalation_restored,
+    label: "Verify Escalation Restored",
+    description: "Confirm that affected incidents now escalate correctly after suppression removal.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check the incident timeline for any newly triggered escalation entries. Review alert routing to confirm the escalation path is functioning and that the previously suppressed incident has been picked up by on-call."
+  )
+end

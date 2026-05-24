@@ -1,0 +1,35 @@
+defmodule <%= inspect(@module_prefix) %>.RetryStorm do
+  use Parapet.Runbook
+
+  title("Retry Storm Recovery")
+  description("Guidance for recovering from a queue saturated with rapid retry attempts after a transient failure.")
+
+  step(:assess_storm,
+    label: "Assess Retry Storm Scope",
+    description: "Confirm the queue is experiencing abnormal retry volume, not normal processing.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check queue depth, retry rate, and worker utilization in your APM. A storm typically shows retry counts growing faster than success counts, with worker threads dominated by retrying items rather than new work.",
+    warning: "Do not apply retry-accelerating mitigations during a storm — executing retries on storming items will worsen worker exhaustion and extend the incident."
+  )
+
+  step(:reduce_retry_pressure,
+    label: "Reduce Retry Pressure",
+    description: "Adjust backoff configuration or temporarily throttle the affected queue.",
+    type: :mitigation,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Increase the retry backoff interval, reduce queue concurrency, or temporarily pause the queue via your job backend's admin interface. Resume once the transient failure that triggered the storm has resolved and worker utilization has normalized.",
+    warning: "Pausing or throttling the queue will delay legitimate work in addition to the retrying items — communicate the expected impact to stakeholders and set a resume reminder."
+  )
+
+  step(:verify_storm_cleared,
+    label: "Verify Storm Has Cleared",
+    description: "Confirm retry volume has returned to normal after adjustments.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Re-check queue metrics in your APM. Retry rate should be declining and worker utilization should be normalizing. Confirm no new storm conditions are forming before restoring original concurrency and backoff settings."
+  )
+end
