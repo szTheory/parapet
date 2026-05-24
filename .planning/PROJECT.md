@@ -12,7 +12,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
 
-**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a version strategy that pins the first publish to a deliberate `0.10.0`.
+**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a deliberate `0.10.0` first publish. Phase 16 SLO Starter Packs & Low-Traffic Guardrails complete (2026-05-24): `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` give adopters one-line SLO registration (no hand-written PromQL) with low-cardinality, low-traffic-safe slices — the code surfaces Phase 18 docs will name.
 
 ## Current Milestone: v0.10 Adopter Success
 
@@ -98,6 +98,8 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ System test suite includes multi-node or concurrency simulation tests verifying that Ecto-backed circuit breakers prevent race conditions — v0.9 (DB-backed contention proof; environment-conditional peer canary)
 - ✓ hex.pm package metadata populated — `links:` (GitHub/HexDocs/Issues + Changelog), `:description`, `source_url`, and a `docs:` extras block — v0.10 Phase 15 (ADOPT-01)
 - ✓ Root `CHANGELOG.md` (Release-Please-owned header-only stub) + retroactive `docs/HISTORY.md` covering v0.1–v0.9, with `CHANGELOG*` in the Hex `files:` whitelist — v0.10 Phase 15 (ADOPT-02)
+- ✓ WebSaaS SLO starter pack — one-line registration of HTTP availability + LoginJourney + Oban job-success via `Parapet.SLO.StarterPack.WebSaaS` with documented default objectives in human terms — v0.10 Phase 16 (SLO-01)
+- ✓ DeliverySaaS SLO starter pack — extends WebSaaS with Mailglass + Chimeway delivery slices that register only when those providers are configured (compile out cleanly otherwise); every pack slice is low-cardinality with a non-zero denominator guard and rides the existing multi-burn-rate Generator unchanged — v0.10 Phase 16 (SLO-02)
 
 ### Active
 
@@ -190,4 +192,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 — completed Phase 15 (Packaging Credibility Gate) of v0.10 Adopter Success*
+*Last updated: 2026-05-24 — completed Phase 16 (SLO Starter Packs & Low-Traffic Guardrails) of v0.10 Adopter Success*
