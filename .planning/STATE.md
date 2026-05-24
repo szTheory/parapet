@@ -4,14 +4,14 @@ milestone: v0.10
 milestone_name: Adopter Success
 status: executing
 stopped_at: Phase 18 context gathered (assumptions mode)
-last_updated: "2026-05-24T17:26:08.123Z"
-last_activity: 2026-05-24 -- Phase 18 planning complete
+last_updated: "2026-05-24T17:35:02.996Z"
+last_activity: 2026-05-24
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 12
-  completed_plans: 7
-  percent: 58
+  completed_plans: 8
+  percent: 67
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-23)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 17 — recovery-depth-runbook-templates
+**Current focus:** Phase 18 — adoption-authoring-docs
 
 ## Current Position
 
-Phase: 18
-Plan: Not started
+Phase: 18 (adoption-authoring-docs) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-24 -- Phase 18 planning complete
+Last activity: 2026-05-24
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 17 P01 | 2 | 3 tasks | 5 files |
 | Phase 17 P02 | 8 | 2 tasks | 4 files |
 | Phase 17 P03 | 3 | 3 tasks | 5 files |
+| Phase 18-adoption-authoring-docs P01 | 12 | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -102,7 +103,7 @@ Items acknowledged and carried forward (not in the v0.10 roadmap):
 
 ## Session Continuity
 
-Last session: 2026-05-24T16:27:45.466Z
+Last session: 2026-05-24T17:35:02.993Z
 Stopped at: Phase 18 context gathered (assumptions mode)
-Resume file: .planning/phases/18-adoption-authoring-docs/18-CONTEXT.md
+Resume file: None
 Next step: `/gsd:plan-phase 15`

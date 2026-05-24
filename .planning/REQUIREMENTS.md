@@ -21,7 +21,7 @@ The dominant risk per research is drift and package scope-leak, not technical di
 - [x] **ADOPT-02**: An adopter can read a root `CHANGELOG.md` covering v0.1–v0.9 retroactively and ongoing releases. *(Conventional Commits / Release Please already in use.)*
 - [ ] **ADOPT-03**: A new adopter can follow a single `docs/getting-started.md` from install → first running SLO → first generated alert in under 30 minutes. *(Ends when they see something work, not when all features are explained.)*
 - [ ] **ADOPT-04**: An adopter who hits a first obstacle can find an answer in `docs/troubleshooting.md` (seeded with the 5–7 most predictable questions: blank Prometheus target, doctor warn-vs-error, Oban compile-out, multi-node uniqueness, Fly.io config).
-- [ ] **ADOPT-05**: An adopter can find a consistent per-integration setup guide under `docs/integrations/` for **Sigra, Accrue, Rulestead, and Threadline** — each surfacing the SLO slices that integration produces out of the box, the `Parapet.attach(adapters: [...])` line, config keys, and 2–3 troubleshooting answers.
+- [x] **ADOPT-05**: An adopter can find a consistent per-integration setup guide under `docs/integrations/` for **Sigra, Accrue, Rulestead, and Threadline** — each surfacing the SLO slices that integration produces out of the box, the `Parapet.attach(adapters: [...])` line, config keys, and 2–3 troubleshooting answers.
 
 ### SLO: SLO Authoring Guidance
 
@@ -78,7 +78,7 @@ Each requirement maps to exactly one phase. v0.10 continues phase numbering from
 | ADOPT-02 | Phase 15 | Complete |
 | ADOPT-03 | Phase 18 | Pending |
 | ADOPT-04 | Phase 18 | Pending |
-| ADOPT-05 | Phase 18 | Pending |
+| ADOPT-05 | Phase 18 | Complete |
 | SLO-01 | Phase 16 | Complete |
 | SLO-02 | Phase 16 | Complete |
 | SLO-03 | Phase 18 | Pending |
