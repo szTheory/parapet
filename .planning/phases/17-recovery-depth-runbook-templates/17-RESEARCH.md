@@ -619,17 +619,17 @@ V5 (Input Validation) is trivially satisfied: the `warning:` field is a compile-
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **`verify.public_api` and undocumented macros**
+1. **`verify.public_api` and undocumented macros** — **RESOLVED**
    - What we know: `step/2` currently has no `@doc` annotation. CI runs `mix docs --warnings-as-errors`.
-   - What's unclear: Whether the current lack of `@doc` on `step/2` is already failing CI or is accepted as-is. The `@moduledoc` on `Parapet.Runbook` exists and documents the module; individual macro `@doc` may or may not be required.
-   - Recommendation: Run `mix verify.public_api` against the current codebase before starting Wave 1 to confirm baseline. If it passes without `@doc` on `step/2`, adding the `@doc` is still the right move for D-12 compliance.
+   - What was unclear: Whether the current lack of `@doc` on `step/2` is already failing CI or is accepted as-is. The `@moduledoc` on `Parapet.Runbook` exists and documents the module; individual macro `@doc` may or may not be required.
+   - **Resolution:** Plan 17-01 Task 1 adds `@doc` to `step/2` in the same change as the `warning:` DSL addition, per D-12 — regardless of the current baseline. Plan 17-01's `<verification>` runs `mix verify.public_api` so the new documented option is proven not to break CI. Confirming the pre-Wave-1 baseline is therefore optional (a nice-to-have diagnostic, not a gate); CI safety is guaranteed either way.
 
-2. **`warning:` as string vs. list**
+2. **`warning:` as string vs. list** — **RESOLVED**
    - What we know: The plan treats `warning:` as a single string (one warning per step, amber block).
-   - What's unclear: Whether any template will want multiple warnings on a single step.
-   - Recommendation: Start with a single string. A single warning per step is sufficient for the RCV depth checklist and simplest to render. Future extension to a list is additive.
+   - What was unclear: Whether any template will want multiple warnings on a single step.
+   - **Resolution:** Single string per step. All plan tasks (17-01/17-02/17-03) and PATTERNS.md treat `warning:` as a single string — sufficient for the RCV depth checklist and simplest to render. A future extension to a list is purely additive and deferred.
 
 ---
 
