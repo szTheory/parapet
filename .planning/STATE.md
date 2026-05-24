@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v0.10
 milestone_name: Adopter Success
-status: executing
+status: verifying
 stopped_at: Phase 17 context gathered (assumptions mode)
-last_updated: "2026-05-24T15:31:17.351Z"
+last_updated: "2026-05-24T15:39:29.661Z"
 last_activity: 2026-05-24
 progress:
   total_phases: 4
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 7
-  completed_plans: 6
-  percent: 50
+  completed_plans: 7
+  percent: 75
 ---
 
 # Project State
@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-05-23)
 
 Phase: 17 (recovery-depth-runbook-templates) — EXECUTING
 Plan: 3 of 3
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-05-24
 
 Progress: [░░░░░░░░░░] 0%
@@ -57,6 +57,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 16 P02 | 4 | 2 tasks | 2 files |
 | Phase 17 P01 | 2 | 3 tasks | 5 files |
 | Phase 17 P02 | 8 | 2 tasks | 4 files |
+| Phase 17 P03 | 3 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -73,6 +74,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Prevents mix verify.public_api failures on Release-Please-generated commit-hash links in CHANGELOG.md
 - [Phase ?]: action-input mode ignores release-please-config.json; manifest mode reads config-file + manifest-file, preventing accidental 1.0.0 release
 - [Phase ?]: callback_delay uses guidance-only mitigation since no allowlisted capability fits callback-delay remediation (D-06 constraint)
+- [Phase 17-03]: retry_storm is guidance-only (RESEARCH D-07 correction) — executing :retry_async_item on storming items worsens worker exhaustion
+- [Phase 17-03]: partial_backlog_drain wires :retry_async_item with target_kind: :async_item, requires_preview: true — exact semantic fit for stuck-subset retry
+- [Phase 17-03]: suppression_drift is guidance-only — no allowlisted capability addresses escalation suppression state management
 
 ### Pending Todos
 
@@ -97,7 +101,7 @@ Items acknowledged and carried forward (not in the v0.10 roadmap):
 
 ## Session Continuity
 
-Last session: 2026-05-24T15:31:17.348Z
-Stopped at: Phase 17 context gathered (assumptions mode)
+Last session: 2026-05-24T15:39:29.655Z
+Stopped at: Completed 17-03-PLAN.md
 Resume file: None
 Next step: `/gsd:plan-phase 15`
