@@ -12,7 +12,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements). See `.planning/MILESTONES.md`.
 
-**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a deliberate `0.10.0` first publish. Phase 16 SLO Starter Packs & Low-Traffic Guardrails complete (2026-05-24): `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` give adopters one-line SLO registration (no hand-written PromQL) with low-cardinality, low-traffic-safe slices — the code surfaces Phase 18 docs will name.
+**In progress:** v0.10 Adopter Success — Phase 15 Packaging Credibility Gate complete (2026-05-24): hex.pm metadata + `links:`, a Release-Please-owned `CHANGELOG.md`, retroactive `docs/HISTORY.md` (v0.1–v0.9), and a deliberate `0.10.0` first publish. Phase 16 SLO Starter Packs & Low-Traffic Guardrails complete (2026-05-24): `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` give adopters one-line SLO registration (no hand-written PromQL) with low-cardinality, low-traffic-safe slices — the code surfaces Phase 18 docs will name. Phase 17 Recovery Depth — Runbook Templates complete (2026-05-24): a `warning:` step annotation now renders end-to-end through the `Parapet.Runbook` DSL → projection → operator UI (it was previously silently swallowed), the four existing runbook templates are deepened to trustworthy depth (precondition, scoped preview, warning, bounded mitigation, verification), and three new templates (`retry_storm`, `suppression_drift`, `partial_backlog_drain`) ship at the same depth — all host-owned via the generator's `on_exists: :skip` contract.
 
 ## Current Milestone: v0.10 Adopter Success
 
@@ -192,4 +192,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 — completed Phase 16 (SLO Starter Packs & Low-Traffic Guardrails) of v0.10 Adopter Success*
+*Last updated: 2026-05-24 — completed Phase 17 (Recovery Depth — Runbook Templates) of v0.10 Adopter Success*
