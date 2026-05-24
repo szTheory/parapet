@@ -10,7 +10,8 @@ defmodule <%= inspect(@module_prefix) %>.DeadLetter do
     type: :manual,
     kind: :guidance,
     preview_only: true,
-    guidance: "Review the attached exception and stacktrace."
+    guidance: "Review the attached exception and stacktrace. Identify whether the failure is transient (e.g. network timeout) or structural (e.g. schema mismatch, bad payload). Proceed to requeue only if the root cause is understood and resolved.",
+    warning: "Do not requeue if the error indicates a persistent structural failure — reprocessing will dead-letter the item again immediately."
   )
 
   step(:requeue_item,
@@ -20,6 +21,16 @@ defmodule <%= inspect(@module_prefix) %>.DeadLetter do
     kind: :capability,
     capability: :requeue_dead_letter,
     target_kind: :async_item,
-    requires_preview: true
+    requires_preview: true,
+    warning: "Requeued items will be re-processed from the start. Confirm the item's operation is idempotent or that any partial side effects from the original attempt have been reversed."
+  )
+
+  step(:verify_recovery,
+    label: "Verify Recovery",
+    description: "Confirm the item processed successfully after requeue.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check the item's status in the job backend — it should no longer appear in the dead letter queue. Verify any expected downstream effects (database writes, notifications, etc.) completed successfully."
   )
 end
