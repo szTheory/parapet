@@ -10,7 +10,8 @@ defmodule <%= inspect(@module_prefix) %>.ProviderOutage do
     type: :manual,
     kind: :guidance,
     preview_only: true,
-    guidance: "Check the official provider status page."
+    guidance: "Check the official provider status page. Also check third-party monitors (e.g. Downdetector) and the provider's social channels for corroborating reports.",
+    warning: "The provider status page itself may be unreachable or stale during a full outage — treat a 'no known issues' status with caution if your own monitoring shows failures."
   )
 
   step(:request_manual_check,
@@ -20,6 +21,16 @@ defmodule <%= inspect(@module_prefix) %>.ProviderOutage do
     kind: :capability,
     capability: :request_manual_provider_check,
     target_kind: :provider,
-    requires_preview: true
+    requires_preview: true,
+    warning: "This action creates a team task visible to on-call. Avoid triggering it multiple times for the same incident — duplicate flags create noise and may mask the original alert."
+  )
+
+  step(:verify_recovery,
+    label: "Verify Recovery",
+    description: "Confirm the provider has recovered and dependent systems are processing normally.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Re-check the provider status page for a resolved status. Verify that any queued or failed requests to the provider are now completing successfully in your own monitoring or APM."
   )
 end

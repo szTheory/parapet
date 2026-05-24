@@ -10,6 +10,26 @@ defmodule <%= inspect(@module_prefix) %>.CallbackDelay do
     type: :manual,
     kind: :guidance,
     preview_only: true,
-    guidance: "Search HTTP logs for incoming requests matching the expected path and payload."
+    guidance: "Search HTTP logs for incoming requests matching the expected path and payload. Confirm whether the request arrived but was not processed, or never arrived at all — the remediation differs.",
+    warning: "A missing callback may indicate a provider-side delivery failure rather than an internal processing issue. Confirm receipt status before taking any action."
+  )
+
+  step(:mitigate_delay,
+    label: "Investigate and Remediate Delay Source",
+    description: "Identify the root cause of the callback delay and take corrective action.",
+    type: :mitigation,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "If the callback was never received: check provider retry policy, verify the registered endpoint URL, and confirm network routing. If received but unprocessed: check queue depth and worker errors. Re-trigger the callback via the provider dashboard if the delivery window has not expired.",
+    warning: "Do not re-trigger if the original callback is still in flight — duplicate delivery may cause double-processing of the associated operation."
+  )
+
+  step(:verify_recovery,
+    label: "Verify Recovery",
+    description: "Confirm the callback was received and processed successfully.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check HTTP logs for a successful incoming request and verify the associated operation completed as expected (e.g. payment recorded, webhook event acknowledged, job enqueued). Confirm no duplicate records were created."
   )
 end
