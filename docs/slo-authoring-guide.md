@@ -54,6 +54,37 @@ config :parapet,
 
 Then run `mix parapet.gen.prometheus` to write the recording rules and alert expressions. You never hand-write PromQL.
 
+## Provider-as-bundle pattern
+
+A `Parapet.SLO.Provider` that returns slices from multiple sub-providers is the bundle abstraction. No separate macro or base module is required — the `slos/0` callback returns a flat list, and list concatenation (`++`) is the composition primitive.
+
+The canonical example is `Parapet.SLO.StarterPack.DeliverySaaS`, which composes three providers into one registration: the three WebSaaS slices plus conditionally-guarded Mailglass and Chimeway delivery slices. Its `slos/0` calls `WebSaaS.slos() ++ delivery_slices(Mailglass, Chimeway)`, where each delivery slice set is included only when the corresponding host library is loaded.
+
+```elixir
+defmodule MyApp.SLO.FullStack do
+  @behaviour Parapet.SLO.Provider
+
+  @impl true
+  def slos do
+    Parapet.SLO.StarterPack.WebSaaS.slos() ++
+      (if Code.ensure_loaded?(Mailglass), do: Parapet.SLO.MailglassDelivery.slos(), else: []) ++
+      my_custom_slices()
+  end
+
+  defp my_custom_slices, do: [...]
+end
+```
+
+Register the bundle provider the same way as any single provider:
+
+```elixir
+config :parapet, providers: [MyApp.SLO.FullStack]
+```
+
+**Conditional registration:** Use `Code.ensure_loaded?/1` to guard slices for optional host libraries. The bundle module itself is always loadable (passes `mix verify.public_api`) regardless of whether the guarded library is present. This is the pattern used by `Parapet.SLO.StarterPack.DeliverySaaS` — see its moduledoc for the reference implementation.
+
+For the full built-in provider catalog and starter packs, see [Parapet SLO Reference](docs/slo-reference.md#starter-packs).
+
 ## Low-traffic and low-volume services
 
 Low-traffic services introduce a specific failure mode: the SLO burns when there is not enough data to know. A single failed login attempt out of five total produces a 20% error rate - which would fire a page alert - even though five requests is not a meaningful signal. The naive solution is to lower the objective to stop the noise. That is the wrong move.
