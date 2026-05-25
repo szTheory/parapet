@@ -19,14 +19,22 @@ defmodule Parapet.SLOTest do
   end
 
   describe "define/2" do
+    # SLO.define/2 is intentionally @deprecated (see STAB-06 test below) but must
+    # still be exercised here while the legacy path is supported. Call it via
+    # apply/3 consistently so these tests do not emit deprecation warnings at
+    # compile time and remain compatible with --warnings-as-errors. The dedicated
+    # STAB-06 test above is where the deprecation warning itself is asserted.
     test "creates a valid SLO and stores it" do
       slo =
-        SLO.define(:api_availability,
-          objective: 99.9,
-          good_events: "http_requests_total{status=~\"5..\"}",
-          total_events: "http_requests_total",
-          runbook: "https://runbook.example.com/api"
-        )
+        apply(SLO, :define, [
+          :api_availability,
+          [
+            objective: 99.9,
+            good_events: "http_requests_total{status=~\"5..\"}",
+            total_events: "http_requests_total",
+            runbook: "https://runbook.example.com/api"
+          ]
+        ])
 
       assert %SLO{} = slo
       assert slo.name == :api_availability
@@ -69,13 +77,16 @@ defmodule Parapet.SLOTest do
     end
 
     test "merges legacy environment state and data-first providers" do
-      # Set up legacy
-      SLO.define(:legacy_slo,
-        objective: 99.9,
-        good_events: "legacy_good",
-        total_events: "legacy_total",
-        runbook: "legacy_runbook"
-      )
+      # Set up legacy (deprecated path — call via apply/3, see note in describe "define/2")
+      apply(SLO, :define, [
+        :legacy_slo,
+        [
+          objective: 99.9,
+          good_events: "legacy_good",
+          total_events: "legacy_total",
+          runbook: "legacy_runbook"
+        ]
+      ])
 
       # Set up provider
       Application.put_env(:parapet, :providers, [DummyProvider])
