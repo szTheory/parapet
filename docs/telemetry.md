@@ -1,5 +1,14 @@
 # Telemetry Event Schema
 
+> #### Stable Contract {: .info}
+>
+> This telemetry reference is **stable** as of v1.0.0. Event names under
+> `[:parapet, …]` are frozen — renaming or removing them is a semver-major change.
+> Measurement and documented metadata keys may be extended in minor releases but
+> will not be removed or renamed without a deprecation cycle. Parapet will never
+> add a configurable `:event_prefix` option; all event names are static.
+> See [Stability & Deprecation Policy](stability.html) for details.
+
 Parapet emits telemetry as a public contract. Event names define the lifecycle seam, while metadata stays bounded and safe for downstream metrics, SLOs, and incident logic.
 
 ## Versioning Contract
