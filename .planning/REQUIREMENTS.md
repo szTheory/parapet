@@ -77,8 +77,6 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ## Traceability
 
-Recommended mapping from the approved 4-phase chunking. Finalized/confirmed during roadmap creation.
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | STAB-01 | Phase 19 | Pending |
@@ -114,4 +112,4 @@ Recommended mapping from the approved 4-phase chunking. Finalized/confirmed duri
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 after initial definition*
+*Last updated: 2026-05-25 — traceability confirmed by ROADMAP.md (Phases 19-22)*

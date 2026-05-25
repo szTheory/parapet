@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Stable Release
 status: planning
-last_updated: "2026-05-25T04:30:02.197Z"
+last_updated: "2026-05-25T00:00:00.000Z"
 last_activity: 2026-05-25
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,23 +17,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-24 after v0.10)
+See: .planning/PROJECT.md (updated 2026-05-25 — v1.0 roadmap created)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Planning the next milestone (`/gsd:new-milestone`)
+**Current focus:** Phase 19 — API & Telemetry Freeze (ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-05-25 — Milestone v1.0 started
+Phase: 19 of 22 (API & Telemetry Freeze)
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-05-25 — Roadmap created for v1.0 Stable Release (Phases 19-22)
+
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 12
+- Total plans completed: 0 (this milestone)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -41,10 +43,10 @@ Last activity: 2026-05-25 — Milestone v1.0 started
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 15 | 2 | - | - |
-| 16 | 2 | - | - |
-| 17 | 3 | - | - |
-| 18 | 5 | - | - |
+| 19 | TBD | - | - |
+| 20 | TBD | - | - |
+| 21 | TBD | - | - |
+| 22 | TBD | - | - |
 
 **Recent Trend:**
 
@@ -52,21 +54,17 @@ Last activity: 2026-05-25 — Milestone v1.0 started
 - Trend: —
 
 *Updated after each plan completion*
-| Phase 15 P02 | 5 | 2 tasks | 2 files |
-| Phase 16 P02 | 4 | 2 tasks | 2 files |
-| Phase 17 P01 | 2 | 3 tasks | 5 files |
-| Phase 17 P02 | 8 | 2 tasks | 4 files |
-| Phase 17 P03 | 3 | 3 tasks | 5 files |
-| Phase 18-adoption-authoring-docs P01 | 12 | 3 tasks | 11 files |
-| Phase 18-adoption-authoring-docs P05 | 2 | 2 tasks | 1 files |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table. v0.10's decisions were
-folded into that table at milestone close; the full per-phase record lives in
-`milestones/v0.10-ROADMAP.md`. No decisions are pending for the next milestone.
+Decisions are logged in PROJECT.md Key Decisions table.
+Recent decisions affecting current work:
+
+- v1.0 scope: Freeze depth = stability tiers + deprecation policy (not a full hardening pass). Proportionate verification gate (REL-03) replaces a security/perf audit.
+- Demo in v1.0: Demo app confirmed in-scope as a CI contract test for the frozen surface (not deferred to v1.1).
+- SLO-B1 dropped: `Parapet.SLO.Provider` returning multiple slices is the bundle abstraction; documented as a pattern (DOCS-05) instead of a separate abstraction.
 
 ### Pending Todos
 
@@ -74,26 +72,19 @@ None.
 
 ### Blockers/Concerns
 
-None open — all v0.10 phase blockers were resolved before close (the `warning:` DSL surface was verified and wired, the HTTP `SliceSpec` selector question was resolved via `AsyncDelivery.selector/2` matching `status_class`, and the Threadline guide ships honest about conceptual-only interop). One release-mechanics follow-up is tracked, not blocking: remove the `release-as: "0.10.0"` pin only after the v0.10.0 release PR merges and tags v0.10.0.
+- **Phase 22 external prerequisite:** The `release-as: "0.10.0"` pin in `release-please-config.json` must remain until the v0.10.0 Release-Please PR merges and tags `v0.10.0`. Removing it earlier risks a wrong version computation. Phase 22 cannot begin the graduation sequence until this is resolved.
 
 ## Deferred Items
 
-Items acknowledged and carried forward (not in the v0.10 roadmap):
-
 | Category | Item | Status | Deferred At |
 |----------|------|--------|-------------|
-| Demo | DEMO-01 runnable demo app (`examples/demo_app/`) + CI check | Deferred to v0.10.x | v0.10 requirements |
-| SLO tooling | SLO-W1 interactive `mix parapet.gen.slo` wizard | Deferred to v1.0+ | v0.10 requirements |
-| SLO bundles | SLO-B1 cross-integration SLO slice bundles | Deferred to v1.0+ | v0.10 requirements |
-| Release | API / telemetry freeze | Deferred to v1.0 (MILESTONE-ARC.md) | v0.10 requirements |
+| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.1 | v1.0 planning |
+| CI | Multi-version Elixir/OTP CI matrix | v1.1 | v1.0 planning |
+| Polish | Logo/favicon, `MAINTAINING.md`, SHA-pinned CI actions, demo Docker Compose | post-1.0 | v1.0 planning |
 
 ## Session Continuity
 
-Last session: 2026-05-24 — v0.10 milestone completed and archived
-Stopped at: Milestone v0.10 complete
+Last session: 2026-05-25 — v1.0 roadmap created (Phases 19-22)
+Stopped at: Roadmap written; ready to plan Phase 19
 Resume file: None
-Next step: `/gsd:new-milestone`
-
-## Operator Next Steps
-
-- Start the next milestone with /gsd:new-milestone
+Next step: `/gsd:plan-phase 19`
