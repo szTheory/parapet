@@ -210,6 +210,17 @@ defmodule Parapet.TelemetryContractTest do
              "Families appear in both lists: #{inspect(MapSet.to_list(overlap))}. " <>
                "Families should appear in exactly one list."
     end
+
+    test "event_name/1 round-trips every family from event_families/0" do
+      # Guards against drift between AsyncDelivery.event_families/0 and the
+      # event_name/1 clauses: each family atom must map back to the exact full
+      # event-name tuple that appears in event_families/0.
+      for [_, _, family] = full <- AsyncDelivery.event_families() do
+        assert AsyncDelivery.event_name(family) == full,
+               "event_name(#{inspect(family)}) drifted from event_families/0 entry #{inspect(full)}. " <>
+                 "Update docs/telemetry.md and AsyncDelivery together."
+      end
+    end
   end
 
   describe "measurement key contract" do
