@@ -14,8 +14,8 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 - [x] **STAB-02**: A written stability & deprecation policy (`docs/stability.md`) enumerates the public API surface, states the semver promise, defines what counts as a breaking vs. additive change, and specifies the deprecation cycle (soft `@doc deprecated:` → hard `@deprecated` for ≥1 minor → removal only at a major).
 - [x] **STAB-03**: The telemetry contract is documented as frozen — static `[:parapet, …]` event names, additive-only evolution of measurements/metadata, and an explicit "no configurable `:event_prefix`" rule — with a stability header on `docs/telemetry.md`.
 - [x] **STAB-04**: `mix verify.public_api` fails (non-zero exit) when any public module is missing a stability-tier declaration, making tier annotation mandatory for every future public surface.
-- [ ] **STAB-05**: A telemetry contract test fails CI when the documented event families, measurement keys, metadata keys, or outcome-atom vocabularies drift from their fixtures.
-- [ ] **STAB-06**: `Parapet.SLO.define/2` is hard-deprecated with a compile-time warning that names `Parapet.SLO.Provider` as the replacement.
+- [x] **STAB-05**: A telemetry contract test fails CI when the documented event families, measurement keys, metadata keys, or outcome-atom vocabularies drift from their fixtures.
+- [x] **STAB-06**: `Parapet.SLO.define/2` is hard-deprecated with a compile-time warning that names `Parapet.SLO.Provider` as the replacement.
 
 ### OSS Governance (GOV)
 
@@ -83,8 +83,8 @@ Explicitly excluded. Documented to prevent scope creep.
 | STAB-02 | Phase 19 | Complete |
 | STAB-03 | Phase 19 | Complete |
 | STAB-04 | Phase 19 | Complete |
-| STAB-05 | Phase 19 | Pending |
-| STAB-06 | Phase 19 | Pending |
+| STAB-05 | Phase 19 | Complete |
+| STAB-06 | Phase 19 | Complete |
 | GOV-01 | Phase 20 | Pending |
 | GOV-02 | Phase 20 | Pending |
 | GOV-03 | Phase 20 | Pending |
