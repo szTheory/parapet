@@ -59,6 +59,7 @@ defmodule Parapet.MixProject do
         "README.md",
         "CHANGELOG.md",
         "docs/HISTORY.md",
+        "docs/stability.md",
         "docs/adopter-flows.md",
         "docs/operator-ui.md",
         "docs/slo-reference.md",
