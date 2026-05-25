@@ -89,15 +89,14 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
   @doc false
   def detect_tier_from_text(text) do
+    # Anchor the tier keyword and its admonition class to the SAME callout line
+    # so an unrelated `{: .info}` callout plus the word "Stable" elsewhere in the
+    # moduledoc cannot misclassify the module. The `####` heading and class must
+    # co-occur in one admonition (e.g. `> #### Stable {: .info}`).
     cond do
-      String.contains?(text, "{: .info}") and String.contains?(text, "Stable") ->
-        :stable
-
-      String.contains?(text, "{: .warning}") and String.contains?(text, "Experimental") ->
-        :experimental
-
-      true ->
-        :unclassified
+      Regex.match?(~r/####\s+Stable\s*\{:\s*\.info\}/, text) -> :stable
+      Regex.match?(~r/####\s+Experimental\s*\{:\s*\.warning\}/, text) -> :experimental
+      true -> :unclassified
     end
   end
 end
