@@ -123,7 +123,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 
   - [x] 21-01-PLAN.md — Phoenix app skeleton: mix.exs/config/application/repo/endpoint/instrumenter + spine migration with runbook_data+trace_id (DEMO-01) (Wave 1)
   - [x] 21-02-PLAN.md — Operator UI wiring: committed generated LiveViews + open /parapet router + Tailwind assets + README (DEMO-01) (Wave 2, depends on 21-01)
-  - [ ] 21-03-PLAN.md — Seeds via Evidence Stable API (open/investigating/resolved + runbook warning) + ConnTest smoke test (DEMO-02/03) (Wave 3, depends on 21-02)
+  - [x] 21-03-PLAN.md — Seeds via Evidence Stable API (open/investigating/resolved + runbook warning) + ConnTest smoke test (DEMO-02/03) (Wave 3, depends on 21-02)
   - [ ] 21-04-PLAN.md — CI demo + release_gate jobs + Hex-exclusion verify + getting-started link + branch-protection checkpoint (DEMO-03/04) (Wave 4, depends on 21-03)
 
 ### Phase 22: Release Readiness & 1.0 Cut
@@ -150,7 +150,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 19. API & Telemetry Freeze | v1.0 | 4/4 | Complete   | 2026-05-25 |
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
-| 21. Runnable Demo App | v1.0 | 2/4 | In Progress|  |
+| 21. Runnable Demo App | v1.0 | 3/4 | In Progress|  |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
 
 _Earlier milestone phases (1-14) are archived — see the milestone archives linked above._
