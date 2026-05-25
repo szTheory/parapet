@@ -98,7 +98,13 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   4. The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters understand multi-integration composition without searching for a separate bundle abstraction.
   5. `hexdocs.pm/parapet` serves grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
 
-**Plans**: TBD
+**Plans**: 5 plans in 2 waves
+
+  - [ ] 20-01-PLAN.md — Governance triad: CONTRIBUTING.md, SECURITY.md, CODE_OF_CONDUCT.md (GOV-01/02/03) (Wave 1)
+  - [ ] 20-02-PLAN.md — README 1.0 semver commitment + Elixir/OTP/Postgres matrix (GOV-04) (Wave 1)
+  - [ ] 20-03-PLAN.md — Four integration guides: Chimeway, Mailglass, Rindle, Scoria (DOCS-01/02/03/04) (Wave 1)
+  - [ ] 20-04-PLAN.md — Provider-as-bundle pattern in SLO authoring guide + slo-reference cross-link (DOCS-05) (Wave 1)
+  - [ ] 20-05-PLAN.md — mix.exs wiring: files: whitelist (GOV-05) + extras/main/groups_for_extras (DOCS-06) (Wave 2, depends on 20-01/03/04)
 
 ### Phase 21: Runnable Demo App
 
@@ -138,7 +144,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete | 2026-05-24 |
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 19. API & Telemetry Freeze | v1.0 | 4/4 | Complete   | 2026-05-25 |
-| 20. Governance & Docs Completeness | v1.0 | 0/TBD | Not started | - |
+| 20. Governance & Docs Completeness | v1.0 | 0/5 | Not started | - |
 | 21. Runnable Demo App | v1.0 | 0/TBD | Not started | - |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
 
