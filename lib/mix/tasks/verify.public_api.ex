@@ -40,7 +40,10 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
     IO.puts(output)
 
-    missing_docs = Enum.filter(manifest, fn m -> not m.has_docs end)
+    # `@moduledoc false` (Code.fetch_docs/1 -> :hidden) maps to the :internal
+    # tier and is an intentional way to mark a public-namespace module internal.
+    # Treat it as a deliberate exclusion, not a missing-documentation failure.
+    missing_docs = Enum.filter(manifest, fn m -> not m.has_docs and m.tier != :internal end)
 
     if missing_docs != [] do
       IO.puts(:stderr, "Error: One or more public API modules are missing documentation.")
