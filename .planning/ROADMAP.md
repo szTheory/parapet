@@ -75,7 +75,11 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   3. `mix verify.public_api` exits non-zero when any public module is missing a stability-tier declaration, making the gate mandatory for all future surface additions.
   4. `test/telemetry_contract_test.exs` fails CI when documented `[:parapet, …]` event families, measurement keys, metadata keys, or outcome-atom vocabularies drift from their committed fixtures.
   5. Calling `Parapet.SLO.define/2` emits a compile-time warning naming `Parapet.SLO.Provider` as the replacement.
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves
+  - [ ] 19-01-PLAN.md — Live STAB-04 gate (tier detection + alias fix) + docs/stability.md policy + telemetry.md stability header (Wave 1)
+  - [ ] 19-02-PLAN.md — Telemetry contract test for all 27 frozen families (STAB-05) + SLO.define/2 deprecation-warning test (STAB-06) (Wave 1)
+  - [ ] 19-03-PLAN.md — Stable-tier callouts + `@doc since: "1.0.0"` on the 13 Stable modules (STAB-01) (Wave 2, depends on 19-01)
+  - [ ] 19-04-PLAN.md — Experimental-tier callouts on the ~50 Experimental modules (STAB-01) (Wave 2, depends on 19-01)
 
 ### Phase 20: Governance & Docs Completeness
 **Goal**: Trust artifacts and documentation gaps are closed — the repository ships the OSS governance triad, a clear version commitment, and all four previously missing integration guides plus hexdocs polish.
@@ -120,7 +124,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 16. SLO Starter Packs & Low-Traffic Guardrails | v0.10 | 2/2 | Complete | 2026-05-24 |
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete | 2026-05-24 |
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
-| 19. API & Telemetry Freeze | v1.0 | 0/TBD | Not started | - |
+| 19. API & Telemetry Freeze | v1.0 | 0/4 | Planned | - |
 | 20. Governance & Docs Completeness | v1.0 | 0/TBD | Not started | - |
 | 21. Runnable Demo App | v1.0 | 0/TBD | Not started | - |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
