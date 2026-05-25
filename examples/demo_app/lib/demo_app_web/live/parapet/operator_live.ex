@@ -4,6 +4,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   import Ecto.Query
   import DemoAppWeb.Parapet.OperatorComponents
+  alias Parapet.Operator.WorkbenchContract
 
   @default_page_size 30
 
@@ -333,7 +334,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     %{
       scope: :resolved,
       direction: direction,
-      items: Enum.map(visible_items, &queue_stream_item/1),
+      items: Enum.map(visible_items, fn incident -> incident |> WorkbenchContract.queue_row() |> queue_stream_item() end),
       has_next_page?: history_has_next_page?(direction, has_more?, visible_items, cursor),
       has_previous_page?: history_has_previous_page?(direction, has_more?, visible_items, cursor),
       next_cursor: history_next_cursor(direction, visible_items, has_more?, cursor),
