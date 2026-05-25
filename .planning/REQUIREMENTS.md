@@ -22,7 +22,7 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 - [ ] **GOV-01**: The repository ships a `CONTRIBUTING.md` covering local proof commands (`mix test`, `mix credo`, `mix dialyzer`), Conventional Commits + formatter expectations, and the PR flow.
 - [ ] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
 - [ ] **GOV-03**: The repository ships a `CODE_OF_CONDUCT.md` (Contributor Covenant or equivalent).
-- [ ] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
+- [x] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
 - [ ] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
 
 ### Documentation Completeness (DOCS)
@@ -88,7 +88,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | GOV-01 | Phase 20 | Pending |
 | GOV-02 | Phase 20 | Pending |
 | GOV-03 | Phase 20 | Pending |
-| GOV-04 | Phase 20 | Pending |
+| GOV-04 | Phase 20 | Complete |
 | GOV-05 | Phase 20 | Pending |
 | DOCS-01 | Phase 20 | Pending |
 | DOCS-02 | Phase 20 | Pending |
