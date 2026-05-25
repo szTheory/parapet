@@ -1,6 +1,12 @@
 defmodule Parapet.Telemetry.AsyncDelivery do
   @moduledoc """
   Public contract helpers for Parapet's async and delivery telemetry families.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @delivery_family_keys %{
@@ -126,14 +132,28 @@ defmodule Parapet.Telemetry.AsyncDelivery do
     webhook_id: :webhook_ref
   }
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the list of all six frozen async and delivery telemetry event family name tuples.
+  """
   def event_families, do: @event_families
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the full telemetry event name tuple for a given delivery or async family atom.
+  """
   def event_name(family) when family in [:outbound, :provider_feedback, :webhook_ingest],
     do: [:parapet, :delivery, family]
 
   def event_name(family) when family in [:stage, :backlog, :callback],
     do: [:parapet, :async, family]
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the list of allowed public metadata keys for a given event family.
+  Accepts either a full event name list (e.g. `[:parapet, :delivery, :outbound]`) or a
+  family atom (e.g. `:outbound`).
+  """
   def allowed_public_keys(family) when is_list(family) do
     family
     |> family_key()
@@ -144,26 +164,51 @@ defmodule Parapet.Telemetry.AsyncDelivery do
     Map.fetch!(@allowed_public_keys, family)
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Normalizes a delivery outcome atom or string to its canonical form.
+  Raises `ArgumentError` for unknown outcomes.
+  """
   def normalize_delivery_outcome(outcome) do
     outcome
     |> normalize_enum(@delivery_outcomes, "delivery outcome")
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Normalizes an async outcome atom or string to its canonical form.
+  Raises `ArgumentError` for unknown outcomes.
+  """
   def normalize_async_outcome(outcome) do
     outcome
     |> normalize_enum(@async_outcomes, "async outcome")
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Normalizes a fault plane atom or string to its canonical form.
+  Raises `ArgumentError` for unknown fault planes.
+  """
   def normalize_fault_plane(plane) do
     plane
     |> normalize_enum(@fault_planes, "fault plane")
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Normalizes a retry state atom or string to its canonical form.
+  Raises `ArgumentError` for unknown retry states.
+  """
   def normalize_retry_state(state) do
     state
     |> normalize_enum(@retry_states, "retry state")
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Buckets a delay in milliseconds into a low-cardinality atom for use as a telemetry metadata value.
+  Accepts integers or floats (floats are rounded). Raises `FunctionClauseError` for negative values.
+  """
   def delay_bucket(delay_ms) when is_integer(delay_ms) and delay_ms >= 0 do
     cond do
       delay_ms < 1_000 -> :subsecond
@@ -180,6 +225,13 @@ defmodule Parapet.Telemetry.AsyncDelivery do
     |> delay_bucket()
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Shapes a raw metadata map for a given event family into the public-key-only metadata map
+  expected in the telemetry event. Strips private/internal keys, normalizes known values, and
+  collects ref keys under a `:refs` sub-map. Accepts either a full event name list or a family
+  atom.
+  """
   def shape_metadata(family, metadata) when is_list(family) do
     family
     |> family_key()

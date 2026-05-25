@@ -48,12 +48,19 @@ defmodule Parapet.SLO.StarterPack.WebSaaS do
   window), which the Generator renders as `... and <total_rate_record> > 0.01` in every
   alert expression. This prevents alert flapping on low-traffic services. Zero Generator
   changes are required.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.SLO.Provider
 
   alias Parapet.SLO.SliceSpec
 
+  @doc since: "1.0.0"
   @doc """
   Returns the three WebSaaS SLO slices: HTTP availability, login journey, and Oban job success.
 

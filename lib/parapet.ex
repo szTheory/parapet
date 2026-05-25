@@ -4,11 +4,18 @@ defmodule Parapet do
 
   This top-level API provides boundary constraints ensuring that metric collection
   bugs never crash the host process and high cardinality labels are explicitly rejected.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   require Logger
 
   alias Parapet.Internal.SafeHandler
 
+  @doc since: "1.0.0"
   @doc """
   Attaches an exception-safe telemetry handler or activates ecosystem integration adapters.
 

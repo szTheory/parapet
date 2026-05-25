@@ -2,6 +2,12 @@ defmodule Parapet.Operator do
   @moduledoc """
   Phoenix-free public boundary for the in-app Operator UI.
   Provides queue/detail queries and audited command entrypoints for incident mutations.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   import Ecto.Query
   alias Parapet.Spine.Incident
@@ -16,6 +22,7 @@ defmodule Parapet.Operator do
   @max_queue_page_size 100
   @queue_page_telemetry_event [:parapet, :operator, :queue, :page]
 
+  @doc since: "1.0.0"
   @doc """
   Returns an Ecto.Query for open action items, sorted by inserted_at ascending.
   """
@@ -26,6 +33,7 @@ defmodule Parapet.Operator do
     )
   end
 
+  @doc since: "1.0.0"
   @doc """
   Returns an Ecto.Query for the incident queue, sorting open/investigating first,
   and resolved incidents second (Phase 2 default sort).
@@ -39,6 +47,7 @@ defmodule Parapet.Operator do
     )
   end
 
+  @doc since: "1.0.0"
   @doc """
   Returns a bounded, active-only incident queue page suitable for operator browsing.
   Invalid cursor or direction params fall back to the first page.
@@ -72,6 +81,7 @@ defmodule Parapet.Operator do
     page
   end
 
+  @doc since: "1.0.0"
   @doc """
   Fetches an incident by ID along with its timeline entries and returns a
   workbench-ready map containing the incident, entries, and derived fields.
@@ -286,6 +296,7 @@ defmodule Parapet.Operator do
   defp result_size_bucket(result_size) when result_size < 100, do: "31-99"
   defp result_size_bucket(_result_size), do: "100+"
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `mark_investigating` command on an incident.
   """
@@ -310,6 +321,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `acknowledge_incident` command.
   Transitions the incident to 'investigating' state and adds an 'acknowledge' timeline entry.
@@ -335,6 +347,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `resolve_incident` command.
   Transitions the incident to 'resolved' state and attaches an automated retrospective.
@@ -385,6 +398,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `record_note` command.
   """
@@ -411,6 +425,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `attach_change_marker` command.
   """
@@ -436,6 +451,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an audited `request_approval` command.
   """
@@ -461,6 +477,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Records an explicit operator request to trigger the next escalation.
   Persists only bounded current-state metadata and leaves execution to the worker.
@@ -507,6 +524,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Records a temporary suppression window for pending escalation execution.
   """
@@ -567,6 +585,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes a mitigation step securely via dynamic dispatch from a runbook.
   """
@@ -607,6 +626,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Previews a recovery action for a runbook step.
   Resolves the named capability and returns a bounded preview payload.
@@ -649,6 +669,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Confirms and executes a recovery action.
   Validates the preview_token and requires an idempotency_key in the payload.
@@ -812,6 +833,7 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Delegates dynamic capability queries (e.g., UI mitigations) to the capability registry.
   """

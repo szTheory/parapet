@@ -3,11 +3,18 @@ defmodule Parapet.Evidence do
   Public API boundary for Spine schemas.
   Enforces a boundary that prevents high-volume telemetry from writing directly
   to the durable Ecto database.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.Spine.{ActionItem, Incident, TimelineEntry, ToolAudit}
   import Ecto.Query
 
+  @doc since: "1.0.0"
   @doc """
   Returns the configured Ecto.Repo for the host application.
   Raises if not configured.
@@ -18,6 +25,7 @@ defmodule Parapet.Evidence do
             "Parapet requires a :repo to be configured. Please set `config :parapet, repo: MyApp.Repo`."
   end
 
+  @doc since: "1.0.0"
   @doc """
   Creates a new ActionItem.
   """
@@ -27,6 +35,7 @@ defmodule Parapet.Evidence do
     |> repo().insert()
   end
 
+  @doc since: "1.0.0"
   @doc """
   Idempotently marks an ActionItem as resolved.
   Accepts either the internal primary key ID or a keyword list of criteria.
@@ -41,6 +50,7 @@ defmodule Parapet.Evidence do
     |> repo().update_all(set: [state: "resolved"])
   end
 
+  @doc since: "1.0.0"
   @doc """
   Creates a new Incident.
   """
@@ -69,6 +79,7 @@ defmodule Parapet.Evidence do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Appends a TimelineEntry to an existing Incident.
   """
@@ -78,6 +89,7 @@ defmodule Parapet.Evidence do
     |> repo().insert()
   end
 
+  @doc since: "1.0.0"
   @doc """
   Logs a ToolAudit entry.
   """
@@ -104,6 +116,7 @@ defmodule Parapet.Evidence do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Executes an operator command as a single transactional seam.
   Requires `incident_changeset`, `timeline_attrs`, and `audit_attrs` keyword list args.

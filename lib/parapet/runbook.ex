@@ -3,6 +3,12 @@ defmodule Parapet.Runbook do
   A DSL for defining standardized runbooks.
 
   Runbooks define the manual and automated steps required to mitigate an incident.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   defmacro __using__(_opts) do
@@ -16,6 +22,7 @@ defmodule Parapet.Runbook do
     end
   end
 
+  @doc since: "1.0.0"
   @doc """
   Defines a single step in the runbook.
 
@@ -54,12 +61,20 @@ defmodule Parapet.Runbook do
     end
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Sets the runbook title displayed in the operator UI.
+  """
   defmacro title(title) do
     quote do
       @title unquote(title)
     end
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Sets the runbook description displayed in the operator UI.
+  """
   defmacro description(desc) do
     quote do
       @description unquote(desc)

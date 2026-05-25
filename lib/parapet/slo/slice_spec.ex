@@ -1,6 +1,12 @@
 defmodule Parapet.SLO.SliceSpec do
   @moduledoc """
   Bounded provider-owned slice description for Phase 5 generators.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @kinds [:ratio, :freshness, :diagnostic]
@@ -31,6 +37,11 @@ defmodule Parapet.SLO.SliceSpec do
 
   @type t :: %__MODULE__{}
 
+  @doc since: "1.0.0"
+  @doc """
+  Builds a validated `Parapet.SLO.SliceSpec` struct from a keyword list of options.
+  Raises `ArgumentError` if required fields are missing or invalid.
+  """
   def new(opts) do
     opts =
       opts
@@ -46,31 +57,64 @@ defmodule Parapet.SLO.SliceSpec do
     validate!(spec)
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns `true` if this slice is a `:diagnostic` kind slice, `false` otherwise.
+  """
   def diagnostic?(%__MODULE__{kind: :diagnostic}), do: true
   def diagnostic?(%__MODULE__{}), do: false
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the primary metric name for this slice. For diagnostic slices, returns the bad metric;
+  for ratio slices, returns the good metric.
+  """
   def value_metric(%__MODULE__{kind: :diagnostic, bad_source_metric: metric}), do: metric
   def value_metric(%__MODULE__{good_source_metric: metric}), do: metric
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the primary label matchers for this slice. For diagnostic slices, returns the bad
+  matchers; for ratio slices, returns the good matchers.
+  """
   def value_matchers(%__MODULE__{kind: :diagnostic, bad_matchers: matchers}), do: matchers
   def value_matchers(%__MODULE__{good_matchers: matchers}), do: matchers
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the error threshold for this slice as a fraction between 0 and 1.
+  If an explicit `:threshold` is set, it is returned directly. Otherwise it is derived
+  from `:objective` as `1 - objective / 100`.
+  """
   def threshold(%__MODULE__{threshold: threshold}) when is_number(threshold), do: threshold
 
   def threshold(%__MODULE__{objective: objective}) when is_number(objective) do
     1 - objective / 100
   end
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the Prometheus alerting severity label string for this slice's alert class.
+  """
   def severity(%__MODULE__{alert_class: :page}), do: "page"
   def severity(%__MODULE__{alert_class: :ticket}), do: "ticket"
   def severity(%__MODULE__{alert_class: :warning}), do: "warning"
   def severity(%__MODULE__{alert_class: :diagnostic}), do: "warning"
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the default `for:` duration string for the Prometheus alert rule based on alert class.
+  """
   def default_for(%__MODULE__{alert_class: :page}), do: "10m"
   def default_for(%__MODULE__{alert_class: :ticket}), do: "20m"
   def default_for(%__MODULE__{alert_class: :warning}), do: "30m"
   def default_for(%__MODULE__{alert_class: :diagnostic}), do: "15m"
 
+  @doc since: "1.0.0"
+  @doc """
+  Returns the default `keep_firing_for:` duration string for the Prometheus alert rule based
+  on alert class.
+  """
   def default_keep_firing_for(%__MODULE__{alert_class: :page}), do: "5m"
   def default_keep_firing_for(%__MODULE__{alert_class: :ticket}), do: "10m"
   def default_keep_firing_for(%__MODULE__{alert_class: :warning}), do: "15m"

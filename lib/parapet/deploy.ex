@@ -1,8 +1,15 @@
 defmodule Parapet.Deploy do
   @moduledoc """
   API for emitting deployment markers as telemetry events.
+
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
+  @doc since: "1.0.0"
   @doc """
   Emits a `[:parapet, :deploy, :mark]` telemetry event.
 

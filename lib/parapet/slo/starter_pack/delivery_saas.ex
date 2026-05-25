@@ -20,6 +20,12 @@ defmodule Parapet.SLO.StarterPack.DeliverySaaS do
   The module itself is always loadable and fully documented regardless of which host
   libraries are present, so `mix verify.public_api` always passes.
 
+  > #### Stable {: .info}
+  >
+  > This module is **stable** as of v1.0.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
+  > [Stability & Deprecation Policy](stability.html) for details.
+
   ## Slices (when all host libs present)
 
   - 3 slices from `Parapet.SLO.StarterPack.WebSaaS` (HTTP availability, login journey,
@@ -38,6 +44,7 @@ defmodule Parapet.SLO.StarterPack.DeliverySaaS do
   alias Parapet.SLO.MailglassDelivery
   alias Parapet.SLO.StarterPack.WebSaaS
 
+  @doc since: "1.0.0"
   @doc """
   Returns the composite SLO slice list: WebSaaS slices plus any loaded delivery slices.
 
