@@ -59,7 +59,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 **Milestone Goal:** Freeze Parapet's public API and telemetry contract under a written stability + deprecation policy, ship the release-readiness scaffolding that lets a stranger trust `~> 1.0`, and cut 1.0.0.
 
 - [x] **Phase 19: API & Telemetry Freeze** — Three stability tiers, deprecation policy, telemetry contract test, `mix verify.public_api` gate, hard-deprecate `Parapet.SLO.define/2` (completed 2026-05-25)
-- [ ] **Phase 20: Governance & Docs Completeness** — OSS governance docs (`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`), README semver commitment, four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), Provider-as-bundle pattern doc, hexdocs grouping
+- [x] **Phase 20: Governance & Docs Completeness** — OSS governance docs (`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`), README semver commitment, four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), Provider-as-bundle pattern doc, hexdocs grouping (completed 2026-05-25)
 - [ ] **Phase 21: Runnable Demo App** — `examples/demo_app/` child Phoenix app with seeded evidence, smoke test, required `demo` CI gate, Hex-excluded
 - [ ] **Phase 22: Release Readiness & 1.0 Cut** — CI warnings-as-errors, Hex publish step, proportionate verification gate, Release-Please 1.0.0 graduation
 
@@ -104,7 +104,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   - [x] 20-02-PLAN.md — README 1.0 semver commitment + Elixir/OTP/Postgres matrix (GOV-04) (Wave 1)
   - [x] 20-03-PLAN.md — Four integration guides: Chimeway, Mailglass, Rindle, Scoria (DOCS-01/02/03/04) (Wave 1)
   - [x] 20-04-PLAN.md — Provider-as-bundle pattern in SLO authoring guide + slo-reference cross-link (DOCS-05) (Wave 1)
-  - [ ] 20-05-PLAN.md — mix.exs wiring: files: whitelist (GOV-05) + extras/main/groups_for_extras (DOCS-06) (Wave 2, depends on 20-01/03/04)
+  - [x] 20-05-PLAN.md — mix.exs wiring: files: whitelist (GOV-05) + extras/main/groups_for_extras (DOCS-06) (Wave 2, depends on 20-01/03/04)
 
 ### Phase 21: Runnable Demo App
 
@@ -144,7 +144,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete | 2026-05-24 |
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 19. API & Telemetry Freeze | v1.0 | 4/4 | Complete   | 2026-05-25 |
-| 20. Governance & Docs Completeness | v1.0 | 4/5 | In Progress|  |
+| 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
 | 21. Runnable Demo App | v1.0 | 0/TBD | Not started | - |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
 

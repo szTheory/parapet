@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: Stable Release
 status: executing
 stopped_at: Phase 20 context gathered
-last_updated: "2026-05-25T14:25:19.942Z"
+last_updated: "2026-05-25T14:31:10.108Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 4
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 9
-  completed_plans: 7
-  percent: 25
+  completed_plans: 9
+  percent: 50
 ---
 
 # Project State
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-25 — v1.0 roadmap created)
 ## Current Position
 
 Phase: 20 (governance-docs-completeness) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-05-25
 
@@ -59,6 +59,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 19 P04 | 19 | 3 tasks | 59 files |
 | Phase 20 P02 | 1 | 1 tasks | 1 files |
 | Phase 20 P03 | 2 | 2 tasks | 4 files |
+| Phase 20 P05 | 9 | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,8 @@ Recent decisions affecting current work:
 - SLO-B1 dropped: `Parapet.SLO.Provider` returning multiple slices is the bundle abstraction; documented as a pattern (DOCS-05) instead of a separate abstraction.
 - [Phase ?]: Integration guides follow sigra.md template with content verified against .ex source files
 - [Phase ?]: Content verified against .ex source
+- [Phase ?]: Explicit file lists for Getting Started, Guides, Reference groups; regex only for Integration Guides — prevents capture overlap Pitfall 6
+- [Phase ?]: CODE_OF_CONDUCT* glob in Hex files: whitelist; file dropped per 20-01 user decision — glob is harmless without the file (GOV-03 not required)
 
 ### Pending Todos
 
@@ -91,7 +94,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-25T14:25:19.939Z
+Last session: 2026-05-25T14:31:10.105Z
 Stopped at: Phase 20 context gathered
 Resume file: None
 Next step: `/gsd:plan-phase 19`

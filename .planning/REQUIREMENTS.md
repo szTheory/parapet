@@ -23,7 +23,7 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 - [ ] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
 - [ ] **GOV-03**: The repository ships a `CODE_OF_CONDUCT.md` (Contributor Covenant or equivalent).
 - [x] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
-- [ ] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
+- [x] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
 
 ### Documentation Completeness (DOCS)
 
@@ -32,7 +32,7 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 - [x] **DOCS-03**: An adopter can activate Rindle monitoring from a dedicated integration guide (same shape).
 - [x] **DOCS-04**: An adopter can activate Scoria monitoring from a dedicated integration guide (same shape).
 - [ ] **DOCS-05**: The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters compose multi-integration SLO sets without looking for a separate bundle abstraction.
-- [ ] **DOCS-06**: HexDocs are organized for adopters — grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
+- [x] **DOCS-06**: HexDocs are organized for adopters — grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
 
 ### Runnable Demo App (DEMO)
 
@@ -89,13 +89,13 @@ Explicitly excluded. Documented to prevent scope creep.
 | GOV-02 | Phase 20 | Pending |
 | GOV-03 | Phase 20 | Pending |
 | GOV-04 | Phase 20 | Complete |
-| GOV-05 | Phase 20 | Pending |
+| GOV-05 | Phase 20 | Complete |
 | DOCS-01 | Phase 20 | Complete |
 | DOCS-02 | Phase 20 | Complete |
 | DOCS-03 | Phase 20 | Complete |
 | DOCS-04 | Phase 20 | Complete |
 | DOCS-05 | Phase 20 | Pending |
-| DOCS-06 | Phase 20 | Pending |
+| DOCS-06 | Phase 20 | Complete |
 | DEMO-01 | Phase 21 | Pending |
 | DEMO-02 | Phase 21 | Pending |
 | DEMO-03 | Phase 21 | Pending |
