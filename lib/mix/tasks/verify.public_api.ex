@@ -10,7 +10,9 @@ defmodule Mix.Tasks.Verify.PublicApi do
   - Experimental: `> #### Experimental {: .warning}`
 
   Modules in the `Parapet.Internal.*` or `Parapet.TestSupport.*` namespaces and
-  modules containing `.Resolvable.` in their name are excluded from this check.
+  modules containing `.Resolvable` in their name are excluded from this check.
+  (This also catches the terminal protocol module `Parapet.SLO.Resolvable` and
+  its auto-generated `defimpl` dispatch modules.)
   """
   use Mix.Task
 
