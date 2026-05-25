@@ -2,6 +2,12 @@ defmodule Parapet.Metrics.PrometheusFormatter do
   @moduledoc """
   A custom formatter that wraps standard Prometheus output and injects
   OpenMetrics exemplars for trace_ids from the ExemplarStore.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.Metrics.ExemplarStore

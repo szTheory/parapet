@@ -2,6 +2,12 @@ defmodule Parapet.Integrations.Accrue do
   @moduledoc """
   Parapet integration for the Accrue billing library.
   Listens to Accrue telemetry events and translates them into standard Parapet billing journey metrics.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.Integration

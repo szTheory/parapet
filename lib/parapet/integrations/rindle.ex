@@ -3,6 +3,12 @@ defmodule Parapet.Integrations.Rindle do
   Parapet integration for the Rindle media processing library.
   Listens to Rindle telemetry events and translates them into the Phase 4
   Parapet async telemetry contract.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.Integration

@@ -3,6 +3,12 @@ defmodule Parapet.Metrics.AsyncDelivery do
   @moduledoc """
   Shared Telemetry.Metrics catalog and PromQL selector helpers for Phase 5
   async and delivery reliability slices.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   import Telemetry.Metrics

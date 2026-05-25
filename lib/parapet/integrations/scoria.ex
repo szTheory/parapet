@@ -3,6 +3,12 @@ defmodule Parapet.Integrations.Scoria do
   Parapet integration for the Scoria AI library.
   Listens to Scoria telemetry events and translates them into Parapet metrics
   while stripping high-cardinality metadata and creating incidents for severe errors.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.Integration

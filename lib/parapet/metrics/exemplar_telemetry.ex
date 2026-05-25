@@ -1,6 +1,12 @@
 defmodule Parapet.Metrics.ExemplarTelemetry do
   @moduledoc """
   Attaches to Telemetry events to capture trace_ids and store them as exemplars.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.Metrics.ExemplarStore

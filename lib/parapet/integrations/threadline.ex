@@ -2,6 +2,12 @@ defmodule Parapet.Integrations.Threadline do
   @moduledoc """
   Parapet integration for the Threadline audit library.
   Maps audit data between Threadline and Parapet.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.Integration
