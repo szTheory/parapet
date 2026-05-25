@@ -4,13 +4,13 @@ milestone: v1.0
 milestone_name: Stable Release
 status: executing
 stopped_at: Phase 20 context gathered
-last_updated: "2026-05-25T14:20:49.883Z"
+last_updated: "2026-05-25T14:25:19.942Z"
 last_activity: 2026-05-25
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 25
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-25 — v1.0 roadmap created)
 ## Current Position
 
 Phase: 20 (governance-docs-completeness) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-25
 
@@ -58,6 +58,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 19 P02 | 5 | 2 tasks | 2 files |
 | Phase 19 P04 | 19 | 3 tasks | 59 files |
 | Phase 20 P02 | 1 | 1 tasks | 1 files |
+| Phase 20 P03 | 2 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -69,6 +70,8 @@ Recent decisions affecting current work:
 - v1.0 scope: Freeze depth = stability tiers + deprecation policy (not a full hardening pass). Proportionate verification gate (REL-03) replaces a security/perf audit.
 - Demo in v1.0: Demo app confirmed in-scope as a CI contract test for the frozen surface (not deferred to v1.1).
 - SLO-B1 dropped: `Parapet.SLO.Provider` returning multiple slices is the bundle abstraction; documented as a pattern (DOCS-05) instead of a separate abstraction.
+- [Phase ?]: Integration guides follow sigra.md template with content verified against .ex source files
+- [Phase ?]: Content verified against .ex source
 
 ### Pending Todos
 
@@ -88,7 +91,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-25T14:20:49.880Z
+Last session: 2026-05-25T14:25:19.939Z
 Stopped at: Phase 20 context gathered
 Resume file: None
 Next step: `/gsd:plan-phase 19`

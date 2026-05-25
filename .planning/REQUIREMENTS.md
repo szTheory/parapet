@@ -27,10 +27,10 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 
 ### Documentation Completeness (DOCS)
 
-- [ ] **DOCS-01**: An adopter can activate Chimeway monitoring from a dedicated integration guide (prerequisites, what it unlocks, uniform activation line, config keys, troubleshooting).
-- [ ] **DOCS-02**: An adopter can activate Mailglass monitoring from a dedicated integration guide (same shape).
-- [ ] **DOCS-03**: An adopter can activate Rindle monitoring from a dedicated integration guide (same shape).
-- [ ] **DOCS-04**: An adopter can activate Scoria monitoring from a dedicated integration guide (same shape).
+- [x] **DOCS-01**: An adopter can activate Chimeway monitoring from a dedicated integration guide (prerequisites, what it unlocks, uniform activation line, config keys, troubleshooting).
+- [x] **DOCS-02**: An adopter can activate Mailglass monitoring from a dedicated integration guide (same shape).
+- [x] **DOCS-03**: An adopter can activate Rindle monitoring from a dedicated integration guide (same shape).
+- [x] **DOCS-04**: An adopter can activate Scoria monitoring from a dedicated integration guide (same shape).
 - [ ] **DOCS-05**: The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters compose multi-integration SLO sets without looking for a separate bundle abstraction.
 - [ ] **DOCS-06**: HexDocs are organized for adopters — grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
 
@@ -90,10 +90,10 @@ Explicitly excluded. Documented to prevent scope creep.
 | GOV-03 | Phase 20 | Pending |
 | GOV-04 | Phase 20 | Complete |
 | GOV-05 | Phase 20 | Pending |
-| DOCS-01 | Phase 20 | Pending |
-| DOCS-02 | Phase 20 | Pending |
-| DOCS-03 | Phase 20 | Pending |
-| DOCS-04 | Phase 20 | Pending |
+| DOCS-01 | Phase 20 | Complete |
+| DOCS-02 | Phase 20 | Complete |
+| DOCS-03 | Phase 20 | Complete |
+| DOCS-04 | Phase 20 | Complete |
 | DOCS-05 | Phase 20 | Pending |
 | DOCS-06 | Phase 20 | Pending |
 | DEMO-01 | Phase 21 | Pending |
