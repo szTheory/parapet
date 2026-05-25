@@ -4,8 +4,8 @@ milestone: v1.0
 milestone_name: Stable Release
 status: executing
 stopped_at: Phase 21 UI-SPEC approved
-last_updated: "2026-05-25T15:40:47.470Z"
-last_activity: 2026-05-25 -- Phase 21 planning complete
+last_updated: "2026-05-25T15:42:14.678Z"
+last_activity: 2026-05-25 -- Phase 21 execution started
 progress:
   total_phases: 4
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-25 — v1.0 roadmap created)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 20 — governance-docs-completeness
+**Current focus:** Phase 21 — runnable-demo-app
 
 ## Current Position
 
-Phase: 20 (governance-docs-completeness) — EXECUTING
-Plan: 4 of 5
-Status: Ready to execute
-Last activity: 2026-05-25 -- Phase 21 planning complete
+Phase: 21 (runnable-demo-app) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 21
+Last activity: 2026-05-25 -- Phase 21 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
