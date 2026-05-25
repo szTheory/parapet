@@ -33,13 +33,23 @@ defmodule DemoApp.MixProject do
       {:postgrex, "~> 0.20"},
       {:bandit, "~> 1.5"},
       {:phoenix_html, "~> 4.1"},
-      {:jason, "~> 1.2"}
+      {:jason, "~> 1.2"},
+      {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:heroicons,
+       github: "tailwindlabs/heroicons",
+       tag: "v2.1.1",
+       sparse: "optimized",
+       app: false,
+       compile: false,
+       depth: 1}
     ]
   end
 
   defp aliases do
     [
-      setup: ["deps.get", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"]
+      setup: ["deps.get", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "assets.build": ["tailwind default"],
+      "assets.deploy": ["tailwind default --minify", "phx.digest"]
     ]
   end
 end
