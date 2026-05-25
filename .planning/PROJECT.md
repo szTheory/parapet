@@ -14,7 +14,24 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Previously shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements).
 
-**Next:** Planning the next milestone via `/gsd:new-milestone`. The API / telemetry freeze remains deferred to v1.0 (per `MILESTONE-ARC.md`); a runnable demo app (DEMO-01) is deferred to v0.10.x. One release-mechanics follow-up is tracked: the `release-as: "0.10.0"` pin stays until the v0.10.0 release PR merges and tags v0.10.0.
+**Next:** v1.0 Stable Release (in planning) — freeze the public API + telemetry contract under a written stability/deprecation policy, complete the release-readiness scaffolding (governance docs, the four remaining integration guides, a runnable demo app), and cut 1.0.0. SLO-W1 (the SLO wizard, reshaped as a flag-based Igniter task) is deferred to v1.1; SLO-B1 is dropped (the `Parapet.SLO.Provider` pattern already serves as the bundle abstraction). One release-mechanics follow-up is tracked: the `release-as: "0.10.0"` pin stays until the v0.10.0 release PR merges and tags v0.10.0.
+
+## Current Milestone: v1.0 Stable Release
+
+**Goal:** Freeze Parapet's public API and telemetry contract under a written stability + deprecation policy, ship the release-readiness scaffolding that lets a stranger trust `~> 1.0`, and cut 1.0.0.
+
+**Posture:** A credibility/commitment milestone, not a feature milestone (the Oban-1.0 model: deprecation cleanup + a written stability promise, proven concrete by a runnable demo — not new feature surface).
+
+**Target features:**
+- **Stability freeze** — three tiers (Stable / Experimental / Internal) signaled via ExDoc callouts, `docs/stability.md` (public-surface enumeration + semver promise + deprecation cycle + telemetry additive-only rules), an extended `mix verify.public_api` gate that fails on unclassified public modules, a `telemetry_contract_test.exs`, and the hard-deprecation of `Parapet.SLO.define/2`.
+- **OSS governance docs** — `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, plus a README semver commitment and an Elixir/OTP/Postgres support matrix.
+- **Documentation completeness** — the four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), the Provider-as-bundle pattern documented, and hexdocs grouping/landing polish.
+- **DEMO-01 runnable demo app** — `examples/demo_app/` child Phoenix app (path dep) with seeded incidents/timelines/runbook/SLO state, a smoke test, and a required `demo` CI gate; Hex-excluded.
+- **Release readiness & the 1.0 cut** — CI warnings-as-errors lanes, a Hex publish step in `release-please.yml`, a proportionate verification gate (no security/perf audit), and the Release-Please `0.10.0 → 1.0.0` graduation sequence.
+
+**Deferred to v1.1:** SLO-W1 (a flag-based `mix parapet.gen.slo` Igniter task), a multi-version Elixir/OTP CI matrix, logo/favicon, `MAINTAINING.md`, SHA-pinned actions, and a demo Docker Compose. **Dropped:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
+
+**Key context:** Freeze depth chosen = stability tiers + deprecation policy (not a full hardening pass). Research backing this milestone lives in `.planning/research/V1-*.md`.
 
 ## Requirements
 
@@ -99,16 +116,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- v0.10 Adopter Success shipped and archived 2026-05-24. No active milestone — define the next via /gsd:new-milestone. -->
+<!-- v1.0 Stable Release milestone defined 2026-05-25. Requirements enumerated in REQUIREMENTS.md; traceability filled by ROADMAP.md. -->
 
-None — v0.10 Adopter Success is shipped and archived (all 11 requirements Validated above). The next milestone's requirements will be defined via `/gsd:new-milestone`.
+v1.0 Stable Release is in planning. Requirements are enumerated in `.planning/REQUIREMENTS.md` (categories: STAB, GOV, DOCS, DEMO, REL) and mapped to phases 19–22 in `.planning/ROADMAP.md`.
 
-Carried forward for consideration in a future milestone:
+Carried forward beyond v1.0:
 
-- **DEMO-01** (v0.10.x): runnable demo app under `examples/demo_app/` + CI green check — deferred to validate that docs alone reduce onboarding friction first.
-- **SLO-W1** (v1.0+): interactive `mix parapet.gen.slo` wizard.
-- **SLO-B1** (v1.0+): cross-integration SLO slice bundles.
-- **API / telemetry freeze** (v1.0): lock recovery and SLO surfaces once proven in adoption.
+- **SLO-W1** (v1.1): `mix parapet.gen.slo` reshaped as a flag-based Igniter task (interactive-wizard form rejected as non-idiomatic — Igniter has no prompt API).
+- Multi-version Elixir/OTP CI matrix, logo/favicon, `MAINTAINING.md`, SHA-pinned CI actions, demo Docker Compose (post-1.0 maturity items).
+
+Dropped:
+
+- **SLO-B1** cross-integration SLO bundles — superseded; `Parapet.SLO.Provider` returning multiple slices already is the bundle abstraction (`DeliverySaaS` proves it). Documented as a pattern in the SLO authoring guide instead.
 
 ### Out of Scope
 
@@ -204,4 +223,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-24 after v0.10 Adopter Success milestone*
+*Last updated: 2026-05-25 — v1.0 Stable Release milestone defined*
