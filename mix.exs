@@ -98,8 +98,6 @@ defmodule Parapet.MixProject do
   end
 
   defp aliases do
-    [
-      "verify.public_api": ["docs --warnings-as-errors"]
-    ]
+    []
   end
 end

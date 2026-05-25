@@ -1,10 +1,20 @@
 defmodule Mix.Tasks.Verify.PublicApi do
   @moduledoc """
-  Verifies that all public API modules have documentation and generate a manifest.
+  Verifies that all public API modules have documentation and a stability-tier
+  declaration, and generates a manifest.
+
+  Each public Parapet module must include an ExDoc admonition callout in its
+  `@moduledoc` to declare its stability tier:
+
+  - Stable: `> #### Stable {: .info}`
+  - Experimental: `> #### Experimental {: .warning}`
+
+  Modules in the `Parapet.Internal.*` or `Parapet.TestSupport.*` namespaces and
+  modules containing `.Resolvable.` in their name are excluded from this check.
   """
   use Mix.Task
 
-  @shortdoc "Verifies public API module documentation"
+  @shortdoc "Verifies public API module documentation and stability-tier declarations"
 
   @impl Mix.Task
   def run(_args) do
@@ -17,7 +27,7 @@ defmodule Mix.Tasks.Verify.PublicApi do
     manifest =
       modules
       |> Enum.filter(&public_api_module?/1)
-      |> Enum.map(&check_module_docs/1)
+      |> Enum.map(&check_module/1)
       |> Enum.sort_by(& &1.module)
 
     # Encode to JSON if Jason is available, otherwise use inspect
@@ -30,8 +40,25 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
     IO.puts(output)
 
-    if Enum.any?(manifest, fn m -> not m.has_docs end) do
+    missing_docs = Enum.filter(manifest, fn m -> not m.has_docs end)
+
+    if missing_docs != [] do
       IO.puts(:stderr, "Error: One or more public API modules are missing documentation.")
+      IO.puts(:stderr, Enum.map_join(missing_docs, "\n", &"  - #{&1.module}"))
+      System.halt(1)
+    end
+
+    unclassified = Enum.filter(manifest, fn m -> m.tier == :unclassified end)
+
+    if unclassified != [] do
+      IO.puts(:stderr, "Error: One or more public API modules are missing a stability-tier declaration.")
+
+      IO.puts(
+        :stderr,
+        "Add '> #### Stable {: .info}' or '> #### Experimental {: .warning}' to each @moduledoc."
+      )
+
+      IO.puts(:stderr, Enum.map_join(unclassified, "\n", &"  - #{&1.module}"))
       System.halt(1)
     end
   end
@@ -45,18 +72,29 @@ defmodule Mix.Tasks.Verify.PublicApi do
       not String.contains?(name, ".Resolvable.")
   end
 
-  defp check_module_docs(module) do
-    has_docs =
+  defp check_module(module) do
+    {has_docs, tier} =
       case Code.fetch_docs(module) do
-        {:docs_v1, _, _, _, :hidden, _, _} -> false
-        {:docs_v1, _, _, _, :none, _, _} -> false
-        {:docs_v1, _, _, _, %{}, _, _} -> true
-        {:error, _} -> false
+        {:docs_v1, _, _, _, :hidden, _, _} -> {false, :internal}
+        {:docs_v1, _, _, _, :none, _, _} -> {false, :unclassified}
+        {:docs_v1, _, _, _, %{"en" => text}, _, _} -> {true, detect_tier_from_text(text)}
+        {:error, _} -> {false, :unclassified}
       end
 
-    %{
-      module: inspect(module),
-      has_docs: has_docs
-    }
+    %{module: inspect(module), has_docs: has_docs, tier: tier}
+  end
+
+  @doc false
+  def detect_tier_from_text(text) do
+    cond do
+      String.contains?(text, "{: .info}") and String.contains?(text, "Stable") ->
+        :stable
+
+      String.contains?(text, "{: .warning}") and String.contains?(text, "Experimental") ->
+        :experimental
+
+      true ->
+        :unclassified
+    end
   end
 end
