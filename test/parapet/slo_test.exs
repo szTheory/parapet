@@ -99,10 +99,14 @@ defmodule Parapet.SLOTest do
     # This test verifies that the compile-time warning fires and names the replacement.
     # No production code change is made here — this is verification only (D-14).
     test "emits compile-time deprecation warning naming Parapet.SLO.Provider" do
+      # Use a unique module name per run so recompiling the probe never emits a
+      # "redefining module" warning that would pollute the captured stderr.
+      probe_module = "Parapet.SLOTest.DeprecationProbe#{System.unique_integer([:positive])}"
+
       output =
         capture_io(:stderr, fn ->
           Code.compile_string("""
-          defmodule Parapet.SLOTest.DeprecationProbe do
+          defmodule #{probe_module} do
             def check do
               Parapet.SLO.define(:test_slo, [
                 objective: 99.0,
@@ -115,13 +119,14 @@ defmodule Parapet.SLOTest do
           """)
         end)
 
-      assert output =~ "deprecated",
-             "Expected compile-time deprecation warning for Parapet.SLO.define/2. " <>
-               "The @deprecated attribute at lib/parapet/slo.ex:29 must fire when a call site is compiled."
-
-      assert output =~ "Parapet.SLO.Provider",
-             "Expected deprecation warning to name the replacement 'Parapet.SLO.Provider'. " <>
-               "The @deprecated message at lib/parapet/slo.ex:29 must name the replacement module."
+      # Assert on the stable part of the message that WE control (the @deprecated
+      # string), not the compiler-generated "deprecated" prefix whose format has
+      # changed across Elixir versions. This also confirms the warning names the
+      # replacement module.
+      assert output =~ "Use a Parapet.SLO.Provider module instead",
+             "Expected compile-time deprecation warning to carry the @deprecated message " <>
+               "'Use a Parapet.SLO.Provider module instead'. The @deprecated attribute at " <>
+               "lib/parapet/slo.ex:35 must fire when a call site is compiled and name the replacement."
     end
   end
 
