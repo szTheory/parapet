@@ -11,8 +11,14 @@ defmodule Parapet.TelemetryContractTest do
   @async_delivery_families AsyncDelivery.event_families()
 
   # ---------------------------------------------------------------------------
-  # Groups 2-7: Hardcoded fixtures — adding a new emit call that is NOT listed
-  # here causes the length assertion to fail in CI.
+  # Groups 2-7: Hardcoded fixtures — this is a MANUAL snapshot, not an automated
+  # drift detector. There is NO coupling to the :telemetry.execute/span/event_name
+  # call sites in lib/, so adding a new emit call in lib/ will NOT, on its own,
+  # fail any assertion here. The length assertion below only fails if a developer
+  # edits these literals. When you add or change an emit family in lib/, you MUST
+  # update this fixture (and docs/telemetry.md) by hand. (See WR-01: the durable
+  # fix is a single source-of-truth registry that emit sites and this test both
+  # read from.)
   # ---------------------------------------------------------------------------
   @other_documented_families [
     # Group 2: Journey (5 families)
