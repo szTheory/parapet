@@ -96,3 +96,4 @@ With `--ci`, the doctor exits `1` for any `:warn` or `:error` finding — a stri
 - [Parapet Adopter Flows](docs/adopter-flows.md) — understand the reliability operating loop and when each surface matters
 - [SLO Authoring Guide](docs/slo-authoring-guide.md) — learn to author custom SLO slices for your specific journeys
 - [Parapet Sigra Integration](docs/integrations/sigra.md) — wire the login journey slice with real authentication event data
+- [Runnable Demo App](https://github.com/szTheory/parapet/tree/main/examples/demo_app) — explore a live, seeded Parapet setup end-to-end: incidents, timeline entries, runbook steps, and the Operator UI populated and ready to browse
