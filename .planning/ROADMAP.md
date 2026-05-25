@@ -60,7 +60,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 
 - [x] **Phase 19: API & Telemetry Freeze** — Three stability tiers, deprecation policy, telemetry contract test, `mix verify.public_api` gate, hard-deprecate `Parapet.SLO.define/2` (completed 2026-05-25)
 - [x] **Phase 20: Governance & Docs Completeness** — OSS governance docs (`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`), README semver commitment, four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), Provider-as-bundle pattern doc, hexdocs grouping (completed 2026-05-25)
-- [ ] **Phase 21: Runnable Demo App** — `examples/demo_app/` child Phoenix app with seeded evidence, smoke test, required `demo` CI gate, Hex-excluded
+- [x] **Phase 21: Runnable Demo App** — `examples/demo_app/` child Phoenix app with seeded evidence, smoke test, required `demo` CI gate, Hex-excluded (completed 2026-05-25)
 - [ ] **Phase 22: Release Readiness & 1.0 Cut** — CI warnings-as-errors, Hex publish step, proportionate verification gate, Release-Please 1.0.0 graduation
 
 ## Phase Details
@@ -124,7 +124,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   - [x] 21-01-PLAN.md — Phoenix app skeleton: mix.exs/config/application/repo/endpoint/instrumenter + spine migration with runbook_data+trace_id (DEMO-01) (Wave 1)
   - [x] 21-02-PLAN.md — Operator UI wiring: committed generated LiveViews + open /parapet router + Tailwind assets + README (DEMO-01) (Wave 2, depends on 21-01)
   - [x] 21-03-PLAN.md — Seeds via Evidence Stable API (open/investigating/resolved + runbook warning) + ConnTest smoke test (DEMO-02/03) (Wave 3, depends on 21-02)
-  - [ ] 21-04-PLAN.md — CI demo + release_gate jobs + Hex-exclusion verify + getting-started link + branch-protection checkpoint (DEMO-03/04) (Wave 4, depends on 21-03)
+  - [x] 21-04-PLAN.md — CI demo + release_gate jobs + Hex-exclusion verify + getting-started link + branch-protection checkpoint (DEMO-03/04) (Wave 4, depends on 21-03)
 
 ### Phase 22: Release Readiness & 1.0 Cut
 
@@ -150,7 +150,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 19. API & Telemetry Freeze | v1.0 | 4/4 | Complete   | 2026-05-25 |
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
-| 21. Runnable Demo App | v1.0 | 3/4 | In Progress|  |
+| 21. Runnable Demo App | v1.0 | 4/4 | Complete   | 2026-05-25 |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
 
 _Earlier milestone phases (1-14) are archived — see the milestone archives linked above._
