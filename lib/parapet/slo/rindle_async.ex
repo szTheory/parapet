@@ -1,6 +1,12 @@
 defmodule Parapet.SLO.RindleAsync do
   @moduledoc """
   Built-in Phase 5 async reliability slices for Rindle.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @behaviour Parapet.SLO.Provider

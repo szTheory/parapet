@@ -1,6 +1,12 @@
 defmodule Parapet.SLO.ScoriaEval do
   @moduledoc """
   Defines an SLO based on Scoria AI evaluation pass rates.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @enforce_keys [:name, :objective, :guardrail, :runbook]

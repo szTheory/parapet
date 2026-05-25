@@ -4,6 +4,12 @@ defmodule Parapet.Operator.ActionPayload do
   Ensures that every mutating operator command provides mandatory
   audit metadata (actor, reason, correlation_id) and distinguishes
   between immutable factual actions and lightweight narrative edits.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   use Ecto.Schema
   import Ecto.Changeset

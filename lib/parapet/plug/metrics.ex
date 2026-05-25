@@ -1,6 +1,12 @@
 defmodule Parapet.Plug.Metrics do
   @moduledoc """
   A plug for extracting HTTP metrics and emitting them as Telemetry events.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   @behaviour Plug
 

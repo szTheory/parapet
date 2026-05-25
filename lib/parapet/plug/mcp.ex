@@ -3,6 +3,12 @@ defmodule Parapet.Plug.MCP do
   A Plug to handle incoming MCP connections via HTTP SSE.
   Accepts JSON-RPC POST requests and streams responses back as SSE chunks.
 
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
+
   **Security Note:**
   Authentication and authorization to the MCP endpoint must be handled by the
   host application's router pipeline *before* requests reach `Parapet.Plug.MCP`.

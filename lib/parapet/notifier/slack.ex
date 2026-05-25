@@ -2,6 +2,12 @@ defmodule Parapet.Notifier.Slack do
   @moduledoc """
   Slack adapter for Parapet notifications.
   Sends rich Block Kit messages for incident updates.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   @behaviour Parapet.Notifier
 

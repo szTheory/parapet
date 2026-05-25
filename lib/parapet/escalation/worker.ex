@@ -2,6 +2,12 @@ if Code.ensure_loaded?(Oban.Worker) do
   defmodule Parapet.Escalation.Worker do
     @moduledoc """
     Oban worker for durable asynchronous dispatch of escalations.
+
+    > #### Experimental {: .warning}
+    >
+    > This module is **experimental** in v1.x. Its API may change in a minor release with a
+    > single-version notice in CHANGELOG.md. See
+    > [Stability & Deprecation Policy](stability.html) for details.
     """
     use Oban.Worker,
       queue: :default,

@@ -3,6 +3,12 @@ defmodule Parapet.Operator.WorkbenchContract do
   Derives operator-facing fields from the durable evidence spine, ensuring that
   features like severity, journey impact, or mitigation state are computed
   deterministically without modifying the core domain schemas.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.Spine.Incident

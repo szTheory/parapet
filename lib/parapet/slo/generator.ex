@@ -2,6 +2,12 @@ defmodule Parapet.SLO.Generator do
   @moduledoc """
   Generates provider-first Prometheus recording and alert rules from
   bounded slice specs while retaining legacy `%Parapet.SLO{}` support.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.SLO

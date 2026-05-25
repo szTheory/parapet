@@ -2,6 +2,12 @@ defmodule Parapet.Spine.SystemEventPruner do
   @moduledoc """
   A built-in GC pruner to prevent `Parapet.Spine.SystemEvent` storage bloat.
   Periodically deletes events older than a specified threshold.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   use GenServer
   require Logger
