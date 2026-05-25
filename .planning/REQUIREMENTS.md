@@ -19,9 +19,9 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 
 ### OSS Governance (GOV)
 
-- [ ] **GOV-01**: The repository ships a `CONTRIBUTING.md` covering local proof commands (`mix test`, `mix credo`, `mix dialyzer`), Conventional Commits + formatter expectations, and the PR flow.
-- [ ] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
-- [ ] **GOV-03**: The repository ships a `CODE_OF_CONDUCT.md` (Contributor Covenant or equivalent).
+- [x] **GOV-01**: The repository ships a `CONTRIBUTING.md` covering local proof commands (`mix test`, `mix credo`, `mix dialyzer`), Conventional Commits + formatter expectations, and the PR flow.
+- [x] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
+- [ ] **GOV-03**: The repository ships a `CODE_OF_CONDUCT.md` (Contributor Covenant or equivalent). *(intentionally omitted in Phase 20 per user decision)*
 - [x] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
 - [x] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
 
@@ -31,7 +31,7 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 - [x] **DOCS-02**: An adopter can activate Mailglass monitoring from a dedicated integration guide (same shape).
 - [x] **DOCS-03**: An adopter can activate Rindle monitoring from a dedicated integration guide (same shape).
 - [x] **DOCS-04**: An adopter can activate Scoria monitoring from a dedicated integration guide (same shape).
-- [ ] **DOCS-05**: The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters compose multi-integration SLO sets without looking for a separate bundle abstraction.
+- [x] **DOCS-05**: The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters compose multi-integration SLO sets without looking for a separate bundle abstraction.
 - [x] **DOCS-06**: HexDocs are organized for adopters — grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
 
 ### Runnable Demo App (DEMO)
@@ -85,8 +85,8 @@ Explicitly excluded. Documented to prevent scope creep.
 | STAB-04 | Phase 19 | Complete |
 | STAB-05 | Phase 19 | Complete |
 | STAB-06 | Phase 19 | Complete |
-| GOV-01 | Phase 20 | Pending |
-| GOV-02 | Phase 20 | Pending |
+| GOV-01 | Phase 20 | Complete |
+| GOV-02 | Phase 20 | Complete |
 | GOV-03 | Phase 20 | Pending |
 | GOV-04 | Phase 20 | Complete |
 | GOV-05 | Phase 20 | Complete |
@@ -94,7 +94,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | DOCS-02 | Phase 20 | Complete |
 | DOCS-03 | Phase 20 | Complete |
 | DOCS-04 | Phase 20 | Complete |
-| DOCS-05 | Phase 20 | Pending |
+| DOCS-05 | Phase 20 | Complete |
 | DOCS-06 | Phase 20 | Complete |
 | DEMO-01 | Phase 21 | Pending |
 | DEMO-02 | Phase 21 | Pending |
