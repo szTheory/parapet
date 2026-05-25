@@ -68,7 +68,7 @@ defmodule DemoAppWeb do
 
   defp html_helpers do
     quote do
-      use Phoenix.HTML
+      import Phoenix.HTML
 
       import Phoenix.LiveView.Helpers
       import DemoAppWeb.CoreComponents, warn: false
@@ -82,42 +82,6 @@ defmodule DemoAppWeb do
   end
 end
 
-defmodule DemoAppWeb.Layouts do
-  use DemoAppWeb, :html
-
-  def root(assigns) do
-    ~H"""
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Demo App</title>
-      </head>
-      <body>
-        <%= @inner_content %>
-      </body>
-    </html>
-    """
-  end
-
-  def app(assigns) do
-    ~H"""
-    <main>
-      <%= @inner_content %>
-    </main>
-    """
-  end
-end
-
 defmodule DemoAppWeb.CoreComponents do
   use Phoenix.Component
-end
-
-defmodule DemoAppWeb.ErrorHTML do
-  use DemoAppWeb, :html
-
-  def render(template, _assigns) do
-    Phoenix.Controller.status_message_from_template(template)
-  end
 end

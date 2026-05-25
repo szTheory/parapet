@@ -1,0 +1,415 @@
+defmodule DemoAppWeb.Parapet.OperatorLive do
+  @moduledoc false
+  use DemoAppWeb, :live_view
+
+  import Ecto.Query
+  import DemoAppWeb.Parapet.OperatorComponents
+
+  @default_page_size 30
+
+  def mount(_params, _session, socket) do
+    action_items = DemoApp.Repo.all(Parapet.Operator.action_items_query())
+
+    journeys = [
+      %{name: "Login", status: :healthy},
+      %{name: "Signup", status: :healthy},
+      %{name: "Checkout", status: :degraded},
+      %{name: "Webhooks", status: :healthy}
+    ]
+
+    {:ok,
+     socket
+     |> assign(
+       action_items: action_items,
+       journeys: journeys,
+       selected_incident: nil,
+       visible_incidents: [],
+       queue_page: empty_queue_page(),
+       queue_params: %{"status" => "active"},
+       queue_refresh_available?: false
+     )
+     |> stream_configure(:incidents, dom_id: &incident_dom_id/1)
+     |> stream(:incidents, [], reset: true)}
+  end
+
+  def handle_params(params, _uri, socket) do
+    queue_params = queue_params(params)
+    queue_page = load_queue_page(queue_params)
+
+    selected =
+      if id = params["id"] do
+        Parapet.Operator.incident_detail(id)
+      else
+        nil
+      end
+
+    visible_incidents = Enum.map(queue_page.items, &queue_stream_item/1)
+
+    {:noreply,
+     socket
+     |> assign(
+       selected_incident: selected,
+       visible_incidents: visible_incidents,
+       queue_page: queue_page,
+       queue_params: visible_queue_params(queue_params, queue_page),
+       queue_refresh_available?: false
+     )
+     |> stream(:incidents, visible_incidents, reset: true)}
+  end
+
+  def handle_event("queue_refresh", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:queue_refresh_available?, false)
+     |> push_patch(to: queue_path(socket, %{"cursor" => nil, "direction" => "next"}))}
+  end
+
+  def handle_event("acknowledge", %{"id" => id}, socket) do
+    incident = DemoApp.Repo.get!(Parapet.Spine.Incident, id)
+
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Acknowledged via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :acknowledge
+    }
+
+    case Parapet.Operator.acknowledge_incident(incident, payload) do
+      {:ok, _result} ->
+        {:noreply,
+         socket
+         |> put_flash(:info, "Incident acknowledged successfully")
+         |> push_patch(to: queue_path(socket, %{"id" => id}))}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
+    end
+  end
+
+  def handle_event("resolve", %{"id" => id}, socket) do
+    incident = DemoApp.Repo.get!(Parapet.Spine.Incident, id)
+
+    payload = %Parapet.Operator.ActionPayload{
+      actor: "operator_ui",
+      reason: "Resolved via UI",
+      correlation_id: Ecto.UUID.generate(),
+      action_type: :resolve
+    }
+
+    case Parapet.Operator.resolve_incident(incident, payload) do
+      {:ok, _result} ->
+        {:noreply, push_patch(socket, to: queue_path(socket, %{"id" => id}))}
+
+      {:error, _reason} ->
+        {:noreply, put_flash(socket, :error, "Failed to resolve")}
+    end
+  end
+
+  def handle_info(:parapet_queue_changed, socket) do
+    {:noreply, assign(socket, :queue_refresh_available?, true)}
+  end
+
+  def handle_info({:parapet_queue_changed, _payload}, socket) do
+    {:noreply, assign(socket, :queue_refresh_available?, true)}
+  end
+
+  def render(assigns) do
+    ~H"""
+    <div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
+      <div class={"w-full md:w-80 border-r border-gray-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+          <.critical_journeys journeys={@journeys} />
+        </div>
+        <div class="p-4 border-b border-gray-200 bg-stone-50">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+                <%= queue_scope_label(@queue_params["status"]) %>
+              </p>
+              <h2 class="mt-2 text-lg font-semibold text-stone-900">Incident Queue</h2>
+              <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
+            </div>
+            <.link
+              patch={queue_path(@queue_params, %{"status" => "resolved", "cursor" => nil, "direction" => "next", "id" => nil})}
+              class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
+            >
+              History
+            </.link>
+          </div>
+        </div>
+        <%= if @queue_refresh_available? do %>
+          <div class="border-b border-stone-200 bg-stone-100 px-4 py-3">
+            <p class="text-sm font-medium text-stone-800">New incidents or queue changes are available.</p>
+            <button
+              type="button"
+              phx-click="queue_refresh"
+              class="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
+            >
+              Load latest changes
+            </button>
+          </div>
+        <% end %>
+        <div class="flex-1 overflow-y-auto border-b border-gray-200">
+          <.incident_list
+            incidents={@visible_incidents}
+            selected={selected_queue_incident(@selected_incident)}
+            queue_params={@queue_params}
+          />
+        </div>
+        <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-stone-50 px-4 py-3">
+          <.link
+            patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+            class={[
+              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              pagination_link_class(@queue_page.has_previous_page?)
+            ]}
+          >
+            Previous
+          </.link>
+          <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced queue</p>
+          <.link
+            patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+            class={[
+              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              pagination_link_class(@queue_page.has_next_page?)
+            ]}
+          >
+            Next
+          </.link>
+        </div>
+
+        <div class="p-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-semibold text-gray-800">Action Items</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto bg-gray-50">
+          <.action_item_list items={@action_items} />
+        </div>
+      </div>
+
+      <div class={"flex-1 flex flex-col md:flex-row min-w-0 bg-gray-50 #{if @selected_incident, do: "flex", else: "hidden md:flex"}"}>
+        <div class="md:hidden p-4 border-b border-gray-200 bg-white">
+          <.link patch={queue_path(@queue_params, %{})} class="text-blue-600 hover:text-blue-800 font-medium">
+            &larr; Back to Queue
+          </.link>
+        </div>
+
+        <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-gray-200">
+          <%= if @selected_incident do %>
+            <div class="p-6 border-b border-gray-200">
+              <.incident_summary detail={@selected_incident} />
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+              <.incident_timeline detail={@selected_incident} />
+            </div>
+          <% else %>
+            <div class="flex-1 flex items-center justify-center text-gray-500">
+              Select an incident to review details
+            </div>
+          <% end %>
+        </div>
+
+        <%= if @selected_incident do %>
+          <div class="w-full md:w-80 bg-gray-50 flex flex-col flex-shrink-0">
+            <div class="p-4 border-b border-gray-200 bg-white md:bg-transparent">
+              <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</h3>
+            </div>
+            <div class="p-4 overflow-y-auto">
+              <.action_rail detail={@selected_incident} />
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    """
+  end
+
+  defp selected_queue_incident(nil), do: nil
+
+  defp selected_queue_incident(%{incident: incident}) do
+    %{id: incident.id}
+  end
+
+  defp queue_stream_item(item) do
+    item
+    |> Map.put(:id, item.incident_id)
+    |> Map.put_new(:title, item.title || item.incident_id)
+  end
+
+  defp incident_dom_id(%{incident_id: incident_id}), do: "incident-#{incident_id}"
+  defp incident_dom_id(%{id: incident_id}), do: "incident-#{incident_id}"
+
+  defp queue_params(params) do
+    %{
+      "page_size" => @default_page_size,
+      "direction" => Map.get(params, "direction", "next"),
+      "cursor" => Map.get(params, "cursor"),
+      "status" => normalized_status(Map.get(params, "status")),
+      "id" => Map.get(params, "id")
+    }
+  end
+
+  defp visible_queue_params(queue_params, queue_page) do
+    queue_params
+    |> Map.put("cursor", queue_params["cursor"])
+    |> Map.put("direction", queue_page.direction |> Atom.to_string())
+    |> Map.put("status", normalized_status(queue_params["status"]))
+  end
+
+  defp normalized_status("resolved"), do: "resolved"
+  defp normalized_status(_status), do: "active"
+
+  defp load_queue_page(%{"status" => "resolved"} = queue_params), do: resolved_history_page(queue_params)
+  defp load_queue_page(queue_params), do: Parapet.Operator.list_incident_queue(queue_params)
+
+  defp queue_scope_label("resolved"), do: "Resolved History"
+  defp queue_scope_label(_status), do: "Active Only"
+
+  defp queue_window_copy(_queue_page, visible_incidents) do
+    visible_count = Enum.count(visible_incidents)
+
+    cond do
+      visible_count == 0 -> "No incidents in this queue window."
+      true -> "#{visible_count} incidents visible in this queue window."
+    end
+  end
+
+  defp empty_queue_page do
+    %{
+      items: [],
+      direction: :next,
+      next_cursor: nil,
+      previous_cursor: nil,
+      has_next_page?: false,
+      has_previous_page?: false,
+      page_size: @default_page_size
+    }
+  end
+
+  defp queue_page_path(queue_params, nil, _direction), do: queue_path(queue_params, %{})
+
+  defp queue_page_path(queue_params, cursor, direction) do
+    queue_path(queue_params, %{"cursor" => cursor, "direction" => direction, "id" => nil})
+  end
+
+  defp queue_path(%{assigns: assigns}, extra_params) do
+    queue_path(assigns.queue_params, extra_params)
+  end
+
+  defp queue_path(queue_params, extra_params) do
+    params =
+      queue_params
+      |> Map.merge(extra_params)
+      |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
+
+    case params do
+      [] -> "/parapet"
+      _ -> "/parapet?" <> URI.encode_query(params)
+    end
+  end
+
+  defp pagination_link_class(true),
+    do: "border-stone-300 bg-white text-stone-900 hover:border-teal-700 hover:text-teal-700"
+
+  defp pagination_link_class(false),
+    do: "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
+
+  defp resolved_history_page(queue_params) do
+    direction = queue_direction(queue_params)
+    cursor = decode_queue_cursor(queue_params["cursor"])
+
+    incidents =
+      Parapet.Spine.Incident
+      |> where([incident], incident.state == "resolved")
+      |> apply_history_cursor(direction, cursor)
+      |> apply_history_order(direction)
+      |> limit(^(Map.get(queue_params, "page_size", @default_page_size) + 1))
+      |> DemoApp.Repo.all()
+
+    {visible_items, has_more?} =
+      incidents
+      |> maybe_reverse_history_items(direction)
+      |> split_queue_page(Map.get(queue_params, "page_size", @default_page_size))
+
+    %{
+      scope: :resolved,
+      direction: direction,
+      items: Enum.map(visible_items, &queue_stream_item/1),
+      has_next_page?: history_has_next_page?(direction, has_more?, visible_items, cursor),
+      has_previous_page?: history_has_previous_page?(direction, has_more?, visible_items, cursor),
+      next_cursor: history_next_cursor(direction, visible_items, has_more?, cursor),
+      previous_cursor: history_previous_cursor(direction, visible_items, has_more?, cursor),
+      page_size: Map.get(queue_params, "page_size", @default_page_size)
+    }
+  end
+
+  defp queue_direction(%{"direction" => "previous"}), do: :previous
+  defp queue_direction(_queue_params), do: :next
+
+  defp decode_queue_cursor(nil), do: nil
+
+  defp decode_queue_cursor(cursor) when is_binary(cursor) do
+    with {:ok, decoded} <- Base.url_decode64(cursor, padding: false),
+         [updated_at_raw, incident_id] <- String.split(decoded, "|", parts: 2),
+         {:ok, updated_at, 0} <- DateTime.from_iso8601(updated_at_raw) do
+      %{updated_at: updated_at, id: incident_id}
+    else
+      _ -> nil
+    end
+  end
+
+  defp apply_history_cursor(query, _direction, nil), do: query
+
+  defp apply_history_cursor(query, :next, %{updated_at: updated_at, id: incident_id}) do
+    where(
+      query,
+      [incident],
+      incident.updated_at < ^updated_at or
+        (incident.updated_at == ^updated_at and incident.id < ^incident_id)
+    )
+  end
+
+  defp apply_history_cursor(query, :previous, %{updated_at: updated_at, id: incident_id}) do
+    where(
+      query,
+      [incident],
+      incident.updated_at > ^updated_at or
+        (incident.updated_at == ^updated_at and incident.id > ^incident_id)
+    )
+  end
+
+  defp apply_history_order(query, :previous), do: order_by(query, [incident], [asc: incident.updated_at, asc: incident.id])
+  defp apply_history_order(query, _direction), do: order_by(query, [incident], [desc: incident.updated_at, desc: incident.id])
+
+  defp maybe_reverse_history_items(items, :previous), do: Enum.reverse(items)
+  defp maybe_reverse_history_items(items, _direction), do: items
+
+  defp split_queue_page(items, page_size) do
+    visible_items = Enum.take(items, page_size)
+    {visible_items, length(items) > page_size}
+  end
+
+  defp history_has_next_page?(:next, has_more?, _items, _cursor), do: has_more?
+  defp history_has_next_page?(:previous, _has_more?, _items, nil), do: false
+  defp history_has_next_page?(:previous, _has_more?, items, _cursor), do: items != []
+
+  defp history_has_previous_page?(:next, _has_more?, _items, nil), do: false
+  defp history_has_previous_page?(:next, _has_more?, items, _cursor), do: items != []
+  defp history_has_previous_page?(:previous, has_more?, _items, _cursor), do: has_more?
+
+  defp history_next_cursor(:next, items, true, _cursor), do: encode_queue_cursor(List.last(items))
+  defp history_next_cursor(:previous, _items, _has_more?, nil), do: nil
+  defp history_next_cursor(:previous, items, _has_more?, _cursor), do: encode_queue_cursor(List.last(items))
+  defp history_next_cursor(_direction, _items, _has_more?, _cursor), do: nil
+
+  defp history_previous_cursor(:next, _items, _has_more?, nil), do: nil
+  defp history_previous_cursor(:next, items, _has_more?, _cursor), do: encode_queue_cursor(List.first(items))
+  defp history_previous_cursor(:previous, items, true, _cursor), do: encode_queue_cursor(List.first(items))
+  defp history_previous_cursor(_direction, _items, _has_more?, _cursor), do: nil
+
+  defp encode_queue_cursor(nil), do: nil
+
+  defp encode_queue_cursor(%{updated_at: %DateTime{} = updated_at, id: incident_id}) do
+    "#{DateTime.to_iso8601(updated_at)}|#{incident_id}"
+    |> Base.url_encode64(padding: false)
+  end
+end
