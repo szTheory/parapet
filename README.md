@@ -10,6 +10,20 @@ It provides an immediate, evidence-based understanding of whether your critical 
 
 Parapet's philosophy: A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
+## Compatibility
+
+| Component | Supported |
+|-----------|-----------|
+| Elixir    | 1.19+     |
+| OTP       | 26–28     |
+| Postgres  | 14+       |
+
+CI validates on Elixir 1.19 / OTP 27 / PG 14.
+
+## Stability & Versioning
+
+Parapet follows [Semantic Versioning](https://semver.org/). Starting at `1.0`, the public API — modules, functions, telemetry event names, SLO slice names, and Prometheus metric names documented in hexdocs — will not break without a major-version bump. Pre-1.0 minor releases may include breaking changes recorded in [CHANGELOG.md](CHANGELOG.md).
+
 ## Features
 
 - **Zero-Conf Instrumentation:** Automatically hooks into Phoenix, Ecto, and Oban telemetry.
