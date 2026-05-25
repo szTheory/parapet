@@ -213,15 +213,19 @@ defmodule Parapet.TelemetryContractTest do
   end
 
   describe "measurement key contract" do
-    for {family, _keys} <- @documented_measurements do
+    for {family, keys} <- @documented_measurements do
       @family family
-      test "#{inspect(@family)} measurement keys are documented in fixture" do
-        # This test documents the EXPECTED measurement keys at review time.
-        # When a developer renames or removes a measurement key at the emit call
-        # site, this fixture should be updated alongside.
+      @expected_keys keys
+      test "#{inspect(@family)} measurement keys match fixture" do
+        # No runtime source of truth exists for these measurement keys (they are
+        # caller-supplied at emit time), so this asserts the EXACT frozen fixture
+        # value rather than mere key presence (which would be tautological — the
+        # family is, by construction, a key of @documented_measurements). When a
+        # developer renames or removes a measurement key at the emit call site,
+        # this fixture must be updated alongside.
         # Update docs/telemetry.md and this fixture together.
-        assert Map.has_key?(@documented_measurements, @family),
-               "No measurement fixture for #{inspect(@family)}. " <>
+        assert Enum.sort(@documented_measurements[@family]) == Enum.sort(@expected_keys),
+               "Measurement keys drifted for #{inspect(@family)}. " <>
                  "Update docs/telemetry.md and this fixture together."
       end
     end
