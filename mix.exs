@@ -52,7 +52,7 @@ defmodule Parapet.MixProject do
 
   defp docs do
     [
-      main: "readme",
+      main: "getting-started",
       source_url: @source_url,
       source_ref: "v#{@version}",
       extras: [
@@ -70,7 +70,11 @@ defmodule Parapet.MixProject do
         "docs/integrations/sigra.md",
         "docs/integrations/accrue.md",
         "docs/integrations/rulestead.md",
-        "docs/integrations/threadline.md"
+        "docs/integrations/threadline.md",
+        "docs/integrations/chimeway.md",
+        "docs/integrations/mailglass.md",
+        "docs/integrations/rindle.md",
+        "docs/integrations/scoria.md"
       ],
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       groups_for_extras: [
