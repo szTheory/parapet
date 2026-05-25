@@ -78,7 +78,21 @@ defmodule Parapet.MixProject do
       ],
       skip_undefined_reference_warnings_on: ["CHANGELOG.md"],
       groups_for_extras: [
-        Guides: ~r/docs\//
+        "Getting Started": ["README.md", "docs/getting-started.md"],
+        Guides: [
+          "docs/adopter-flows.md",
+          "docs/operator-ui.md",
+          "docs/slo-authoring-guide.md",
+          "docs/troubleshooting.md",
+          "docs/HISTORY.md",
+          "CHANGELOG.md"
+        ],
+        "Integration Guides": ~r|docs/integrations/|,
+        Reference: [
+          "docs/stability.md",
+          "docs/telemetry.md",
+          "docs/slo-reference.md"
+        ]
       ]
     ]
   end
