@@ -88,6 +88,20 @@ defmodule Parapet.SLOTest do
     end
 
     test "attach does not silently activate providers" do
+      # Parapet.attach/1 resolves each adapter and runs its setup/0, which attaches
+      # global :telemetry handlers (process-independent state). Detach the exact
+      # handler ids these adapters register so they do not leak into other suites
+      # running in the same VM.
+      on_exit(fn ->
+        for id <- [
+              "parapet-mailglass-delivery",
+              "parapet-chimeway-delivery-events",
+              "parapet-rindle-async"
+            ] do
+          :telemetry.detach(id)
+        end
+      end)
+
       Parapet.attach(adapters: [:mailglass, :chimeway, :rindle])
       assert SLO.provider_catalog() == []
       assert SLO.all() == []
