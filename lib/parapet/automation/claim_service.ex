@@ -1,6 +1,12 @@
 defmodule Parapet.Automation.ClaimService do
   @moduledoc """
   Transaction seam for durable logical-action claims under contention.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   import Ecto.Query
 

@@ -2,6 +2,12 @@ if Code.ensure_loaded?(Oban.Worker) do
   defmodule Parapet.Probe.ObanScheduler do
     @moduledoc """
     Optional Oban worker for scheduling synthetic probes without retries.
+
+    > #### Experimental {: .warning}
+    >
+    > This module is **experimental** in v1.x. Its API may change in a minor release with a
+    > single-version notice in CHANGELOG.md. See
+    > [Stability & Deprecation Policy](stability.html) for details.
     """
     use Oban.Worker, max_attempts: 1
 

@@ -4,6 +4,12 @@ defmodule Parapet.Probe do
 
   Probes are active checks that maintain SLO signal quality by running
   periodic business logic.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @callback run() :: :ok | {:error, term()}

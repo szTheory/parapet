@@ -3,6 +3,12 @@ if Code.ensure_loaded?(Oban.Worker) do
     @moduledoc """
     Oban worker for executing automated runbook mitigations.
     Safely delegates back to the Operator API under a system identity.
+
+    > #### Experimental {: .warning}
+    >
+    > This module is **experimental** in v1.x. Its API may change in a minor release with a
+    > single-version notice in CHANGELOG.md. See
+    > [Stability & Deprecation Policy](stability.html) for details.
     """
     use Oban.Worker,
       queue: :default,

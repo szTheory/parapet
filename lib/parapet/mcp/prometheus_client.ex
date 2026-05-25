@@ -2,6 +2,12 @@ defmodule Parapet.MCP.PrometheusClient do
   @moduledoc """
   A read-only Prometheus HTTP API proxy using `Req` to allow external agents
   to retrieve predefined time-series metrics.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   @doc """

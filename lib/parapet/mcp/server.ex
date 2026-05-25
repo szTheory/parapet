@@ -2,6 +2,12 @@ defmodule Parapet.MCP.Server do
   @moduledoc """
   Core MCP server tool execution and routing.
   Provides a controlled, read-only interface for external AI agents to investigate incidents safely.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
 
   alias Parapet.Spine.Incident

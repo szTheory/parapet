@@ -4,6 +4,12 @@ defmodule Parapet.Probe.NativeScheduler do
 
   It uses `:timer.send_interval/2` to periodically trigger probe executions.
   Useful for standalone or non-clustered setups.
+
+  > #### Experimental {: .warning}
+  >
+  > This module is **experimental** in v1.x. Its API may change in a minor release with a
+  > single-version notice in CHANGELOG.md. See
+  > [Stability & Deprecation Policy](stability.html) for details.
   """
   use GenServer
 
