@@ -32,13 +32,21 @@ defmodule Mix.Tasks.Verify.PublicApi do
       |> Enum.map(&check_module/1)
       |> Enum.sort_by(& &1.module)
 
-    # Encode to JSON if Jason is available, otherwise use inspect
-    output =
-      if Code.ensure_loaded?(Jason) do
-        Jason.encode!(manifest, pretty: true)
-      else
-        inspect(manifest, pretty: true, limit: :infinity)
-      end
+    # The manifest is a machine-readable artifact, so it must always be emitted in
+    # one canonical format (pretty JSON). Fail loudly if Jason is unavailable
+    # rather than silently degrading to `inspect`, which would produce a second,
+    # non-interchangeable representation that downstream diffs cannot compare.
+    unless Code.ensure_loaded?(Jason) do
+      IO.puts(
+        :stderr,
+        "Error: Jason is required to emit the public-API manifest as canonical JSON. " <>
+          "Add {:jason, \"~> 1.0\"} to your deps and run `mix deps.get`."
+      )
+
+      System.halt(1)
+    end
+
+    output = Jason.encode!(manifest, pretty: true)
 
     IO.puts(output)
 
