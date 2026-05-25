@@ -1,5 +1,6 @@
 defmodule Parapet.SLOTest do
   use ExUnit.Case, async: false
+  import ExUnit.CaptureIO
 
   alias Parapet.SLO
   alias Parapet.SLO.Generator
@@ -90,6 +91,37 @@ defmodule Parapet.SLOTest do
       Parapet.attach(adapters: [:mailglass, :chimeway, :rindle])
       assert SLO.provider_catalog() == []
       assert SLO.all() == []
+    end
+  end
+
+  describe "Parapet.SLO.define/2 compile-time deprecation warning (STAB-06)" do
+    # STAB-06: @deprecated is already in place at lib/parapet/slo.ex:29.
+    # This test verifies that the compile-time warning fires and names the replacement.
+    # No production code change is made here — this is verification only (D-14).
+    test "emits compile-time deprecation warning naming Parapet.SLO.Provider" do
+      output =
+        capture_io(:stderr, fn ->
+          Code.compile_string("""
+          defmodule Parapet.SLOTest.DeprecationProbe do
+            def check do
+              Parapet.SLO.define(:test_slo, [
+                objective: 99.0,
+                good_events: "x",
+                total_events: "y",
+                runbook: "http://example.com"
+              ])
+            end
+          end
+          """)
+        end)
+
+      assert output =~ "deprecated",
+             "Expected compile-time deprecation warning for Parapet.SLO.define/2. " <>
+               "The @deprecated attribute at lib/parapet/slo.ex:29 must fire when a call site is compiled."
+
+      assert output =~ "Parapet.SLO.Provider",
+             "Expected deprecation warning to name the replacement 'Parapet.SLO.Provider'. " <>
+               "The @deprecated message at lib/parapet/slo.ex:29 must name the replacement module."
     end
   end
 
