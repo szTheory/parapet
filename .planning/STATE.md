@@ -82,7 +82,7 @@ None.
 
 ### Blockers/Concerns
 
-- **Phase 22 external prerequisite:** The `release-as: "0.10.0"` pin in `release-please-config.json` must remain until the v0.10.0 Release-Please PR merges and tags `v0.10.0`. Removing it earlier risks a wrong version computation. Phase 22 cannot begin the graduation sequence until this is resolved.
+- **Phase 22 external prerequisite:** The exact `v0.10.0` tag now exists and the GitHub `v0.10.0` release was published on 2026-05-26. The `0.10.0` pin is no longer correct; the next repo-side step is the one-time `release-as: "1.0.0"` graduation pin while the Hex packaging fix rolls forward to a publishable major cut.
 
 ## Deferred Items
 
