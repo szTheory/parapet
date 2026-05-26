@@ -118,6 +118,65 @@ Do not claim Phase 22 complete until all of these are true:
 6. Hex and HexDocs both resolve for `1.0.0`.
 7. The immediate post-cut cleanup from the graduation sequence is merged.
 
+## Exact Release-Please Graduation Sequence
+
+This is the authoritative `0.10.0 -> 1.0.0` choreography.
+
+### What stays committed now
+
+- `release-please-config.json` keeps `release-as: "0.10.0"`.
+- `release-please-config.json` keeps both pre-major flags:
+  - `bump-minor-pre-major`
+  - `bump-patch-for-minor-pre-major`
+- `.release-please-manifest.json` is treated as read-only Release Please state.
+
+### Step 1: wait for the exact `v0.10.0` tag
+
+Do not change the current pin until the exact tag exists.
+
+Verification:
+
+```bash
+git tag --list 'v0.10.0'
+```
+
+Expected result: `v0.10.0` is present.
+
+### Step 2: remove the `0.10.0` pin
+
+Only after the exact `v0.10.0` tag exists, remove:
+
+- `release-as: "0.10.0"`
+
+Do not change the pre-major bump flags yet.
+
+### Step 3: stage the one-time `1.0.0` graduation pin
+
+Only after all Phase 22 prep work is merged and green, add:
+
+- `release-as: "1.0.0"`
+
+This is a one-time steering pin for the graduation Release Please PR.
+
+### Step 4: execute the real cut
+
+Merge the `1.0.0` Release Please PR only after:
+
+- the automated gate is green
+- the manual cold-start walkthrough is green
+- `HEX_API_KEY` is configured
+- the publish workflow is ready to run
+
+### Step 5: immediate post-cut cleanup
+
+Immediately after the exact `v1.0.0` tag exists, remove:
+
+- `release-as: "1.0.0"`
+- `bump-minor-pre-major`
+- `bump-patch-for-minor-pre-major`
+
+Do not hand-edit `.release-please-manifest.json` during any step of this sequence.
+
 ## Explicitly Out Of Scope
 
 This gate does not expand into:
