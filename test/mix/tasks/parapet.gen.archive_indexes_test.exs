@@ -35,10 +35,12 @@ defmodule Mix.Tasks.Parapet.Gen.ArchiveIndexesTest do
                up_ast,
                "drop(constraint(:parapet_tool_audits, \"parapet_tool_audits_timeline_entry_id_fkey\"))"
              )
+
       assert contains_snippet?(
                up_ast,
                "references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)"
              )
+
       assert contains_snippet?(
                up_ast,
                "create(index(:parapet_incidents, [:updated_at, :id], where: \"state in ('open', 'investigating')\"))"
@@ -49,17 +51,26 @@ defmodule Mix.Tasks.Parapet.Gen.ArchiveIndexesTest do
                "create(index(:parapet_incidents, [:updated_at, :id], where: \"state = 'resolved'\"))"
              )
 
-      assert contains_snippet?(up_ast, "create(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))")
-      assert contains_snippet?(up_ast, "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))")
+      assert contains_snippet?(
+               up_ast,
+               "create(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))"
+             )
+
+      assert contains_snippet?(
+               up_ast,
+               "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))"
+             )
 
       assert contains_snippet?(
                down_ast,
                "drop(constraint(:parapet_tool_audits, \"parapet_tool_audits_timeline_entry_id_fkey\"))"
              )
+
       assert contains_snippet?(
                down_ast,
                "references(:parapet_timeline_entries, type: :binary_id, on_delete: :nilify_all)"
              )
+
       assert contains_snippet?(
                down_ast,
                "drop(index(:parapet_incidents, [:updated_at, :id], where: \"state = 'resolved'\"))"
@@ -70,8 +81,15 @@ defmodule Mix.Tasks.Parapet.Gen.ArchiveIndexesTest do
                "drop(index(:parapet_incidents, [:updated_at, :id], where: \"state in ('open', 'investigating')\"))"
              )
 
-      assert contains_snippet?(down_ast, "drop(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))")
-      assert contains_snippet?(down_ast, "drop(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))")
+      assert contains_snippet?(
+               down_ast,
+               "drop(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))"
+             )
+
+      assert contains_snippet?(
+               down_ast,
+               "drop(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))"
+             )
     end
   end
 

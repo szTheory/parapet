@@ -170,7 +170,11 @@ defmodule Parapet.Spine.AlertProcessorTest do
       Process.put(:mock_incident_id, "new-incident-id")
 
       Process.put(:mock_system_events, [
-        %SystemEvent{id: "evt-1", type: "rulestead_flag_change", payload: %{"flag" => "feature_x"}}
+        %SystemEvent{
+          id: "evt-1",
+          type: "rulestead_flag_change",
+          payload: %{"flag" => "feature_x"}
+        }
       ])
 
       payload = %{
@@ -267,6 +271,7 @@ defmodule Parapet.Spine.AlertProcessorTest do
       incident = Ecto.Changeset.apply_changes(changeset)
 
       assert incident.title == "Rindle queue freshness burn"
+
       assert incident.runbook_data["triage"] == %{
                "integration" => "rindle",
                "symptom" => "Queue freshness burn",

@@ -43,11 +43,13 @@ defmodule Parapet.Automation.ExecutorTest do
           # In newer Ecto, multi.insert with function becomes a :run under the hood.
           # We just run the function and if it returns a struct/changeset, we can inspect it.
           case fun.(__MODULE__, acc) do
-            {:ok, value} -> 
+            {:ok, value} ->
               {:cont, {:ok, Map.put(acc, name, value)}}
-            {:error, error} -> {:halt, {:error, name, error, acc}}
+
+            {:error, error} ->
+              {:halt, {:error, name, error, acc}}
           end
-          
+
         {name, other}, {:ok, acc} ->
           # Catch all for unexpected operations
           IO.puts("Unexpected operation: #{name} - #{inspect(other)}")
@@ -80,7 +82,9 @@ defmodule Parapet.Automation.ExecutorTest do
   defmodule ShortCircuitClaimService do
     def claim_action(opts) do
       send(self(), {:claim_action, opts})
-      {:short_circuited, %ActionClaim{id: "claim-1", status: "short_circuited"}, "circuit_breaker_tripped"}
+
+      {:short_circuited, %ActionClaim{id: "claim-1", status: "short_circuited"},
+       "circuit_breaker_tripped"}
     end
 
     def mark_executed(_claim, _opts \\ []), do: raise("should not mark executed")

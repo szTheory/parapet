@@ -26,7 +26,11 @@ defmodule Parapet.ConcurrencyBootstrapTest do
 
     {:ok, entry} =
       %TimelineEntry{}
-      |> TimelineEntry.changeset(%{incident_id: incident.id, type: "note", payload: %{"text" => "ok"}})
+      |> TimelineEntry.changeset(%{
+        incident_id: incident.id,
+        type: "note",
+        payload: %{"text" => "ok"}
+      })
       |> ConcurrencyRepo.insert()
 
     assert {:ok, _audit} =

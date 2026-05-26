@@ -34,7 +34,7 @@ defmodule Parapet.Internal.LabelPolicy do
         raise ArgumentError,
               "High cardinality label rejected by Parapet safety policy: #{key}"
 
-      not (key in allowed_keys) ->
+      key not in allowed_keys ->
         raise ArgumentError,
               "Unsupported public metadata key #{inspect(key)} for #{inspect(family)}"
 

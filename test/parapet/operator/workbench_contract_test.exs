@@ -312,7 +312,12 @@ defmodule Parapet.Operator.WorkbenchContractTest do
           "title" => "Mailglass Recovery",
           "description" => "Recovery steps for Mailglass",
           "steps" => [
-            %{id: "step-1", label: "Check status", preview_only: true, warning: "test warning text"},
+            %{
+              id: "step-1",
+              label: "Check status",
+              preview_only: true,
+              warning: "test warning text"
+            },
             %{
               id: "step-2",
               label: "Retry delivery",

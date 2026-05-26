@@ -48,8 +48,13 @@ defmodule Mix.Tasks.Parapet.Gen.UiShiftLeftTest do
         |> Rewrite.Source.get(:content)
 
       assert components_source =~ "if escalation_controls_enabled?(@detail.incident) do"
-      assert components_source =~ "Escalation controls are available only while the incident is open."
-      assert components_source =~ "defp escalation_controls_enabled?(%{state: \"open\"}), do: true"
+
+      assert components_source =~
+               "Escalation controls are available only while the incident is open."
+
+      assert components_source =~
+               "defp escalation_controls_enabled?(%{state: \"open\"}), do: true"
+
       assert components_source =~ "defp escalation_controls_enabled?(_incident), do: false"
 
       assert index_of(components_source, "if escalation_controls_enabled?(@detail.incident) do") <

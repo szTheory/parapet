@@ -87,7 +87,11 @@ defmodule Parapet.Integrations.ThreadlineTest do
     :code.delete(Threadline)
     :code.purge(Threadline)
 
-    assert :ok = :telemetry.execute([:parapet, :audit, :created], %{}, %{audit_attrs: %{tool_name: "test"}})
+    assert :ok =
+             :telemetry.execute([:parapet, :audit, :created], %{}, %{
+               audit_attrs: %{tool_name: "test"}
+             })
+
     refute_receive {:threadline_log_audit, _}
 
     File.rename!(bak_path, beam_path)

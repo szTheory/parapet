@@ -113,7 +113,8 @@ defmodule Parapet.Automation.ExecutorConcurrencyTest do
       conflict_entry =
         ConcurrencyRepo.one!(
           from(entry in TimelineEntry,
-            where: entry.incident_id == ^incident.id and entry.type == "automation_claim_conflicted"
+            where:
+              entry.incident_id == ^incident.id and entry.type == "automation_claim_conflicted"
           )
         )
 

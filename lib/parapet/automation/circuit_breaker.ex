@@ -61,6 +61,10 @@ defmodule Parapet.Automation.CircuitBreaker do
   end
 
   defp config_value(opts, key, default) do
-    Keyword.get(opts, key, Keyword.get(Application.get_env(:parapet, :automation, []), key, default))
+    Keyword.get(
+      opts,
+      key,
+      Keyword.get(Application.get_env(:parapet, :automation, []), key, default)
+    )
   end
 end

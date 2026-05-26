@@ -34,12 +34,14 @@ defmodule Parapet.Capabilities do
         execute: Keyword.get(attrs, :execute),
         preview_only: Keyword.get(attrs, :preview_only, false)
       }
+
       put_in(state, [:recovery, id], capability)
     end)
   end
 
   def register_recovery(id, _attrs) do
-    raise ArgumentError, "Invalid recovery capability id: #{inspect(id)}. Valid ids are: #{inspect(@valid_capabilities)}"
+    raise ArgumentError,
+          "Invalid recovery capability id: #{inspect(id)}. Valid ids are: #{inspect(@valid_capabilities)}"
   end
 
   @doc """

@@ -101,7 +101,12 @@ defmodule Parapet.OperatorTest do
           }
         },
         %Incident{id: "inc-2", state: "investigating", updated_at: now, title: "Current"},
-        %Incident{id: "inc-1", state: "open", updated_at: ~U[2026-05-10 09:59:00Z], title: "Older"}
+        %Incident{
+          id: "inc-1",
+          state: "open",
+          updated_at: ~U[2026-05-10 09:59:00Z],
+          title: "Older"
+        }
       ])
 
       page = Operator.list_incident_queue(page_size: 2)

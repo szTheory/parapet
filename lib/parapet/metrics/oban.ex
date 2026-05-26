@@ -1,6 +1,7 @@
 if Code.ensure_loaded?(Oban) do
   defmodule Parapet.Metrics.Oban do
     use Parapet.Metrics.Validator
+
     @moduledoc """
     Defines Prometheus distributions and counters for Oban jobs conditionally.
 
@@ -93,7 +94,8 @@ if Code.ensure_loaded?(Oban) do
     end
 
     defp get_trace_id do
-      if Code.ensure_loaded?(:opentelemetry) and function_exported?(OpenTelemetry.Tracer, :current_span_ctx, 0) do
+      if Code.ensure_loaded?(:opentelemetry) and
+           function_exported?(OpenTelemetry.Tracer, :current_span_ctx, 0) do
         span_ctx = OpenTelemetry.Tracer.current_span_ctx()
 
         if span_ctx != :undefined do

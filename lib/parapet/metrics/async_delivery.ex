@@ -1,5 +1,6 @@
 defmodule Parapet.Metrics.AsyncDelivery do
   use Parapet.Metrics.Validator
+
   @moduledoc """
   Shared Telemetry.Metrics catalog and PromQL selector helpers for Phase 5
   async and delivery reliability slices.
@@ -84,7 +85,15 @@ defmodule Parapet.Metrics.AsyncDelivery do
       :fault_plane
     ],
     webhook_ingest: [:integration, :provider, :channel, :fault_plane],
-    stage: [:integration, :provider, :queue, :pipeline_stage, :outcome, :retry_state, :fault_plane],
+    stage: [
+      :integration,
+      :provider,
+      :queue,
+      :pipeline_stage,
+      :outcome,
+      :retry_state,
+      :fault_plane
+    ],
     backlog: [:integration, :provider, :queue, :fault_plane],
     callback: [:integration, :provider, :queue, :pipeline_stage, :fault_plane]
   }
@@ -129,7 +138,9 @@ defmodule Parapet.Metrics.AsyncDelivery do
       _ ->
         rendered =
           normalized
-          |> Enum.map_join(", ", fn {key, value} -> "#{key}#{operator(value)}#{render_value(value)}" end)
+          |> Enum.map_join(", ", fn {key, value} ->
+            "#{key}#{operator(value)}#{render_value(value)}"
+          end)
 
         "#{metric_name}{#{rendered}}"
     end
@@ -191,7 +202,8 @@ defmodule Parapet.Metrics.AsyncDelivery do
   defp counter_description(:backlog), do: "Total normalized async backlog delay events"
   defp counter_description(:callback), do: "Total normalized async callback delay events"
 
-  defp distribution_description(:outbound), do: "Duration of outbound delivery attempts in seconds"
+  defp distribution_description(:outbound),
+    do: "Duration of outbound delivery attempts in seconds"
 
   defp distribution_description(:provider_feedback),
     do: "Duration of provider feedback handling in seconds"

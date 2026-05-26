@@ -40,8 +40,18 @@ defmodule Parapet.Operator.QueuePaginationTest do
         }
       },
       %Incident{id: "inc-3", state: "investigating", updated_at: now, title: "Tie break by id"},
-      %Incident{id: "inc-2", state: "open", updated_at: ~U[2026-05-10 09:59:00Z], title: "Older open"},
-      %Incident{id: "inc-1", state: "resolved", updated_at: ~U[2026-05-10 09:58:00Z], title: "Resolved"}
+      %Incident{
+        id: "inc-2",
+        state: "open",
+        updated_at: ~U[2026-05-10 09:59:00Z],
+        title: "Older open"
+      },
+      %Incident{
+        id: "inc-1",
+        state: "resolved",
+        updated_at: ~U[2026-05-10 09:58:00Z],
+        title: "Resolved"
+      }
     ])
 
     on_exit(fn -> Application.delete_env(:parapet, :repo) end)
@@ -82,9 +92,24 @@ defmodule Parapet.Operator.QueuePaginationTest do
 
   test "falls back to the first page when cursor or direction are invalid" do
     Process.put(:mock_incidents, [
-      %Incident{id: "inc-4", state: "open", updated_at: ~U[2026-05-10 10:00:00Z], title: "Newest open"},
-      %Incident{id: "inc-3", state: "investigating", updated_at: ~U[2026-05-10 10:00:00Z], title: "Tie break by id"},
-      %Incident{id: "inc-2", state: "open", updated_at: ~U[2026-05-10 09:59:00Z], title: "Older open"}
+      %Incident{
+        id: "inc-4",
+        state: "open",
+        updated_at: ~U[2026-05-10 10:00:00Z],
+        title: "Newest open"
+      },
+      %Incident{
+        id: "inc-3",
+        state: "investigating",
+        updated_at: ~U[2026-05-10 10:00:00Z],
+        title: "Tie break by id"
+      },
+      %Incident{
+        id: "inc-2",
+        state: "open",
+        updated_at: ~U[2026-05-10 09:59:00Z],
+        title: "Older open"
+      }
     ])
 
     page =
@@ -105,8 +130,18 @@ defmodule Parapet.Operator.QueuePaginationTest do
     cursor = Base.url_encode64("2026-05-10T09:59:00Z|inc-2", padding: false)
 
     Process.put(:mock_incidents, [
-      %Incident{id: "inc-3", state: "investigating", updated_at: ~U[2026-05-10 09:59:59Z], title: "Overflow"},
-      %Incident{id: "inc-4", state: "open", updated_at: ~U[2026-05-10 10:00:00Z], title: "Current"},
+      %Incident{
+        id: "inc-3",
+        state: "investigating",
+        updated_at: ~U[2026-05-10 09:59:59Z],
+        title: "Overflow"
+      },
+      %Incident{
+        id: "inc-4",
+        state: "open",
+        updated_at: ~U[2026-05-10 10:00:00Z],
+        title: "Current"
+      },
       %Incident{id: "inc-5", state: "open", updated_at: ~U[2026-05-10 10:01:00Z], title: "Newest"}
     ])
 
@@ -122,11 +157,11 @@ defmodule Parapet.Operator.QueuePaginationTest do
     Operator.list_incident_queue(page_size: 2)
 
     assert_receive {
-                     :queue_page_event,
-                     @telemetry_event,
-                     measurements,
-                     metadata
-                   }
+      :queue_page_event,
+      @telemetry_event,
+      measurements,
+      metadata
+    }
 
     assert %{duration_ms: duration_ms, duration_native: duration_native} = measurements
     assert is_integer(duration_ms)

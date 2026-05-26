@@ -31,6 +31,7 @@ defmodule Parapet.Metrics.PrometheusFormatter do
 
   defp process_line(line) do
     line = String.trim(line)
+
     if String.starts_with?(line, "#") or line == "" do
       line
     else
@@ -40,6 +41,7 @@ defmodule Parapet.Metrics.PrometheusFormatter do
             nil -> line
             trace_id -> "#{line} # {trace_id=\"#{trace_id}\"}"
           end
+
         nil ->
           line
       end
@@ -54,11 +56,14 @@ defmodule Parapet.Metrics.PrometheusFormatter do
             labels_str = String.trim_trailing(labels_part, "}")
             base_name = strip_suffix(name_part)
             {base_name, parse_labels(labels_str)}
+
           [name_part] ->
             base_name = strip_suffix(name_part)
             {base_name, %{}}
         end
-      _ -> nil
+
+      _ ->
+        nil
     end
   end
 
@@ -70,6 +75,7 @@ defmodule Parapet.Metrics.PrometheusFormatter do
   end
 
   defp parse_labels(""), do: %{}
+
   defp parse_labels(labels_str) do
     labels_str
     |> String.split(",")
@@ -78,6 +84,7 @@ defmodule Parapet.Metrics.PrometheusFormatter do
         [k, v] ->
           unquoted_v = String.trim(v, "\"")
           Map.put(acc, String.to_atom(k), unquoted_v)
+
         _ ->
           acc
       end

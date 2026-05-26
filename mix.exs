@@ -13,13 +13,13 @@ defmodule Parapet.MixProject do
       start_permanent: Mix.env() == :prod,
 
       # Hex
-      description: "An opinionated SRE reliability layer for Phoenix/Elixir SaaS — turn existing telemetry into user-journey SLOs, deploy correlation, incident evidence, and operator-grade runbooks.",
+      description:
+        "An opinionated SRE reliability layer for Phoenix/Elixir SaaS — turn existing telemetry into user-journey SLOs, deploy correlation, incident evidence, and operator-grade runbooks.",
       source_url: @source_url,
       package: package(),
 
       # Docs
       docs: docs(),
-
       deps: deps(),
       aliases: aliases(),
       dialyzer: [plt_add_apps: [:mix, :ex_unit]]
@@ -39,7 +39,8 @@ defmodule Parapet.MixProject do
 
   defp package do
     [
-      files: ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* CONTRIBUTING* SECURITY* CODE_OF_CONDUCT* LICENSE* docs),
+      files:
+        ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* CONTRIBUTING* SECURITY* CODE_OF_CONDUCT* LICENSE* docs),
       licenses: ["MIT"],
       links: %{
         "GitHub" => @source_url,

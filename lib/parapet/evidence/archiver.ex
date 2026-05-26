@@ -16,7 +16,8 @@ defmodule Parapet.Evidence.Archiver do
   @default_chunk_size 100
 
   @spec archive(module(), Path.t(), pos_integer()) :: {:ok, :ok}
-  def archive(repo, path, retention_days) when is_integer(retention_days) and retention_days > 0 do
+  def archive(repo, path, retention_days)
+      when is_integer(retention_days) and retention_days > 0 do
     cutoff =
       DateTime.utc_now()
       |> DateTime.add(-retention_days, :day)
@@ -30,7 +31,7 @@ defmodule Parapet.Evidence.Archiver do
       |> repo.stream(max_rows: chunk_size())
       |> Stream.chunk_every(chunk_size())
       |> Enum.each(fn incidents ->
-        full_incidents = repo.preload(incidents, [timeline_entries: :tool_audits])
+        full_incidents = repo.preload(incidents, timeline_entries: :tool_audits)
 
         jsonl =
           full_incidents
@@ -40,7 +41,7 @@ defmodule Parapet.Evidence.Archiver do
         File.write!(path, jsonl <> "\n", [:append, :utf8])
 
         ids = Enum.map(incidents, & &1.id)
-        repo.delete_all(from incident in Incident, where: incident.id in ^ids)
+        repo.delete_all(from(incident in Incident, where: incident.id in ^ids))
       end)
 
       :ok

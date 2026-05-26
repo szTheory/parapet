@@ -44,6 +44,7 @@ defmodule Parapet.Integrations.IntegrationBehaviourTest do
     test "Parapet.attach(adapters: [:rulestead]) registers the parapet-rulestead-telemetry handler" do
       Parapet.attach(adapters: [:rulestead])
       handlers = :telemetry.list_handlers([:rulestead, :admin, :ruleset, :published])
+
       assert Enum.any?(handlers, fn h -> h.id == "parapet-rulestead-telemetry" end),
              "Expected parapet-rulestead-telemetry handler to be registered"
     end

@@ -64,6 +64,7 @@ defmodule Parapet.Integrations.MailglassTest do
       assert_receive {:telemetry_event, [:parapet, :delivery, :outbound], measurements, metadata}
 
       assert measurements.duration_ms == 200
+
       assert metadata == %{
                integration: :mailglass,
                provider: :ses,
@@ -98,6 +99,7 @@ defmodule Parapet.Integrations.MailglassTest do
       assert metadata.channel == :email
       assert metadata.outcome == :delivered
       assert metadata.fault_plane == :provider
+
       assert metadata.refs == %{
                delivery_ref: "del-555",
                provider_message_ref: "provider-888"
@@ -126,6 +128,7 @@ defmodule Parapet.Integrations.MailglassTest do
                       metadata}
 
       assert measurements.duration_ms == 80
+
       assert metadata == %{
                integration: :mailglass,
                provider: :ses,

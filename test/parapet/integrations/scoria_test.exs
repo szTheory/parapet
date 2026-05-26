@@ -40,6 +40,7 @@ defmodule Parapet.Integrations.ScoriaTest do
 
               {name, {:insert, fun, _opts}} when is_function(fun) ->
                 changeset = fun.(acc)
+
                 if changeset.valid? do
                   struct = Ecto.Changeset.apply_changes(changeset)
                   struct = Map.put(struct, :id, Ecto.UUID.generate())

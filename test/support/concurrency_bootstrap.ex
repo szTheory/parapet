@@ -18,7 +18,11 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
   end
 
   def reset! do
-    SQL.query!(ConcurrencyRepo, "TRUNCATE #{Enum.join(@tables, ", ")} RESTART IDENTITY CASCADE", [])
+    SQL.query!(
+      ConcurrencyRepo,
+      "TRUNCATE #{Enum.join(@tables, ", ")} RESTART IDENTITY CASCADE",
+      []
+    )
   end
 
   def table_names, do: @tables

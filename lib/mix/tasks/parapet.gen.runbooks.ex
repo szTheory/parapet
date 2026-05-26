@@ -31,43 +31,78 @@ defmodule Mix.Tasks.Parapet.Gen.Runbooks do
 
     igniter
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "stalled_executor.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "stalled_executor.ex.eex"
+      ]),
       Path.join([lib_dir, "stalled_executor.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "dead_letter.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "dead_letter.ex.eex"
+      ]),
       Path.join([lib_dir, "dead_letter.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "provider_outage.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "provider_outage.ex.eex"
+      ]),
       Path.join([lib_dir, "provider_outage.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "callback_delay.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "callback_delay.ex.eex"
+      ]),
       Path.join([lib_dir, "callback_delay.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "retry_storm.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "retry_storm.ex.eex"
+      ]),
       Path.join([lib_dir, "retry_storm.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "suppression_drift.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "suppression_drift.ex.eex"
+      ]),
       Path.join([lib_dir, "suppression_drift.ex"]),
       assigns,
       on_exists: :skip
     )
     |> Igniter.copy_template(
-      Path.join([:code.priv_dir(:parapet), "templates", "parapet.gen.runbooks", "partial_backlog_drain.ex.eex"]),
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "partial_backlog_drain.ex.eex"
+      ]),
       Path.join([lib_dir, "partial_backlog_drain.ex"]),
       assigns,
       on_exists: :skip

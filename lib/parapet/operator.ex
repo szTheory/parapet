@@ -135,13 +135,16 @@ defmodule Parapet.Operator do
     |> Enum.map(& &1.payload)
   end
 
-  defp normalize_queue_options(opts) when is_list(opts), do: opts |> Enum.into(%{}) |> normalize_queue_options()
+  defp normalize_queue_options(opts) when is_list(opts),
+    do: opts |> Enum.into(%{}) |> normalize_queue_options()
 
   defp normalize_queue_options(opts) when is_map(opts) do
     page_size = normalize_page_size(Map.get(opts, :page_size) || Map.get(opts, "page_size"))
 
-    with {:ok, direction} <- normalize_queue_direction(Map.get(opts, :direction) || Map.get(opts, "direction")),
-         {:ok, cursor} <- normalize_queue_cursor(Map.get(opts, :cursor) || Map.get(opts, "cursor")) do
+    with {:ok, direction} <-
+           normalize_queue_direction(Map.get(opts, :direction) || Map.get(opts, "direction")),
+         {:ok, cursor} <-
+           normalize_queue_cursor(Map.get(opts, :cursor) || Map.get(opts, "cursor")) do
       %{
         scope: :active,
         direction: direction,
@@ -229,11 +232,11 @@ defmodule Parapet.Operator do
   end
 
   defp apply_queue_order(query, :next) do
-    order_by(query, [i], [desc: i.updated_at, desc: i.id])
+    order_by(query, [i], desc: i.updated_at, desc: i.id)
   end
 
   defp apply_queue_order(query, :previous) do
-    order_by(query, [i], [asc: i.updated_at, asc: i.id])
+    order_by(query, [i], asc: i.updated_at, asc: i.id)
   end
 
   defp maybe_reverse_queue_items(items, :previous), do: Enum.reverse(items)
@@ -252,14 +255,24 @@ defmodule Parapet.Operator do
   defp has_previous_page?(%{direction: :next}, _has_more?, items), do: items != []
   defp has_previous_page?(%{direction: :previous}, has_more?, _items), do: has_more?
 
-  defp next_cursor_for(%{direction: :next}, items, true), do: encode_queue_cursor(List.last(items))
+  defp next_cursor_for(%{direction: :next}, items, true),
+    do: encode_queue_cursor(List.last(items))
+
   defp next_cursor_for(%{direction: :previous, cursor: nil}, _items, _has_more?), do: nil
-  defp next_cursor_for(%{direction: :previous}, items, _has_more?), do: encode_queue_cursor(List.last(items))
+
+  defp next_cursor_for(%{direction: :previous}, items, _has_more?),
+    do: encode_queue_cursor(List.last(items))
+
   defp next_cursor_for(_options, _items, _has_more?), do: nil
 
   defp previous_cursor_for(%{direction: :next, cursor: nil}, _items, _has_more?), do: nil
-  defp previous_cursor_for(%{direction: :next}, items, _has_more?), do: encode_queue_cursor(List.first(items))
-  defp previous_cursor_for(%{direction: :previous}, items, true), do: encode_queue_cursor(List.first(items))
+
+  defp previous_cursor_for(%{direction: :next}, items, _has_more?),
+    do: encode_queue_cursor(List.first(items))
+
+  defp previous_cursor_for(%{direction: :previous}, items, true),
+    do: encode_queue_cursor(List.first(items))
+
   defp previous_cursor_for(_options, _items, _has_more?), do: nil
 
   defp encode_queue_cursor(nil), do: nil

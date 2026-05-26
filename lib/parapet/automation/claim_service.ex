@@ -37,14 +37,19 @@ defmodule Parapet.Automation.ClaimService do
     case repo.transaction(fn ->
            case acquire_claim(repo, attrs) do
              {:won, claim} ->
-               incident = lock_incident(repo, incident_id, Keyword.get(opts, :lock_incident?, true))
+               incident =
+                 lock_incident(repo, incident_id, Keyword.get(opts, :lock_incident?, true))
 
                case run_gates(repo, incident, claim, opts) do
                  :ok ->
                    {:won, claim}
 
                  {:short_circuit, reason} ->
-                   claim = update_claim_status(repo, claim, "short_circuited", %{short_circuit_reason: reason})
+                   claim =
+                     update_claim_status(repo, claim, "short_circuited", %{
+                       short_circuit_reason: reason
+                     })
+
                    {:short_circuited, claim, reason}
                end
 
@@ -59,7 +64,10 @@ defmodule Parapet.Automation.ClaimService do
 
   def mark_executed(claim, opts \\ []) do
     repo = Keyword.get(opts, :repo, Evidence.repo())
-    finished_at = Keyword.get(opts, :finished_at, DateTime.utc_now() |> DateTime.truncate(:microsecond))
+
+    finished_at =
+      Keyword.get(opts, :finished_at, DateTime.utc_now() |> DateTime.truncate(:microsecond))
+
     update_claim_status(repo, claim, "executed", %{finished_at: finished_at})
   end
 

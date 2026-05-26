@@ -173,7 +173,12 @@ defmodule Parapet.SLO.SliceSpec do
     end
   end
 
-  defp validate_threshold!(%__MODULE__{threshold: threshold, objective: objective, kind: kind, name: name}) do
+  defp validate_threshold!(%__MODULE__{
+         threshold: threshold,
+         objective: objective,
+         kind: kind,
+         name: name
+       }) do
     cond do
       is_number(threshold) ->
         :ok

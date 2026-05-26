@@ -18,7 +18,7 @@ defmodule Parapet.CapabilitiesTest do
 
   describe "register_recovery/2" do
     test "adds capability to list without duplicates" do
-      attrs = [name: "Retry Async", target_kind: :async_item, preview: &(&1), execute: &(&1)]
+      attrs = [name: "Retry Async", target_kind: :async_item, preview: & &1, execute: & &1]
 
       assert :ok = Capabilities.register_recovery(:retry_async_item, attrs)
       assert :ok = Capabilities.register_recovery(:retry_async_item, attrs)
@@ -42,7 +42,7 @@ defmodule Parapet.CapabilitiesTest do
     end
 
     test "supports preview-only capability" do
-      attrs = [name: "Check Provider", preview_only: true, preview: &(&1)]
+      attrs = [name: "Check Provider", preview_only: true, preview: & &1]
       assert :ok = Capabilities.register_recovery(:request_manual_provider_check, attrs)
 
       cap = Capabilities.get_recovery(:request_manual_provider_check)

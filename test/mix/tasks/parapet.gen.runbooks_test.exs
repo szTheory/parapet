@@ -12,13 +12,34 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
 
       files = Rewrite.sources(igniter.rewrite) |> Enum.map(&Rewrite.Source.get(&1, :path))
 
-      assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/stalled_executor.ex"))
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/stalled_executor.ex")
+             )
+
       assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/dead_letter.ex"))
-      assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/provider_outage.ex"))
-      assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/callback_delay.ex"))
+
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/provider_outage.ex")
+             )
+
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/callback_delay.ex")
+             )
+
       assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/retry_storm.ex"))
-      assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/suppression_drift.ex"))
-      assert Enum.any?(files, &String.contains?(&1, "lib/test/parapet/runbooks/partial_backlog_drain.ex"))
+
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/suppression_drift.ex")
+             )
+
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/partial_backlog_drain.ex")
+             )
 
       stalled_executor_source =
         Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/stalled_executor.ex")
@@ -71,7 +92,9 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
         Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/partial_backlog_drain.ex")
         |> Rewrite.Source.get(:content)
 
-      assert partial_backlog_drain_source =~ "defmodule Test.Parapet.Runbooks.PartialBacklogDrain do"
+      assert partial_backlog_drain_source =~
+               "defmodule Test.Parapet.Runbooks.PartialBacklogDrain do"
+
       assert partial_backlog_drain_source =~ "capability: :retry_async_item"
       assert partial_backlog_drain_source =~ "warning:"
     end

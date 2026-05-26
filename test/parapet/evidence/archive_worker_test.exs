@@ -9,15 +9,18 @@ if Code.ensure_loaded?(Oban) do
       use Agent
 
       def start_link(fixtures) do
-        Agent.start_link(fn ->
-          %{
-            incidents: fixtures,
-            archived_ids: [],
-            stream_opts: [],
-            transactions: 0,
-            in_transaction?: false
-          }
-        end, name: __MODULE__)
+        Agent.start_link(
+          fn ->
+            %{
+              incidents: fixtures,
+              archived_ids: [],
+              stream_opts: [],
+              transactions: 0,
+              in_transaction?: false
+            }
+          end,
+          name: __MODULE__
+        )
       end
 
       def transaction(fun) when is_function(fun, 0) do
@@ -80,9 +83,23 @@ if Code.ensure_loaded?(Oban) do
           "parapet-archive-worker-#{System.unique_integer([:positive])}.jsonl"
         )
 
-      old_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(120)}
-      old_investigating = %Incident{id: Ecto.UUID.generate(), state: "investigating", inserted_at: days_ago(120)}
-      recent_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(10)}
+      old_incident = %Incident{
+        id: Ecto.UUID.generate(),
+        state: "resolved",
+        inserted_at: days_ago(120)
+      }
+
+      old_investigating = %Incident{
+        id: Ecto.UUID.generate(),
+        state: "investigating",
+        inserted_at: days_ago(120)
+      }
+
+      recent_incident = %Incident{
+        id: Ecto.UUID.generate(),
+        state: "resolved",
+        inserted_at: days_ago(10)
+      }
 
       Application.put_env(:parapet, :repo, FakeRepo)
       start_supervised!({FakeRepo, [old_incident, old_investigating, recent_incident]})
@@ -92,7 +109,11 @@ if Code.ensure_loaded?(Oban) do
         File.rm(archive_path)
       end)
 
-      %{archive_path: archive_path, archived_id: old_incident.id, investigating_id: old_investigating.id}
+      %{
+        archive_path: archive_path,
+        archived_id: old_incident.id,
+        investigating_id: old_investigating.id
+      }
     end
 
     test "defines an Oban worker" do
@@ -100,7 +121,11 @@ if Code.ensure_loaded?(Oban) do
       assert Ecto.Changeset.get_change(changeset, :worker) == "Parapet.Evidence.ArchiveWorker"
     end
 
-    test "archives using explicit job args", %{archive_path: archive_path, archived_id: archived_id, investigating_id: investigating_id} do
+    test "archives using explicit job args", %{
+      archive_path: archive_path,
+      archived_id: archived_id,
+      investigating_id: investigating_id
+    } do
       job = %Oban.Job{args: %{"days" => 90, "path" => archive_path}}
 
       assert {:ok, :ok} = ArchiveWorker.perform(job)
@@ -110,7 +135,11 @@ if Code.ensure_loaded?(Oban) do
       assert snapshot.transactions == 1
       assert File.exists?(archive_path)
       assert snapshot.stream_opts == [[max_rows: 100]]
-      assert Enum.any?(snapshot.incidents, &(&1.id == investigating_id and &1.state == "investigating"))
+
+      assert Enum.any?(
+               snapshot.incidents,
+               &(&1.id == investigating_id and &1.state == "investigating")
+             )
     end
 
     test "uses default job args when absent" do

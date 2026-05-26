@@ -51,16 +51,24 @@ defmodule Parapet.Spine.SystemEventPruner do
 
       case repo.delete_all(query) do
         {count, _} ->
-          Logger.info("[Parapet.Spine.SystemEventPruner] Pruned #{count} system events older than #{@retention_days} days.")
+          Logger.info(
+            "[Parapet.Spine.SystemEventPruner] Pruned #{count} system events older than #{@retention_days} days."
+          )
 
         error ->
-          Logger.error("[Parapet.Spine.SystemEventPruner] Failed to prune system events: #{inspect(error)}")
+          Logger.error(
+            "[Parapet.Spine.SystemEventPruner] Failed to prune system events: #{inspect(error)}"
+          )
       end
     else
-      Logger.debug("[Parapet.Spine.SystemEventPruner] Parapet.Evidence.repo() not configured, skipping pruning.")
+      Logger.debug(
+        "[Parapet.Spine.SystemEventPruner] Parapet.Evidence.repo() not configured, skipping pruning."
+      )
     end
   rescue
     e ->
-      Logger.error("[Parapet.Spine.SystemEventPruner] Error during prune: #{Exception.message(e)}")
+      Logger.error(
+        "[Parapet.Spine.SystemEventPruner] Error during prune: #{Exception.message(e)}"
+      )
   end
 end

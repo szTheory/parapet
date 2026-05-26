@@ -27,7 +27,9 @@ defmodule Parapet.Metrics.ExemplarTelemetry do
 
   def handle_event([:parapet, :http, :request], _measurements, metadata, _config) do
     case Map.get(metadata, :trace_id) do
-      nil -> :ok
+      nil ->
+        :ok
+
       trace_id when is_binary(trace_id) ->
         tags = Map.take(metadata, [:route, :method, :status_class])
         ExemplarStore.record_trace("parapet_http_request_duration_ms", tags, trace_id)
@@ -36,7 +38,9 @@ defmodule Parapet.Metrics.ExemplarTelemetry do
 
   def handle_event([:parapet, :oban, :job], _measurements, metadata, _config) do
     case Map.get(metadata, :trace_id) do
-      nil -> :ok
+      nil ->
+        :ok
+
       trace_id when is_binary(trace_id) ->
         tags = Map.take(metadata, [:worker, :queue, :state])
         ExemplarStore.record_trace("parapet_oban_job_duration_ms", tags, trace_id)

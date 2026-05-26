@@ -92,8 +92,8 @@ defmodule Parapet.Integrations.RindleTest do
       %{queue: "media", job_id: 1003}
     )
 
-    assert_receive {:telemetry_event, [:parapet, :async, :backlog],
-                    %{count: 1, delay_ms: 42_000}, metadata}
+    assert_receive {:telemetry_event, [:parapet, :async, :backlog], %{count: 1, delay_ms: 42_000},
+                    metadata}
 
     assert metadata.integration == :rindle
     assert metadata.queue == "media"

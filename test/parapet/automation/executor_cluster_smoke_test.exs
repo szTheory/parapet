@@ -87,7 +87,11 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
           :ok = :erpc.call(node, Application, :put_env, [:parapet, :repo, ConcurrencyRepo])
 
           :ok =
-            :erpc.call(node, Application, :put_env, [:parapet, :automation, [max_executions: 3, within: 3600]])
+            :erpc.call(node, Application, :put_env, [
+              :parapet,
+              :automation,
+              [max_executions: 3, within: 3600]
+            ])
 
           :ok = :erpc.call(node, Application, :put_env, [:parapet, :executor_test_pid, self()])
 
@@ -201,7 +205,11 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
                  "peer-node canary was skipped because distributed Erlang is unavailable in this environment"
                )
 
-        assert String.contains?(reason, "DB-backed contention suite remains the closure-grade proof")
+        assert String.contains?(
+                 reason,
+                 "DB-backed contention suite remains the closure-grade proof"
+               )
+
         refute_receive {:cluster_mitigated, _node}, 200
         assert String.contains?(reason, "SCALE-02")
     end

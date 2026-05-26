@@ -43,7 +43,14 @@ defmodule Parapet.Integrations.ChimewayTest do
       proven_metadata = %{provider: :smtp, error: :rejected, message_id: "msg-77", delay_ms: 500}
 
       assert proven_event == [:chimeway, :event, :failed]
-      assert Map.keys(proven_metadata) |> Enum.sort() == [:delay_ms, :error, :message_id, :provider]
+
+      assert Map.keys(proven_metadata) |> Enum.sort() == [
+               :delay_ms,
+               :error,
+               :message_id,
+               :provider
+             ]
+
       refute match?([:chimeway, :event, :accepted], proven_event)
     end
   end
@@ -62,6 +69,7 @@ defmodule Parapet.Integrations.ChimewayTest do
                       metadata}
 
       assert measurements.duration_ms == 300
+
       assert metadata == %{
                integration: :chimeway,
                provider: :smtp,
@@ -86,6 +94,7 @@ defmodule Parapet.Integrations.ChimewayTest do
                       metadata}
 
       assert measurements.duration_ms == 45
+
       assert metadata == %{
                integration: :chimeway,
                provider: :smtp,

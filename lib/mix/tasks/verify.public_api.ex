@@ -64,7 +64,10 @@ defmodule Mix.Tasks.Verify.PublicApi do
     unclassified = Enum.filter(manifest, fn m -> m.tier == :unclassified end)
 
     if unclassified != [] do
-      IO.puts(:stderr, "Error: One or more public API modules are missing a stability-tier declaration.")
+      IO.puts(
+        :stderr,
+        "Error: One or more public API modules are missing a stability-tier declaration."
+      )
 
       IO.puts(
         :stderr,

@@ -8,15 +8,18 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
     use Agent
 
     def start_link(fixtures) do
-      Agent.start_link(fn ->
-        %{
-          incidents: fixtures,
-          archived_ids: [],
-          stream_opts: [],
-          transactions: 0,
-          in_transaction?: false
-        }
-      end, name: __MODULE__)
+      Agent.start_link(
+        fn ->
+          %{
+            incidents: fixtures,
+            archived_ids: [],
+            stream_opts: [],
+            transactions: 0,
+            in_transaction?: false
+          }
+        end,
+        name: __MODULE__
+      )
     end
 
     def transaction(fun) when is_function(fun, 0) do
@@ -77,11 +80,28 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
     Mix.Task.reenable("app.config")
 
     archive_path =
-      Path.join(System.tmp_dir!(), "parapet-archive-task-#{System.unique_integer([:positive])}.jsonl")
+      Path.join(
+        System.tmp_dir!(),
+        "parapet-archive-task-#{System.unique_integer([:positive])}.jsonl"
+      )
 
-    old_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(120)}
-    old_investigating = %Incident{id: Ecto.UUID.generate(), state: "investigating", inserted_at: days_ago(120)}
-    recent_incident = %Incident{id: Ecto.UUID.generate(), state: "resolved", inserted_at: days_ago(10)}
+    old_incident = %Incident{
+      id: Ecto.UUID.generate(),
+      state: "resolved",
+      inserted_at: days_ago(120)
+    }
+
+    old_investigating = %Incident{
+      id: Ecto.UUID.generate(),
+      state: "investigating",
+      inserted_at: days_ago(120)
+    }
+
+    recent_incident = %Incident{
+      id: Ecto.UUID.generate(),
+      state: "resolved",
+      inserted_at: days_ago(10)
+    }
 
     Application.put_env(:parapet, :repo, FakeRepo)
     start_supervised!({FakeRepo, [old_incident, old_investigating, recent_incident]})
@@ -91,7 +111,11 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
       File.rm(archive_path)
     end)
 
-    %{archive_path: archive_path, archived_id: old_incident.id, investigating_id: old_investigating.id}
+    %{
+      archive_path: archive_path,
+      archived_id: old_incident.id,
+      investigating_id: old_investigating.id
+    }
   end
 
   test "parses CLI args, fetches repo from config, invokes the archiver, and prints JSON", %{
@@ -110,7 +134,11 @@ defmodule Mix.Tasks.Parapet.ArchiveTest do
     assert snapshot.transactions == 1
     assert snapshot.stream_opts == [[max_rows: 100]]
     assert File.exists?(archive_path)
-    assert Enum.any?(snapshot.incidents, &(&1.id == investigating_id and &1.state == "investigating"))
+
+    assert Enum.any?(
+             snapshot.incidents,
+             &(&1.id == investigating_id and &1.state == "investigating")
+           )
   end
 
   test "uses default days and path when no flags are provided" do

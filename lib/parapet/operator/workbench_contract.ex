@@ -556,7 +556,8 @@ defmodule Parapet.Operator.WorkbenchContract do
     symptom
   end
 
-  defp queue_title(_incident, %{"symptom" => symptom}) when is_binary(symptom) and symptom != "" do
+  defp queue_title(_incident, %{"symptom" => symptom})
+       when is_binary(symptom) and symptom != "" do
     symptom
   end
 
@@ -607,6 +608,7 @@ defmodule Parapet.Operator.WorkbenchContract do
     case Map.get(runbook_data, "escalation") do
       escalation when is_map(escalation) ->
         escalation = stringify_keys(escalation)
+
         Map.get(escalation, "pending_trigger") == true or
           is_binary(Map.get(escalation, "current_step_id")) or
           match?(%DateTime{}, to_datetime(Map.get(escalation, "next_escalation_at")))

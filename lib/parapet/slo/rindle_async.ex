@@ -23,7 +23,11 @@ defmodule Parapet.SLO.RindleAsync do
         kind: :ratio,
         source_metric: AsyncDelivery.metric_name(:stage, :total),
         good_matchers: [integration: :rindle, outcome: :succeeded, fault_plane: :worker],
-        total_matchers: [integration: :rindle, outcome: [:succeeded, :discarded], fault_plane: :worker],
+        total_matchers: [
+          integration: :rindle,
+          outcome: [:succeeded, :discarded],
+          fault_plane: :worker
+        ],
         objective: 99.0,
         alert_class: :page,
         runbook: "https://parapet.dev/runbooks/rindle-terminal-success",
@@ -89,7 +93,11 @@ defmodule Parapet.SLO.RindleAsync do
         integration: :rindle,
         kind: :diagnostic,
         bad_source_metric: AsyncDelivery.metric_name(:stage, :total),
-        bad_matchers: [integration: :rindle, outcome: [:retryable_failed, :discarded], fault_plane: :worker],
+        bad_matchers: [
+          integration: :rindle,
+          outcome: [:retryable_failed, :discarded],
+          fault_plane: :worker
+        ],
         total_source_metric: AsyncDelivery.metric_name(:stage, :total),
         total_matchers: [integration: :rindle, fault_plane: :worker],
         threshold: 0.03,

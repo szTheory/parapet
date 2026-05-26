@@ -1,5 +1,6 @@
 defmodule Parapet.Metrics.Scoria do
   use Parapet.Metrics.Validator
+
   @moduledoc """
   Defines Prometheus counters and distributions for Scoria evaluation metrics.
 

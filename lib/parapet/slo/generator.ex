@@ -156,7 +156,12 @@ defmodule Parapet.SLO.Generator do
   end
 
   defp value_rate_expr(%SliceSpec{} = spec, window) do
-    aggregate_rate(SliceSpec.value_metric(spec), SliceSpec.value_matchers(spec), spec.group_labels, window)
+    aggregate_rate(
+      SliceSpec.value_metric(spec),
+      SliceSpec.value_matchers(spec),
+      spec.group_labels,
+      window
+    )
   end
 
   defp aggregate_rate(metric, matchers, labels, window) do

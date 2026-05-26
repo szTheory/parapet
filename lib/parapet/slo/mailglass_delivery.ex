@@ -29,7 +29,12 @@ defmodule Parapet.SLO.MailglassDelivery do
           fault_plane: :provider
         ],
         total_source_metric: AsyncDelivery.metric_name(:outbound, :total),
-        total_matchers: [integration: :mailglass, channel: :email, outcome: :attempted, fault_plane: :provider],
+        total_matchers: [
+          integration: :mailglass,
+          channel: :email,
+          outcome: :attempted,
+          fault_plane: :provider
+        ],
         objective: 99.0,
         alert_class: :ticket,
         runbook: "https://parapet.dev/runbooks/mailglass-submit-acceptance",
@@ -49,7 +54,12 @@ defmodule Parapet.SLO.MailglassDelivery do
           fault_plane: :provider
         ],
         total_source_metric: AsyncDelivery.metric_name(:outbound, :total),
-        total_matchers: [integration: :mailglass, channel: :email, outcome: :attempted, fault_plane: :provider],
+        total_matchers: [
+          integration: :mailglass,
+          channel: :email,
+          outcome: :attempted,
+          fault_plane: :provider
+        ],
         objective: 99.0,
         alert_class: :page,
         runbook: "https://parapet.dev/runbooks/mailglass-confirmed-delivery",
@@ -88,7 +98,12 @@ defmodule Parapet.SLO.MailglassDelivery do
           outcome: :suppressed
         ],
         total_source_metric: AsyncDelivery.metric_name(:outbound, :total),
-        total_matchers: [integration: :mailglass, channel: :email, outcome: :attempted, fault_plane: :provider],
+        total_matchers: [
+          integration: :mailglass,
+          channel: :email,
+          outcome: :attempted,
+          fault_plane: :provider
+        ],
         threshold: 0.02,
         alert_class: :diagnostic,
         runbook: "https://parapet.dev/runbooks/mailglass-suppression-drift",

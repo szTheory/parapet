@@ -1,5 +1,6 @@
 defmodule Parapet.Metrics.Rulestead do
   use Parapet.Metrics.Validator
+
   @moduledoc """
   Prometheus metric definitions for Rulestead events.
 
@@ -12,7 +13,7 @@ defmodule Parapet.Metrics.Rulestead do
 
   def metrics do
     import Telemetry.Metrics
-    
+
     [
       counter("parapet_rulestead_flag_change_total",
         event_name: [:parapet, :rulestead, :flag_change],

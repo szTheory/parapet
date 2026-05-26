@@ -28,18 +28,41 @@ defmodule Mix.Tasks.Parapet.Gen.SpineTest do
       migration_ast = Code.string_to_quoted!(migration_source)
       normalized_source = migration_source |> String.replace(~r/\s+/, " ")
 
-      assert contains_snippet?(migration_ast, "create(table(:parapet_incidents, primary_key: false))")
-      assert contains_snippet?(migration_ast, "create(table(:parapet_timeline_entries, primary_key: false))")
-      assert contains_snippet?(migration_ast, "create(table(:parapet_tool_audits, primary_key: false))")
-      assert contains_snippet?(migration_ast, "references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)")
+      assert contains_snippet?(
+               migration_ast,
+               "create(table(:parapet_incidents, primary_key: false))"
+             )
+
+      assert contains_snippet?(
+               migration_ast,
+               "create(table(:parapet_timeline_entries, primary_key: false))"
+             )
+
+      assert contains_snippet?(
+               migration_ast,
+               "create(table(:parapet_tool_audits, primary_key: false))"
+             )
+
+      assert contains_snippet?(
+               migration_ast,
+               "references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)"
+             )
+
       assert normalized_source =~
                "create( index(:parapet_incidents, [:updated_at, :id], where: \"state in ('open', 'investigating')\") )"
 
       assert normalized_source =~
                "create(index(:parapet_incidents, [:updated_at, :id], where: \"state = 'resolved'\"))"
 
-      assert contains_snippet?(migration_ast, "create(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))")
-      assert contains_snippet?(migration_ast, "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))")
+      assert contains_snippet?(
+               migration_ast,
+               "create(index(:parapet_timeline_entries, [:incident_id, :inserted_at]))"
+             )
+
+      assert contains_snippet?(
+               migration_ast,
+               "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))"
+             )
     end
   end
 

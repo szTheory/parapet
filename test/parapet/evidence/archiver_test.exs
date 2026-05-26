@@ -8,17 +8,20 @@ defmodule Parapet.Evidence.ArchiverTest do
     use Agent
 
     def start_link(fixtures) do
-      Agent.start_link(fn ->
-        %{
-          incidents: fixtures,
-          archived_ids: [],
-          preloads: [],
-          stream_calls: [],
-          delete_calls: [],
-          transactions: 0,
-          in_transaction?: false
-        }
-      end, name: __MODULE__)
+      Agent.start_link(
+        fn ->
+          %{
+            incidents: fixtures,
+            archived_ids: [],
+            preloads: [],
+            stream_calls: [],
+            delete_calls: [],
+            transactions: 0,
+            in_transaction?: false
+          }
+        end,
+        name: __MODULE__
+      )
     end
 
     def transaction(fun) when is_function(fun, 0) do
@@ -209,7 +212,11 @@ defmodule Parapet.Evidence.ArchiverTest do
     assert snapshot.delete_calls == [[archived_id]]
     assert snapshot.preloads == [[timeline_entries: :tool_audits]]
     assert [%{opts: [max_rows: 1]}] = snapshot.stream_calls
-    assert Enum.any?(snapshot.incidents, &(&1.id == investigating_id and &1.state == "investigating"))
+
+    assert Enum.any?(
+             snapshot.incidents,
+             &(&1.id == investigating_id and &1.state == "investigating")
+           )
 
     remaining_states = Enum.map(snapshot.incidents, & &1.state)
     assert Enum.sort(remaining_states) == ["investigating", "open", "resolved"]
