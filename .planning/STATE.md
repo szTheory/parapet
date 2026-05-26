@@ -82,7 +82,7 @@ None.
 
 ### Blockers/Concerns
 
-- **Phase 22 external prerequisite:** The exact `v0.10.0` tag now exists and the GitHub `v0.10.0` release was published on 2026-05-26. The `0.10.0` pin is no longer correct; the next repo-side step is the one-time `release-as: "1.0.0"` graduation pin while the Hex packaging fix rolls forward to a publishable major cut.
+- **Phase 22 release outcome:** The exact `v0.10.0` and `v1.0.0` tags now exist and GitHub releases were published on 2026-05-26. `parapet 1.0.0` now resolves on Hex and HexDocs. The observed release workflow failure was a false negative caused by HexDocs propagation lag, so the one-time `1.0.0` pin has been removed and the HexDocs verification step now retries before failing.
 
 ## Deferred Items
 
