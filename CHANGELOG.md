@@ -11,6 +11,13 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## [1.0.0](https://github.com/szTheory/parapet/compare/v0.10.0...v1.0.0) (2026-05-26)
+
+
+### Bug Fixes
+
+* **hex:** stop packaging missing code of conduct file ([a6ab21e](https://github.com/szTheory/parapet/commit/a6ab21ed2c62834f936a82d5b98c6216d387fe2e))
+
 ## [0.10.0](https://github.com/szTheory/parapet/compare/v0.9.0...v0.10.0) (2026-05-26)
 
 
