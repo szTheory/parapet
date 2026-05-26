@@ -47,12 +47,11 @@ defmodule Parapet.TestSupport.ConcurrencyCase do
       true ->
         name = :"parapet_executor_smoke_#{System.unique_integer([:positive])}"
 
-        case Node.start(name, :shortnames) do
+        case Node.start(name, name_domain: :shortnames) do
           {:ok, _pid} -> {:ok, true}
           {:error, {{:already_started, _pid}, _details}} -> {:ok, false}
           {:error, {:already_started, _pid}} -> {:ok, false}
           {:error, reason} -> normalize_distribution_start_error(reason)
-          other -> normalize_distribution_start_error(other)
         end
     end
   end
