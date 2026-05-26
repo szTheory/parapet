@@ -21,7 +21,7 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 
 - [x] **GOV-01**: The repository ships a `CONTRIBUTING.md` covering local proof commands (`mix test`, `mix credo`, `mix dialyzer`), Conventional Commits + formatter expectations, and the PR flow.
 - [x] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
-- [ ] **GOV-03**: The repository ships a `CODE_OF_CONDUCT.md` (Contributor Covenant or equivalent). *(intentionally omitted in Phase 20 per user decision)*
+- [x] **GOV-03**: Governance-doc packaging decision is explicit and stable for v1.0. `CODE_OF_CONDUCT.md` remains intentionally omitted per maintainer decision, and the Hex `files:` contract stays coherent with that omission.
 - [x] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
 - [x] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
 
@@ -36,17 +36,17 @@ Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase 
 
 ### Runnable Demo App (DEMO)
 
-- [ ] **DEMO-01**: A runnable demo Phoenix app under `examples/demo_app/` (path dep on parapet) starts with `mix setup && mix phx.server` and serves the Operator UI at `/parapet`.
-- [ ] **DEMO-02**: The demo is seeded with realistic evidence — incidents in open/investigating/resolved states, timeline entries, a tool audit, a runbook with a `warning:` step, and registered WebSaaS SLO state — so the Operator UI is populated on first run.
-- [ ] **DEMO-03**: A demo smoke test asserts the Operator UI responds `200` and at least one seeded incident exists, and runs as a required CI gate (in `release_gate`, never `continue-on-error`).
-- [ ] **DEMO-04**: The demo app is excluded from the published Hex package (verified via `mix hex.build` dry run) and is linked from the getting-started guide.
+- [x] **DEMO-01**: A runnable demo Phoenix app under `examples/demo_app/` (path dep on parapet) starts with `mix setup && mix phx.server` and serves the Operator UI at `/parapet`.
+- [x] **DEMO-02**: The demo is seeded with realistic evidence — incidents in open/investigating/resolved states, timeline entries, a tool audit, a runbook with a `warning:` step, and registered WebSaaS SLO state — so the Operator UI is populated on first run.
+- [x] **DEMO-03**: A demo smoke test asserts the Operator UI responds `200` and at least one seeded incident exists, and runs as a required CI gate (in `release_gate`, never `continue-on-error`).
+- [x] **DEMO-04**: The demo app is excluded from the published Hex package (verified via `mix hex.build` dry run) and is linked from the getting-started guide.
 
 ### Release Readiness & 1.0 Cut (REL)
 
-- [ ] **REL-01**: CI enforces `compile --warnings-as-errors`, `compile --no-optional-deps --warnings-as-errors`, and `docs --warnings-as-errors` in the lint lane.
-- [ ] **REL-02**: `release-please.yml` publishes to Hex.pm on a created release (`hex.publish --dry-run` → `hex.publish --yes` → post-publish verification).
-- [ ] **REL-03**: A documented, proportionate pre-release verification gate (`verify.public_api`, `test`, `credo --strict`, `dialyzer`, no-optional-deps compile, one manual cold-start walkthrough) passes before the 1.0 cut — no security or performance audit.
-- [ ] **REL-04**: Parapet is released as `1.0.0` via Release-Please (0.10.0 merged → `release-as` pin removed → `1.0.0` pinned and cut → pin plus the pre-1.0 `bump-*-pre-major` flags removed) and resolves at `hexdocs.pm/parapet/1.0.0/`.
+- [x] **REL-01**: CI enforces `compile --warnings-as-errors`, `compile --no-optional-deps --warnings-as-errors`, and `docs --warnings-as-errors` in the lint lane.
+- [x] **REL-02**: `release-please.yml` publishes to Hex.pm on a created release (`hex.publish --dry-run` → `hex.publish --yes` → post-publish verification).
+- [x] **REL-03**: A documented, proportionate pre-release verification gate (`verify.public_api`, `test`, `credo --strict`, `dialyzer`, no-optional-deps compile, one manual cold-start walkthrough) passes before the 1.0 cut — no security or performance audit.
+- [x] **REL-04**: Parapet is released as `1.0.0` via Release-Please (0.10.0 merged → `release-as` pin removed → `1.0.0` pinned and cut → pin plus the pre-1.0 `bump-*-pre-major` flags removed) and resolves at `hexdocs.pm/parapet/1.0.0/`.
 
 ## Future Requirements
 
@@ -87,7 +87,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | STAB-06 | Phase 19 | Complete |
 | GOV-01 | Phase 20 | Complete |
 | GOV-02 | Phase 20 | Complete |
-| GOV-03 | Phase 20 | Pending |
+| GOV-03 | Phase 20 | Complete |
 | GOV-04 | Phase 20 | Complete |
 | GOV-05 | Phase 20 | Complete |
 | DOCS-01 | Phase 20 | Complete |
@@ -96,14 +96,14 @@ Explicitly excluded. Documented to prevent scope creep.
 | DOCS-04 | Phase 20 | Complete |
 | DOCS-05 | Phase 20 | Complete |
 | DOCS-06 | Phase 20 | Complete |
-| DEMO-01 | Phase 21 | Pending |
-| DEMO-02 | Phase 21 | Pending |
-| DEMO-03 | Phase 21 | Pending |
-| DEMO-04 | Phase 21 | Pending |
-| REL-01 | Phase 22 | Pending |
-| REL-02 | Phase 22 | Pending |
-| REL-03 | Phase 22 | Pending |
-| REL-04 | Phase 22 | Pending |
+| DEMO-01 | Phase 21 | Complete |
+| DEMO-02 | Phase 21 | Complete |
+| DEMO-03 | Phase 21 | Complete |
+| DEMO-04 | Phase 21 | Complete |
+| REL-01 | Phase 22 | Complete |
+| REL-02 | Phase 22 | Complete |
+| REL-03 | Phase 22 | Complete |
+| REL-04 | Phase 22 | Complete |
 
 **Coverage:**
 
@@ -113,4 +113,4 @@ Explicitly excluded. Documented to prevent scope creep.
 
 ---
 *Requirements defined: 2026-05-25*
-*Last updated: 2026-05-25 — traceability confirmed by ROADMAP.md (Phases 19-22)*
+*Last updated: 2026-05-26 — v1.0 shipped; release-train posture now defaults to stable `main`*

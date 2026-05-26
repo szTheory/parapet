@@ -10,28 +10,27 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
+**Shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release with Hex + HexDocs resolution and post-cut cleanup on `main`. `main` now returns to steady-state release config with no one-off `release-as` pin. See `.planning/ROADMAP.md` and `docs/release-policy.md`.
 
-**Previously shipped:** v0.9 Performance, Scale & DX (2026-05-23) — TSDB cardinality protection, database scale & pruning, responsive Operator UI under 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Milestone audit `passed` (12/12 requirements).
+**Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
 
-**Next:** v1.0 Stable Release (in planning) — freeze the public API + telemetry contract under a written stability/deprecation policy, complete the release-readiness scaffolding (governance docs, the four remaining integration guides, a runnable demo app), and cut 1.0.0. SLO-W1 (the SLO wizard, reshaped as a flag-based Igniter task) is deferred to v1.1; SLO-B1 is dropped (the `Parapet.SLO.Provider` pattern already serves as the bundle abstraction). One release-mechanics follow-up is tracked: the `release-as: "0.10.0"` pin stays until the v0.10.0 release PR merges and tags v0.10.0.
+**Next:** Quiet stable-line maintenance by default. Candidate follow-up work remains parked until a concrete PR-shaped slice is worth opening: SLO-W1 as a flag-based Igniter task, a multi-version Elixir/OTP CI matrix, and post-1.0 polish such as SHA-pinned actions, logo/favicon, `MAINTAINING.md`, and demo Docker Compose.
 
-## Current Milestone: v1.0 Stable Release
+## Current Posture: Released Maintenance
 
-**Goal:** Freeze Parapet's public API and telemetry contract under a written stability + deprecation policy, ship the release-readiness scaffolding that lets a stranger trust `~> 1.0`, and cut 1.0.0.
+**Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
 
-**Posture:** A credibility/commitment milestone, not a feature milestone (the Oban-1.0 model: deprecation cleanup + a written stability promise, proven concrete by a runnable demo — not new feature surface).
+**Posture:** Released product, quiet by default. `main` stays green and releasable; version cuts happen through Release Please PRs, not ad hoc tagging or auto-publish-on-every-merge. Serious feature work is PR-only and should not become ambient milestone churn.
 
-**Target features:**
-- **Stability freeze** — three tiers (Stable / Experimental / Internal) signaled via ExDoc callouts, `docs/stability.md` (public-surface enumeration + semver promise + deprecation cycle + telemetry additive-only rules), an extended `mix verify.public_api` gate that fails on unclassified public modules, a `telemetry_contract_test.exs`, and the hard-deprecation of `Parapet.SLO.define/2`.
-- **OSS governance docs** — `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, plus a README semver commitment and an Elixir/OTP/Postgres support matrix.
-- **Documentation completeness** — the four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), the Provider-as-bundle pattern documented, and hexdocs grouping/landing polish.
-- **DEMO-01 runnable demo app** — `examples/demo_app/` child Phoenix app (path dep) with seeded incidents/timelines/runbook/SLO state, a smoke test, and a required `demo` CI gate; Hex-excluded.
-- **Release readiness & the 1.0 cut** — CI warnings-as-errors lanes, a Hex publish step in `release-please.yml`, a proportionate verification gate (no security/perf audit), and the Release-Please `0.10.0 → 1.0.0` graduation sequence.
+**Candidate follow-up work:**
+- **SLO authoring DX** — SLO-W1 as a flag-based `mix parapet.gen.slo` Igniter task that stays host-owned, dry-runnable, and composable with the existing install/generate flow.
+- **CI maturity** — a multi-version Elixir/OTP matrix and supply-chain hardening without changing the release-train rule that `main` must stay releasable.
+- **Maintainer polish** — `MAINTAINING.md`, HexDocs logo/favicon, and demo Docker Compose as post-1.0 additive trust work.
+- **Stable-main discipline** — keep `release_gate` as the branch-protection signal and use `docs/release-policy.md` as the maintainer contract for future patch/minor cuts.
 
-**Deferred to v1.1:** SLO-W1 (a flag-based `mix parapet.gen.slo` Igniter task), a multi-version Elixir/OTP CI matrix, logo/favicon, `MAINTAINING.md`, SHA-pinned actions, and a demo Docker Compose. **Dropped:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
+**Activation rule:** candidate work stays parked until a concrete slice is ready to be worked through a PR without weakening the stable-main posture. **Dropped:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
 
-**Key context:** Freeze depth chosen = stability tiers + deprecation policy (not a full hardening pass). Research backing this milestone lives in `.planning/research/V1-*.md`.
+**Key context:** The public surface is already frozen under `docs/stability.md`; future work should assume that contract. Research backing the additive follow-up still lives in `.planning/research/V1-*.md`.
 
 ## Requirements
 
@@ -116,9 +115,9 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- v1.0 Stable Release milestone defined 2026-05-25. Requirements enumerated in REQUIREMENTS.md; traceability filled by ROADMAP.md. -->
+<!-- v1.0 Stable Release shipped 2026-05-26. Quiet stable-line mode is the default until a new PR-shaped slice is explicitly opened. -->
 
-v1.0 Stable Release is in planning. Requirements are enumerated in `.planning/REQUIREMENTS.md` (categories: STAB, GOV, DOCS, DEMO, REL) and mapped to phases 19–22 in `.planning/ROADMAP.md`.
+No active feature milestone by default. The shipped v1.0 requirements remain the current frozen baseline in `.planning/REQUIREMENTS.md`, and candidate post-1.0 work should open as explicit PR-scoped slices before it becomes active milestone state.
 
 Carried forward beyond v1.0:
 

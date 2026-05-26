@@ -12,7 +12,9 @@
 - ✅ **v0.8 Deterministic Escalation & Bounded Mitigation** — shipped 2026-05-19 ([archive](milestones/v0.8-ROADMAP.md))
 - ✅ **v0.9 Performance, Scale & DX** — Phases 1-14 (shipped 2026-05-23) ([archive](milestones/v0.9-ROADMAP.md))
 - ✅ **v0.10 Adopter Success** — Phases 15-18 (shipped 2026-05-24) ([archive](milestones/v0.10-ROADMAP.md))
-- 🚧 **v1.0 Stable Release** — Phases 19-22 (in progress)
+- ✅ **v1.0 Stable Release** — Phases 19-22 (shipped 2026-05-26)
+- 💤 **No Active Milestone** — stable `main`, quiet by default
+- 📌 **v1.1 Authoring DX & Maturity** — candidate; open only when a concrete PR-shaped slice is ready
 
 ## Phases
 
@@ -54,14 +56,31 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 
 </details>
 
-### 🚧 v1.0 Stable Release (In Progress)
+### ✅ v1.0 Stable Release (Shipped 2026-05-26)
 
 **Milestone Goal:** Freeze Parapet's public API and telemetry contract under a written stability + deprecation policy, ship the release-readiness scaffolding that lets a stranger trust `~> 1.0`, and cut 1.0.0.
 
 - [x] **Phase 19: API & Telemetry Freeze** — Three stability tiers, deprecation policy, telemetry contract test, `mix verify.public_api` gate, hard-deprecate `Parapet.SLO.define/2` (completed 2026-05-25)
 - [x] **Phase 20: Governance & Docs Completeness** — OSS governance docs (`CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`), README semver commitment, four remaining integration guides (Chimeway, Mailglass, Rindle, Scoria), Provider-as-bundle pattern doc, hexdocs grouping (completed 2026-05-25)
-- [ ] **Phase 21: Runnable Demo App** — `examples/demo_app/` child Phoenix app with seeded evidence, smoke test, required `demo` CI gate, Hex-excluded (verification found gaps 2026-05-25 — gap closure in progress: 21-05/21-06)
-- [ ] **Phase 22: Release Readiness & 1.0 Cut** — CI warnings-as-errors, Hex publish step, proportionate verification gate, Release-Please 1.0.0 graduation
+- [x] **Phase 21: Runnable Demo App** — `examples/demo_app/` child Phoenix app with seeded evidence, smoke test, required `demo` CI gate, Hex-excluded (completed 2026-05-26 after 21-05/21-06 gap closure)
+- [x] **Phase 22: Release Readiness & 1.0 Cut** — CI warnings-as-errors, Hex publish step, proportionate verification gate, Release-Please graduation, live `v1.0.0` tag/release, Hex + HexDocs verification, and post-cut cleanup removing the one-time `release-as` pin plus pre-1.0 bump flags (completed 2026-05-26)
+
+**Release Evidence:** `v1.0.0` was published on 2026-05-26, `https://hex.pm/packages/parapet` resolves, `https://hexdocs.pm/parapet/1.0.0/` resolves, and `main` returns to steady-state Release Please config with no one-off version pin.
+
+### 💤 Released Maintenance (Default)
+
+**Default Goal:** Keep `main` stable and releasable. If `release_gate` is green and release truth is coherent, the default answer is that there is nothing to do.
+
+- [ ] **Routine maintenance only** — fixes, docs, CI hygiene, and release-train-safe upkeep
+- [ ] **Feature work requires activation** — serious feature work opens first as a PR-shaped slice, then becomes milestone work if needed
+
+### 📌 v1.1 Authoring DX & Maturity (Candidate)
+
+**Candidate Goal:** Land additive DX and maturity work without reopening the 1.0 freeze.
+
+- [ ] **SLO-W1** — Flag-based `mix parapet.gen.slo` Igniter task
+- [ ] **CI-M1** — Multi-version Elixir / OTP CI matrix
+- [ ] **Post-1.0 maturity** — SHA-pinned actions, HexDocs logo/favicon, `MAINTAINING.md`, demo Docker Compose
 
 ## Phase Details
 
@@ -125,13 +144,13 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   - [x] 21-02-PLAN.md — Operator UI wiring: committed generated LiveViews + open /parapet router + Tailwind assets + README (DEMO-01) (Wave 2, depends on 21-01)
   - [x] 21-03-PLAN.md — Seeds via Evidence Stable API (open/investigating/resolved + runbook warning) + ConnTest smoke test (DEMO-02/03) (Wave 3, depends on 21-02)
   - [x] 21-04-PLAN.md — CI demo + release_gate jobs + Hex-exclusion verify + getting-started link + branch-protection checkpoint (DEMO-03/04) (Wave 4, depends on 21-03)
-  - [ ] 21-05-PLAN.md — Gap closure: fix History-tab KeyError (CR-01) + add LiveView JS bundle/esbuild/script tag (CR-02) (DEMO-01/02) (Wave 5, depends on 21-04)
-  - [ ] 21-06-PLAN.md — Gap closure: configure release_gate as a required branch-protection check on main (DEMO-03) (Wave 6, depends on 21-05)
+  - [x] 21-05-PLAN.md — Gap closure: fix History-tab KeyError (CR-01) + add LiveView JS bundle/esbuild/script tag (CR-02) (DEMO-01/02) (Wave 5, depends on 21-04)
+  - [x] 21-06-PLAN.md — Gap closure: configure release_gate as a required branch-protection check on main (DEMO-03) (Wave 6, depends on 21-05)
 
 ### Phase 22: Release Readiness & 1.0 Cut
 
 **Goal**: All CI hardening lands, the Hex publish pipeline is wired, the proportionate verification gate passes, and `1.0.0` is cut via Release-Please and resolves on hexdocs.
-**Depends on**: Phase 21; external prerequisite: the pending v0.10.0 Release-Please PR must be merged and `v0.10.0` tagged before the `release-as` pin can be advanced (tracked risk — blocks the graduation sequence if delayed).
+**Depends on**: Phase 21
 **Requirements**: REL-01, REL-02, REL-03, REL-04
 **Success Criteria** (what must be TRUE):
 
@@ -140,7 +159,12 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   3. The proportionate verification gate (`mix verify.public_api`, `mix test`, `mix credo --strict`, `mix dialyzer`, no-optional-deps compile, one manual cold-start walkthrough) passes in full.
   4. `hexdocs.pm/parapet/1.0.0/` resolves and the `bump-minor-pre-major` / `bump-patch-for-minor-pre-major` pre-release flags are removed from `release-please-config.json`.
 
-**Plans**: TBD
+**Plans**: 4 plans in 4 waves
+
+  - [x] 22-01-PLAN.md — CI hardening: dedicated lint lane + `release_gate` fan-in on lint/test/demo (REL-01, REL-03) (Wave 1)
+  - [x] 22-02-PLAN.md — Release Please publish automation: gated Hex dry-run/publish/post-publish verify job (REL-02) (Wave 2, depends on 22-01)
+  - [x] 22-03-PLAN.md — Proportionate verification truth surface: canonical 1.0 release gate + bounded manual cold-start walkthrough (REL-03) (Wave 3, depends on 22-01/22-02)
+  - [x] 22-04-PLAN.md — Release-Please graduation sequence: staged `0.10.0 -> 1.0.0` cut + post-cut config cleanup checkpoint (REL-04) (Wave 4, completed 2026-05-26)
 
 ## Progress
 
@@ -152,7 +176,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 19. API & Telemetry Freeze | v1.0 | 4/4 | Complete   | 2026-05-25 |
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
-| 21. Runnable Demo App | v1.0 | 4/6 | Gap closure | - |
-| 22. Release Readiness & 1.0 Cut | v1.0 | 0/TBD | Not started | - |
+| 21. Runnable Demo App | v1.0 | 6/6 | Complete | 2026-05-26 |
+| 22. Release Readiness & 1.0 Cut | v1.0 | 4/4 | Complete | 2026-05-26 |
 
 _Earlier milestone phases (1-14) are archived — see the milestone archives linked above._

@@ -24,6 +24,8 @@ CI validates on Elixir 1.19 / OTP 27 / PG 14.
 
 Parapet follows [Semantic Versioning](https://semver.org/). Starting at `1.0`, the public API — modules, functions, telemetry event names, SLO slice names, and Prometheus metric names documented in hexdocs — will not break without a major-version bump. Pre-1.0 minor releases may include breaking changes recorded in [CHANGELOG.md](CHANGELOG.md).
 
+After `v1.0.0`, `main` is treated as the stable release line: merges must keep `release_gate` green, and releases are cut by merging the generated Release Please PR rather than auto-publishing on every merge. See [docs/release-policy.md](docs/release-policy.md).
+
 ## Features
 
 - **Zero-Conf Instrumentation:** Automatically hooks into Phoenix, Ecto, and Oban telemetry.
@@ -39,7 +41,7 @@ Add `parapet` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:parapet, "~> 0.1.0"}
+    {:parapet, "~> 1.0"}
   ]
 end
 ```
