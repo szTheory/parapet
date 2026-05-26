@@ -54,6 +54,7 @@ defmodule Parapet.Evidence do
   @doc """
   Creates a new Incident.
   """
+  @dialyzer {:nowarn_function, create_incident: 1}
   def create_incident(attrs \\ %{}) do
     multi =
       Ecto.Multi.new()
@@ -72,7 +73,7 @@ defmodule Parapet.Evidence do
 
     if Code.ensure_loaded?(worker) and Application.get_env(:parapet, :escalation_policy) do
       Ecto.Multi.insert(multi, :escalation_job, fn %{incident: incident} ->
-        apply(worker, :new, [%{"incident_id" => incident.id}])
+        worker.new(%{"incident_id" => incident.id})
       end)
     else
       multi

@@ -11,7 +11,6 @@ defmodule Parapet.Metrics.PrometheusFormatterTest do
 
   test "appends exemplars to prometheus lines when trace_id is found" do
     ExemplarStore.record_trace("parapet_http_request_duration_ms", %{method: "GET", route: "/api", status_class: "2xx"}, "trace-123")
-    IO.inspect(ExemplarStore.get_trace("parapet_http_request_duration_ms", %{method: "GET", route: "/api", status_class: "2xx"}), label: "TRACE_RECORDED")
 
     input = """
 # HELP parapet_http_request_duration_ms Duration

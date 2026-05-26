@@ -30,7 +30,7 @@ defmodule Parapet.Plug.MCP do
       |> put_resp_header("cache-control", "no-cache")
       |> send_chunked(200)
 
-    payload = conn.body_params || %{}
+    payload = conn.body_params
 
     # Basic JSON-RPC handling
     id = Map.get(payload, "id")

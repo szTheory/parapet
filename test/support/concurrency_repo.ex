@@ -1,4 +1,6 @@
 defmodule Parapet.TestSupport.ConcurrencyRepo do
+  @moduledoc false
+
   use Ecto.Repo,
     otp_app: :parapet,
     adapter: Ecto.Adapters.Postgres

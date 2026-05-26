@@ -345,6 +345,7 @@ if Code.ensure_loaded?(Oban.Worker) do
 
     defp maybe_put_suppression_details(payload, _escalation_state, _reason), do: payload
 
+    @dialyzer {:nowarn_function, persist_execution_outcome: 5}
     defp persist_execution_outcome(
            incident,
            claim,

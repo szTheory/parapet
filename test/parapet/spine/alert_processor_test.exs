@@ -325,8 +325,7 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert snapshot.type == "triage_snapshot"
       assert snapshot.payload["fault_plane"] == "webhook"
       assert snapshot.payload["pipeline_stage"] == "callback_ingest"
-      assert is_list(snapshot.payload["evidence_facts"])
-      assert length(snapshot.payload["evidence_facts"]) >= 1
+      assert [_ | _] = snapshot.payload["evidence_facts"]
     end
 
     test "rejects invalid payloads" do

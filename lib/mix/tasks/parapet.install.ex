@@ -151,15 +151,16 @@ defmodule Mix.Tasks.Parapet.Install do
       :parapet,
       [:providers],
       providers,
-      updater: fn zipper ->
+      updater: fn %Sourceror.Zipper{} = zipper ->
         merged =
           zipper
+          |> Sourceror.Zipper.node()
           |> Sourceror.to_string()
           |> eval_config_list()
           |> Kernel.++(providers)
           |> Enum.uniq()
 
-        {:ok, Common.replace_code(zipper, Sourceror.parse_string!(inspect(merged)))}
+        {:ok, Common.replace_code(zipper, inspect(merged))}
       end
     )
   end

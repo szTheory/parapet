@@ -42,6 +42,7 @@ defmodule Parapet.Spine.AlertProcessor do
 
   defp valid_payload?(_), do: false
 
+  @dialyzer {:nowarn_function, process_firing_alert: 1}
   defp process_firing_alert(alert) do
     repo = Evidence.repo()
     correlation_key = derive_correlation_key(alert)
@@ -214,6 +215,7 @@ defmodule Parapet.Spine.AlertProcessor do
   defp build_incident_changeset(%Incident{} = incident, attrs),
     do: Incident.changeset(incident, attrs)
 
+  @dialyzer {:nowarn_function, put_incident: 3}
   defp put_incident(multi, nil, changeset), do: Ecto.Multi.insert(multi, :incident, changeset)
 
   defp put_incident(multi, _incident, changeset),

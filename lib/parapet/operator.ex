@@ -112,7 +112,7 @@ defmodule Parapet.Operator do
 
     timeline_entries =
       entries
-      |> Enum.zip(derived.timeline_presentations || [])
+      |> Enum.zip(derived.timeline_presentations)
       |> Enum.map(fn {entry, presentation} ->
         %{entry: entry, presentation: presentation}
       end)
