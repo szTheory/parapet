@@ -35,6 +35,7 @@ defmodule DemoApp.MixProject do
       {:phoenix_html, "~> 4.1"},
       {:jason, "~> 1.2"},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:heroicons,
        github: "tailwindlabs/heroicons",
        tag: "v2.1.1",
@@ -48,8 +49,8 @@ defmodule DemoApp.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
-      "assets.build": ["tailwind default"],
-      "assets.deploy": ["tailwind default --minify", "phx.digest"]
+      "assets.build": ["tailwind default", "esbuild demo_app"],
+      "assets.deploy": ["tailwind default --minify", "esbuild demo_app --minify", "phx.digest"]
     ]
   end
 end
