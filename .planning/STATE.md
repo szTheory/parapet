@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
-status: planning
-last_updated: "2026-05-27T09:51:16.529Z"
-last_activity: 2026-05-27
+status: completed
+stopped_at: Phase 23 context gathered (assumptions mode)
+last_updated: "2026-05-27T10:41:52.368Z"
+last_activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requirements mapped, 0 unmapped)
 progress:
-  total_phases: 7
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 5
+  completed_phases: 3
+  total_plans: 19
+  completed_plans: 18
+  percent: 60
 ---
 
 # Project State
@@ -95,7 +96,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-27T09:51:16.529Z
-Stopped at: v1.1 roadmap landed (Phases 23–29, 24/24 requirements mapped). STATE.md updated to point at Phase 23.
-Resume file: .planning/ROADMAP.md
+Last session: 2026-05-27T10:41:52.365Z
+Stopped at: Phase 23 context gathered (assumptions mode)
+Resume file: .planning/phases/23-foundations-telemetry-contract-lease-until-migration/23-CONTEXT.md
 Next step: `/gsd:discuss-phase 23` to begin planning Foundations (telemetry contract lock + `lease_until` schema migration).
