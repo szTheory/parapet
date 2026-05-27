@@ -14,6 +14,8 @@ defmodule Parapet.Automation.ClaimService do
   alias Parapet.Evidence
   alias Parapet.Spine.{ActionClaim, Incident}
 
+  @default_lease_ms 5 * 60 * 1_000
+
   def claim_action(opts) do
     repo = Keyword.get(opts, :repo, Evidence.repo())
     incident_id = Keyword.fetch!(opts, :incident_id)
@@ -21,6 +23,7 @@ defmodule Parapet.Automation.ClaimService do
     action_key = opts |> Keyword.fetch!(:action_key) |> to_string()
     idempotency_key = Keyword.fetch!(opts, :idempotency_key)
     now = Keyword.get(opts, :now, DateTime.utc_now() |> DateTime.truncate(:microsecond))
+    lease_until = DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
 
     attrs = %{
       incident_id: incident_id,
@@ -30,6 +33,7 @@ defmodule Parapet.Automation.ClaimService do
       idempotency_key: idempotency_key,
       attempt_count: Keyword.get(opts, :attempt_count, 1),
       claimed_at: now,
+      lease_until: lease_until,
       inserted_at: now,
       updated_at: now
     }
@@ -82,17 +86,56 @@ defmodule Parapet.Automation.ClaimService do
     if count == 1 do
       {:won, rows |> returned_claim() |> to_claim()}
     else
-      claim =
-        repo.one!(
-          from(claim in ActionClaim,
-            where:
-              claim.incident_id == ^attrs.incident_id and
-                claim.action_kind == ^attrs.action_kind and
-                claim.action_key == ^attrs.action_key
-          )
-        )
+      case steal_expired_claim(repo, attrs) do
+        {:won, claim} ->
+          {:won, claim}
 
-      {:conflicted, claim}
+        nil ->
+          claim =
+            repo.one!(
+              from(claim in ActionClaim,
+                where:
+                  claim.incident_id == ^attrs.incident_id and
+                    claim.action_kind == ^attrs.action_kind and
+                    claim.action_key == ^attrs.action_key
+              )
+            )
+
+          {:conflicted, claim}
+      end
+    end
+  end
+
+  defp steal_expired_claim(repo, attrs) do
+    now = attrs.claimed_at
+    new_lease_until = DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
+
+    steal_query =
+      from(claim in ActionClaim,
+        where:
+          claim.incident_id == ^attrs.incident_id and
+            claim.action_kind == ^attrs.action_kind and
+            claim.action_key == ^attrs.action_key and
+            claim.status == "claimed" and
+            claim.lease_until < ^now,
+        update: [
+          set: [
+            idempotency_key: ^attrs.idempotency_key,
+            claimed_at: ^now,
+            lease_until: ^new_lease_until,
+            updated_at: ^now
+          ],
+          inc: [attempt_count: 1]
+        ],
+        select: claim
+      )
+
+    {count, rows} = repo.update_all(steal_query, [])
+
+    if count == 1 do
+      {:won, rows |> List.first() |> to_claim()}
+    else
+      nil
     end
   end
 
@@ -170,6 +213,7 @@ defmodule Parapet.Automation.ClaimService do
       :idempotency_key,
       :attempt_count,
       :claimed_at,
+      :lease_until,
       :finished_at,
       :short_circuit_reason,
       :last_error_kind,

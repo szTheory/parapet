@@ -43,6 +43,9 @@ defmodule Parapet.ConcurrencyBootstrapTest do
              })
              |> ConcurrencyRepo.insert()
 
+    claimed_at = DateTime.utc_now() |> DateTime.truncate(:microsecond)
+    lease_until = DateTime.add(claimed_at, 5 * 60, :second) |> DateTime.truncate(:microsecond)
+
     assert {:ok, _claim} =
              %ActionClaim{}
              |> ActionClaim.changeset(%{
@@ -52,7 +55,8 @@ defmodule Parapet.ConcurrencyBootstrapTest do
                status: "claimed",
                idempotency_key: "auto_exec_#{incident.id}_auto_step",
                attempt_count: 1,
-               claimed_at: DateTime.utc_now() |> DateTime.truncate(:microsecond)
+               claimed_at: claimed_at,
+               lease_until: lease_until
              })
              |> ConcurrencyRepo.insert()
 
