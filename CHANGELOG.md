@@ -11,6 +11,19 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## [1.0.1](https://github.com/szTheory/parapet/compare/v1.0.0...v1.0.1) (2026-05-27)
+
+
+### Features
+
+* **demo_app:** wire esbuild JS pipeline and LiveSocket entry point ([4ed806c](https://github.com/szTheory/parapet/commit/4ed806c13db9d6cfc7b3b52891f5425b66e02541))
+* **demo_app:** wire esbuild JS pipeline and LiveSocket entry point ([885e7d7](https://github.com/szTheory/parapet/commit/885e7d748b954fd8e45581e4c0b3b797488f99f9))
+
+
+### Miscellaneous Chores
+
+* cap pending release to 1.0.1 (demo_app-only feat) ([2cee017](https://github.com/szTheory/parapet/commit/2cee0172c4ab7c23ddfe28a0738a0d399ee06f28))
+
 ## [1.0.0](https://github.com/szTheory/parapet/compare/v0.10.0...v1.0.0) (2026-05-26)
 
 
