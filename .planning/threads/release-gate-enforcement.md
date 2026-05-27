@@ -20,7 +20,7 @@ links:
 - `allow_auto_merge: true` on the repo.
 - `required_approving_review_count: 0` (solo OSS rationale locked into user memory as `project-solo-oss-required-reviews-disabled`).
 - Auto-merge step in `release-please.yml` (PR #6 / commit c2349b4).
-- `workflow_dispatch:` on `ci.yml` + dispatch step in `release-please.yml` so CI actually runs on Release Please PRs (PR #7 / commits 132e436 + ad39b77). Solves the GITHUB_TOKEN cycle-prevention gotcha.
+- ~~`workflow_dispatch:` on `ci.yml` + dispatch step in `release-please.yml`~~ → **superseded by `RELEASE_PLEASE_TOKEN` PAT (set 2026-05-27).** The escape hatch was a workaround for the GITHUB_TOKEN cycle-prevention; the PAT eliminates the underlying problem entirely. Validated end-to-end on parapet v1.0.3 — release auto-published with zero manual `gh workflow run` commands. The escape hatch removed in the same v1.0.3 cleanup cycle.
 - `docs/release-policy.md` recast from "manual merge" to "auto-merge by default" with a Manual Intervention section.
 
 **Remaining for v1.2:**
