@@ -14,7 +14,9 @@ defmodule Parapet.Capabilities do
   @valid_capabilities [
     :retry_async_item,
     :requeue_dead_letter,
-    :request_manual_provider_check
+    :request_manual_provider_check,
+    :revert_feature_flag,
+    :disable_metric_label
   ]
 
   def start_link(_opts) do
