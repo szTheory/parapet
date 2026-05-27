@@ -105,41 +105,41 @@ The v1.0 requirements (25 total: STAB-01 through STAB-06, GOV-01 through GOV-05,
 
 ## Traceability
 
-Filled by the roadmapper once phases are mapped.
+Filled by the roadmapper. Each v1.1 requirement maps to exactly one phase (23–29).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FND-01 | — | Pending |
-| FND-02 | — | Pending |
-| RCV-01 | — | Pending |
-| RCV-02 | — | Pending |
-| RCV-03 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
-| UI-04 | — | Pending |
-| AUD-01 | — | Pending |
-| AUD-02 | — | Pending |
-| AUD-03 | — | Pending |
-| PB-01 | — | Pending |
-| PB-02 | — | Pending |
-| PB-03 | — | Pending |
-| PB-04 | — | Pending |
-| PB-05 | — | Pending |
-| PB-06 | — | Pending |
-| DEMO-05 | — | Pending |
-| DEMO-06 | — | Pending |
-| STAB-07 | — | Pending |
-| ADOP-01 | — | Pending |
-| ADOP-02 | — | Pending |
-| ADOP-03 | — | Pending |
+| FND-01 | Phase 23 | Pending |
+| FND-02 | Phase 23 | Pending |
+| RCV-01 | Phase 24 | Pending |
+| RCV-02 | Phase 24 | Pending |
+| RCV-03 | Phase 24 | Pending |
+| UI-01 | Phase 25 | Pending |
+| UI-02 | Phase 25 | Pending |
+| UI-03 | Phase 25 | Pending |
+| UI-04 | Phase 25 | Pending |
+| AUD-01 | Phase 26 | Pending |
+| AUD-02 | Phase 26 | Pending |
+| AUD-03 | Phase 26 | Pending |
+| PB-01 | Phase 27 | Pending |
+| PB-02 | Phase 27 | Pending |
+| PB-03 | Phase 27 | Pending |
+| PB-04 | Phase 27 | Pending |
+| PB-05 | Phase 27 | Pending |
+| PB-06 | Phase 27 | Pending |
+| DEMO-05 | Phase 28 | Pending |
+| DEMO-06 | Phase 28 | Pending |
+| STAB-07 | Phase 29 | Pending |
+| ADOP-01 | Phase 29 | Pending |
+| ADOP-02 | Phase 29 | Pending |
+| ADOP-03 | Phase 29 | Pending |
 
 **Coverage:**
 
 - v1.1 requirements: 24 total
-- Mapped to phases: 0 (roadmapper fills)
-- Unmapped: 24
+- Mapped to phases: 24
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-27*
-*Last updated: 2026-05-27 — v1.1 Actionable Recovery milestone opened*
+*Last updated: 2026-05-27 — v1.1 traceability filled (Phases 23–29, 24/24 mapped)*
