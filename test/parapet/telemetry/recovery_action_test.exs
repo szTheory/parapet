@@ -78,6 +78,27 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
              RecoveryAction.allowed_public_keys(:executed)
   end
 
+  test "allowed_public_keys/1 raises a clear ArgumentError for unrecognized event name shapes" do
+    # WR-02 regression: a malformed event name list (e.g. bare family list, typo,
+    # or wrong shape) used to surface as an opaque FunctionClauseError. It must
+    # now raise ArgumentError naming the offending value and the expected shapes.
+    assert_raise ArgumentError, ~r/Unsupported recovery_action event name/, fn ->
+      RecoveryAction.allowed_public_keys([:previewed])
+    end
+
+    assert_raise ArgumentError, ~r/Unsupported recovery_action event name/, fn ->
+      RecoveryAction.allowed_public_keys([:parapet, :operator, :recovery_action, :typo, :extra])
+    end
+  end
+
+  test "shape_metadata/2 raises a clear ArgumentError for unrecognized event name shapes" do
+    # WR-02 regression: same property for shape_metadata/2 — the other public
+    # entry point that funnels through family_key/1.
+    assert_raise ArgumentError, ~r/Unsupported recovery_action event name/, fn ->
+      RecoveryAction.shape_metadata([:wrong, :shape], %{capability_id: :retry_async_item})
+    end
+  end
+
   test "normalize_outcome/1 does not create atoms for the poison binary itself (atom-table safety)" do
     # CR-01 regression: a malicious or buggy upstream sending attacker-controlled
     # strings to the normalize_*/1 helpers must NOT leak atoms. The helpers must

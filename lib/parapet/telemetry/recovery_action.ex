@@ -220,7 +220,15 @@ defmodule Parapet.Telemetry.RecoveryAction do
   # Single-shot events: returns the last atom (e.g. :previewed).
   # Span sub-events: returns :executed for all three sub-events.
   defp family_key([:parapet, :operator, :recovery_action, :executed, _sub]), do: :executed
-  defp family_key([:parapet, :operator, :recovery_action, family]), do: family
+
+  defp family_key([:parapet, :operator, :recovery_action, family]) when is_atom(family),
+    do: family
+
+  defp family_key(other) do
+    raise ArgumentError,
+          "Unsupported recovery_action event name: #{inspect(other)}. " <>
+            "Expected one of #{inspect(event_families())}."
+  end
 
   defp maybe_normalize_known_values(metadata) do
     metadata
