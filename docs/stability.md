@@ -46,6 +46,7 @@ in a minor release; a single CHANGELOG entry will accompany any breaking change.
 |--------|-------------|
 | `Parapet.MCP.Server` | Read-only MCP server surface |
 | `Parapet.MCP.PrometheusClient` | Prometheus query client for MCP |
+| `Parapet.Telemetry.RecoveryAction` | Machine-readable recovery action telemetry contract |
 | `Parapet.Automation.CircuitBreaker` | Ecto-backed circuit breaker for mitigations |
 | `Parapet.Automation.ClaimService` | Action claim and idempotency service |
 | `Parapet.Automation.Executor` | Async runbook execution via Oban |
