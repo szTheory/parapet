@@ -1,13 +1,10 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: Released Maintenance
-status: quiet
-stopped_at: v1.0 closed; no concrete feature slice is open
-last_updated: "2026-05-27T08:25:00.000Z"
-last_activity: |
-  2026-05-27 -- post-1.0 strategic assessment landed; v1.1 target retargeted from SLO-W1 to Actionable Recovery (see .planning/NEXT-STEP-ASSESSMENT.md); SLO-W1 + CI matrix + supply-chain hardening deferred to v1.2; two threads opened (actionable-recovery-design, release-gate-enforcement); first phase LEARNINGS file written (22-LEARNINGS.md).
-  2026-05-27 -- shifted left to true CI/CD: required reviews → 0 (locked into user memory as solo-OSS decision), allow_auto_merge → true, release-please workflow auto-merges its PRs and dispatches CI on the release branch via workflow_dispatch (escape hatch from GITHUB_TOKEN cycle-prevention). v1.0.1 cut as the first auto-merged release; v1.1 (Actionable Recovery) will be the first feature-driven cut to ride the chain.
+milestone: v1.1
+milestone_name: Actionable Recovery
+status: planning
+last_updated: "2026-05-27T09:51:16.529Z"
+last_activity: 2026-05-27
 progress:
   total_phases: 0
   completed_phases: 0
@@ -27,12 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-26 — v1.0 shipped; quiet stable-lin
 
 ## Current Position
 
-Milestone: none — QUIET
-Default branch posture: `main` is stable and releasable by default
-Status: if `release_gate` is green and release truth is coherent, the default answer is that there is nothing to do
-Last activity: 2026-05-26 -- quiet-default release-train policy codified; feature work now requires a concrete PR-shaped slice
-
-Progress: [░░░░░░░░░░] 0%
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-27 — Milestone v1.1 started
 
 ## Performance Metrics
 
