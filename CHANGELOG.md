@@ -11,6 +11,14 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## [1.0.2](https://github.com/szTheory/parapet/compare/v1.0.1...v1.0.2) (2026-05-27)
+
+
+### Bug Fixes
+
+* **test:** isolate parapet.gen.grafana_test from global SLO state ([6ae94fe](https://github.com/szTheory/parapet/commit/6ae94fe4fd2c0aec8c3effb2c9be967c3f506f24))
+* **test:** isolate parapet.gen.grafana_test from global SLO state ([fa26ac2](https://github.com/szTheory/parapet/commit/fa26ac23cf0f1cceffc28d0ed9cb794c082e17b2))
+
 ## [1.0.1](https://github.com/szTheory/parapet/compare/v1.0.0...v1.0.1) (2026-05-27)
 
 
