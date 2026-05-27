@@ -1,8 +1,26 @@
 defmodule Mix.Tasks.Parapet.Gen.GrafanaTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import Igniter.Test
 
   alias Mix.Tasks.Parapet.Gen.Grafana
+
+  setup do
+    previous_slos = Application.get_env(:parapet, :slos)
+    previous_providers = Application.get_env(:parapet, :providers)
+
+    Application.delete_env(:parapet, :slos)
+    Application.delete_env(:parapet, :providers)
+
+    on_exit(fn ->
+      restore_env(:slos, previous_slos)
+      restore_env(:providers, previous_providers)
+    end)
+
+    :ok
+  end
+
+  defp restore_env(key, nil), do: Application.delete_env(:parapet, key)
+  defp restore_env(key, value), do: Application.put_env(:parapet, key, value)
 
   describe "mix parapet.gen.grafana" do
     test "generates a grafana dashboard and provisioning file" do
