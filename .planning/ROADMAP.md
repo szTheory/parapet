@@ -75,7 +75,7 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 **Milestone Goal:** Close the action loop the operator UI already implies. Turn runbook steps into executable, audited, host-registered recovery actions with a safe Preview → Confirm flow. Pure additive on the v1.0 frozen surface — most infrastructure already in `lib/`. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
 
 - [x] **Phase 23: Foundations — Telemetry Contract + `lease_until` Migration** — Lock the v1.1 telemetry event family under Experimental tier and add the claim-lease column before any capability ships (FND-01, FND-02) (completed 2026-05-27)
-- [ ] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03)
+- [x] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03) (completed 2026-05-27)
 - [ ] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04)
 - [ ] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03)
 - [ ] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06)
@@ -131,7 +131,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 
   - [x] 24-01-PLAN.md — Behaviour module `Parapet.Recovery` at `lib/parapet/recovery.ex` (4 `@callback`s + minimal `__using__/1` + crash-proof `attach/1` with `Code.ensure_loaded?` skip + `{:ok, registered_ids}` return + verbatim Experimental admonition) (RCV-01, RCV-02) (Wave 1)
   - [x] 24-02-PLAN.md — Allowlist widening: append `:revert_feature_flag, :disable_metric_label` to `@valid_capabilities` in `lib/parapet/capabilities.ex` + add `Parapet.Recovery` row to `docs/stability.md` Experimental Modules table (alphabetical between `Parapet.MCP.PrometheusClient` and `Parapet.Telemetry.RecoveryAction`) (RCV-03) (Wave 1)
-  - [ ] 24-03-PLAN.md — `test/parapet/recovery_test.exs` sync sweep (all 4 success criteria via `attach/1` integration tests) + 100-async sweep parameterized cyclically over the 5 allowlisted atoms (Pitfall 13 avoidance) (RCV-01, RCV-02, RCV-03) (Wave 2 — depends on 24-01 + 24-02)
+  - [x] 24-03-PLAN.md — `test/parapet/recovery_test.exs` sync sweep (all 4 success criteria via `attach/1` integration tests) + 100-async sweep parameterized cyclically over the 5 allowlisted atoms (Pitfall 13 avoidance) (RCV-01, RCV-02, RCV-03) (Wave 2 — depends on 24-01 + 24-02)
 
 ### Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX
 
@@ -219,7 +219,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete | 2026-05-24 |
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete    | 2026-05-27 |
-| 24. Recovery Behaviour + Capability Allowlist | v1.1 | 2/3 | In Progress|  |
+| 24. Recovery Behaviour + Capability Allowlist | v1.1 | 3/3 | Complete   | 2026-05-27 |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
 | 27. Prebuilt Playbooks | v1.1 | 0/0 | Not started | - |
