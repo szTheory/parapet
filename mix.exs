@@ -68,6 +68,7 @@ defmodule Parapet.MixProject do
         "docs/getting-started.md",
         "docs/troubleshooting.md",
         "docs/slo-authoring-guide.md",
+        "docs/release-policy.md",
         "docs/integrations/sigra.md",
         "docs/integrations/accrue.md",
         "docs/integrations/rulestead.md",
@@ -85,6 +86,7 @@ defmodule Parapet.MixProject do
           "docs/operator-ui.md",
           "docs/slo-authoring-guide.md",
           "docs/troubleshooting.md",
+          "docs/release-policy.md",
           "docs/HISTORY.md",
           "CHANGELOG.md"
         ],
