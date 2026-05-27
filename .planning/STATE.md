@@ -95,6 +95,7 @@ None.
 | SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | deferred from v1.1 | Design resolved; build it after recovery loop closes |
 | CI | Multi-version Elixir/OTP CI matrix | v1.2 | candidate | Maturity signal |
 | Supply chain | SHA-pinned actions, Dependabot config (currently missing), `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` for bypass-closure work |
+| Architecture | Move `Parapet.SLO` state off of `Application` env (registry refactor; preempts SLO-W1) | v1.2 | candidate | See `.planning/threads/slo-state-off-application-env.md` — graduation candidate from the 2026-05-27 grafana_test fix; high priority per maintainer signal |
 | Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | candidate | Adopter-facing trust work |
 | Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
 | Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |
