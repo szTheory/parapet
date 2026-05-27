@@ -132,6 +132,7 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
         idempotency_key varchar(255) NOT NULL,
         attempt_count integer NOT NULL DEFAULT 1,
         claimed_at timestamp(6) without time zone NOT NULL,
+        lease_until timestamp(6) without time zone NOT NULL,
         finished_at timestamp(6) without time zone,
         short_circuit_reason varchar(255),
         last_error_kind varchar(255),
@@ -148,6 +149,11 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
       """
       CREATE INDEX IF NOT EXISTS parapet_action_claims_status_claimed_at_index
       ON parapet_action_claims (status, claimed_at)
+      """,
+      """
+      CREATE INDEX IF NOT EXISTS parapet_action_claims_lease_until_claimed_index
+      ON parapet_action_claims (lease_until)
+      WHERE status = 'claimed'
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_action_claims_incident_id_inserted_at_index
