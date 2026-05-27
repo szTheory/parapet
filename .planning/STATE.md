@@ -4,8 +4,8 @@ milestone: none
 milestone_name: Released Maintenance
 status: quiet
 stopped_at: v1.0 closed; no concrete feature slice is open
-last_updated: "2026-05-26T15:05:00.000Z"
-last_activity: 2026-05-26 -- shifted GSD to quiet stable-line mode: no active milestone until a concrete PR-shaped slice is opened
+last_updated: "2026-05-27T07:00:00.000Z"
+last_activity: 2026-05-27 -- post-1.0 strategic assessment landed; v1.1 target retargeted from SLO-W1 to Actionable Recovery (see .planning/NEXT-STEP-ASSESSMENT.md); SLO-W1 + CI matrix + supply-chain hardening deferred to v1.2; two threads opened (actionable-recovery-design, release-gate-enforcement); first phase LEARNINGS file written (22-LEARNINGS.md)
 progress:
   total_phases: 0
   completed_phases: 0
@@ -87,15 +87,19 @@ None.
 
 ## Candidate Work
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | candidate | v1.0 planning |
-| CI | Multi-version Elixir/OTP CI matrix | candidate | v1.0 planning |
-| Polish | Logo/favicon, `MAINTAINING.md`, SHA-pinned CI actions, demo Docker Compose | candidate | v1.0 planning |
+| Category | Item | Target | Status | Notes |
+|----------|------|--------|--------|-------|
+| Operator UI | v1.1 Actionable Recovery (Preview/Confirm flow + 4–6 playbooks + audit propagation) | v1.1 | candidate | Highest-leverage next milestone per 2026-05-27 strategic assessment; see `.planning/threads/actionable-recovery-design.md` |
+| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | deferred from v1.1 | Design resolved; build it after recovery loop closes |
+| CI | Multi-version Elixir/OTP CI matrix | v1.2 | candidate | Maturity signal |
+| Supply chain | SHA-pinned actions, Dependabot config (currently missing), `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` for bypass-closure work |
+| Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | candidate | Adopter-facing trust work |
+| Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
+| Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |
 
 ## Session Continuity
 
-Last session: 2026-05-26T15:05:00.000Z
-Stopped at: quiet stable-line mode established
-Resume file: docs/release-policy.md
-Next step: Stay silent unless a concrete maintenance task or PR-shaped feature slice is opened; if serious feature work starts, open the slice first and then promote it into milestone state.
+Last session: 2026-05-27T07:00:00.000Z
+Stopped at: post-1.0 strategic assessment landed; v1.1 target = Actionable Recovery (candidate); quiet stable-line mode still active until user opens the milestone
+Resume file: .planning/NEXT-STEP-ASSESSMENT.md
+Next step: Stay quiet by default. When the user is ready to open v1.1, the seed lives in `.planning/threads/actionable-recovery-design.md` — kick off via `/gsd:new-milestone` or `/gsd:discuss-phase` from there. Concurrent threads (e.g., `release-gate-enforcement` for v1.2) should not auto-promote.

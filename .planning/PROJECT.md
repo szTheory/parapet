@@ -14,7 +14,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
 
-**Next:** Quiet stable-line maintenance by default. Candidate follow-up work remains parked until a concrete PR-shaped slice is worth opening: SLO-W1 as a flag-based Igniter task, a multi-version Elixir/OTP CI matrix, and post-1.0 polish such as SHA-pinned actions, logo/favicon, `MAINTAINING.md`, and demo Docker Compose.
+**Next:** Quiet stable-line maintenance by default. The 2026-05-27 strategic assessment (`.planning/NEXT-STEP-ASSESSMENT.md`) identified Actionable Recovery as the highest-leverage v1.1 wedge: wire the operator UI to actually execute runbook steps (Preview → Confirm) with 4–6 prebuilt recovery playbooks, audit propagation, and a demo seed that proves the loop. SLO-W1, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement move to v1.2 (Authoring DX & Maturity). Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+. None of these activate until a concrete PR-shaped slice opens.
 
 ## Current Posture: Released Maintenance
 
@@ -22,15 +22,22 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Posture:** Released product, quiet by default. `main` stays green and releasable; version cuts happen through Release Please PRs, not ad hoc tagging or auto-publish-on-every-merge. Serious feature work is PR-only and should not become ambient milestone churn.
 
-**Candidate follow-up work:**
-- **SLO authoring DX** — SLO-W1 as a flag-based `mix parapet.gen.slo` Igniter task that stays host-owned, dry-runnable, and composable with the existing install/generate flow.
-- **CI maturity** — a multi-version Elixir/OTP matrix and supply-chain hardening without changing the release-train rule that `main` must stay releasable.
-- **Maintainer polish** — `MAINTAINING.md`, HexDocs logo/favicon, and demo Docker Compose as post-1.0 additive trust work.
-- **Stable-main discipline** — keep `release_gate` as the branch-protection signal and use `docs/release-policy.md` as the maintainer contract for future patch/minor cuts.
+**Candidate follow-up work (per 2026-05-27 strategic assessment):**
 
-**Activation rule:** candidate work stays parked until a concrete slice is ready to be worked through a PR without weakening the stable-main posture. **Dropped:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
+- **v1.1 — Actionable Recovery (the wedge):** Operator UI executes runbook steps via Guidance → Preview → Confirm; 4–6 prebuilt recovery playbooks (retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout); audit propagation via `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free; demo seed wires at least one Preview-able + Confirm-able action. **In scope:** operator-in-the-loop execution only. **Out of scope:** autonomous remediation, cross-app correlation, multi-tenant action scoping. Thread: `.planning/threads/actionable-recovery-design.md`.
+- **v1.2 — Authoring DX & Maturity:** SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task; multi-version Elixir/OTP CI matrix; supply-chain hardening (SHA-pinned actions, Dependabot, `MAINTAINING.md`, hexdocs logo/favicon); v0.x → v1.0 migration guide; deployment guide; branch-protection enforcement (make `release_gate` truly required, close the admin bypass) + conventional-commit taxonomy codified in `CONTRIBUTING.md` + PR template. Thread: `.planning/threads/release-gate-enforcement.md`.
+- **v1.3 — Team Workflow & Coordination (JTBD #2):** Responder model, handoff/acknowledgement formalization, on-call rotation hooks (PagerDuty/Opsgenie/webhook adapter).
+- **v1.4+ — Cross-boundary journey correlation (JTBD #4) + vertical starter packs** for non-Phoenix-default verticals.
 
-**Key context:** The public surface is already frozen under `docs/stability.md`; future work should assume that contract. Research backing the additive follow-up still lives in `.planning/research/V1-*.md`.
+**Decisions surfaced 2026-05-27:**
+- **In scope (v1.1):** operator UI executes runbooks; preview-before-mutate is the safety posture.
+- **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane.
+- **Deferred to v1.4+:** multi-tenant SLO scoping and per-org operator views.
+- **Dropped earlier:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
+
+**Activation rule:** candidate work stays parked until a concrete slice is ready to be worked through a PR without weakening the stable-main posture.
+
+**Key context:** The public surface is already frozen under `docs/stability.md`; future work should assume that contract. Research backing the additive follow-up still lives in `.planning/research/V1-*.md`. The 2026-05-27 strategic assessment lives at `.planning/NEXT-STEP-ASSESSMENT.md` and expires when v1.1 ships.
 
 ## Requirements
 
