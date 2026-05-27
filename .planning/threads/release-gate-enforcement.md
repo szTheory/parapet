@@ -2,14 +2,31 @@
 thread: release-gate-enforcement
 opened: "2026-05-27"
 target_milestone: v1.2 (Authoring DX & Maturity)
-status: open
+status: partially-shipped
+shipped_in: v1.0.1 cut (2026-05-27)
 links:
   - .planning/phases/22-release-readiness-1-0-cut/22-LEARNINGS.md
   - docs/release-policy.md
   - CONTRIBUTING.md
   - .github/PULL_REQUEST_TEMPLATE.md
   - .github/workflows/ci.yml
+  - .github/workflows/release-please.yml
 ---
+
+**Status update 2026-05-27 (v1.0.1 train):** Most of this thread shipped during the v1.0.1 cut. Remaining work scoped down to a single v1.2 item — see "Remaining for v1.2" at the bottom.
+
+**Shipped (no longer open):**
+- `enforce_admins: true` enabled on main branch protection — admin bypass closed.
+- `allow_auto_merge: true` on the repo.
+- `required_approving_review_count: 0` (solo OSS rationale locked into user memory as `project-solo-oss-required-reviews-disabled`).
+- Auto-merge step in `release-please.yml` (PR #6 / commit c2349b4).
+- `workflow_dispatch:` on `ci.yml` + dispatch step in `release-please.yml` so CI actually runs on Release Please PRs (PR #7 / commits 132e436 + ad39b77). Solves the GITHUB_TOKEN cycle-prevention gotcha.
+- `docs/release-policy.md` recast from "manual merge" to "auto-merge by default" with a Manual Intervention section.
+
+**Remaining for v1.2:**
+- Codify conventional-commit taxonomy in `CONTRIBUTING.md` + `.github/PULL_REQUEST_TEMPLATE.md` (which `docs:`/`chore:`/`ci:`/`test:` paths can be direct on a multi-maintainer project — moot for parapet's solo posture but worth documenting for adopters who fork this CI shape).
+- Path-based rulesets to allow direct-to-main for `docs:` / `.planning/` paths (reduces PR overhead on noise commits).
+- **Flaky test:** `test/mix/tasks/parapet.gen.grafana_test.exs:22` failed on the workflow_dispatch-triggered CI run during the v1.0.1 cut while the pull_request-triggered run on the same SHA passed. Could break the future auto-merge chain if it flakes during a release. Investigate root cause (likely test-ordering / shared-state issue).
 
 # Thread: Make `release_gate` Truly Required
 
