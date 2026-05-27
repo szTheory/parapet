@@ -78,37 +78,57 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
              RecoveryAction.allowed_public_keys(:executed)
   end
 
-  test "normalize_outcome/1 does not create atoms for unknown binary inputs (atom-table safety)" do
+  test "normalize_outcome/1 does not create atoms for the poison binary itself (atom-table safety)" do
     # CR-01 regression: a malicious or buggy upstream sending attacker-controlled
     # strings to the normalize_*/1 helpers must NOT leak atoms. The helpers must
     # raise ArgumentError for unknown inputs WITHOUT minting a fresh atom in the
     # global table (which is never garbage-collected and capped at ~1M entries).
     #
-    # Use a string that is overwhelmingly unlikely to already be interned. If it
-    # somehow IS already interned (e.g., the test runner created it), the
-    # atom_count delta will still be zero — that's also a passing condition.
+    # We assert this property TWO ways:
+    #
+    # 1. After rejection, the poison string itself MUST NOT exist as an atom
+    #    (the most direct check; not sensitive to test-infrastructure atoms).
+    # 2. After a warm-up pass + measurement, atom_count is stable across
+    #    repeated rejections of FRESH poison strings (proves the helper is the
+    #    non-leaking path).
     poison = "definitely-not-a-known-atom-#{System.unique_integer([:positive])}"
-
-    before_count = :erlang.system_info(:atom_count)
 
     assert_raise ArgumentError, ~r/Unsupported outcome/, fn ->
       RecoveryAction.normalize_outcome(poison)
     end
 
+    # Direct check: poison was never interned. This is the load-bearing
+    # assertion — if String.to_atom were still in the code path, this would
+    # succeed (returning the atom) instead of raising.
+    assert_raise ArgumentError, fn -> String.to_existing_atom(poison) end
+
+    # Warm-up: run one rejection pass to let assert_raise + error-message
+    # machinery intern any of their own internal atoms. THEN measure stability
+    # over a second rejection pass with a fresh poison string.
+    warmup_poison = "warmup-poison-#{System.unique_integer([:positive])}"
+
+    assert_raise ArgumentError, fn ->
+      RecoveryAction.normalize_outcome(warmup_poison)
+    end
+
+    poison_2 = "second-poison-#{System.unique_integer([:positive])}"
+    before_count = :erlang.system_info(:atom_count)
+
+    assert_raise ArgumentError, fn ->
+      RecoveryAction.normalize_outcome(poison_2)
+    end
+
     after_count = :erlang.system_info(:atom_count)
 
     assert after_count == before_count,
-           "normalize_outcome leaked atoms: atom_count went from #{before_count} to #{after_count} " <>
-             "after rejecting unknown binary #{inspect(poison)}. " <>
-             "This indicates String.to_atom/1 was called before validating against the closed vocabulary."
-
-    # Belt-and-suspenders: the same atom should not be present at all.
-    assert_raise ArgumentError, fn -> String.to_existing_atom(poison) end
+           "normalize_outcome leaked atoms on second pass: #{before_count} → #{after_count} " <>
+             "(poison=#{inspect(poison_2)}). String.to_atom/1 must not be called before " <>
+             "the closed-vocabulary lookup."
   end
 
-  test "normalize_*/1 helpers raise ArgumentError for unknown binary inputs without leaking atoms" do
-    # CR-01 regression: apply the same property to every normalize_*/1 helper
-    # that accepts binary input.
+  test "normalize_*/1 helpers raise ArgumentError for unknown binary inputs (no fresh atom interned)" do
+    # CR-01 regression: every normalize_*/1 helper that accepts a binary must
+    # reject unknown inputs WITHOUT interning the input string as an atom.
     poisons = %{
       normalize_outcome: "evil-outcome-#{System.unique_integer([:positive])}",
       normalize_short_circuit_reason: "evil-sc-#{System.unique_integer([:positive])}",
@@ -117,27 +137,64 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
       normalize_action_kind: "evil-act-#{System.unique_integer([:positive])}"
     }
 
-    before_count = :erlang.system_info(:atom_count)
-
     for {fun, poison} <- poisons do
       assert_raise ArgumentError, fn ->
         apply(RecoveryAction, fun, [poison])
       end
+
+      # Direct check: each poison string was NOT interned by the helper.
+      assert_raise ArgumentError, fn -> String.to_existing_atom(poison) end
     end
-
-    after_count = :erlang.system_info(:atom_count)
-
-    assert after_count == before_count,
-           "RecoveryAction normalize_*/1 helpers leaked #{after_count - before_count} atoms"
   end
 
-  test "shape_metadata silently drops unknown ref keys without leaking atoms" do
+  test "shape_metadata accepts refs: nil as no-op" do
+    # WR-01 regression: refs: nil must be treated as "no explicit refs"
+    # instead of crashing with FunctionClauseError.
+    shaped =
+      RecoveryAction.shape_metadata(:previewed, %{
+        capability_id: :retry_async_item,
+        incident_id: "inc-1",
+        refs: nil
+      })
+
+    assert shaped.refs == %{incident_ref: "inc-1"}
+  end
+
+  test "shape_metadata accepts refs as a keyword list" do
+    # WR-01 regression: keyword lists are idiomatic in Elixir telemetry
+    # metadata and must be coerced to a map cleanly.
+    shaped =
+      RecoveryAction.shape_metadata(:previewed, %{
+        capability_id: :retry_async_item,
+        refs: [step_ref: "step-9", incident_ref: "inc-2"]
+      })
+
+    assert shaped.refs == %{step_ref: "step-9", incident_ref: "inc-2"}
+  end
+
+  test "shape_metadata raises ArgumentError for non-map / non-keyword refs" do
+    # WR-01 regression: invalid refs shapes get an actionable diagnostic,
+    # not an opaque FunctionClauseError.
+    assert_raise ArgumentError, ~r/refs must be a map, keyword list, or nil/, fn ->
+      RecoveryAction.shape_metadata(:previewed, %{
+        capability_id: :retry_async_item,
+        refs: "step-9"
+      })
+    end
+
+    assert_raise ArgumentError, ~r/refs must be a map, keyword list, or nil/, fn ->
+      RecoveryAction.shape_metadata(:previewed, %{
+        capability_id: :retry_async_item,
+        refs: [1, 2, 3]
+      })
+    end
+  end
+
+  test "shape_metadata silently drops unknown ref keys without interning them as atoms" do
     # CR-01 regression for normalize_ref_key/1: explicit refs with unknown string
     # keys must be silently dropped (matching documented behavior) and MUST NOT
     # mint a fresh atom.
     poison_key = "evil-ref-key-#{System.unique_integer([:positive])}"
-
-    before_count = :erlang.system_info(:atom_count)
 
     shaped =
       RecoveryAction.shape_metadata(:previewed, %{
@@ -145,10 +202,10 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
         refs: %{poison_key => "should-be-dropped", "step_ref" => "step-9"}
       })
 
-    after_count = :erlang.system_info(:atom_count)
-
-    assert after_count == before_count,
-           "shape_metadata leaked atoms via unknown ref key: #{before_count} → #{after_count}"
+    # The unknown ref key was silently dropped, and is NOT now interned as an atom.
+    # If String.to_atom/1 were still in normalize_ref_key/1, the poison_key would
+    # exist as an atom and to_existing_atom would succeed.
+    assert_raise ArgumentError, fn -> String.to_existing_atom(poison_key) end
 
     # Known ref key (string form) is still accepted via to_existing_atom.
     assert shaped.refs == %{step_ref: "step-9"}

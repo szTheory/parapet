@@ -286,6 +286,29 @@ defmodule Parapet.Telemetry.RecoveryAction do
     end)
   end
 
+  # `refs: nil` is treated as "no explicit refs". Adopters that omit refs
+  # entirely already hit this path via `Map.get(metadata, :refs, %{})`, so
+  # accepting nil keeps shape_metadata polite for callers that explicitly
+  # pass refs: nil.
+  defp merge_explicit_refs(refs, nil), do: refs
+
+  # Keyword lists are idiomatic in Elixir telemetry metadata (e.g.
+  # `refs: [step_ref: "step-9"]`). Coerce to a map and recurse so the
+  # closed-vocabulary filter still applies.
+  defp merge_explicit_refs(refs, explicit_refs) when is_list(explicit_refs) do
+    if Keyword.keyword?(explicit_refs) do
+      merge_explicit_refs(refs, Map.new(explicit_refs))
+    else
+      raise ArgumentError,
+            "refs must be a map, keyword list, or nil; got: #{inspect(explicit_refs)}"
+    end
+  end
+
+  defp merge_explicit_refs(_refs, other) do
+    raise ArgumentError,
+          "refs must be a map, keyword list, or nil; got: #{inspect(other)}"
+  end
+
   defp normalize_ref_key(key) when is_atom(key), do: key
 
   defp normalize_ref_key(key) when is_binary(key) do
