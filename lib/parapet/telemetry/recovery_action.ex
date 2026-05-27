@@ -251,7 +251,18 @@ defmodule Parapet.Telemetry.RecoveryAction do
   end
 
   defp normalize_key(value) when is_atom(value), do: value
-  defp normalize_key(value) when is_binary(value), do: value |> String.trim() |> String.to_atom()
+
+  defp normalize_key(value) when is_binary(value) do
+    # Use to_existing_atom (NOT to_atom) to prevent atom-table exhaustion from
+    # adopter input. All legal vocabulary atoms (@outcomes, @short_circuit_reasons,
+    # @failure_classes, @actor_kinds, @action_kinds keys) are interned at module
+    # compile time. Unknown strings collapse to the :__unknown__ sentinel which
+    # then fails the Map.fetch lookup in normalize_enum/3 → raises the documented
+    # ArgumentError without minting a new atom.
+    String.to_existing_atom(String.trim(value))
+  rescue
+    ArgumentError -> :__unknown__
+  end
 
   defp extract_known_refs(metadata) do
     Enum.reduce(@known_ref_mappings, %{}, fn {source_key, ref_key}, refs ->
@@ -278,8 +289,13 @@ defmodule Parapet.Telemetry.RecoveryAction do
   defp normalize_ref_key(key) when is_atom(key), do: key
 
   defp normalize_ref_key(key) when is_binary(key) do
-    key
-    |> String.trim()
-    |> String.to_atom()
+    # Use to_existing_atom (NOT to_atom) to prevent atom-table exhaustion from
+    # adopter input. Unknown ref keys collapse to :__unknown__, which fails the
+    # `in @allowed_ref_keys` check in merge_explicit_refs/2 and is silently
+    # dropped — matching the documented "unknown keys are dropped" semantics
+    # without minting a new atom.
+    String.to_existing_atom(String.trim(key))
+  rescue
+    ArgumentError -> :__unknown__
   end
 end
