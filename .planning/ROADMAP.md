@@ -129,8 +129,8 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 
 **Plans**: 3 plans in 2 waves
 
-  - [ ] 24-01-PLAN.md — Behaviour module `Parapet.Recovery` at `lib/parapet/recovery.ex` (4 `@callback`s + minimal `__using__/1` + crash-proof `attach/1` with `Code.ensure_loaded?` skip + `{:ok, registered_ids}` return + verbatim Experimental admonition) (RCV-01, RCV-02) (Wave 1)
-  - [ ] 24-02-PLAN.md — Allowlist widening: append `:revert_feature_flag, :disable_metric_label` to `@valid_capabilities` in `lib/parapet/capabilities.ex` + add `Parapet.Recovery` row to `docs/stability.md` Experimental Modules table (alphabetical between `Parapet.MCP.PrometheusClient` and `Parapet.Telemetry.RecoveryAction`) (RCV-03) (Wave 1)
+  - [x] 24-01-PLAN.md — Behaviour module `Parapet.Recovery` at `lib/parapet/recovery.ex` (4 `@callback`s + minimal `__using__/1` + crash-proof `attach/1` with `Code.ensure_loaded?` skip + `{:ok, registered_ids}` return + verbatim Experimental admonition) (RCV-01, RCV-02) (Wave 1)
+  - [x] 24-02-PLAN.md — Allowlist widening: append `:revert_feature_flag, :disable_metric_label` to `@valid_capabilities` in `lib/parapet/capabilities.ex` + add `Parapet.Recovery` row to `docs/stability.md` Experimental Modules table (alphabetical between `Parapet.MCP.PrometheusClient` and `Parapet.Telemetry.RecoveryAction`) (RCV-03) (Wave 1)
   - [ ] 24-03-PLAN.md — `test/parapet/recovery_test.exs` sync sweep (all 4 success criteria via `attach/1` integration tests) + 100-async sweep parameterized cyclically over the 5 allowlisted atoms (Pitfall 13 avoidance) (RCV-01, RCV-02, RCV-03) (Wave 2 — depends on 24-01 + 24-02)
 
 ### Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX
@@ -219,7 +219,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 17. Recovery Depth — Runbook Templates | v0.10 | 3/3 | Complete | 2026-05-24 |
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete    | 2026-05-27 |
-| 24. Recovery Behaviour + Capability Allowlist | v1.1 | 0/3 | Planned | - |
+| 24. Recovery Behaviour + Capability Allowlist | v1.1 | 2/3 | In Progress|  |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
 | 27. Prebuilt Playbooks | v1.1 | 0/0 | Not started | - |
