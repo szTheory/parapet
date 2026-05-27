@@ -29,6 +29,8 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Started:** 2026-05-27. Seed thread: `.planning/threads/actionable-recovery-design.md`. Strategic context: `.planning/NEXT-STEP-ASSESSMENT.md`.
 
+**Progress:** Phase 23 (Foundations) complete 2026-05-27 — FND-01 (`lease_until` claim-lease column + `ClaimService` atomic self-heal, proven by automated migration-backfill + concurrency tests) and FND-02 (`Parapet.Telemetry.RecoveryAction` Experimental-tier event family + docs) shipped. Both decisions are irreversible-on-publish under the v1.0 freeze, so they land before any capability dispatch code. 366 tests / 0 failures.
+
 ## Previous Posture: Released Maintenance
 
 **Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
@@ -242,4 +244,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 — v1.0 Stable Release milestone defined*
+*Last updated: 2026-05-27 — Phase 23 (v1.1 foundations: FND-01 + FND-02) complete*
