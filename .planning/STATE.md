@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
-status: completed
+status: executing
 stopped_at: Phase 23 plans created (2 plans, Wave 1 parallel)
-last_updated: "2026-05-27T11:13:14.022Z"
-last_activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requirements mapped, 0 unmapped)
+last_updated: "2026-05-27T12:16:14.767Z"
+last_activity: 2026-05-27 -- Phase 23 execution started
 progress:
   total_phases: 5
   completed_phases: 3
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** v1.1 Actionable Recovery — close the operator-UI action loop with Preview → Confirm executable recovery actions.
+**Current focus:** Phase 23 — foundations-telemetry-contract-lease-until-migration
 
 ## Current Position
 
-Phase: 23 — Foundations — Telemetry Contract + `lease_until` Migration
-Plan: —
-Status: Roadmap complete; awaiting `/gsd:discuss-phase 23`
-Last activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requirements mapped, 0 unmapped)
+Phase: 23 (foundations-telemetry-contract-lease-until-migration) — EXECUTING
+Plan: 1 of 2
+Status: Executing Phase 23
+Last activity: 2026-05-27 -- Phase 23 execution started
 
 ## Performance Metrics
 

@@ -71,7 +71,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 
 **Milestone Goal:** Close the action loop the operator UI already implies. Turn runbook steps into executable, audited, host-registered recovery actions with a safe Preview → Confirm flow. Pure additive on the v1.0 frozen surface — most infrastructure already in `lib/`. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
 
-- [ ] **Phase 23: Foundations — Telemetry Contract + `lease_until` Migration** — Lock the v1.1 telemetry event family under Experimental tier and add the claim-lease column before any capability ships (FND-01, FND-02)
+- [x] **Phase 23: Foundations — Telemetry Contract + `lease_until` Migration** — Lock the v1.1 telemetry event family under Experimental tier and add the claim-lease column before any capability ships (FND-01, FND-02) (completed 2026-05-27)
 - [ ] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03)
 - [ ] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04)
 - [ ] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03)
@@ -188,8 +188,8 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 
 **Plans**: 2 plans in 1 wave (single coherent PR per D-17)
 
-  - [ ] 23-01-PLAN.md — Telemetry contract module `Parapet.Telemetry.RecoveryAction` (Experimental tier) + contract test + docs/telemetry.md Recovery Action section + docs/stability.md Experimental row (FND-02) (Wave 1)
-  - [ ] 23-02-PLAN.md — `lease_until` migration + schema field + `ClaimService` self-heal + `concurrency_bootstrap.ex` DDL update + expired-lease self-heal concurrency test (FND-01) (Wave 1)
+  - [x] 23-01-PLAN.md — Telemetry contract module `Parapet.Telemetry.RecoveryAction` (Experimental tier) + contract test + docs/telemetry.md Recovery Action section + docs/stability.md Experimental row (FND-02) (Wave 1)
+  - [x] 23-02-PLAN.md — `lease_until` migration + schema field + `ClaimService` self-heal + `concurrency_bootstrap.ex` DDL update + expired-lease self-heal concurrency test (FND-01) (Wave 1)
 
 ### Phase 24: Recovery Behaviour + Capability Allowlist
 
@@ -295,7 +295,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
 | 21. Runnable Demo App | v1.0 | 6/6 | Complete | 2026-05-26 |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 4/4 | Complete | 2026-05-26 |
-| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 0/2 | Not started | - |
+| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete   | 2026-05-27 |
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 0/0 | Not started | - |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
