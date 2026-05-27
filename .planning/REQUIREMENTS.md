@@ -1,116 +1,145 @@
-# Requirements: Parapet — v1.0 Stable Release
+# Requirements: Parapet — v1.1 Actionable Recovery
 
-**Defined:** 2026-05-25
+**Defined:** 2026-05-27
 **Core Value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Milestone posture:** Credibility/commitment milestone — freeze the public surface and make `~> 1.0` trustworthy. No new runtime feature surface. Research backing: `.planning/research/V1-*.md`.
+**Milestone posture:** Close the action loop the operator UI already implies. Turn runbook steps into executable, audited, host-registered recovery actions with a safe Preview → Confirm flow. Pure additive on the v1.0 frozen surface — most infrastructure already in `lib/`. Research backing: `.planning/research/SUMMARY.md`.
 
-## v1.0 Requirements
+## v1.1 Requirements
 
-Requirements for the 1.0 stable release. Each maps to exactly one roadmap phase (19–22).
+24 requirements across 8 categories. Each maps to exactly one roadmap phase. Continuing phase numbering from v1.0 (last phase = 22), so v1.1 starts at phase 23.
 
-### Stability Freeze (STAB)
+### Foundations (FND)
 
-- [x] **STAB-01**: Every public module (not `@moduledoc false`, not under `Parapet.Internal.*`) declares a stability tier — Stable or Experimental — via an ExDoc callout in its moduledoc, and every Stable public function carries `@doc since: "1.0.0"`.
-- [x] **STAB-02**: A written stability & deprecation policy (`docs/stability.md`) enumerates the public API surface, states the semver promise, defines what counts as a breaking vs. additive change, and specifies the deprecation cycle (soft `@doc deprecated:` → hard `@deprecated` for ≥1 minor → removal only at a major).
-- [x] **STAB-03**: The telemetry contract is documented as frozen — static `[:parapet, …]` event names, additive-only evolution of measurements/metadata, and an explicit "no configurable `:event_prefix`" rule — with a stability header on `docs/telemetry.md`.
-- [x] **STAB-04**: `mix verify.public_api` fails (non-zero exit) when any public module is missing a stability-tier declaration, making tier annotation mandatory for every future public surface.
-- [x] **STAB-05**: A telemetry contract test fails CI when the documented event families, measurement keys, metadata keys, or outcome-atom vocabularies drift from their fixtures.
-- [x] **STAB-06**: `Parapet.SLO.define/2` is hard-deprecated with a compile-time warning that names `Parapet.SLO.Provider` as the replacement.
+Schema + telemetry contract changes that must land BEFORE any capability dispatch code (lock-in cost is higher to change later).
 
-### OSS Governance (GOV)
+- [ ] **FND-01**: `parapet_action_claims` schema migration adds a `lease_until` column for claim lease/expiry; existing rows backfilled with a sensible default so no operator-claim ordering breaks.
+- [ ] **FND-02**: Telemetry contract for `[:parapet, :operator, :recovery_action, ...]` events is documented in `docs/telemetry.md` under the Experimental stability tier (separate from v1.0's frozen Stable telemetry); event names, measurement keys, and metadata keys are explicit.
 
-- [x] **GOV-01**: The repository ships a `CONTRIBUTING.md` covering local proof commands (`mix test`, `mix credo`, `mix dialyzer`), Conventional Commits + formatter expectations, and the PR flow.
-- [x] **GOV-02**: The repository ships a `SECURITY.md` documenting the vulnerability-disclosure process.
-- [x] **GOV-03**: Governance-doc packaging decision is explicit and stable for v1.0. `CODE_OF_CONDUCT.md` remains intentionally omitted per maintainer decision, and the Hex `files:` contract stays coherent with that omission.
-- [x] **GOV-04**: The README states the 1.0 semver commitment and a supported Elixir / OTP / Postgres version matrix.
-- [x] **GOV-05**: The new governance docs are included in the Hex `files:` whitelist so they ship with the published package.
+### Recovery Behaviour (RCV)
 
-### Documentation Completeness (DOCS)
+The host-app-facing capability registration API.
 
-- [x] **DOCS-01**: An adopter can activate Chimeway monitoring from a dedicated integration guide (prerequisites, what it unlocks, uniform activation line, config keys, troubleshooting).
-- [x] **DOCS-02**: An adopter can activate Mailglass monitoring from a dedicated integration guide (same shape).
-- [x] **DOCS-03**: An adopter can activate Rindle monitoring from a dedicated integration guide (same shape).
-- [x] **DOCS-04**: An adopter can activate Scoria monitoring from a dedicated integration guide (same shape).
-- [x] **DOCS-05**: The SLO authoring guide documents the Provider-as-bundle pattern (a `Parapet.SLO.Provider` returning multiple slices) so adopters compose multi-integration SLO sets without looking for a separate bundle abstraction.
-- [x] **DOCS-06**: HexDocs are organized for adopters — grouped extras (Getting Started / Guides / Integration Guides / Reference) with the getting-started guide as the landing page.
+- [ ] **RCV-01**: Host application can declare named recovery actions via a `Parapet.Recovery` behaviour mirroring `Parapet.Integration` (callbacks: `id/0`, `label/0`, `preview/2`, `execute/2`); written code follows the proven uniform-activation idiom.
+- [ ] **RCV-02**: `Parapet.Recovery.attach/1` is uniform and crash-proof — silently skips unloaded host modules via `Code.ensure_loaded?/1` so optional capabilities compile out cleanly when their host deps aren't present.
+- [ ] **RCV-03**: `Parapet.Capabilities` allowlist widened from 3 to 5 atoms (adds `:revert_feature_flag`, `:disable_metric_label`); other capability ids attempted at attach time are rejected with a clear error.
 
-### Runnable Demo App (DEMO)
+### Preview → Confirm Flow (UI)
 
-- [x] **DEMO-01**: A runnable demo Phoenix app under `examples/demo_app/` (path dep on parapet) starts with `mix setup && mix phx.server` and serves the Operator UI at `/parapet`.
-- [x] **DEMO-02**: The demo is seeded with realistic evidence — incidents in open/investigating/resolved states, timeline entries, a tool audit, a runbook with a `warning:` step, and registered WebSaaS SLO state — so the Operator UI is populated on first run.
-- [x] **DEMO-03**: A demo smoke test asserts the Operator UI responds `200` and at least one seeded incident exists, and runs as a required CI gate (in `release_gate`, never `continue-on-error`).
-- [x] **DEMO-04**: The demo app is excluded from the published Hex package (verified via `mix hex.build` dry run) and is linked from the getting-started guide.
+The operator-facing experience.
 
-### Release Readiness & 1.0 Cut (REL)
+- [ ] **UI-01**: Operator clicks "Preview" on a runbook step → sees action name, target args, blast-radius indicator, and expected diff in a dedicated panel before any execution.
+- [ ] **UI-02**: Operator's Confirm click routes execution through `Parapet.Operator.ActionPayload` + `Parapet.Automation.ClaimService.claim_action/1` (closes the existing defect where operator-clicked path skipped the claim service that the Oban auto-execution path uses).
+- [ ] **UI-03**: Preview tokens have a 5-minute expiry; stale previews are detected via `target_refs` hash and rejected with a clear error message; expired tokens prompt the operator to re-Preview.
+- [ ] **UI-04**: Confirm returns `{:short_circuited, reason}` if circuit breaker open or incident state changed since Preview, and `{:conflicted, claim_id}` if another operator holds the claim; the LiveView renders both branches with operator-actionable next steps.
 
-- [x] **REL-01**: CI enforces `compile --warnings-as-errors`, `compile --no-optional-deps --warnings-as-errors`, and `docs --warnings-as-errors` in the lint lane.
-- [x] **REL-02**: `release-please.yml` publishes to Hex.pm on a created release (`hex.publish --dry-run` → `hex.publish --yes` → post-publish verification).
-- [x] **REL-03**: A documented, proportionate pre-release verification gate (`verify.public_api`, `test`, `credo --strict`, `dialyzer`, no-optional-deps compile, one manual cold-start walkthrough) passes before the 1.0 cut — no security or performance audit.
-- [x] **REL-04**: Parapet is released as `1.0.0` via Release-Please (0.10.0 merged → `release-as` pin removed → `1.0.0` pinned and cut → pin plus the pre-1.0 `bump-*-pre-major` flags removed) and resolves at `hexdocs.pm/parapet/1.0.0/`.
+### Audit Propagation (AUD)
+
+Evidence trail for every action.
+
+- [ ] **AUD-01**: Every successful recovery action emits a `TimelineEntry` (`type: :recovery_confirmed`) linked to the incident, capturing operator identity, action name, args, outcome, and timestamps.
+- [ ] **AUD-02**: Every successful recovery action emits a `ToolAudit` row with the same evidence — operator identity, action name, args, outcome, timestamps — so the durable spine records what was done by whom.
+- [ ] **AUD-03**: `:recovery_failed` TimelineEntry type is added and emitted on capability execution error (distinct from short-circuit / conflict states, which emit no entry because nothing was executed).
+
+### Prebuilt Playbooks (PB)
+
+Six runbooks shipping with v1.1, matching JTBD-MAP failure modes.
+
+- [ ] **PB-01**: Retry Storm runbook ships as guidance-only by design (no capability binding) — every obvious mitigation worsens the failure; the template includes an explicit warning explaining why.
+- [ ] **PB-02**: Suppression Drift runbook ships as guidance-only by design (no capability binding) — same architectural rationale documented inline.
+- [ ] **PB-03**: Stalled Async runbook ships with a capability-backed step via the existing `:retry_async_item` allowlist id; demo scenario validates Preview → Confirm against a seeded stalled job.
+- [ ] **PB-04**: Dead-Letter Drain runbook ships with a capability-backed step via the existing `:requeue_dead_letter` allowlist id; demo scenario validates Preview → Confirm against seeded DLQ entries.
+- [ ] **PB-05**: Deploy-Tied Incident runbook ships with a capability-backed step via the new `:revert_feature_flag` capability id; example host implementation uses Rulestead as the canonical wiring target.
+- [ ] **PB-06**: Cardinality Blowout runbook ships with a capability-backed step via the new `:disable_metric_label` capability id; example host implementation references the existing cardinality analyzer surface.
+
+### Demo Seed (DEMO)
+
+Demo app proves the loop end-to-end.
+
+- [ ] **DEMO-05**: Demo app (`examples/demo_app/`) is seeded with at least one capability-backed incident that exposes a Preview-able + Confirm-able action via the generated operator UI; the seed runs as part of `mix setup` so fresh clones demonstrate the loop on first open.
+- [ ] **DEMO-06**: CI demo lane exercises four scenarios on the demo: happy-path Confirm, Preview-token-expired retry, short-circuit on resolved incident, and claim-conflict between two simulated operators; failures break the build.
+
+### Stability (STAB)
+
+The v1.1 surface joins the v1.0 contract.
+
+- [ ] **STAB-07**: `Parapet.Recovery` behaviour and its 4 callbacks are declared Stable in `docs/stability.md`; CHANGELOG migration notes warn adopters who pattern-match `Parapet.Operator.confirm_runbook_step/4` return values that the new error tuple variants (`:short_circuited`, `:conflicted`) are additive and will not be removed in 1.x.
+
+### Adopter Onboarding (ADOP)
+
+The "shipped ≠ adopted" prevention.
+
+- [ ] **ADOP-01**: `mix parapet.gen.recovery <NAME>` Igniter task scaffolds a new host-application recovery module with the four required callbacks and a docstring template; flag-based, not interactive (matches the SLO-W1 idiom planned for v1.2).
+- [ ] **ADOP-02**: `mix parapet.doctor` reports a recovery-action adoption signal — count of attached capabilities, warnings for runbook steps that reference capabilities not in the registry, and per-capability check that the host module is loaded and has the expected callbacks.
+- [ ] **ADOP-03**: `docs/recovery-actions.md` adopter guide explains capability authoring, Preview/Confirm UX, error semantics, and four worked examples (one per capability-backed playbook); cross-linked from the existing operator-ui.md and getting-started.md.
 
 ## Future Requirements
 
-Acknowledged but deferred beyond v1.0. Not in the current roadmap.
+Deferred to v1.2+ — not in v1.1 scope:
 
-### SLO Authoring (SLO)
-
-- **SLO-W1** (v1.1): `mix parapet.gen.slo` as a *flag-based Igniter task* (not an interactive wizard) that renders a host-owned `Parapet.SLO.Provider` module from flags, shows a diff, is dry-runnable/composable, and chains `parapet.gen.prometheus`.
-
-### CI & Polish
-
-- **CI-M1** (v1.1): multi-version Elixir/OTP CI test matrix.
-- **CI-S1** (post-1.0): SHA-pin CI actions for supply-chain hardening.
-- **DX-1** (post-1.0): HexDocs logo/favicon.
-- **MAINT-1** (post-1.0): `MAINTAINING.md` maintainer runbook.
-- **DEMO-X** (post-1.0): demo Docker Compose convenience + golden-installer diff test against `mix parapet.install` output.
+- **Move `Parapet.SLO` registry off `Application` env** — graduation from the v1.0.1 grafana-test bandage. See `.planning/threads/slo-state-off-application-env.md`. Lands FIRST in v1.2 so SLO-W1 inherits clean state. (The new `Parapet.Recovery` registry uses the existing `Parapet.Capabilities` Agent, NOT `Application.put_env`, so v1.1 doesn't repeat the mistake.)
+- **`mix parapet.gen.slo`** — flag-based Igniter task. Design decision settled in `prompts/V1-SLO-WIZARD-BUNDLES.md`. v1.2.
+- **Elixir/OTP CI matrix + Dependabot + SHA-pinned actions + `MAINTAINING.md`** — supply-chain hardening. v1.2.
+- **Conventional-commit taxonomy codified in `CONTRIBUTING.md` + PR template + path-based branch protection rulesets.** v1.2.
+- **v0.x → v1.0 migration guide + deployment guide.** v1.2.
+- **MCP Preview surface (read-only) for recovery actions.** Stability-tier mismatch with the rest of MCP; defer until MCP graduates to Stable. v1.3+.
+- **Per-capability cooldown / breaker scope (vs the system-scoped breaker today).** Defer; current scope works for v1.1. v1.2.
+- **Responder model, handoff, on-call rotation hooks (PagerDuty/Opsgenie).** Team Workflow & Coordination, JTBD #2. v1.3.
+- **Multi-app journey correlation + vertical starter packs.** JTBD #4. v1.4+.
 
 ## Out of Scope
 
-Explicitly excluded. Documented to prevent scope creep.
+Explicitly excluded from v1.1 to prevent scope creep. Documented so future sessions can't relitigate.
 
 | Feature | Reason |
 |---------|--------|
-| SLO-B1 formal `Parapet.SLO.Bundle` abstraction | Superseded — a `Parapet.SLO.Provider` returning multiple slices already is the bundle (`DeliverySaaS` proves it). A macro saving ~5 lines would freeze a premature abstraction whose right shape depends on future Grafana grouping. Documented as a pattern instead (DOCS-05). |
-| Interactive (prompt-driven) generator wizard | Non-idiomatic — Igniter has no interactive-prompt API; a prompt-driven `Mix.Task` loses dry-run/composability and breaks DX consistency with `mix parapet.install`. The flag-based form is the v1.1 plan (SLO-W1). |
-| Full security / performance re-audit | Maintainer chose freeze depth = stability tiers + deprecation policy, not a full hardening pass. A proportionate verify gate (REL-03) is used instead. |
-| New runtime features / new integrations | v1.0 is a freeze and credibility milestone, not a feature vehicle (the Oban-1.0 model). |
+| Autonomous (no-human) recovery action execution | Operator-in-the-loop is the safety posture parapet sells. Auto-execution-via-Oban exists for *escalation policies* (which are configured ahead of time), not ad-hoc operator-initiated actions. Servers reject `ActionPayload` records whose `actor` field starts with `system:` on the human-Confirm path. |
+| Cross-app journey correlation | parapet stays single-app for v1.1. Multi-app correlation is JTBD #4, parked for v1.4+. v1.1 design must not lock in single-app-only schema decisions, but also must not implement multi-app. |
+| Multi-tenant action scoping (per-customer / per-org) | Single-tenant SaaS focus for v1.1. Deferred to v1.4+ alongside multi-tenant SLO scoping. v1.1 must not add `tenant_id` columns. |
+| Capability dispatch via Oban for long-running actions | All v1.1 capabilities execute synchronously inside the LiveView Confirm handler. If a capability needs to run async, that's a future capability flag, not a v1.1 surface. Defer until a real long-running playbook appears. |
+| Capability marketplaces / capability discovery from Hex | parapet is host-owned. Capabilities are declared in the host app, attached at boot, and registered into `Parapet.Capabilities`. No remote registry. |
+| `Parapet.SLO.Provider` redesign or removal of `Parapet.SLO.define/2` | v1.0 already hard-deprecated `define/2`. Removal happens at v2.0. v1.1 does not touch the SLO surface. |
+
+## Previously Validated
+
+The v1.0 requirements (25 total: STAB-01 through STAB-06, GOV-01 through GOV-05, DOCS-01 through DOCS-06, DEMO-01 through DEMO-04, REL-01 through REL-04) shipped in milestone v1.0 on 2026-05-26. All marked complete; see git history under phases 19–22 and `.planning/MILESTONES.md` for the validation record. v1.1 numbering continues from there (DEMO continues at DEMO-05; STAB continues at STAB-07).
 
 ## Traceability
 
+Filled by the roadmapper once phases are mapped.
+
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAB-01 | Phase 19 | Complete |
-| STAB-02 | Phase 19 | Complete |
-| STAB-03 | Phase 19 | Complete |
-| STAB-04 | Phase 19 | Complete |
-| STAB-05 | Phase 19 | Complete |
-| STAB-06 | Phase 19 | Complete |
-| GOV-01 | Phase 20 | Complete |
-| GOV-02 | Phase 20 | Complete |
-| GOV-03 | Phase 20 | Complete |
-| GOV-04 | Phase 20 | Complete |
-| GOV-05 | Phase 20 | Complete |
-| DOCS-01 | Phase 20 | Complete |
-| DOCS-02 | Phase 20 | Complete |
-| DOCS-03 | Phase 20 | Complete |
-| DOCS-04 | Phase 20 | Complete |
-| DOCS-05 | Phase 20 | Complete |
-| DOCS-06 | Phase 20 | Complete |
-| DEMO-01 | Phase 21 | Complete |
-| DEMO-02 | Phase 21 | Complete |
-| DEMO-03 | Phase 21 | Complete |
-| DEMO-04 | Phase 21 | Complete |
-| REL-01 | Phase 22 | Complete |
-| REL-02 | Phase 22 | Complete |
-| REL-03 | Phase 22 | Complete |
-| REL-04 | Phase 22 | Complete |
+| FND-01 | — | Pending |
+| FND-02 | — | Pending |
+| RCV-01 | — | Pending |
+| RCV-02 | — | Pending |
+| RCV-03 | — | Pending |
+| UI-01 | — | Pending |
+| UI-02 | — | Pending |
+| UI-03 | — | Pending |
+| UI-04 | — | Pending |
+| AUD-01 | — | Pending |
+| AUD-02 | — | Pending |
+| AUD-03 | — | Pending |
+| PB-01 | — | Pending |
+| PB-02 | — | Pending |
+| PB-03 | — | Pending |
+| PB-04 | — | Pending |
+| PB-05 | — | Pending |
+| PB-06 | — | Pending |
+| DEMO-05 | — | Pending |
+| DEMO-06 | — | Pending |
+| STAB-07 | — | Pending |
+| ADOP-01 | — | Pending |
+| ADOP-02 | — | Pending |
+| ADOP-03 | — | Pending |
 
 **Coverage:**
 
-- v1.0 requirements: 25 total
-- Mapped to phases: 25
-- Unmapped: 0 ✓
+- v1.1 requirements: 24 total
+- Mapped to phases: 0 (roadmapper fills)
+- Unmapped: 24
 
 ---
-*Requirements defined: 2026-05-25*
-*Last updated: 2026-05-26 — v1.0 shipped; release-train posture now defaults to stable `main`*
+*Requirements defined: 2026-05-27*
+*Last updated: 2026-05-27 — v1.1 Actionable Recovery milestone opened*
