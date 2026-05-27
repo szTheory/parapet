@@ -71,24 +71,49 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
       )
 
     on_exit(fn ->
-      # Tear down: restore the DB to a clean state for subsequent test runs.
+      # Tear down: restore the DB to the canonical post-bootstrap state so
+      # subsequent test modules see the same schema ConcurrencyBootstrap
+      # declared at suite start (see test/support/concurrency_bootstrap.ex).
+      #
+      # ConcurrencyBootstrap.bootstrap!/0 only runs once (at test_helper.exs
+      # startup), so we can't just drop the column and rely on a re-bootstrap.
+      # Instead, mirror the canonical DDL exactly: NOT NULL column + partial
+      # index. This makes teardown self-contained and idempotent regardless
+      # of which step of the test left the column in.
 
-      # Remove this migration's schema_migrations record.
+      # WR-06: remove only this migration's row, not the whole schema_migrations
+      # table. The row-level DELETE is idempotent and sufficient for cleanup;
+      # DROP TABLE would be needlessly broad and would couple this teardown
+      # to the assumption that no other test in the suite uses schema_migrations.
       Postgrex.query!(conn, "DELETE FROM schema_migrations WHERE version = $1", [
         @migration_version
       ])
 
-      # Re-add the lease_until column if the test left it dropped.
+      # WR-05: restore lease_until to match the canonical bootstrap DDL
+      # (NOT NULL, with the partial index). The migration under test may have
+      # left the column either dropped (if the test failed before step 4), or
+      # present-and-NOT-NULL (if the migration ran fully), or present-and-NULLABLE
+      # (if the migration's intermediate state was observed). Handle all three:
+      #
+      # 1. ADD COLUMN IF NOT EXISTS — covers the dropped case.
+      # 2. Backfill any NULL rows — required before we can set NOT NULL.
+      # 3. SET NOT NULL — restore canonical bootstrap declaration; idempotent
+      #    when the column is already NOT NULL.
       Postgrex.query!(
         conn,
         "ALTER TABLE parapet_action_claims ADD COLUMN IF NOT EXISTS lease_until timestamp(6) without time zone",
         []
       )
 
-      # Backfill any rows missing lease_until (safety for the NOT NULL restoration).
       Postgrex.query!(
         conn,
         "UPDATE parapet_action_claims SET lease_until = claimed_at + INTERVAL '5 minutes' WHERE lease_until IS NULL",
+        []
+      )
+
+      Postgrex.query!(
+        conn,
+        "ALTER TABLE parapet_action_claims ALTER COLUMN lease_until SET NOT NULL",
         []
       )
 
@@ -111,9 +136,6 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
         "DELETE FROM parapet_incidents WHERE title = 'migration-backfill-verify'",
         []
       )
-
-      # Clean up schema_migrations table (kept pristine across runs).
-      Postgrex.query!(conn, "DROP TABLE IF EXISTS schema_migrations", [])
 
       GenServer.stop(conn)
     end)
