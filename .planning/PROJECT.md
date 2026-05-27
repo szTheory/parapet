@@ -16,7 +16,20 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Next:** Quiet stable-line maintenance by default. The 2026-05-27 strategic assessment (`.planning/NEXT-STEP-ASSESSMENT.md`) identified Actionable Recovery as the highest-leverage v1.1 wedge: wire the operator UI to actually execute runbook steps (Preview → Confirm) with 4–6 prebuilt recovery playbooks, audit propagation, and a demo seed that proves the loop. SLO-W1, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement move to v1.2 (Authoring DX & Maturity). Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+. None of these activate until a concrete PR-shaped slice opens.
 
-## Current Posture: Released Maintenance
+## Current Milestone: v1.1 Actionable Recovery
+
+**Goal:** Close the action loop in the operator UI — turn runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
+
+**Target features:**
+- Runbook capability-registration API (Behaviour-based, mirrors `Parapet.Integration`) so host apps declare named recovery actions parapet can dispatch
+- Operator UI Guidance → Preview → Confirm flow (no auto-execution; Confirm wraps in `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free)
+- 4–6 prebuilt recovery playbooks for JTBD-MAP failure modes: retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout
+- Audit propagation — every action emits a `TimelineEntry` (`type: :recovery_action`) + `ToolAudit` row
+- Demo seed — fresh demo app shows at least one runbook with a Preview-able + Confirm-able action wired up
+
+**Started:** 2026-05-27. Seed thread: `.planning/threads/actionable-recovery-design.md`. Strategic context: `.planning/NEXT-STEP-ASSESSMENT.md`.
+
+## Previous Posture: Released Maintenance
 
 **Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
 

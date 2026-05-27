@@ -1,15 +1,12 @@
 ---
 gsd_state_version: 1.0
-milestone: none
-milestone_name: Released Maintenance
-status: quiet
-stopped_at: v1.0 closed; no concrete feature slice is open
-last_updated: "2026-05-27T08:25:00.000Z"
-last_activity: |
-  2026-05-27 -- post-1.0 strategic assessment landed; v1.1 target retargeted from SLO-W1 to Actionable Recovery (see .planning/NEXT-STEP-ASSESSMENT.md); SLO-W1 + CI matrix + supply-chain hardening deferred to v1.2; two threads opened (actionable-recovery-design, release-gate-enforcement); first phase LEARNINGS file written (22-LEARNINGS.md).
-  2026-05-27 -- shifted left to true CI/CD: required reviews → 0 (locked into user memory as solo-OSS decision), allow_auto_merge → true, release-please workflow auto-merges its PRs and dispatches CI on the release branch via workflow_dispatch (escape hatch from GITHUB_TOKEN cycle-prevention). v1.0.1 cut as the first auto-merged release; v1.1 (Actionable Recovery) will be the first feature-driven cut to ride the chain.
+milestone: v1.1
+milestone_name: Actionable Recovery
+status: planning
+last_updated: "2026-05-27T09:51:16.529Z"
+last_activity: 2026-05-27
 progress:
-  total_phases: 0
+  total_phases: 7
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -20,25 +17,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-26 — v1.0 shipped; quiet stable-line mode active)
+See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** released maintenance on a stable release line
+**Current focus:** v1.1 Actionable Recovery — close the operator-UI action loop with Preview → Confirm executable recovery actions.
 
 ## Current Position
 
-Milestone: none — QUIET
-Default branch posture: `main` is stable and releasable by default
-Status: if `release_gate` is green and release truth is coherent, the default answer is that there is nothing to do
-Last activity: 2026-05-26 -- quiet-default release-train policy codified; feature work now requires a concrete PR-shaped slice
-
-Progress: [░░░░░░░░░░] 0%
+Phase: 23 — Foundations — Telemetry Contract + `lease_until` Migration
+Plan: —
+Status: Roadmap complete; awaiting `/gsd:discuss-phase 23`
+Last activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requirements mapped, 0 unmapped)
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0 (no active milestone)
+- Total plans completed: 0 (v1.1 starting)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -46,7 +41,13 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| No active slice | — | — | — |
+| Phase 23 | 0 | — | — |
+| Phase 24 | 0 | — | — |
+| Phase 25 | 0 | — | — |
+| Phase 26 | 0 | — | — |
+| Phase 27 | 0 | — | — |
+| Phase 28 | 0 | — | — |
+| Phase 29 | 0 | — | — |
 
 **Recent Trend:**
 
@@ -54,11 +55,6 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: —
 
 *Updated after each plan completion*
-| Phase 19 P02 | 5 | 2 tasks | 2 files |
-| Phase 19 P04 | 19 | 3 tasks | 59 files |
-| Phase 20 P02 | 1 | 1 tasks | 1 files |
-| Phase 20 P03 | 2 | 2 tasks | 4 files |
-| Phase 20 P05 | 9 | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -67,17 +63,14 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- v1.0 scope: Freeze depth = stability tiers + deprecation policy (not a full hardening pass). Proportionate verification gate (REL-03) replaces a security/perf audit.
-- Demo in v1.0: Demo app confirmed in-scope as a CI contract test for the frozen surface (not deferred to v1.1).
-- SLO-B1 dropped: `Parapet.SLO.Provider` returning multiple slices is the bundle abstraction; documented as a pattern (DOCS-05) instead of a separate abstraction.
-- After `v1.0.0`, `main` is treated as the stable release line: green `release_gate`, repo hygiene, and coherent Release Please truth are the default merge posture.
-- Patch/minor releases continue through Release Please PRs on `main`; do not auto-publish on every merge.
-- Quiet-default rule: if `main` is green and there is no concrete release-affecting work, remain silent and do not invent milestone motion.
-- Serious feature work is PR-only and should open as an explicit scoped slice before it becomes active milestone work.
-- [Phase ?]: Integration guides follow sigra.md template with content verified against .ex source files
-- [Phase ?]: Content verified against .ex source
-- [Phase ?]: Explicit file lists for Getting Started, Guides, Reference groups; regex only for Integration Guides — prevents capture overlap Pitfall 6
-- [Phase ?]: CODE_OF_CONDUCT* glob in Hex files: whitelist; file dropped per 20-01 user decision — glob is harmless without the file (GOV-03 not required)
+- v1.1 scope: operator-in-the-loop execution only. Out of scope: autonomous remediation, cross-app correlation, multi-tenant action scoping.
+- v1.1 is a wiring milestone, not a redesign: every load-bearing primitive (`Parapet.Capabilities`, `Parapet.Operator.preview/confirm_runbook_step`, `ActionPayload`, `ClaimService`, `CircuitBreaker`, `Parapet.Runbook` DSL) already ships in v1.0.
+- Zero new runtime or dev dependencies. Zero `mix.lock` churn.
+- Phase 23 lands FIRST because telemetry naming + schema columns become irreversible under the v1.0 stability freeze the moment they ship.
+- `Parapet.Recovery` registry uses the existing `Parapet.Capabilities` Agent (NOT `Application.put_env`) to avoid repeating the v0.10 `Parapet.SLO` mistake (Pitfall 13 in research).
+- Two of six prebuilt playbooks (Retry Storm, Suppression Drift) stay guidance-only by design — every obvious automated mitigation worsens the failure (continues v0.10 "guidance-only runbooks where no allowlisted capability fits" decision).
+- `Parapet.Recovery` ships Stable-tier from day one in Phase 29; the 4-callback shape is frozen because adding required callbacks in v1.2 would be breaking under the v1.0 stability promise.
+- Operator-clicked Confirm path is the v1.1 architectural defect closure: today it skips `ClaimService` while the Oban auto-execution path goes through it. Phase 25 closes the gap.
 
 ### Pending Todos
 
@@ -85,24 +78,24 @@ None.
 
 ### Blockers/Concerns
 
-- None for the shipped `v1.0.0` line. The release outcome is settled: `v0.10.0` and `v1.0.0` exist, GitHub/Hex/HexDocs resolve, and the one-time `1.0.0` pin has already been removed. New work should assume `main` stays releasable and should avoid one-off release config drift unless staging a deliberate version cut.
+None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 phases. Research confidence is HIGH (`.planning/research/SUMMARY.md`).
 
 ## Candidate Work
 
 | Category | Item | Target | Status | Notes |
 |----------|------|--------|--------|-------|
-| Operator UI | v1.1 Actionable Recovery (Preview/Confirm flow + 4–6 playbooks + audit propagation) | v1.1 | candidate | Highest-leverage next milestone per 2026-05-27 strategic assessment; see `.planning/threads/actionable-recovery-design.md` |
 | SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | deferred from v1.1 | Design resolved; build it after recovery loop closes |
+| Architecture | Move `Parapet.SLO` state off `Application` env (registry refactor; lands before SLO-W1) | v1.2 | candidate | See `.planning/threads/slo-state-off-application-env.md` |
 | CI | Multi-version Elixir/OTP CI matrix | v1.2 | candidate | Maturity signal |
-| Supply chain | SHA-pinned actions, Dependabot config (currently missing), `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` for bypass-closure work |
-| Architecture | Move `Parapet.SLO` state off of `Application` env (registry refactor; preempts SLO-W1) | v1.2 | candidate | See `.planning/threads/slo-state-off-application-env.md` — graduation candidate from the 2026-05-27 grafana_test fix; high priority per maintainer signal |
+| Supply chain | SHA-pinned actions, Dependabot config, `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` |
 | Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | candidate | Adopter-facing trust work |
+| Recovery extensions | MCP Preview surface (read-only) for recovery actions; per-capability cooldown rules; adapter-provided capabilities (Rulestead → `:revert_feature_flag`) | v1.2/v1.3 | deferred from v1.1 | Defer until MCP graduates from Experimental |
 | Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
 | Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |
 
 ## Session Continuity
 
-Last session: 2026-05-27T07:00:00.000Z
-Stopped at: post-1.0 strategic assessment landed; v1.1 target = Actionable Recovery (candidate); quiet stable-line mode still active until user opens the milestone
-Resume file: .planning/NEXT-STEP-ASSESSMENT.md
-Next step: Stay quiet by default. When the user is ready to open v1.1, the seed lives in `.planning/threads/actionable-recovery-design.md` — kick off via `/gsd:new-milestone` or `/gsd:discuss-phase` from there. Concurrent threads (e.g., `release-gate-enforcement` for v1.2) should not auto-promote.
+Last session: 2026-05-27T09:51:16.529Z
+Stopped at: v1.1 roadmap landed (Phases 23–29, 24/24 requirements mapped). STATE.md updated to point at Phase 23.
+Resume file: .planning/ROADMAP.md
+Next step: `/gsd:discuss-phase 23` to begin planning Foundations (telemetry contract lock + `lease_until` schema migration).

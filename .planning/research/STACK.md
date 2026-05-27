@@ -1,390 +1,262 @@
 # Stack Research
 
-**Domain:** Elixir/Phoenix OSS SRE Library — v0.10 Adopter Success
-**Researched:** 2026-05-23
-**Confidence:** HIGH (all critical decisions verified against official sources or live repo state)
+**Project:** parapet v1.1 — Actionable Recovery (executable runbook recovery actions)
+**Researched:** 2026-05-27
+**Confidence:** HIGH (verified directly against live repo state in `lib/parapet/**` and `mix.exs`)
+**Mode:** Subsequent-milestone STACK (deltas only; v1.0 stack already validated)
 
----
+## TL;DR — Honest Answer
 
-## Scope
+**No new runtime dependencies. No new dev/test dependencies. No version bumps required.**
 
-This document covers only the tooling and configuration additions needed for v0.10's three
-pillars: runnable demo harness, docs/packaging, and SLO authoring guidance. It does not
-re-research anything already built through v0.9.
+v1.1 Actionable Recovery is **pure additive code on the existing surface**. Every load-bearing primitive the milestone needs already shipped in v0.7 / v0.8 / v1.0:
 
----
+- A capability registry (`Parapet.Capabilities`) with a closed atom whitelist exists.
+- A Preview -> Confirm operator API (`Parapet.Operator.preview_runbook_step/3` and `confirm_runbook_step/4`) exists, complete with `preview_token` + 5-minute expiry, target-ref capture, and stale-preview rejection.
+- The `ActionPayload` audit envelope exists and already enforces `idempotency_key` on `:execute_mitigation`.
+- Multi-node-safe claim + circuit-breaker exists (`Parapet.Automation.{ClaimService, CircuitBreaker}`).
+- The runbook DSL already supports `:capability`, `:requires_preview`, `:preview_only`, `:warning`, and `:guidance` keys.
+- The `WorkbenchContract` already projects `runbook_steps` with `state: :previewable | :executable | :guidance | :executed`, surfaces `active_preview`, and writes `recovery_preview` / `recovery_confirmed` timeline entries through the existing `Evidence.run_operator_command/1` transaction seam.
+- `TimelineEntry.type` is a free-form string, so `recovery_action` (or the already-used `recovery_preview` / `recovery_confirmed`) propagates without schema work.
 
-## Pillar A: Runnable Demo Harness
+What v1.1 actually adds is **wiring + content**, not stack:
 
-### Decision: Docker Compose + checked-in example Phoenix app
+1. A tiny `Parapet.Recovery` Behaviour shim (mirrors `Parapet.Integration`) that compiles down to calls into the existing `Parapet.Capabilities.register_recovery/2` registry.
+2. Generated LiveView Preview -> Confirm UX wired to the operator API methods that already exist.
+3. The 4-6 prebuilt playbooks as runbook modules under `lib/parapet/runbooks/` (host-overridable) — pure runbook DSL + capability dispatch, no new libs.
+4. Demo seed update — adds one runbook with a Preview-able + Confirm-able step plus a `MyApp.Recovery` host capability module.
 
-**Recommended approach:** a `demo/` directory at the repository root containing a minimal
-Phoenix app (`demo/app/`) plus a Docker Compose file (`demo/docker-compose.yml`) that
-brings up Prometheus, Grafana, and the demo app together.
+**Roadmap implication:** v1.1 does not need a "deps" phase. Phase 1 can be `Parapet.Recovery` behaviour + capability whitelist expansion. No `mix.lock` churn, no Hex resolution risk, no supply-chain review.
 
-**Why not a standalone checked-in example app without Docker Compose:**
-A raw Phoenix app in `example/` with no infrastructure harness shifts the setup burden
-to the adopter. They still have to wire Prometheus and Grafana themselves, which is
-exactly the friction the demo is meant to remove. Real adopters evaluating an SRE library
-need to see the full loop (metrics → alert → incident → runbook) fire end-to-end, not
-just compile and guess.
+## Recommended Stack (no change from v1.0)
 
-**Why not Livebook (`.livemd`):**
-Livebook requires adopters to run Livebook alongside their app, configure distributed
-Erlang/cookies for the attached-node runtime, and still have no Prometheus or Grafana
-running. That is three separate infrastructure concerns before the first metric appears.
-A `.livemd` is well-suited for interactive exploration of a running system (Fly.io,
-Bumblebee demos, etc.) but is the wrong medium for "prove the SRE loop works end-to-end
-for a stranger." It also cannot substitute for the demo harness because the SLO burn rate
-story requires a live TSDB.
+### Core Framework
 
-**Why Docker Compose wins for this domain:**
-- Single command (`docker compose up`) gives adopters Prometheus (scraping the app),
-  Grafana (pre-provisioned dashboards), and the demo Phoenix app in one shot
-- prom_ex (the closest Elixir analogue) ships an `example_applications/shared_docker/`
-  directory with exactly this pattern — it is the de facto Elixir observability demo idiom
-- Docker Compose is universally available to any engineer evaluating an Elixir library and
-  requires no Erlang distribution knowledge
-- Rot risk is lowest here: the Compose file pins image versions; the demo app pins Parapet
-  via a local path reference (`{:parapet, path: "../../"}`), so it exercises the real lib
-  and not a stale Hex snapshot
-- Grafana Alertmanager tutorial and PromEx both use this exact pattern for demo harnesses
+| Technology | Version (mix.exs) | Purpose | Why kept |
+|------------|-------------------|---------|----------|
+| Elixir | `~> 1.19` | Language | Frozen v1.0 baseline |
+| OTP | 27.x | Runtime | Frozen v1.0 baseline |
+| `ecto` | `~> 3.10` | Schema + changeset (ActionPayload, TimelineEntry, ToolAudit) | Already drives recovery_preview/confirmed writes |
+| `ecto_sql` | `~> 3.10` | PostgreSQL adapter; transaction seam for `Evidence.run_operator_command/1` | Already drives multi-node claim + circuit-breaker queries |
+| `postgrex` | `~> 0.20` | Postgres driver | Frozen |
+| `phoenix_live_view` | (host app, not in parapet's mix.exs) | Operator Preview -> Confirm UI surface | Already generated by `mix parapet.gen.ui` |
+| `telemetry` | `~> 1.2` | Recovery action emission | Frozen |
+| `telemetry_metrics` | `~> 1.0` | Aggregation | Frozen |
 
-**Directory layout:**
+### Optional Dependencies (already declared, unchanged)
 
-```
-demo/
-  app/                  # Minimal Phoenix app (mix.exs, lib/, config/, priv/)
-    mix.exs             # declares {:parapet, path: "../../"}
-  docker-compose.yml    # services: app, prometheus, grafana
-  prometheus/
-    prometheus.yml      # scrape config pointing at demo app :9568
-  grafana/
-    provisioning/       # auto-provision Parapet dashboards from priv/parapet/grafana/
-```
+| Library | Version (mix.exs) | Why it stays optional in v1.1 |
+|---------|-------------------|-------------------------------|
+| `oban` | `>= 0.0.0`, optional | Stalled-async / dead-letter-drain playbooks call into host-app Oban APIs. The playbook code does that **through the host's `MyApp.Recovery` capability module**, so parapet itself stays Oban-soft. No new Oban version pin required. |
+| `req` | `~> 0.5.17`, optional | Some playbooks (e.g., revert-feature-flag for deploy-tied incident) issue HTTP calls; `req` is already used by `Parapet.Notifier.Slack`/`Teams` and `Parapet.MCP.PrometheusClient`. Existing pin is sufficient. |
+| `igniter` | `~> 0.7.9` | If we ship `mix parapet.gen.recovery` as a flag-based installer for the host's `MyApp.Recovery` skeleton, the existing Igniter pin handles it. No Igniter version bump. |
+| `opentelemetry_api` | `~> 1.3`, optional | Recovery actions emit telemetry through the existing dual-track pattern; no OTel API surface change. |
+| `sigra` | `>= 0.0.0`, optional | Unrelated to recovery loop. |
 
-**files: whitelist impact — ZERO.**
-The current whitelist is `~w(lib priv .formatter.exs mix.exs README* docs)`. The `demo/`
-directory is not in this list. It will not enter the published Hex package. No change to
-`mix.exs` `files:` is needed. This is the critical constraint and it is satisfied
-automatically by using a top-level directory not named `lib`, `priv`, or `docs`.
+### Infrastructure (host-owned, not parapet's deps)
 
-**Demo app deps:**
-The demo app's `mix.exs` is independent. It can freely declare `phoenix`, `phoenix_live_view`,
-`ecto_sql`, `postgrex`, `oban`, and `parapet` (via local path). These deps never appear in
-the published Parapet package.
+| Concern | How v1.1 inherits it |
+|---------|----------------------|
+| Background execution | Host-app Oban already required by v0.7+ playbooks. v1.1 host capabilities (`MyApp.Recovery.retry_dlq/1`, etc.) call host Oban directly. Parapet does not enqueue user-app jobs. |
+| Auth on Operator UI | Already enforced via `live_session` + host pipeline (see `docs/operator-ui.md`). Confirm step inherits that auth boundary. |
+| Multi-node safety | `Parapet.Automation.ClaimService` uses `(incident_id, action_kind, action_key)` Postgres unique index. Already proven by v0.9 concurrency-case tests. |
 
-**What NOT to add:**
-- Do not add `demo/` or any `example*/` path to the Parapet `files:` whitelist — demo
-  is repo-only
-- Do not add demo-specific deps (e.g., `faker`, `phoenix_gen_socket_client`) to the
-  top-level Parapet `mix.exs` — they must live only in `demo/app/mix.exs`
-- Do not use a Livebook as the primary demo harness — it cannot demonstrate the TSDB loop
-- Do not use Mix.install-based standalone scripts — fragile with private hex packages and
-  no TSDB
+### Supporting Libraries — None Added
 
-### Core Technologies
+The v0.10 STACK declared zero new runtime deps. v1.1 holds that line.
 
-| Technology | Version | Purpose | Why Recommended |
-|------------|---------|---------|-----------------|
-| Docker Compose | v2 (compose spec) | Orchestrate Prometheus + Grafana + demo app | Single-command full-loop demo; universally available; no Erlang distribution required |
-| Prometheus | `prom/prometheus:v3.x` | TSDB scraping demo app metrics | Matches what real adopters run; exercises the full recording-rule/alert pipeline |
-| Grafana | `grafana/grafana:11.x` | Dashboard visualization | Auto-provision from existing `priv/parapet/grafana/` artifacts; zero dashboard hand-wiring |
-| Phoenix (demo app) | `~> 1.7` | Minimal host app exercising Parapet | Demonstrates real install surface; dep declared via `path: "../../"` |
+## Per-Question Findings
 
-Pin Docker image versions in `docker-compose.yml` to prevent silent upstream breakage.
-Use `prom/prometheus:v3.x` and `grafana/grafana:11.x` minor-pinned, not `latest`.
+### 1. Host-app capability registration — does it need anything beyond what's already in parapet?
 
----
+**No new lib. One new module (`Parapet.Recovery`), no new dep.**
 
-## Pillar B: Docs and Packaging
+Current state:
+- `Parapet.Capabilities` (lib/parapet/capabilities.ex) is an `Agent`-backed registry with a closed atom whitelist (`@valid_capabilities`). It already exposes `register_recovery/2`, `get_recovery/1`, and `capabilities(:recovery)`.
+- Hosts already register via `Parapet.Capabilities.register_recovery(:retry_async_item, name: ..., preview: fn, execute: fn)` — verified by `test/parapet/capabilities_test.exs`.
+- Three capability ids exist today: `:retry_async_item`, `:requeue_dead_letter`, `:request_manual_provider_check`.
 
-### ExDoc Configuration
+What v1.1 needs:
+- **Expand the whitelist** to cover the new playbooks. Concretely: `:clear_suppression`, `:back_off_retries`, `:requeue_stalled_async`, `:revert_feature_flag`, `:disable_metric_label`. (Some can reuse existing ids — `:requeue_dead_letter` already covers dead-letter-drain.) Pure additive change to `@valid_capabilities` list. No new dependency.
+- **Add a `Parapet.Recovery` behaviour** that wraps the registry call in the same ergonomic shape as `Parapet.Integration`. This is **a few dozen LOC of behaviour + macro, no new lib**. It mirrors the proven idiom and gives compile-time `@callback` warnings for missing `c:preview/2` / `c:execute/2` implementations — same DX win that `Parapet.Integration` delivered for adapters.
 
-**Current state:** mix.exs declares `{:ex_doc, "~> 0.31", only: :dev, runtime: false}`.
-Installed version in mix.lock is `0.40.2`. Latest on hex.pm is `0.40.3`.
-
-**Recommendation:** Bump the version constraint to `"~> 0.40"` to pick up 0.40.x
-improvements (`.livemd` extras support, better sidebar grouping). No breaking changes
-in the 0.31 → 0.40 range for the configuration surface Parapet uses.
-
-**docs: key additions to mix.exs:**
-
-The `project/0` function needs a `:docs` key added alongside the existing `:package` key.
-These live at the project level, not inside `package:`.
-
+Sketch (no new deps):
 ```elixir
-defp project do
-  [
-    # ... existing keys ...
-    docs: docs()
-  ]
-end
-
-defp docs do
-  [
-    main: "readme",
-    source_url: "https://github.com/szTheory/parapet",
-    extras: [
-      "README.md",
-      "CHANGELOG.md",
-      "docs/adopter-flows.md",
-      "docs/operator-ui.md",
-      "docs/slo-reference.md",
-      "docs/telemetry.md"
-      # v0.10 additions (new files to create):
-      # "docs/getting-started.md",
-      # "docs/troubleshooting.md",
-      # "docs/integrations/http.md",
-      # "docs/integrations/oban.md",
-      # "docs/integrations/mailglass.md",
-      # "docs/integrations/chimeway.md",
-      # "docs/integrations/rindle.md",
-      # "docs/slo-packs/saas-api.md",
-      # "docs/slo-packs/background-jobs.md",
-      # "docs/slo-packs/delivery.md"
-    ],
-    groups_for_extras: [
-      "Getting Started": ~r/docs\/getting-started/,
-      "Integration Guides": ~r/docs\/integrations\//,
-      "SLO Authoring": ~r/docs\/slo-packs\//,
-      "Reference": ~r/docs\/(adopter-flows|operator-ui|slo-reference|telemetry)/,
-      "Project": ["CHANGELOG.md"]
-    ],
-    groups_for_modules: [
-      "SLO Engine": ~r/Parapet\.SLO/,
-      "Runbooks": ~r/Parapet\.Runbook/,
-      "Incident Management": ~r/Parapet\.(Incident|Evidence|Timeline)/,
-      "Escalation": ~r/Parapet\.Escalation/,
-      "Integrations": ~r/Parapet\.Integrations/,
-      "Generators": ~r/Mix\.Tasks\.Parapet/,
-      "Internals": ~r/Parapet\.Internal/
-    ],
-    nest_modules_by_prefix: [Parapet]
-  ]
+defmodule Parapet.Recovery do
+  @callback recovery_capabilities() :: [keyword()]
+  defmacro __using__(_opts) do
+    quote do
+      @behaviour Parapet.Recovery
+      def __register_recovery__ do
+        for cap <- recovery_capabilities() do
+          {id, attrs} = Keyword.pop!(cap, :id)
+          Parapet.Capabilities.register_recovery(id, attrs)
+        end
+      end
+    end
+  end
 end
 ```
+`Parapet.attach(adapters: [...])` already loops the integrations; v1.1 extends the same call site to also invoke `MyApp.Recovery.__register_recovery__/0` if the host opts in. **Zero new deps.**
 
-**Confidence:** HIGH — verified against ExDoc v0.40.x docs, ecto/mix.exs, req/mix.exs,
-and ex_doc/mix.exs as authoritative real-world references.
+**Verdict: behaviour shim only. No stack change.**
 
-### Package links: metadata
+### 2. Preview -> Confirm UI flow in LiveView — any libs beyond what's already on the stack?
 
-The current `links: %{}` is empty. Standard keys used by well-maintained Elixir packages
-(verified from ecto, req, ex_doc themselves):
+**No new libs. The host app already pulls `phoenix_live_view ~> 1.1` (verified in `examples/demo_app/mix.exs`). The generated `OperatorDetailLive` is the surface; v1.1 wires three event handlers on top of code that already projects the data.**
 
-```elixir
-package: [
-  files: ~w(lib priv .formatter.exs mix.exs README* docs CHANGELOG*),
-  licenses: ["MIT"],
-  links: %{
-    "GitHub" => "https://github.com/szTheory/parapet",
-    "Changelog" => "https://hexdocs.pm/parapet/changelog.html"
-  }
-]
+Already shipped:
+- `WorkbenchContract.derive/3` returns `runbook_steps` with `state: :previewable | :executable | :guidance | :executed` and `active_preview` (preview_token + expires_at + target_refs). The LiveView already has the data it needs.
+- `Operator.preview_runbook_step/3` writes a `recovery_preview` TimelineEntry with `preview_token`, `expires_at: +300s`, `target_refs`, `count`, `preconditions`, `warnings`, `idempotency_caveats`. It runs through `Evidence.run_operator_command/1`, which means ActionPayload + ToolAudit are emitted in the same transaction.
+- `Operator.confirm_runbook_step/4` validates the token, rejects stale previews (>5min), invokes `capability.execute.(incident, target_refs)`, and writes a `recovery_confirmed` TimelineEntry through the same transaction seam.
+
+What v1.1 needs:
+- LiveView event handlers (`handle_event("preview_step", ...)`, `handle_event("confirm_step", ...)`) that call those two functions. **Pure host-owned generator output, no new deps.**
+- A small `OperatorComponents` partial that renders the preview block (`count`, `warnings`, `target_refs`) and the Confirm button (disabled if `active_preview` is nil or expired). Pure Tailwind + HEEx, both already in the generated demo.
+
+**No `phoenix_live_view_native`, no `live_view_component_library`, no `surface_ui`, no `salad_ui`.** Plain HEEx + Tailwind is the project's established posture (see Phase 3 `generated resolve-flow proof lane`).
+
+**Verdict: zero new libs.**
+
+### 3. 4-6 prebuilt recovery playbooks — do they need any new deps (Oban admin APIs, etc.)?
+
+**No new parapet deps. The playbooks are host-callable runbooks; the actual mutation lives in the host's `MyApp.Recovery` module, which calls whatever host APIs (Oban, Ecto, feature-flag lib) it already has.**
+
+Playbook-by-playbook honesty check:
+
+| Playbook | Capability id | Where the mutation lives | New dep? |
+|----------|--------------|--------------------------|----------|
+| **Retry storm** | `:back_off_retries` (advisory by default; preview-only is the safe default — D-21 "Preview Before Mutation" + thread §3 "back off + clear in-flight retry intent") | Host. `MyApp.Recovery.back_off_retries(incident, _refs)` toggles its own retry config. | **None** |
+| **Suppression drift** | `:clear_suppression` (already covered by Mailglass's existing suppression APIs; host calls them) | Host (via Mailglass integration if present) | **None** — Mailglass adapter already optional in v0.7 |
+| **Stalled async** | `:requeue_stalled_async` (new id) | Host calls `Oban.Job` re-enqueue. Oban admin APIs (`Oban.cancel_job/1`, `Oban.retry_job/1`) are part of stock Oban; no `oban_pro` / `oban_web` required. | **None** |
+| **Dead-letter drain** | `:requeue_dead_letter` (already exists) | Host calls Oban. | **None** |
+| **Deploy-tied incident** | `:revert_feature_flag` (new id) | Host calls Rulestead (if integrated) or its own flag lib. | **None** — Rulestead already optional in v0.6 |
+| **Cardinality blowout** | `:disable_metric_label` (new id; preview-only is safer — strongly recommend `preview_only: true` + guidance to run `mix parapet.doctor cardinality`) | Host or operator action via existing `Parapet.Metrics.Validator` | **None** — analyzer shipped in v0.9 |
+
+Three honest caveats to flag in PITFALLS.md (not STACK):
+1. `Oban.retry_job/1` and `Oban.cancel_job/1` are stock Oban functions on every supported version (Oban 2.x). **No `oban_pro` required.** Confirmed by Oban hex docs (v2.17+ — already covered by the `oban >= 0.0.0` optional pin).
+2. For the "retry storm" playbook, the right safe default is **guidance-only** (no `execute` callback). The thread §3 explicitly flags this: "back off + clear in-flight retry intent" — executing a retry during a retry storm is the failure mode. Treat it like `retry_storm` already does in v0.10 — Guidance-only runbook step.
+3. For "cardinality blowout", the operator action that actually moves the needle is editing source (the offending label). The capability should be `preview_only: true`, surfacing the analyzer report as the preview payload. This is consistent with the v0.10 decision "Guidance-only runbooks where no allowlisted capability fits."
+
+**Verdict: zero new deps. The playbooks are runbook modules + host capability functions, nothing more.**
+
+### 4. Audit propagation (`TimelineEntry` + `ToolAudit` wrapped in `ActionPayload`) — anything missing?
+
+**Nothing missing. This is already wired end-to-end.**
+
+Verified seam-by-seam:
+- `ActionPayload` (lib/parapet/operator/action_payload.ex) — has an `:execute_mitigation` value in `action_type` enum and enforces `:idempotency_key` for it. Already correct for recovery.
+- `Operator.preview_runbook_step/3` builds `build_audit("operator_preview_recovery", payload)` and routes it through `Evidence.run_operator_command/1` — so the preview itself produces a TimelineEntry + ToolAudit row inside a single transaction.
+- `Operator.confirm_runbook_step/4` builds `build_audit("operator_confirm_recovery", payload)` through the same seam.
+- `Parapet.Automation.Executor` already wraps automated executions in an `ActionPayload` with `actor: "system:automation:executor"` and routes through `Operator.execute_runbook_step/3`. Multi-node claim is acquired before execution; circuit breaker shorts at `max_executions = 3` per hour by default.
+
+What v1.1 needs:
+- One naming reconciliation: the thread §4 calls the audit event `:recovery_action`; the code already emits `recovery_preview` and `recovery_confirmed`. Either keep the existing two events (preferred — already shipped and tested) or add a unified `recovery_action` summary type. **Either way, no new deps. Pure naming/wiring decision for the planning phase.**
+
+**Verdict: nothing missing in the stack. Decisions are naming only.**
+
+### 5. Demo seed showing a Preview-able + Confirm-able action — any test/dev-only deps needed?
+
+**No. The demo app already has everything it needs.**
+
+Current state of `examples/demo_app/`:
+- `phoenix ~> 1.8`, `phoenix_live_view ~> 1.1`, `phoenix_ecto ~> 4.4`, `bandit ~> 1.5`, `tailwind`, `esbuild`, `heroicons` — all already declared.
+- `priv/repo/seeds.exs` already creates 3 incidents but **none have `capability:` keys on their runbook steps** — that's the gap, not a stack gap.
+
+What v1.1 needs (no new deps):
+1. Update seeds to include one runbook with a `capability: :requeue_dead_letter` step + `requires_preview: true`.
+2. Add `examples/demo_app/lib/demo_app/recovery.ex` implementing `@behaviour Parapet.Recovery` with one host-owned `execute` callback (could be a no-op that returns `{:ok, %{requeued: 0}}` for a deterministic demo, or a real Oban call if seeds also seed a fake stuck job).
+3. Wire the demo's `application.ex` (or `attach/1` call) to register the capability on boot.
+
+Testing: existing ExUnit + `ConcurrencyCase`/`ConcurrencyRepo` (already in the repo) cover multi-node claim contention. No `mox`, `bypass`, or `floki` additions. The `mix test` command already runs against the demo's generated LiveView for end-to-end coverage (proof lane already exists from Phase 3).
+
+**Verdict: zero new test/dev deps. Seed + behaviour module additions only.**
+
+## Alternatives Considered (and rejected)
+
+| Category | Considered | Why rejected for v1.1 |
+|----------|-----------|----------------------|
+| Capability registry | `:persistent_term`, ETS, or compile-time module registry | `Agent` registry already shipped and tested. Switching now is churn with no benefit at v1.1 scope. |
+| Preview UX framework | `salad_ui`, `live_select`, modal libraries | Native LiveView + HEEx already proven in v0.2-v1.0 generators. Adding UI libs would violate "host-owned generated code beats opaque magic." |
+| Background execution | Adding `oban_pro` for advanced retry control | Stock Oban functions cover every named playbook. `oban_pro` is paid and would break the "compile out cleanly when absent" constraint. |
+| Audit envelope | New `RecoveryPayload` struct distinct from `ActionPayload` | `ActionPayload` already has `:execute_mitigation` enum value and `idempotency_key` enforcement. Splitting would fork the audit surface. |
+| Idempotency | `idempotent` lib or `oban_unique` | `idempotency_key` enforcement is already in `ActionPayload.changeset/2`. Preview token + `(incident_id, action_kind, action_key)` unique index in `ActionClaim` already covers double-confirm. |
+| Recovery installer | Standalone `mix parapet.gen.recovery` | Optional, idiomatic via existing `igniter ~> 0.7.9`. **If shipped**, no new dep. If deferred, also no new dep. Either path stays on the v1.0 stack. |
+
+## Installation (No Change)
+
+```bash
+# No new packages. mix.exs is unchanged. mix.lock is unchanged.
+# v1.1 ships entirely through lib/parapet/recovery.ex (new) + behaviour additions
+# + updated examples/demo_app/priv/repo/seeds.exs + a new examples/demo_app/lib/demo_app/recovery.ex.
 ```
 
-**"GitHub" and "Changelog" are the canonical two keys.** A "Docs" key pointing at
-hexdocs.pm/parapet is redundant — Hex already renders the HexDocs link automatically.
-Do not add "Issues" or "Sponsor" unless there is a specific reason; they clutter
-the package sidebar.
+## Integration Points (Named, Existing)
 
-**files: note:** Add `CHANGELOG*` to the whitelist so the generated CHANGELOG.md is
-included in the published package and the `"Changelog"` link resolves correctly on
-hexdocs.pm. The current whitelist does not include it.
+Roadmap should reference these existing modules — every v1.1 phase will touch them:
 
-### CHANGELOG.md and Release Please
+| Module | File | What v1.1 does to it |
+|--------|------|----------------------|
+| `Parapet.Capabilities` | `lib/parapet/capabilities.ex` | Expand `@valid_capabilities` whitelist. No structural change. |
+| `Parapet.Operator` | `lib/parapet/operator.ex:647` (`preview_runbook_step/3`) and `:690` (`confirm_runbook_step/4`) | **No edits required.** The two functions are already the public seam. |
+| `Parapet.Operator.ActionPayload` | `lib/parapet/operator/action_payload.ex` | **No edits.** `:execute_mitigation` + `idempotency_key` already enforced. |
+| `Parapet.Operator.WorkbenchContract` | `lib/parapet/operator/workbench_contract.ex:88,89` (`derive_runbook_steps`, `find_active_preview`) | **No edits.** Already projects `:previewable` / `:executable` / `:executed` states and `active_preview` block. |
+| `Parapet.Automation.ClaimService` | `lib/parapet/automation/claim_service.ex` | **No edits.** Multi-node claim already in place via Postgres unique index on `(incident_id, action_kind, action_key)`. |
+| `Parapet.Automation.CircuitBreaker` | `lib/parapet/automation/circuit_breaker.ex` | **No edits.** Default `max_executions = 3 / hour` already gates flap loops. |
+| `Parapet.Runbook` | `lib/parapet/runbook.ex` | **No edits.** DSL already accepts `:capability`, `:requires_preview`, `:preview_only`, `:warning`, `:guidance`. |
+| `Parapet.Integration` | `lib/parapet/integration.ex` | **No edits to this module.** Used as the **template** for `Parapet.Recovery` behaviour. |
+| `Parapet.Internal.Application` | `lib/parapet/internal/application.ex` | No supervisor changes — `Parapet.Capabilities` Agent already in the child spec. |
+| `Parapet.attach/1` | `lib/parapet.ex` | Add host-recovery activation arm (mirrors `:adapters` arm). Pure additive. |
+| `examples/demo_app/priv/repo/seeds.exs` | demo | Add one runbook with a `capability` step and one timeline entry showing the Preview/Confirm wire-up. |
+| `examples/demo_app/lib/demo_app/recovery.ex` | demo (new file) | Implements `@behaviour Parapet.Recovery` with one preview + execute pair. |
 
-**Release Please owns CHANGELOG.md — do not hand-edit it.**
+## What NOT to Add (Anti-Stack)
 
-Verification (HIGH confidence from elixirschool.com and googleapis/release-please):
-- Release Please with `release-type: elixir` (as configured in `.github/workflows/release-please.yml`)
-  automatically generates and maintains CHANGELOG.md
-- On each merge to `main`, Release Please updates or creates a Release PR that bumps
-  `mix.exs` version and prepends a new section to CHANGELOG.md
-- Merging that Release PR tags the commit, creates a GitHub Release, and the CHANGELOG.md
-  state in the repo is authoritative
+These are anti-features for v1.1 — list them in roadmap "out of scope" so they don't accrete:
 
-**What humans do and do not touch:**
+| Tempting addition | Why NOT |
+|-------------------|---------|
+| `oban_pro` / `oban_web` | Paid; breaks compile-out-cleanly; stock Oban covers every playbook. |
+| `phoenix_storybook` for previews | Operator UI is not a component gallery — `mix parapet.doctor` + Phase 3 proof lane is the proof surface. |
+| `commanded` / event-sourcing framework | TimelineEntry already is the audit log. CQRS framework is order-of-magnitude over-engineering for the wedge. |
+| `bypass` / `mox` for tests | Existing `ConcurrencyCase`/`ConcurrencyRepo` + `Code.ensure_loaded?` seams cover testing without test-doubles. |
+| `gen_state_machine` for the preview state | Three states (`:previewable | :executable | :executed`) projected from durable evidence — no FSM library needed. |
+| Custom JSON Schema validator (`ex_json_schema` etc.) for capability args | Capability `preview` callbacks already receive structured `incident` + `step` and return `{:ok, host_data}` — keep args as plain maps; let the host validate. |
+| `phoenix_live_view_native` or `salad_ui` for the Confirm modal | Plain HEEx + Tailwind matches every other generated UI surface. |
+| `tesla` (HTTP) for capability execute callbacks | `req ~> 0.5.17` already optional; hosts use whatever they want for execute callbacks — that's the point of host-owned recovery. |
+| A new `:recovery_action` TimelineEntry type as a *required* schema migration | Type is free-form `:string` already. Naming is a planning decision, not a schema change. |
+| `nimble_options` for capability registration validation | Closed atom whitelist + Keyword fetch is already the pattern; `nimble_options` would replace ~10 lines of working code. |
 
-| Surface | Owner | Human action |
-|---------|-------|--------------|
-| `CHANGELOG.md` content | Release Please | None — do not manually edit; it regenerates from Conventional Commits |
-| Commit messages | Developer | Must follow Conventional Commits (`feat:`, `fix:`, `docs:`, etc.) — this is the only human input to changelog quality |
-| Release PR | Developer | Review and merge when ready to ship; no content editing needed |
-| `.release-please-manifest.json` | Release Please | Auto-created on first run if absent; do not pre-create it |
-| `release-please-config.json` | Optional human | Add only if needing multi-package or extra-files configuration |
+## Confidence Sources
 
-**For v0.10:** The repo has no `.release-please-manifest.json` and no `release-please-config.json`.
-This is correct for a simple single-package repo using the default `release-type: elixir` action.
-Release Please will create the manifest on first successful release. No configuration files
-need to be added unless extra-files tracking (e.g., auto-bumping a version constant elsewhere)
-is needed.
+| Claim | Source | Confidence |
+|-------|--------|------------|
+| `Parapet.Capabilities` already exists with whitelist + `register_recovery/2` | `lib/parapet/capabilities.ex` lines 1-65 | HIGH |
+| `Operator.preview_runbook_step/3` + `confirm_runbook_step/4` already shipped | `lib/parapet/operator.ex` lines 647-745 | HIGH |
+| `ActionPayload` already enforces `idempotency_key` on `:execute_mitigation` | `lib/parapet/operator/action_payload.ex` lines 26-50 | HIGH |
+| Multi-node claim + circuit breaker already shipped | `lib/parapet/automation/claim_service.ex` + `lib/parapet/automation/circuit_breaker.ex` | HIGH |
+| Runbook DSL already supports `:capability`, `:requires_preview`, `:preview_only` | `lib/parapet/runbook.ex` lines 34-62 | HIGH |
+| `Parapet.Integration` is the template idiom | `lib/parapet/integration.ex` lines 1-28 | HIGH |
+| `WorkbenchContract` already derives runbook step states + `active_preview` | `lib/parapet/operator/workbench_contract.ex` lines 88-205 | HIGH |
+| `TimelineEntry.type` is unbounded string | `lib/parapet/spine/timeline_entry.ex:33` | HIGH |
+| Demo app has Phoenix/LiveView + Ecto and lacks capability seeds | `examples/demo_app/mix.exs` + `examples/demo_app/priv/repo/seeds.exs` | HIGH |
+| Stock Oban (>= 2.0) has `retry_job/1` + `cancel_job/1` (no `oban_pro` needed) | hexdocs.pm/oban (Oban 2.17+ — covered by repo's `>= 0.0.0` optional pin) | HIGH |
+| `req ~> 0.5.17` already optional dep used by Slack/Teams notifiers and Prometheus MCP client | `mix.exs:114` + `lib/parapet/notifier/{slack,teams}.ex` + `lib/parapet/mcp/prometheus_client.ex` | HIGH |
+| The thread's "Lean: A" decision matches existing `Parapet.Integration` pattern | `.planning/threads/actionable-recovery-design.md` §1 + `lib/parapet/integration.ex` | HIGH |
 
-**CHANGELOG.md initial state:** Since no CHANGELOG.md exists yet, Release Please will create
-it on the first Release PR merge. Optionally, a minimal `CHANGELOG.md` stub can be committed
-manually as a placeholder for hexdocs to render before the first Release Please run — but keep
-it to a header only and let Release Please own all content below it.
+## Open Questions (Naming-Only, Not Stack)
 
-### Supporting Libraries
+These are for the planning phase, not the deps phase:
 
-| Library | Version | Purpose | When to Use |
-|---------|---------|---------|-------------|
-| ex_doc | `~> 0.40` | Hexdocs HTML + sidebar generation | Bump from `~> 0.31`; enables clean extras grouping and `.livemd` support |
-
-No other new libraries needed for the docs/packaging pillar.
-
----
-
-## Pillar C: SLO Authoring Guidance
-
-### Decision: Pure docs + provider modules — no new library
-
-**Recommendation: do not add a new `mix parapet.gen.slo` task or a separate SLO-pack
-catalog module. This is pure docs work plus adding new `Parapet.SLO.StarterPack.*`
-modules using the existing `Parapet.SLO.Provider` behaviour.**
-
-**Rationale:**
-
-The SLO engine is complete and expressive. The `Parapet.SLO.Provider` behaviour and the
-`Parapet.SLO.SliceSpec` struct are the correct extension point. The gap identified in
-JTBD-MAP gap #3 is a **guidance gap**, not a capability gap. Adopters cannot choose good
-first SLOs not because the engine cannot express them, but because there are no
-opinionated defaults to copy.
-
-The correct solution is:
-1. New provider modules that ship pre-configured `SliceSpec` structs for common app types
-   (SaaS API, background-job-heavy, delivery-heavy)
-2. A `docs/slo-packs/` guide directory with examples, good-vs-bad journey-slicing
-   comparisons, and low-traffic alerting guidance
-3. A `mix parapet.gen.slo` Mix task only if there is genuine evidence that adopters need
-   interactive scaffolding — the existing `mix parapet.install --with-*` flags cover
-   registration already; a new task risks duplicating that surface
-
-**No new deps are warranted for this pillar.** The existing `Parapet.SLO.Generator`
-handles PromQL generation. New provider modules live in `lib/parapet/slo/`. The docs
-live in `docs/slo-packs/` and will be in the `files:` whitelist via `docs`.
-
-**What the starter pack modules look like:**
-New modules following the existing `Parapet.SLO.Provider` pattern, e.g.:
-- `Parapet.SLO.Pack.SaasApi` — HTTP error rate, latency P95, availability per route group
-- `Parapet.SLO.Pack.BackgroundJobs` — Oban queue failure rate, throughput, latency
-- `Parapet.SLO.Pack.Delivery` — Wraps the existing Mailglass/Chimeway providers with
-  opinionated objectives rather than requiring adopters to tune them
-
-These are registered the same way as existing built-in providers:
-
-```elixir
-config :parapet,
-  providers: [Parapet.SLO.Pack.SaasApi]
-```
-
-**Runbook template enrichment:**
-The existing four `priv/templates/parapet.gen.runbooks/*.ex.eex` templates are thin
-(1-2 steps, no preconditions, no warning text). Richer templates with explicit preconditions,
-warnings, and `guidance:` text are the right v0.10 deliverable for gap #1 (common recovery
-depth). This is purely template content work — no new EEx tooling is needed. The existing
-Igniter-based `mix parapet.gen.runbooks` generator already reads from `priv/templates/`.
-
-**What NOT to add:**
-- Do not add a `mix parapet.gen.slo` interactive task — complexity without evidence of need;
-  `mix parapet.install --with-<pack>` flags are the correct registration surface
-- Do not add a `Parapet.SLO.Catalog` GenServer or runtime registry — the compile-time
-  Provider behaviour is correct; a catalog module risks becoming a second, unsynchronized
-  registry
-- Do not pull in external SLO library deps (e.g., `prometheus_plugs`, `telemetry_metrics_prometheus`)
-  — Parapet already owns the full metrics/SLO stack and these would conflict
-
----
-
-## Installation Changes
-
-The only mix.exs changes needed for v0.10:
-
-```elixir
-# 1. Bump ex_doc constraint
-{:ex_doc, "~> 0.40", only: :dev, runtime: false}
-
-# 2. Add docs: key to project/0 (new function defp docs())
-# 3. Add links: and CHANGELOG* to package/0
-```
-
-No new runtime deps. No new optional deps. No new applications. The demo app in `demo/`
-is fully isolated with its own `mix.exs`.
-
----
-
-## Alternatives Considered
-
-| Recommended | Alternative | Why Not |
-|-------------|-------------|---------|
-| `demo/` Docker Compose | Livebook `.livemd` | Requires distributed Erlang setup; no TSDB; wrong medium for full SRE loop |
-| `demo/` Docker Compose | Standalone example Phoenix app (no Docker) | Shifts Prometheus/Grafana setup to adopter; breaks the "single command" promise |
-| Pure docs + provider modules for SLO packs | New `mix parapet.gen.slo` task | No evidence of need; install flags already cover registration; adds surface to maintain |
-| Pure docs + provider modules for SLO packs | `Parapet.SLO.Catalog` GenServer | Second registry risks drift from Provider behaviour; compile-time is already correct |
-| ExDoc `groups_for_extras` for sidebar | Flat extras list | Flat list gives no navigation for 8+ guide pages; groups are necessary at this scale |
-| Release Please owns CHANGELOG.md fully | Human-maintained CHANGELOG | Defeats the existing Conventional Commits + Release Please investment; causes merge conflicts |
-
----
-
-## What NOT to Use
-
-| Avoid | Why | Use Instead |
-|-------|-----|-------------|
-| Adding `demo/` to `files:` whitelist | Leaks demo deps and Phoenix app into published package | Keep `demo/` out of whitelist; it is git-only |
-| `{:ex_doc, "~> 0.31"}` (current) | Pins below current 0.40.x line; misses sidebar grouping improvements | `"~> 0.40"` |
-| `links: %{"Docs" => ...}` | Hex renders HexDocs link automatically; redundant | `"GitHub"` and `"Changelog"` only |
-| Hand-editing CHANGELOG.md | Conflicts with Release Please automation | Write good Conventional Commit messages; let Release Please generate changelog |
-| New `Parapet.SLO.Catalog` module | Second registry drifts from Provider behaviour | More provider modules using existing `Parapet.SLO.Provider` behaviour |
-| Demo deps in top-level mix.exs | Pollutes published package dep tree | Demo deps declared only in `demo/app/mix.exs` |
-
----
-
-## Version Compatibility
-
-| Package | Current Constraint | Recommended Constraint | Notes |
-|---------|-------------------|-----------------------|-------|
-| ex_doc | `~> 0.31` | `~> 0.40` | Current locked: 0.40.2; latest: 0.40.3; no breaking changes in range |
-| Phoenix (demo app only) | n/a | `~> 1.7` | In `demo/app/mix.exs` only; not in published package |
-| Prometheus image | n/a | `v3.x` | Pin in `docker-compose.yml`; not a mix dep |
-| Grafana image | n/a | `11.x` | Pin in `docker-compose.yml`; not a mix dep |
-
----
-
-## Files: Whitelist Audit
-
-Current: `~w(lib priv .formatter.exs mix.exs README* docs)`
-
-Recommended changes for v0.10:
-
-```elixir
-files: ~w(lib priv .formatter.exs mix.exs README* docs CHANGELOG*)
-```
-
-| Path | In whitelist? | Correct? | Action |
-|------|--------------|---------|--------|
-| `lib/` | Yes | Yes | No change |
-| `priv/` | Yes | Yes | No change (runbook templates live here) |
-| `docs/` | Yes | Yes | New guide files added here are included automatically |
-| `README*` | Yes | Yes | No change |
-| `CHANGELOG*` | **No** | **Should be Yes** | Add `CHANGELOG*` — needed for `"Changelog"` link to resolve on hexdocs |
-| `demo/` | No | Correct | Do NOT add — demo is repo-only |
-| `.planning/` | No | Correct | Do NOT add |
-
----
+1. **Capability id taxonomy.** The whitelist needs new atoms for the four new playbooks. Suggested: `:requeue_stalled_async`, `:revert_feature_flag`, `:disable_metric_label`. (`:retry_storm` and `:suppression_drift` should stay guidance-only — already the v0.10 decision pattern.) No stack impact.
+2. **Naming reconciliation.** Thread §4 names the event `:recovery_action`; code emits `recovery_preview` + `recovery_confirmed`. Recommend keeping both granular events — they are already tested and used by `WorkbenchContract.find_active_preview/1`. No stack impact.
+3. **Behaviour ergonomics.** `Parapet.Recovery` could either take a runtime callback list (simpler) or a compile-time `step/2`-style macro. The thread's "Lean: A" already endorses the runtime-callbacks-with-`@behaviour` style. No stack impact.
 
 ## Sources
 
-- `https://hexdocs.pm/ex_doc/ExDoc.html` — ExDoc configuration options (HIGH confidence, official)
-- `https://github.com/elixir-ecto/ecto/blob/master/mix.exs` — links: keys pattern ("GitHub", "Changelog") (HIGH confidence, canonical OSS reference)
-- `https://github.com/wojtekmach/req/blob/main/mix.exs` — extras + CHANGELOG pattern (HIGH confidence)
-- `https://github.com/elixir-lang/ex_doc/blob/main/mix.exs` — groups_for_extras, module grouping (HIGH confidence)
-- `https://elixirschool.com/blog/managing-releases-with-release-please` — Release Please Elixir CHANGELOG ownership (HIGH confidence)
-- `https://hex.pm/packages/ex_doc` — current version 0.40.3 (HIGH confidence, verified live)
-- `https://github.com/akoutmos/prom_ex` — `example_applications/` demo pattern with Docker Compose (MEDIUM confidence, verified structure)
-- Repository state: `mix.exs`, `mix.lock`, `.github/workflows/release-please.yml`, `priv/templates/parapet.gen.runbooks/` (HIGH confidence, read directly)
-
----
-
-*Stack research for: Parapet v0.10 Adopter Success*
-*Researched: 2026-05-23*
+- Live repo state (Hex-published `parapet v1.0.3`): all files referenced above are committed to `main`.
+- `mix.exs:104-119` for declared deps.
+- `.planning/threads/actionable-recovery-design.md` for v1.1 scope.
+- `docs/operator-ui.md` Phase 7 section (recovery flow design).
+- `prompts/parapet-engineering-dna-from-sibling-libs.md` for "host-owned beats remote magic" + "compile out cleanly" + "no magic DSL" constraints.
+- Oban hexdocs (oban 2.17+): `Oban.retry_job/1`, `Oban.cancel_job/1` are stock.
