@@ -134,4 +134,47 @@ defmodule Parapet.Automation.ClaimServiceTest do
       assert claim.short_circuit_reason == "circuit_breaker_tripped"
     end)
   end
+
+  @tag :unboxed
+  test "self-heals an expired-lease stale claim left by a crashed node" do
+    unboxed_run(fn ->
+      ConcurrencyBootstrap.reset!()
+
+      {:ok, incident} =
+        %Incident{}
+        |> Incident.changeset(%{title: "Crashed node remnant"})
+        |> ConcurrencyRepo.insert()
+
+      past = DateTime.add(DateTime.utc_now(), -10 * 60, :second) |> DateTime.truncate(:microsecond)
+
+      {:ok, original} =
+        ConcurrencyRepo.insert(%ActionClaim{
+          id: Ecto.UUID.generate(),
+          incident_id: incident.id,
+          action_kind: "operator",
+          action_key: "step-1",
+          status: "claimed",
+          idempotency_key: "old_key_#{incident.id}",
+          attempt_count: 1,
+          claimed_at: past,
+          lease_until: past,
+          inserted_at: past,
+          updated_at: past,
+          error_metadata: %{}
+        })
+
+      assert {:won, claim} =
+               ClaimService.claim_action(
+                 incident_id: incident.id,
+                 action_kind: "operator",
+                 action_key: "step-1",
+                 idempotency_key: "new_key_#{incident.id}"
+               )
+
+      assert claim.id == original.id
+      assert claim.attempt_count == 2
+      assert claim.idempotency_key == "new_key_#{incident.id}"
+      assert DateTime.compare(claim.lease_until, DateTime.utc_now()) == :gt
+    end)
+  end
 end

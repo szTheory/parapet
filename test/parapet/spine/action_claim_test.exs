@@ -6,6 +6,8 @@ defmodule Parapet.Spine.ActionClaimTest do
   test "changeset accepts bounded lifecycle attributes" do
     claimed_at = DateTime.utc_now() |> DateTime.truncate(:microsecond)
 
+    lease_until = DateTime.add(claimed_at, 5 * 60, :second) |> DateTime.truncate(:microsecond)
+
     changeset =
       ActionClaim.changeset(%ActionClaim{}, %{
         incident_id: Ecto.UUID.generate(),
@@ -14,7 +16,8 @@ defmodule Parapet.Spine.ActionClaimTest do
         status: "claimed",
         idempotency_key: "auto_exec_incident_step-1",
         attempt_count: 1,
-        claimed_at: claimed_at
+        claimed_at: claimed_at,
+        lease_until: lease_until
       })
 
     assert changeset.valid?

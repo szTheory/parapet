@@ -126,10 +126,11 @@ defmodule Parapet.Automation.ClaimService do
             updated_at: ^now
           ],
           inc: [attempt_count: 1]
-        ]
+        ],
+        select: claim
       )
 
-    {count, rows} = repo.update_all(steal_query, [], returning: true)
+    {count, rows} = repo.update_all(steal_query, [])
 
     if count == 1 do
       {:won, rows |> List.first() |> to_claim()}
