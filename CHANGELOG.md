@@ -11,6 +11,14 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## [1.0.3](https://github.com/szTheory/parapet/compare/v1.0.2...v1.0.3) (2026-05-27)
+
+
+### Bug Fixes
+
+* **ci:** validate end-to-end auto-publish chain with PAT ([18775c4](https://github.com/szTheory/parapet/commit/18775c4019dddab405c3d00ba265b93afc14a07b))
+* **ci:** validate end-to-end auto-publish chain with PAT ([98af8df](https://github.com/szTheory/parapet/commit/98af8df8c95771d433d0fb1ad43ad5f18a6ba9d2))
+
 ## [1.0.2](https://github.com/szTheory/parapet/compare/v1.0.1...v1.0.2) (2026-05-27)
 
 
