@@ -1,7 +1,7 @@
 ---
 phase: 20-governance-docs-completeness
-verified: 2026-05-25T14:40:22Z
-status: human_needed
+verified: 2026-05-25T19:46:09Z
+status: verified
 score: 10/11 must-haves verified
 overrides_applied: 1
 overrides:
@@ -9,21 +9,14 @@ overrides:
     reason: "CODE_OF_CONDUCT.md intentionally dropped per user decision during plan 20-01 execution — content filter blocked generation, user confirmed the file is not required."
     accepted_by: "user (confirmed in 20-01-SUMMARY.md)"
     accepted_at: "2026-05-25T13:44:00Z"
-human_verification:
-  - test: "Enable GitHub Private Vulnerability Reporting in the parapet repo"
-    expected: "The URL https://github.com/szTheory/parapet/security/advisories/new resolves and the advisory submission form loads. Without this, SECURITY.md links to a 404."
-    why_human: "Requires a manual toggle in GitHub repo Settings > Code security and analysis — cannot be verified from the codebase."
-  - test: "Confirm REQUIREMENTS.md tracking records are updated to reflect phase 20 completions"
-    expected: "GOV-01, GOV-02, DOCS-05 checkboxes should be [x] and traceability table rows should read Complete"
-    why_human: "REQUIREMENTS.md still shows [ ] / Pending for GOV-01, GOV-02, and DOCS-05 — these are stale. The codebase evidence shows all three are satisfied. A human should update the tracking document."
 ---
 
 # Phase 20: Governance Docs Completeness Verification Report
 
 **Phase Goal:** Trust artifacts and documentation gaps are closed — the repository ships the OSS governance triad, a clear version commitment, and all four previously missing integration guides plus hexdocs polish.
-**Verified:** 2026-05-25T14:40:22Z
-**Status:** human_needed
-**Re-verification:** No — initial verification
+**Verified:** 2026-05-25T19:46:09Z
+**Status:** verified
+**Re-verification:** Yes — cleared stale follow-ups and confirmed GitHub Private Vulnerability Reporting is enabled
 
 ## Goal Achievement
 
@@ -65,7 +58,7 @@ human_verification:
 
 | From | To | Via | Status | Details |
 |------|----|-----|--------|---------|
-| `SECURITY.md` | GitHub Private Vulnerability Reporting | `github.com/szTheory/parapet/security/advisories/new` | WIRED (code) / UNVERIFIABLE (live) | URL present in file; live activation requires human action (PVR must be enabled in repo settings) |
+| `SECURITY.md` | GitHub Private Vulnerability Reporting | `github.com/szTheory/parapet/security/advisories/new` | VERIFIED | URL present in file and repository setting confirmed enabled via GitHub API (`repos/szTheory/parapet/private-vulnerability-reporting` returned `{\"enabled\":true}`) |
 | `README.md` | semver.org | Markdown link | WIRED | `semver.org` link present |
 | `docs/slo-reference.md` | `docs/slo-authoring-guide.md#provider-as-bundle-pattern` | Markdown anchor | WIRED | Anchor text confirmed in both files |
 | `mix.exs package.files` | CONTRIBUTING.md / SECURITY.md | `CONTRIBUTING* SECURITY* CODE_OF_CONDUCT*` globs | WIRED | Globs present in files: sigil |
@@ -90,6 +83,7 @@ Not applicable — this phase creates and modifies Markdown documentation files 
 | mix.exs has `main: "getting-started"` | `grep -q 'main: "getting-started"'` | exits 0 | PASS |
 | mix.exs has Integration Guides regex | `grep -q '"Integration Guides": ~r\|docs/integrations/\|'` | exits 0 | PASS |
 | All 10 SUMMARY commits exist | `git log --oneline` grep | all 10 hashes found | PASS |
+| GitHub Private Vulnerability Reporting is enabled | `gh api repos/szTheory/parapet/private-vulnerability-reporting` | returns `{"enabled":true}` | PASS |
 
 ### Probe Execution
 
@@ -111,7 +105,7 @@ Step 7c: SKIPPED — no `scripts/*/tests/probe-*.sh` files exist; this is a docu
 | DOCS-05 | 20-04 | Provider-as-bundle pattern in SLO authoring guide | SATISFIED | Section appended with canonical example; cross-link in slo-reference.md; committed a9ad80d, 95c6de8 |
 | DOCS-06 | 20-05 | HexDocs 4-group navigation with getting-started landing | SATISFIED | mix.exs groups_for_extras restructured; committed a8d89fd, a137733 |
 
-**REQUIREMENTS.md tracking is stale for GOV-01, GOV-02, and DOCS-05.** These three requirement IDs still show `[ ]` (unchecked) and "Pending" in the traceability table, but codebase evidence proves they are satisfied. This is a documentation tracking gap — not a code gap. A human should update REQUIREMENTS.md.
+`REQUIREMENTS.md` tracking for GOV-01, GOV-02, and DOCS-05 is current: these requirement IDs now show `[x]` in the checklist and `Complete` in the traceability table.
 
 ### Anti-Patterns Found
 
@@ -123,31 +117,17 @@ No debt markers found in any of: CONTRIBUTING.md, SECURITY.md, README.md, docs/i
 
 The `[...]` placeholder in the `slo-authoring-guide.md` code example (`defp my_custom_slices, do: [...]`) is intentional documentation convention representing "insert your slices here" — it is not a runtime stub and does not affect goal achievement.
 
-### Human Verification Required
-
-#### 1. Enable GitHub Private Vulnerability Reporting
-
-**Test:** Go to the parapet GitHub repository Settings > Code security and analysis, and enable Private Vulnerability Reporting.
-**Expected:** The URL https://github.com/szTheory/parapet/security/advisories/new resolves to an advisory submission form. SECURITY.md's disclosure channel works correctly for reporters.
-**Why human:** This is a GitHub repository settings toggle — it cannot be verified from the codebase or by grepping files.
-
-#### 2. Update REQUIREMENTS.md tracking records
-
-**Test:** Open `.planning/REQUIREMENTS.md` and update the checkbox and traceability table entries for GOV-01, GOV-02, and DOCS-05 from `[ ]`/Pending to `[x]`/Complete.
-**Expected:** REQUIREMENTS.md accurately reflects that GOV-01, GOV-02, and DOCS-05 are now satisfied by the phase 20 artifacts.
-**Why human:** REQUIREMENTS.md is a tracking document maintained by the project owner. Its stale state is a documentation gap — the underlying requirements are proven satisfied by codebase evidence, but the tracking file was not updated as part of the phase execution.
-
 ### Gaps Summary
 
 No code gaps. All deliverable artifacts exist, are substantive, and are wired correctly. The phase goal is achieved.
 
-Two items require human action before this phase is fully closed:
-1. Enable GitHub Private Vulnerability Reporting in repo settings (pre-merge action documented in SUMMARY).
-2. Update REQUIREMENTS.md tracking checkboxes for GOV-01, GOV-02, and DOCS-05.
+The previously outstanding follow-ups are now closed:
+1. GitHub Private Vulnerability Reporting is enabled for `szTheory/parapet`.
+2. `REQUIREMENTS.md` already reflects GOV-01, GOV-02, and DOCS-05 as complete.
 
-The GOV-03 (CODE_OF_CONDUCT.md) deviation is intentional and documented with an override.
+The GOV-03 (CODE_OF_CONDUCT.md) deviation remains intentional and documented with an override.
 
 ---
 
-_Verified: 2026-05-25T14:40:22Z_
+_Verified: 2026-05-25T19:46:09Z_
 _Verifier: Claude (gsd-verifier)_
