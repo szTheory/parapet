@@ -43,6 +43,18 @@ jobs:
           gh pr merge --auto --merge \
             "$(echo '${{ steps.release.outputs.pr }}' | jq -r '.number')"
 
+      - name: Trigger CI on the release PR branch
+        if: ${{ steps.release.outputs.pr }}
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+        run: |
+          # Release Please pushes to its PR branch with GITHUB_TOKEN, which
+          # by GitHub design does not trigger downstream workflows. Dispatch
+          # the CI workflow explicitly so release_gate reports against the
+          # PR head SHA and auto-merge can fire. workflow_dispatch is the
+          # documented exception to the GITHUB_TOKEN cycle-prevention rule.
+          gh workflow run ci.yml --ref release-please--branches--main
+
   publish-hex:
     runs-on: ubuntu-latest
     needs: [release-please]
