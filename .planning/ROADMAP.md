@@ -186,7 +186,10 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
   3. `ClaimService.claim_action/1` self-heals an expired-lease row atomically (`UPDATE ... WHERE lease_until < now() RETURNING *`), proven by a concurrency test that wins a claim against a stale claim left behind by a simulated node crash.
   4. A future capability addition can wire a new emit-site to a documented telemetry event without inventing a new event name.
 
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave (single coherent PR per D-17)
+
+  - [ ] 23-01-PLAN.md — Telemetry contract module `Parapet.Telemetry.RecoveryAction` (Experimental tier) + contract test + docs/telemetry.md Recovery Action section + docs/stability.md Experimental row (FND-02) (Wave 1)
+  - [ ] 23-02-PLAN.md — `lease_until` migration + schema field + `ClaimService` self-heal + `concurrency_bootstrap.ex` DDL update + expired-lease self-heal concurrency test (FND-01) (Wave 1)
 
 ### Phase 24: Recovery Behaviour + Capability Allowlist
 
@@ -292,7 +295,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
 | 21. Runnable Demo App | v1.0 | 6/6 | Complete | 2026-05-26 |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 4/4 | Complete | 2026-05-26 |
-| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 0/0 | Not started | - |
+| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 0/2 | Not started | - |
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 0/0 | Not started | - |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
