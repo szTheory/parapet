@@ -29,7 +29,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Started:** 2026-05-27. Seed thread: `.planning/threads/actionable-recovery-design.md`. Strategic context: `.planning/NEXT-STEP-ASSESSMENT.md`.
 
-**Progress:** Phase 23 (Foundations) complete 2026-05-27 — FND-01 (`lease_until` claim-lease column + `ClaimService` atomic self-heal, proven by automated migration-backfill + concurrency tests) and FND-02 (`Parapet.Telemetry.RecoveryAction` Experimental-tier event family + docs) shipped. Both decisions are irreversible-on-publish under the v1.0 freeze, so they land before any capability dispatch code. 366 tests / 0 failures.
+**Progress:** Phase 23 (Foundations) complete 2026-05-27 — FND-01 (`lease_until` claim-lease column + `ClaimService` atomic self-heal, proven by automated migration-backfill + concurrency tests) and FND-02 (`Parapet.Telemetry.RecoveryAction` Experimental-tier event family + docs) shipped. Both decisions are irreversible-on-publish under the v1.0 freeze, so they land before any capability dispatch code. 366 tests / 0 failures. Phase 24 (Recovery Behaviour + Capability Allowlist) complete 2026-05-27 — RCV-01 (`Parapet.Recovery` behaviour at `lib/parapet/recovery.ex` with four `@callback`s + minimal `__using__/1`), RCV-02 (crash-proof `attach/1` that silently skips unloaded host modules and bridges to the supervised `Parapet.Capabilities` Agent via `&module.preview/2` / `&module.execute/2` captures), and RCV-03 (allowlist widened to 5 atoms) shipped under the Experimental tier. 111 phase-scoped tests (7 sync + 100 async sweep, Pitfall 13 avoidance proven) / 0 failures.
 
 ## Previous Posture: Released Maintenance
 
@@ -244,4 +244,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-27 — Phase 23 (v1.1 foundations: FND-01 + FND-02) complete*
+*Last updated: 2026-05-27 — Phase 24 (v1.1 RCV-01 + RCV-02 + RCV-03) complete*
