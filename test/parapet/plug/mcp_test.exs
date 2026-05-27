@@ -1,5 +1,5 @@
 defmodule Parapet.Plug.MCPTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   import Plug.Test
   import Plug.Conn
 
@@ -10,7 +10,17 @@ defmodule Parapet.Plug.MCPTest do
   end
 
   setup do
+    previous_repo = Application.get_env(:parapet, :repo)
     Application.put_env(:parapet, :repo, DummyRepo)
+
+    on_exit(fn ->
+      if previous_repo do
+        Application.put_env(:parapet, :repo, previous_repo)
+      else
+        Application.delete_env(:parapet, :repo)
+      end
+    end)
+
     :ok
   end
 
