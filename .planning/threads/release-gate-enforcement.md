@@ -26,7 +26,7 @@ links:
 **Remaining for v1.2:**
 - Codify conventional-commit taxonomy in `CONTRIBUTING.md` + `.github/PULL_REQUEST_TEMPLATE.md` (which `docs:`/`chore:`/`ci:`/`test:` paths can be direct on a multi-maintainer project — moot for parapet's solo posture but worth documenting for adopters who fork this CI shape).
 - Path-based rulesets to allow direct-to-main for `docs:` / `.planning/` paths (reduces PR overhead on noise commits).
-- **Flaky test:** `test/mix/tasks/parapet.gen.grafana_test.exs:22` failed on the workflow_dispatch-triggered CI run during the v1.0.1 cut while the pull_request-triggered run on the same SHA passed. Could break the future auto-merge chain if it flakes during a release. Investigate root cause (likely test-ordering / shared-state issue).
+- **Flaky test:** `test/mix/tasks/parapet.gen.grafana_test.exs:22` ~~failed on the workflow_dispatch-triggered CI run during the v1.0.1 cut~~ → **fixed in PR #9 / commit fa26ac2** (`fix(test): isolate parapet.gen.grafana_test from global SLO state`). The fix is a bandage — `async: false` + setup-block snapshot/restore. The architectural root cause (Parapet.SLO uses global Application env as its registry) is split into its own dedicated thread: **[`slo-state-off-application-env`](slo-state-off-application-env.md)**. That thread is a v1.2 graduation candidate (high priority per maintainer signal).
 
 # Thread: Make `release_gate` Truly Required
 
