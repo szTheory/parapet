@@ -295,7 +295,7 @@ detail and per-phase closure evidence in [milestones/v0.9-ROADMAP.md](milestones
 | 20. Governance & Docs Completeness | v1.0 | 5/5 | Complete   | 2026-05-25 |
 | 21. Runnable Demo App | v1.0 | 6/6 | Complete | 2026-05-26 |
 | 22. Release Readiness & 1.0 Cut | v1.0 | 4/4 | Complete | 2026-05-26 |
-| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete   | 2026-05-27 |
+| 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete    | 2026-05-27 |
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 0/0 | Not started | - |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
