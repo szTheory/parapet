@@ -44,12 +44,12 @@ Evidence trail for every action.
 
 Six runbooks shipping with v1.1, matching JTBD-MAP failure modes.
 
-- [ ] **PB-01**: Retry Storm runbook ships as guidance-only by design (no capability binding) — every obvious mitigation worsens the failure; the template includes an explicit warning explaining why.
-- [ ] **PB-02**: Suppression Drift runbook ships as guidance-only by design (no capability binding) — same architectural rationale documented inline.
-- [ ] **PB-03**: Stalled Async runbook ships with a capability-backed step via the existing `:retry_async_item` allowlist id; demo scenario validates Preview → Confirm against a seeded stalled job.
-- [ ] **PB-04**: Dead-Letter Drain runbook ships with a capability-backed step via the existing `:requeue_dead_letter` allowlist id; demo scenario validates Preview → Confirm against seeded DLQ entries.
-- [ ] **PB-05**: Deploy-Tied Incident runbook ships with a capability-backed step via the new `:revert_feature_flag` capability id; example host implementation uses Rulestead as the canonical wiring target.
-- [ ] **PB-06**: Cardinality Blowout runbook ships with a capability-backed step via the new `:disable_metric_label` capability id; example host implementation references the existing cardinality analyzer surface.
+- [x] **PB-01**: Retry Storm runbook ships as guidance-only by design (no capability binding) — every obvious mitigation worsens the failure; the template includes an explicit warning explaining why.
+- [x] **PB-02**: Suppression Drift runbook ships as guidance-only by design (no capability binding) — same architectural rationale documented inline.
+- [x] **PB-03**: Stalled Async runbook ships with a capability-backed step via the existing `:retry_async_item` allowlist id; demo scenario validates Preview → Confirm against a seeded stalled job.
+- [x] **PB-04**: Dead-Letter Drain runbook ships with a capability-backed step via the existing `:requeue_dead_letter` allowlist id; demo scenario validates Preview → Confirm against seeded DLQ entries.
+- [x] **PB-05**: Deploy-Tied Incident runbook ships with a capability-backed step via the new `:revert_feature_flag` capability id; example host implementation uses Rulestead as the canonical wiring target.
+- [x] **PB-06**: Cardinality Blowout runbook ships with a capability-backed step via the new `:disable_metric_label` capability id; example host implementation references the existing cardinality analyzer surface.
 
 ### Demo Seed (DEMO)
 
@@ -121,12 +121,12 @@ Filled by the roadmapper. Each v1.1 requirement maps to exactly one phase (23–
 | AUD-01 | Phase 26 | Complete |
 | AUD-02 | Phase 26 | Complete |
 | AUD-03 | Phase 26 | Complete |
-| PB-01 | Phase 27 | Pending |
-| PB-02 | Phase 27 | Pending |
-| PB-03 | Phase 27 | Pending |
-| PB-04 | Phase 27 | Pending |
-| PB-05 | Phase 27 | Pending |
-| PB-06 | Phase 27 | Pending |
+| PB-01 | Phase 27 | Complete |
+| PB-02 | Phase 27 | Complete |
+| PB-03 | Phase 27 | Complete |
+| PB-04 | Phase 27 | Complete |
+| PB-05 | Phase 27 | Complete |
+| PB-06 | Phase 27 | Complete |
 | DEMO-05 | Phase 28 | Pending |
 | DEMO-06 | Phase 28 | Pending |
 | STAB-07 | Phase 29 | Pending |
