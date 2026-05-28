@@ -36,9 +36,9 @@ The operator-facing experience.
 
 Evidence trail for every action.
 
-- [ ] **AUD-01**: Every successful recovery action emits a `TimelineEntry` (`type: :recovery_confirmed`) linked to the incident, capturing operator identity, action name, args, outcome, and timestamps.
-- [ ] **AUD-02**: Every successful recovery action emits a `ToolAudit` row with the same evidence — operator identity, action name, args, outcome, timestamps — so the durable spine records what was done by whom.
-- [ ] **AUD-03**: `:recovery_failed` TimelineEntry type is added and emitted on capability execution error (distinct from short-circuit / conflict states, which emit no entry because nothing was executed).
+- [x] **AUD-01**: Every successful recovery action emits a `TimelineEntry` (`type: :recovery_confirmed`) linked to the incident, capturing operator identity, action name, args, outcome, and timestamps.
+- [x] **AUD-02**: Every successful recovery action emits a `ToolAudit` row with the same evidence — operator identity, action name, args, outcome, timestamps — so the durable spine records what was done by whom.
+- [x] **AUD-03**: `:recovery_failed` TimelineEntry type is added and emitted on capability execution error (distinct from short-circuit / conflict states, which emit no entry because nothing was executed).
 
 ### Prebuilt Playbooks (PB)
 
@@ -118,9 +118,9 @@ Filled by the roadmapper. Each v1.1 requirement maps to exactly one phase (23–
 | UI-02 | Phase 25 | Pending |
 | UI-03 | Phase 25 | Pending |
 | UI-04 | Phase 25 | Pending |
-| AUD-01 | Phase 26 | Pending |
-| AUD-02 | Phase 26 | Pending |
-| AUD-03 | Phase 26 | Pending |
+| AUD-01 | Phase 26 | Complete |
+| AUD-02 | Phase 26 | Complete |
+| AUD-03 | Phase 26 | Complete |
 | PB-01 | Phase 27 | Pending |
 | PB-02 | Phase 27 | Pending |
 | PB-03 | Phase 27 | Pending |
