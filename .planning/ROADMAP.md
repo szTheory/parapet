@@ -82,16 +82,6 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 - [ ] **Phase 28: Demo Seed + CI Lane** — Demo app seeded with a Preview-able + Confirm-able incident; CI exercises happy-path, preview-expiry, short-circuit, and claim-conflict scenarios (DEMO-05, DEMO-06)
 - [ ] **Phase 29: Stability + Adopter Onboarding** — Declare `Parapet.Recovery` Stable; CHANGELOG migration notes; `mix parapet.gen.recovery` Igniter task; `mix parapet.doctor` adoption signal; `docs/recovery-actions.md` adopter guide (STAB-07, ADOP-01, ADOP-02, ADOP-03)
 
-### 📌 v1.2 Authoring DX & Maturity (Candidate)
-
-**Candidate Goal:** Land additive DX and maturity work without reopening the 1.0 freeze.
-
-- [ ] **SLO-W1** — Flag-based `mix parapet.gen.slo` Igniter task
-- [ ] **Move `Parapet.SLO` registry off `Application` env** — graduation from the v1.0.1 grafana-test bandage
-- [ ] **CI-M1** — Multi-version Elixir / OTP CI matrix
-- [ ] **Post-1.0 maturity** — SHA-pinned actions, Dependabot, HexDocs logo/favicon, `MAINTAINING.md`, demo Docker Compose, branch-protection enforcement, conventional-commit taxonomy in CONTRIBUTING.md
-- [ ] **v0.x → v1.0 migration guide + deployment guide**
-
 ## Phase Details
 
 _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)._
@@ -231,3 +221,17 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
 
 _Earlier milestone phases (1-22) are archived — see the milestone archives linked above._
+
+## Candidate Milestones
+
+_Not-yet-started candidates. Kept after Phase Details so current-milestone tooling scopes correctly; also summarized in the top Milestones list._
+
+### 📌 v1.2 Authoring DX & Maturity (Candidate)
+
+**Candidate Goal:** Land additive DX and maturity work without reopening the 1.0 freeze.
+
+- [ ] **SLO-W1** — Flag-based `mix parapet.gen.slo` Igniter task
+- [ ] **Move `Parapet.SLO` registry off `Application` env** — graduation from the v1.0.1 grafana-test bandage
+- [ ] **CI-M1** — Multi-version Elixir / OTP CI matrix
+- [ ] **Post-1.0 maturity** — SHA-pinned actions, Dependabot, HexDocs logo/favicon, `MAINTAINING.md`, demo Docker Compose, branch-protection enforcement, conventional-commit taxonomy in CONTRIBUTING.md
+- [ ] **v0.x → v1.0 migration guide + deployment guide**
