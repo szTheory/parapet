@@ -121,10 +121,13 @@ defmodule Parapet.Operator.WorkbenchContract do
       step = stringify_keys(step)
       step_id = Map.get(step, "id")
 
-      # Check if this step was executed
+      # Check if this step was executed. A direct runbook execution writes
+      # "mitigation_executed"; a claim-protected operator Confirm writes
+      # "recovery_confirmed" (operator.ex). Both mark the step done so the
+      # Confirm/Execute affordance clears and a double-confirm can't re-fire.
       executed_entry =
         Enum.find(entries, fn e ->
-          e.type == "mitigation_executed" and
+          e.type in ["mitigation_executed", "recovery_confirmed"] and
             Map.get(e.payload || %{}, "step_id") == to_string(step_id)
         end)
 

@@ -396,6 +396,28 @@ defmodule Parapet.Operator.WorkbenchContractTest do
       assert step.executed_at == ~U[2026-05-10 10:15:00Z]
     end
 
+    test "marks steps as executed if a recovery_confirmed entry exists (WR-04: Confirm button clears)" do
+      incident = %Incident{
+        id: "inc-1",
+        runbook_data: %{
+          "steps" => [%{id: "step-1", label: "Fix it"}]
+        }
+      }
+
+      entries = [
+        %TimelineEntry{
+          type: "recovery_confirmed",
+          payload: %{"step_id" => "step-1", "capability" => "retry_async_item"},
+          inserted_at: ~U[2026-05-10 10:20:00Z]
+        }
+      ]
+
+      derived = WorkbenchContract.derive(incident, entries)
+      step = hd(derived.runbook_steps)
+      assert step.state == :executed
+      assert step.executed_at == ~U[2026-05-10 10:20:00Z]
+    end
+
     test "does not parse titles or descriptions when no durable triage evidence exists" do
       incident = %Incident{
         id: "inc-1",
