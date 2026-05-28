@@ -23,7 +23,7 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
 
   alias Parapet.Operator
   alias Parapet.Operator.ActionPayload
-  alias Parapet.Spine.{ActionClaim, Incident}
+  alias Parapet.Spine.{ActionClaim, Incident, TimelineEntry}
 
   defmodule ConcurrencyRunbook do
     @moduledoc false
@@ -191,6 +191,20 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
 
       assert length(all_claims) == 1,
              "unique constraint must keep exactly one claim row; got: #{length(all_claims)}"
+
+      # AUD-03 negative: the conflict arm must write zero recovery TimelineEntries.
+      # If the loser regressed and wrote one, the count here would be 2.
+      recovery_entries =
+        ConcurrencyRepo.all(
+          from(t in TimelineEntry,
+            where: t.incident_id == ^incident.id and t.type in ["recovery_confirmed", "recovery_failed"]
+          )
+        )
+
+      assert length(recovery_entries) == 1,
+             "conflict arm must write no recovery TimelineEntry: expected exactly 1 (winner's recovery_confirmed), got #{length(recovery_entries)}"
+
+      assert hd(recovery_entries).type == "recovery_confirmed"
     end)
   end
 end
