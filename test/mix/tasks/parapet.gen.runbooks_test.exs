@@ -97,6 +97,9 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
 
       assert suppression_drift_source =~ "defmodule Test.Parapet.Runbooks.SuppressionDrift do"
       assert suppression_drift_source =~ "warning:"
+      # Guidance-only contract (success criterion #2): no capability may ever be wired in.
+      assert suppression_drift_source =~ "kind: :guidance"
+      refute suppression_drift_source =~ "capability:"
 
       partial_backlog_drain_source =
         Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/partial_backlog_drain.ex")
@@ -115,6 +118,7 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
       assert deploy_tied_incident_source =~
                "defmodule Test.Parapet.Runbooks.DeployTiedIncident do"
 
+      assert deploy_tied_incident_source =~ "use Parapet.Runbook"
       assert deploy_tied_incident_source =~ "capability: :revert_feature_flag"
       assert deploy_tied_incident_source =~ "warning:"
 
@@ -125,6 +129,7 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
       assert cardinality_blowout_source =~
                "defmodule Test.Parapet.Runbooks.CardinalityBlowout do"
 
+      assert cardinality_blowout_source =~ "use Parapet.Runbook"
       assert cardinality_blowout_source =~ "capability: :disable_metric_label"
       assert cardinality_blowout_source =~ "warning:"
     end
