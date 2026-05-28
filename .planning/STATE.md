@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: verifying
-stopped_at: Completed 28-04-PLAN.md
-last_updated: "2026-05-28T20:35:56.218Z"
+stopped_at: Phase 29 context gathered (assumptions mode)
+last_updated: "2026-05-28T21:03:58.279Z"
 last_activity: 2026-05-28
 progress:
   total_phases: 7
@@ -112,7 +112,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T19:54:56.194Z
-Stopped at: Completed 28-04-PLAN.md
-Resume file: None
+Last session: 2026-05-28T21:03:58.275Z
+Stopped at: Phase 29 context gathered (assumptions mode)
+Resume file: .planning/phases/29-stability-adopter-onboarding/29-CONTEXT.md
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
