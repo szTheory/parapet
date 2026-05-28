@@ -1,0 +1,37 @@
+defmodule <%= inspect(@module_prefix) %>.CardinalityBlowout do
+  use Parapet.Runbook
+
+  title("Cardinality Blowout Recovery")
+  description("Guidance and recovery actions for a metric label cardinality explosion that is saturating the TSDB.")
+
+  step(:investigate_cardinality,
+    label: "Identify the High-Cardinality Label",
+    description: "Determine which metric and label combination is causing the cardinality blowout.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Run `mix parapet.doctor cardinality` against your application to statically flag unsafe label patterns. In your APM or TSDB admin UI, look for metrics whose label value counts have grown unboundedly — common culprits are user IDs, request IDs, or trace IDs accidentally promoted to labels. Cross-reference with the `Parapet.Metrics.Validator` compile-time ceiling (max 10 labels per metric) to identify any recently added label that bypassed the static guard at runtime via a dynamic value.",
+    warning: "Do not disable a label without confirming it is the source — removing a legitimate label will break any alerts or dashboards that filter on it."
+  )
+
+  step(:disable_label,
+    label: "Disable High-Cardinality Metric Label",
+    description: "Disable the offending metric label to stop cardinality growth in the TSDB.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :disable_metric_label,
+    target_kind: :metric_label,
+    requires_preview: true,
+    guidance: "The :disable_metric_label capability is wired at host registration time. The canonical reference surface for identifying and acting on cardinality issues is `mix parapet.doctor cardinality` and `Parapet.Metrics.Validator`. Register the capability in your Parapet.Recovery implementation to dispatch the label-disable action via your metrics configuration or TSDB admin API. Do not hard-code a module reference here — the capability dispatch is fully decoupled from the provider at template compile time.",
+    warning: "Disabling a metric label is immediately effective but may break existing Prometheus alert rules and Grafana panels that filter on the label value. Coordinate with your observability team before confirming. After disabling, trigger a scrape cycle and verify TSDB series count is declining. Re-enable only after the label source has been corrected to emit bounded values."
+  )
+
+  step(:verify_recovery,
+    label: "Verify Cardinality Reduction",
+    description: "Confirm the TSDB series count has returned to normal after the label is disabled.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check your TSDB admin UI or APM dashboard for a declining series count on the affected metric. Re-run `mix parapet.doctor cardinality` to confirm the static analysis is now clean. Verify that any dependent alert rules still fire correctly with the reduced label set and that no dashboards are showing missing-data gaps that would indicate a panel was relying on the disabled label."
+  )
+end
