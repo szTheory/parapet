@@ -173,7 +173,9 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   3. The four capability-backed templates (Stalled Async via `:retry_async_item`, Dead-Letter Drain via `:requeue_dead_letter`, Deploy-Tied Incident via `:revert_feature_flag`, Cardinality Blowout via `:disable_metric_label`) demonstrate the Preview → Confirm flow against realistic preview output (count, target_refs, preconditions, warnings, summary).
   4. Adopters can map any of the six templates to a specific SLO or alert name using the existing `Parapet.Runbook` DSL without modification.
 
-**Plans**: TBD
+**Plans**: 1 plan in 1 wave (single coherent PR — template authoring + suppression_drift hardening + generator wiring + test extension land atomically)
+
+  - [ ] 27-01-PLAN.md — Author two net-new capability templates (`deploy_tied_incident.ex.eex` via `:revert_feature_flag`, `cardinality_blowout.ex.eex` via `:disable_metric_label`); harden `suppression_drift.ex.eex` guidance-only warning; wire two `Igniter.copy_template` calls into `mix parapet.gen.runbooks`; extend the generator test (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (Wave 1)
 
 ### Phase 28: Demo Seed + CI Lane
 
@@ -218,7 +220,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 3/3 | Complete    | 2026-05-27 |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete    | 2026-05-28 |
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
-| 27. Prebuilt Playbooks | v1.1 | 0/0 | Not started | - |
+| 27. Prebuilt Playbooks | v1.1 | 0/1 | Planned     | - |
 | 28. Demo Seed + CI Lane | v1.1 | 0/0 | Not started | - |
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
 
