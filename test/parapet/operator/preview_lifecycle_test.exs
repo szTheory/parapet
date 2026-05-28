@@ -262,6 +262,111 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     assert {:ok, %{timeline_entry: %TimelineEntry{type: "recovery_confirmed"}}} = result
   end
 
+  test "confirm_runbook_step succeeds while the incident is investigating (CR-01: ack-then-confirm)",
+       %{payload: payload, incident: incident} do
+    # An operator typically Acknowledges (state -> "investigating") before
+    # Confirming. The claim must still be granted: confirm_runbook_step passes
+    # allowed_states: ["open", "investigating"] so the ClaimService state gate
+    # does NOT short-circuit. Regression guard for the CR-01 happy-path break.
+    investigating = %{incident | state: "investigating"}
+    Process.put(:mock_incident, investigating)
+
+    {:ok, %{preview: preview}} = Operator.preview_runbook_step(investigating, :retry, payload)
+    token = preview["preview_token"]
+
+    entry = %TimelineEntry{
+      incident_id: investigating.id,
+      type: "recovery_preview",
+      payload: preview,
+      inserted_at: DateTime.utc_now()
+    }
+
+    Process.put(:mock_entries, [entry])
+
+    assert {:ok, %{timeline_entry: %TimelineEntry{type: "recovery_confirmed"}}} =
+             Operator.confirm_runbook_step(investigating, :retry, token, payload)
+  end
+
+  test "confirm_runbook_step short-circuits :incident_resolved when the incident is resolved",
+       %{payload: payload, incident: incident} do
+    # "resolved" is NOT in the operator allowed_states, so the gate short-circuits
+    # with "already_resolved" -> :incident_resolved. This is the honest case the
+    # :incident_resolved reason is meant for (contrast with CR-01's investigating).
+    resolved = %{incident | state: "resolved"}
+    Process.put(:mock_incident, resolved)
+
+    {:ok, %{preview: preview}} = Operator.preview_runbook_step(resolved, :retry, payload)
+    token = preview["preview_token"]
+
+    entry = %TimelineEntry{
+      incident_id: resolved.id,
+      type: "recovery_preview",
+      payload: preview,
+      inserted_at: DateTime.utc_now()
+    }
+
+    Process.put(:mock_entries, [entry])
+
+    assert {:short_circuited, :incident_resolved} =
+             Operator.confirm_runbook_step(resolved, :retry, token, payload)
+  end
+
+  test "confirm_runbook_step returns the capability error and releases the claim on execute failure (CR-02)",
+       %{payload: payload, incident: incident} do
+    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+
+    Parapet.Capabilities.register_recovery(:retry_async_item,
+      name: "Retry Item",
+      target_kind: "async_item",
+      preview: fn _incident, _step -> {:ok, %{"target_refs" => ["item-a"]}} end,
+      execute: fn _incident, _refs -> {:error, :provider_unavailable} end
+    )
+
+    {:ok, %{preview: preview}} = Operator.preview_runbook_step(incident, :retry, payload)
+    token = preview["preview_token"]
+
+    entry = %TimelineEntry{
+      incident_id: incident.id,
+      type: "recovery_preview",
+      payload: preview,
+      inserted_at: DateTime.utc_now()
+    }
+
+    Process.put(:mock_entries, [entry])
+
+    assert {:error, :provider_unavailable} =
+             Operator.confirm_runbook_step(incident, :retry, token, payload)
+  end
+
+  test "confirm_runbook_step converts a raised capability into a structured error (CR-03)",
+       %{payload: payload, incident: incident} do
+    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+
+    Parapet.Capabilities.register_recovery(:retry_async_item,
+      name: "Retry Item",
+      target_kind: "async_item",
+      preview: fn _incident, _step -> {:ok, %{"target_refs" => ["item-a"]}} end,
+      execute: fn _incident, _refs -> raise "boom from host" end
+    )
+
+    {:ok, %{preview: preview}} = Operator.preview_runbook_step(incident, :retry, payload)
+    token = preview["preview_token"]
+
+    entry = %TimelineEntry{
+      incident_id: incident.id,
+      type: "recovery_preview",
+      payload: preview,
+      inserted_at: DateTime.utc_now()
+    }
+
+    Process.put(:mock_entries, [entry])
+
+    assert {:error, {:capability_raised, message}} =
+             Operator.confirm_runbook_step(incident, :retry, token, payload)
+
+    assert message =~ "boom from host"
+  end
+
   test "target_refs canonicalization is stable across atom-vs-string round-trip (Pitfall 5 regression guard)",
        %{payload: payload, incident: incident} do
     # The capability for this test returns atom target_refs; compute_preview/3

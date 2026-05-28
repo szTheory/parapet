@@ -177,4 +177,49 @@ defmodule Parapet.Automation.ClaimServiceTest do
       assert DateTime.compare(claim.lease_until, DateTime.utc_now()) == :gt
     end)
   end
+
+  @tag :unboxed
+  test "mark_failed releases a won claim so a retry re-grants it instead of conflicting" do
+    unboxed_run(fn ->
+      ConcurrencyBootstrap.reset!()
+
+      {:ok, incident} =
+        %Incident{}
+        |> Incident.changeset(%{title: "Retry after execute failure"})
+        |> ConcurrencyRepo.insert()
+
+      assert {:won, claim} =
+               ClaimService.claim_action(
+                 incident_id: incident.id,
+                 action_kind: "operator",
+                 action_key: "step-1",
+                 idempotency_key: "attempt_1_#{incident.id}"
+               )
+
+      # Simulate the operator-path execute failure releasing the claim.
+      ClaimService.mark_failed(claim, {:capability_raised, "provider boom"})
+
+      released = ConcurrencyRepo.get!(ActionClaim, claim.id)
+      assert released.status == "failed_retryable"
+      assert released.last_error_kind == "capability_raised"
+      assert released.last_error_message == "provider boom"
+
+      # A retry within the original lease window must re-grant the SAME row
+      # (CR-02: no 5-minute lockout), not return {:conflicted, _}.
+      assert {:won, retried} =
+               ClaimService.claim_action(
+                 incident_id: incident.id,
+                 action_kind: "operator",
+                 action_key: "step-1",
+                 idempotency_key: "attempt_2_#{incident.id}"
+               )
+
+      assert retried.id == claim.id
+      assert retried.status == "claimed"
+      assert retried.attempt_count == 2
+      assert is_nil(retried.last_error_kind)
+      assert retried.idempotency_key == "attempt_2_#{incident.id}"
+      assert ConcurrencyRepo.aggregate(ActionClaim, :count, :id) == 1
+    end)
+  end
 end
