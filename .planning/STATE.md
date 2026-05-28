@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
-stopped_at: Phase 26 planned (1 plan, plan-checker passed)
-last_updated: "2026-05-28T14:52:05.133Z"
+stopped_at: Phase 27 context gathered (assumptions mode)
+last_updated: "2026-05-28T17:35:29.895Z"
 last_activity: 2026-05-28
 progress:
   total_phases: 7
@@ -100,7 +100,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T11:51:22.276Z
-Stopped at: Phase 26 planned (1 plan, plan-checker passed)
-Resume file: .planning/phases/26-audit-propagation/26-01-PLAN.md
+Last session: 2026-05-28T17:35:29.893Z
+Stopped at: Phase 27 context gathered (assumptions mode)
+Resume file: .planning/phases/27-prebuilt-playbooks/27-CONTEXT.md
 Next step: `/gsd:execute-phase 26` to execute the audit-propagation plan.
