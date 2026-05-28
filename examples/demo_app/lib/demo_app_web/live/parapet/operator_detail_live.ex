@@ -136,6 +136,19 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
          socket
          |> put_flash(:info, "Mitigation confirmed and executed")
          |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
+      {:short_circuited, reason} ->
+        {:noreply,
+         socket
+         |> put_flash(:warning, short_circuit_flash(reason))
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
+      {:conflicted, _claim_id} ->
+        {:noreply,
+         socket
+         |> put_flash(:warning, "Another node is executing this recovery — refresh to see the outcome")
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Confirmation failed: #{inspect(reason)}")}
     end
@@ -144,6 +157,11 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
   def handle_event("cancel_preview", _params, socket) do
     {:noreply, socket}
   end
+
+  defp short_circuit_flash(:preview_expired), do: "Preview expired — please re-Preview before confirming"
+  defp short_circuit_flash(:incident_resolved), do: "Incident already resolved — no action needed"
+  defp short_circuit_flash(:breaker_open), do: "Circuit breaker open — recovery temporarily disabled"
+  defp short_circuit_flash(:target_refs_drift), do: "Target state changed since Preview — please re-Preview"
 
   def render(assigns) do
     ~H"""
