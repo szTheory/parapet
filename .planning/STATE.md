@@ -4,13 +4,13 @@ milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
 stopped_at: Completed 28-01-PLAN.md
-last_updated: "2026-05-28T19:03:56.174Z"
+last_updated: "2026-05-28T19:05:54.195Z"
 last_activity: 2026-05-28
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 15
-  completed_plans: 11
+  completed_plans: 12
   percent: 71
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery miles
 ## Current Position
 
 Phase: 28 (demo-seed-ci-lane) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-05-28
 
@@ -62,6 +62,7 @@ Last activity: 2026-05-28
 
 *Updated after each plan completion*
 | Phase 28 P01 | 8 | 2 tasks | 2 files |
+| Phase 28 P02 | 33s | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,7 @@ Recent decisions affecting current work:
 - `Parapet.Recovery` ships Stable-tier from day one in Phase 29; the 4-callback shape is frozen because adding required callbacks in v1.2 would be breaking under the v1.0 stability promise.
 - Operator-clicked Confirm path is the v1.1 architectural defect closure: today it skips `ClaimService` while the Oban auto-execution path goes through it. Phase 25 closes the gap.
 - [Phase ?]: Reuse frozen-allowlist atom :retry_async_item in DemoApp.Recovery.RetryAsyncItem — non-allowlisted id raises ArgumentError at Parapet.Capabilities.register_recovery/2
+- [Phase ?]: demo.reset leads with ecto.drop so seeds stay always-insert and replayability comes from the drop (D-10)
 
 ### Pending Todos
 
@@ -103,7 +105,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T19:03:56.171Z
+Last session: 2026-05-28T19:05:47.411Z
 Stopped at: Completed 28-01-PLAN.md
 Resume file: None
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
