@@ -1,0 +1,37 @@
+defmodule <%= inspect(@module_prefix) %>.DeployTiedIncident do
+  use Parapet.Runbook
+
+  title("Deploy-Tied Incident Recovery")
+  description("Guidance and recovery actions for incidents correlated with a recent deploy or feature-flag change.")
+
+  step(:investigate_deployment,
+    label: "Correlate Incident With Recent Deploy",
+    description: "Determine whether the incident onset aligns with a recent deployment or feature-flag activation.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Review your deploy history and feature-flag change log for events in the window immediately preceding the incident. Check your APM for error-rate or latency spikes that align with a specific deploy or flag activation. Cross-reference the SLO error budget burn rate against the deploy timestamp to confirm causation before proceeding to mitigation.",
+    warning: "Do not revert a flag without confirming it was the causal change — reverting an unrelated flag may have unintended side effects and will not resolve the incident."
+  )
+
+  step(:revert_flag,
+    label: "Revert Feature Flag",
+    description: "Roll back the feature flag associated with the deploy to restore previous behavior.",
+    type: :mitigation,
+    kind: :capability,
+    capability: :revert_feature_flag,
+    target_kind: :feature_flag,
+    requires_preview: true,
+    guidance: "The :revert_feature_flag capability is wired at host registration time via Rulestead, Parapet's feature-flag change-correlation integration. Register the capability in your Parapet.Recovery implementation using Rulestead's flag-revert surface. See the Rulestead integration guide for the exact registration call. Do not hard-code a module reference here — the capability dispatch is fully decoupled from the provider at template compile time.",
+    warning: "Reverting a flag will affect all users currently in the rollout cohort. Confirm the blast radius (percentage of traffic, feature scope) before confirming the preview. If the flag controls a database migration path or a schema-dependent feature, coordinate a rollback of the migration before reverting the flag to avoid data-integrity issues."
+  )
+
+  step(:verify_recovery,
+    label: "Verify Recovery",
+    description: "Confirm the incident has resolved after the flag revert.",
+    type: :manual,
+    kind: :guidance,
+    preview_only: true,
+    guidance: "Check your APM and SLO error budget for improvement within 2–5 minutes of the flag revert. Verify that the error rate and latency have returned to pre-incident baselines. Review the incident timeline for any new escalation entries that may indicate residual impact from the flag change."
+  )
+end

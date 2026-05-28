@@ -107,6 +107,28 @@ defmodule Mix.Tasks.Parapet.Gen.Runbooks do
       assigns,
       on_exists: :skip
     )
+    |> Igniter.copy_template(
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "deploy_tied_incident.ex.eex"
+      ]),
+      Path.join([lib_dir, "deploy_tied_incident.ex"]),
+      assigns,
+      on_exists: :skip
+    )
+    |> Igniter.copy_template(
+      Path.join([
+        :code.priv_dir(:parapet),
+        "templates",
+        "parapet.gen.runbooks",
+        "cardinality_blowout.ex.eex"
+      ]),
+      Path.join([lib_dir, "cardinality_blowout.ex"]),
+      assigns,
+      on_exists: :skip
+    )
     |> Igniter.add_notice("""
     Parapet runbooks generated at `#{lib_dir}`.
     You can customize the copy and thresholds to fit your domain.

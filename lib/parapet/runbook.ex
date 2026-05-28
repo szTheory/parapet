@@ -33,7 +33,8 @@ defmodule Parapet.Runbook do
     * `:type` - The step type: `:manual` or `:mitigation`.
     * `:kind` - The step kind: `:guidance` or `:capability`.
     * `:capability` - The capability id to invoke for capability-backed mitigation steps
-      (one of `:retry_async_item`, `:requeue_dead_letter`, `:request_manual_provider_check`).
+      (one of `:retry_async_item`, `:requeue_dead_letter`, `:request_manual_provider_check`,
+      `:revert_feature_flag`, `:disable_metric_label`).
     * `:target_kind` - The kind of action item this step targets (atom or string).
     * `:requires_preview` - Whether a preview must be confirmed before execution (boolean, default `false`).
     * `:preview_only` - Whether this step renders as a guidance block with no action button (boolean, default `false`).
