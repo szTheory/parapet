@@ -199,7 +199,7 @@ target refs drift, or incident already resolved).
 - `capability_id`
 - `action_kind`
 - `outcome` - Always `:short_circuited` at this seam.
-- `short_circuit_reason` - One of `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`.
+- `short_circuit_reason` - One of `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`, `:internal_error`.
 - `actor_kind`
 
 ### `[:parapet, :operator, :recovery_action, :conflicted]`
@@ -247,7 +247,7 @@ version change); removing or renaming is breaking (major version change). See
 [Stability & Deprecation Policy](stability.html) for details.
 
 - **`outcome`**: `:previewed`, `:confirmed`, `:short_circuited`, `:conflicted`, `:succeeded`, `:failed`
-- **`short_circuit_reason`**: `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`
+- **`short_circuit_reason`**: `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`, `:internal_error`
 - **`failure_class`**: `:precondition_failed`, `:provider_unavailable`, `:partial_failure`, `:internal_error`
 - **`actor_kind`**: `:human`, `:system`
 - **`action_kind`**: `"operator"`, `"automation"`, `"escalation"`

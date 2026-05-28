@@ -138,9 +138,11 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
          |> assign(incident: load_detail(incident_id))}
 
       {:short_circuited, reason} ->
+        {level, message} = Parapet.Operator.UI.short_circuit_flash(reason)
+
         {:noreply,
          socket
-         |> put_flash(:warning, short_circuit_flash(reason))
+         |> put_flash(level, message)
          |> assign(incident: load_detail(incident_id))}
 
       {:conflicted, _claim_id} ->
@@ -151,17 +153,21 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
 
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Confirmation failed: #{inspect(reason)}")}
+
+      other ->
+        require Logger
+        Logger.warning("Unhandled confirm_runbook_step/4 result: #{inspect(other)}")
+
+        {:noreply,
+         socket
+         |> put_flash(:warning, "Recovery returned an unexpected result — refresh to review")
+         |> assign(incident: load_detail(incident_id))}
     end
   end
 
   def handle_event("cancel_preview", _params, socket) do
     {:noreply, socket}
   end
-
-  defp short_circuit_flash(:preview_expired), do: "Preview expired — please re-Preview before confirming"
-  defp short_circuit_flash(:incident_resolved), do: "Incident already resolved — no action needed"
-  defp short_circuit_flash(:breaker_open), do: "Circuit breaker open — recovery temporarily disabled"
-  defp short_circuit_flash(:target_refs_drift), do: "Target state changed since Preview — please re-Preview"
 
   # Server-side resolution of the capability's user-facing action name onto the
   # active preview map. CONTEXT D-09 forbids editing WorkbenchContract.find_active_preview/1,

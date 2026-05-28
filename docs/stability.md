@@ -47,6 +47,7 @@ in a minor release; a single CHANGELOG entry will accompany any breaking change.
 | `Parapet.MCP.Server` | Read-only MCP server surface |
 | `Parapet.MCP.PrometheusClient` | Prometheus query client for MCP |
 | `Parapet.Recovery` | Host-app-facing recovery action behaviour + activation function |
+| `Parapet.Operator.UI` | Operator recovery-action UI copy helpers for generated LiveViews |
 | `Parapet.Telemetry.RecoveryAction` | Machine-readable recovery action telemetry contract |
 | `Parapet.Automation.CircuitBreaker` | Ecto-backed circuit breaker for mitigations |
 | `Parapet.Automation.ClaimService` | Action claim and idempotency service |

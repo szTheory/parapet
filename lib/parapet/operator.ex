@@ -15,6 +15,7 @@ defmodule Parapet.Operator do
   alias Parapet.Operator.ActionPayload
   alias Parapet.Evidence
   alias Parapet.Automation.ClaimService
+  alias Parapet.Telemetry.RecoveryAction
 
   alias Parapet.Operator.WorkbenchContract
 
@@ -22,6 +23,27 @@ defmodule Parapet.Operator do
   @default_queue_page_size 30
   @max_queue_page_size 100
   @queue_page_telemetry_event [:parapet, :operator, :queue, :page]
+  @recovery_action_prefix [:parapet, :operator, :recovery_action]
+
+  @typedoc """
+  Closed vocabulary of reasons a recovery Confirm can be short-circuited without
+  executing. Additive within 1.x — new reasons may be added in a minor release,
+  but existing reasons will not be removed. Callers should handle unknown reasons
+  defensively (see `Parapet.Operator.UI.short_circuit_flash/1`).
+  """
+  @type short_circuit_reason ::
+          :preview_expired
+          | :target_refs_drift
+          | :incident_resolved
+          | :breaker_open
+          | :internal_error
+
+  @typedoc "Return contract of `confirm_runbook_step/4`."
+  @type confirm_result ::
+          {:ok, map()}
+          | {:short_circuited, short_circuit_reason()}
+          | {:conflicted, binary()}
+          | {:error, term()}
 
   @doc since: "1.0.0"
   @doc """
@@ -671,8 +693,30 @@ defmodule Parapet.Operator do
           audit_attrs: audit_attrs
         )
         |> case do
-          {:ok, result} -> {:ok, Map.put(result, :preview, preview_data)}
-          error -> error
+          {:ok, result} ->
+            emit_recovery_event(:previewed, %{
+              capability_id: capability_id,
+              action_kind: :operator,
+              outcome: :previewed,
+              actor_kind: :human,
+              incident_id: incident.id,
+              step_id: to_string(step_id_atom)
+            })
+
+            {:ok, Map.put(result, :preview, preview_data)}
+
+          error ->
+            emit_recovery_event(:preview_failed, %{
+              capability_id: capability_id,
+              action_kind: :operator,
+              outcome: :failed,
+              failure_class: :internal_error,
+              actor_kind: :human,
+              incident_id: incident.id,
+              step_id: to_string(step_id_atom)
+            })
+
+            error
         end
       else
         nil -> {:error, :capability_unwired}
@@ -683,11 +727,25 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.1.0"
+  @doc """
+  Returns the closed list of `t:short_circuit_reason/0` atoms that
+  `confirm_runbook_step/4` may return inside a `{:short_circuited, reason}` tuple.
+
+  Generated operator UIs and tests enumerate this list to verify they handle
+  every reason. The list is additive within 1.x.
+  """
+  @spec short_circuit_reasons() :: [short_circuit_reason()]
+  def short_circuit_reasons,
+    do: [:preview_expired, :target_refs_drift, :incident_resolved, :breaker_open, :internal_error]
+
   @doc since: "1.0.0"
   @doc """
   Confirms and executes a recovery action.
   Validates the preview_token and requires an idempotency_key in the payload.
   """
+  @spec confirm_runbook_step(Incident.t(), atom() | String.t(), String.t(), ActionPayload.t()) ::
+          confirm_result()
   def confirm_runbook_step(
         %Incident{} = incident,
         step_id,
@@ -707,11 +765,13 @@ defmodule Parapet.Operator do
            {:ok, preview_entry} <- find_recent_preview(incident.id, step_id_atom, preview_token) do
         cond do
           DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) != :gt ->
+            emit_short_circuit(:preview_expired, capability_id, incident.id, step_id_atom)
             {:short_circuited, :preview_expired}
 
           not is_nil(preview_entry.target_refs_hash) and
               preview_entry.target_refs_hash !=
                 target_refs_hash(preview_entry.target_refs) ->
+            emit_short_circuit(:target_refs_drift, capability_id, incident.id, step_id_atom)
             {:short_circuited, :target_refs_drift}
 
           not is_function(capability.execute, 2) ->
@@ -730,14 +790,65 @@ defmodule Parapet.Operator do
                    allowed_states: ["open", "investigating"]
                  ) do
               {:won, claim} ->
+                emit_recovery_event(:confirmed, %{
+                  capability_id: capability_id,
+                  action_kind: :operator,
+                  outcome: :confirmed,
+                  actor_kind: :human,
+                  incident_id: incident.id,
+                  claim_id: claim.id
+                })
+
                 # Adopter-supplied execute closure: isolate exceptions so a host
                 # crash can't strand the won claim or crash the calling process.
+                # The span measures only the execute call; the rescue keeps a host
+                # raise from surfacing as a :telemetry :exception sub-event (which is
+                # reserved for genuinely uncaught raises) and from stranding the claim.
                 exec_outcome =
-                  try do
-                    capability.execute.(incident, preview_entry.target_refs)
-                  rescue
-                    e -> {:error, {:capability_raised, Exception.message(e)}}
-                  end
+                  :telemetry.span(
+                    @recovery_action_prefix ++ [:executed],
+                    RecoveryAction.shape_metadata(:executed, %{
+                      capability_id: capability_id,
+                      action_kind: :operator,
+                      actor_kind: :human,
+                      incident_id: incident.id,
+                      claim_id: claim.id
+                    }),
+                    fn ->
+                      result =
+                        try do
+                          capability.execute.(incident, preview_entry.target_refs)
+                        rescue
+                          e -> {:error, {:capability_raised, Exception.message(e)}}
+                        end
+
+                      stop_meta =
+                        case result do
+                          {:ok, _} ->
+                            RecoveryAction.shape_metadata(:executed, %{
+                              capability_id: capability_id,
+                              action_kind: :operator,
+                              actor_kind: :human,
+                              outcome: :succeeded,
+                              incident_id: incident.id,
+                              claim_id: claim.id
+                            })
+
+                          {:error, _} ->
+                            RecoveryAction.shape_metadata(:executed, %{
+                              capability_id: capability_id,
+                              action_kind: :operator,
+                              actor_kind: :human,
+                              outcome: :failed,
+                              failure_class: :internal_error,
+                              incident_id: incident.id,
+                              claim_id: claim.id
+                            })
+                        end
+
+                      {result, stop_meta}
+                    end
+                  )
 
                 case exec_outcome do
                   {:ok, exec_result} ->
@@ -756,7 +867,10 @@ defmodule Parapet.Operator do
 
                     audit_attrs =
                       build_audit("operator_confirm_recovery", payload)
-                      |> Map.put(:output, %{"status" => "succeeded", "result" => inspect(exec_result)})
+                      |> Map.put(:output, %{
+                        "status" => "succeeded",
+                        "result" => inspect(exec_result)
+                      })
                       |> Map.update!(:input, fn base ->
                         Map.merge(base, %{
                           "action_name" => to_string(capability_id),
@@ -818,9 +932,20 @@ defmodule Parapet.Operator do
                 end
 
               {:short_circuited, _claim, reason_string} ->
-                {:short_circuited, map_short_circuit_reason(reason_string)}
+                reason = map_short_circuit_reason(reason_string)
+                emit_short_circuit(reason, capability_id, incident.id, step_id_atom)
+                {:short_circuited, reason}
 
               {:conflicted, claim} ->
+                emit_recovery_event(:conflicted, %{
+                  capability_id: capability_id,
+                  action_kind: :operator,
+                  outcome: :conflicted,
+                  actor_kind: :human,
+                  incident_id: incident.id,
+                  claim_id: claim.id
+                })
+
                 {:conflicted, claim.id}
 
               {:error, reason} ->
@@ -839,10 +964,35 @@ defmodule Parapet.Operator do
   defp validate_step_exists(nil), do: {:error, :step_not_found}
   defp validate_step_exists(step), do: {:ok, step}
 
+  # Emits a discrete recovery_action telemetry event. shape_metadata/2 enforces
+  # redaction by construction (Map.take of allowlisted keys), so only the closed
+  # vocabulary + IDs-as-refs ever reach a subscriber — never the incident struct,
+  # raw target_refs, the actor string, or the execute result (those go to the
+  # durable ToolAudit/TimelineEntry, keeping telemetry separate from audit).
+  defp emit_recovery_event(family, metadata) do
+    :telemetry.execute(
+      @recovery_action_prefix ++ [family],
+      %{count: 1},
+      RecoveryAction.shape_metadata(family, metadata)
+    )
+  end
+
+  defp emit_short_circuit(reason, capability_id, incident_id, step_id_atom) do
+    emit_recovery_event(:short_circuited, %{
+      capability_id: capability_id,
+      action_kind: :operator,
+      outcome: :short_circuited,
+      short_circuit_reason: reason,
+      actor_kind: :human,
+      incident_id: incident_id,
+      step_id: to_string(step_id_atom)
+    })
+  end
+
   # Maps ClaimService's internal short-circuit reason strings to the frozen
-  # public atom vocab in Parapet.Telemetry.RecoveryAction (@short_circuit_reasons
-  # at recovery_action.ex:46-51). Fallback returns :internal_error to avoid
-  # leaking raw strings to adopters (RESEARCH Pattern 3 + Security V7).
+  # public atom vocab in Parapet.Telemetry.RecoveryAction (@short_circuit_reasons)
+  # — also the t:short_circuit_reason/0 type. Fallback returns :internal_error to
+  # avoid leaking raw strings to adopters (RESEARCH Pattern 3 + Security V7).
   defp map_short_circuit_reason("already_resolved"), do: :incident_resolved
   defp map_short_circuit_reason("already_investigating"), do: :incident_resolved
   defp map_short_circuit_reason("already_open"), do: :incident_resolved

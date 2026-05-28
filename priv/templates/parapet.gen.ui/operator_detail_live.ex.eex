@@ -136,8 +136,34 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
          socket
          |> put_flash(:info, "Mitigation confirmed and executed")
          |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
+      {:short_circuited, reason} ->
+        {level, message} = Parapet.Operator.UI.short_circuit_flash(reason)
+
+        {:noreply,
+         socket
+         |> put_flash(level, message)
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
+      {:conflicted, _claim_id} ->
+        {:noreply,
+         socket
+         |> put_flash(:warning, "Another node is executing this recovery — refresh to see the outcome")
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+
       {:error, reason} ->
         {:noreply, put_flash(socket, :error, "Confirmation failed: #{inspect(reason)}")}
+
+      # Forward-compatibility: a future additive return variant degrades to a
+      # refresh instead of crashing this (possibly older) generated LiveView.
+      other ->
+        require Logger
+        Logger.warning("Unhandled confirm_runbook_step/4 result: #{inspect(other)}")
+
+        {:noreply,
+         socket
+         |> put_flash(:warning, "Recovery returned an unexpected result — refresh to review")
+         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
     end
   end
 

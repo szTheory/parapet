@@ -47,7 +47,8 @@ defmodule Parapet.Telemetry.RecoveryAction do
     incident_resolved: :incident_resolved,
     breaker_open: :breaker_open,
     preview_expired: :preview_expired,
-    target_refs_drift: :target_refs_drift
+    target_refs_drift: :target_refs_drift,
+    internal_error: :internal_error
   }
 
   @failure_classes %{
@@ -175,7 +176,7 @@ defmodule Parapet.Telemetry.RecoveryAction do
   Raises `ArgumentError` for unknown short circuit reasons.
 
   Valid reasons: `:incident_resolved`, `:breaker_open`, `:preview_expired`,
-  `:target_refs_drift`.
+  `:target_refs_drift`, `:internal_error`.
   """
   def normalize_short_circuit_reason(reason) do
     reason |> normalize_enum(@short_circuit_reasons, "short_circuit_reason")
