@@ -104,6 +104,26 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
   })
 
 # ---------------------------------------------------------------------------
+# Incident 4: OPEN — stalled async executor (capability-backed, Preview/Confirm)
+# ---------------------------------------------------------------------------
+{:ok, incident_stalled} =
+  Parapet.Evidence.create_incident(%{
+    title: "Stalled async executor",
+    description: "Background job stuck in executing state for > 10 minutes",
+    state: "open",
+    correlation_key: "stalled-async-executor",
+    runbook_data: %{
+      "module" => to_string(DemoApp.Runbooks.StalledExecutor)
+    }
+  })
+
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_stalled.id, %{
+    type: "note",
+    payload: %{"text" => "Job ID 8821 last heartbeat at 09:14 UTC — executor did not report completion"}
+  })
+
+# ---------------------------------------------------------------------------
 # Tool audit — records a doctor check against the demo environment
 # ---------------------------------------------------------------------------
 {:ok, _} =
@@ -115,4 +135,4 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     duration_ms: 23
   })
 
-IO.puts("Seeds complete: 3 incidents (open/investigating/resolved), 6 timeline entries, 1 tool audit")
+IO.puts("Seeds complete: 4 incidents (open x2/investigating/resolved), 7 timeline entries, 1 tool audit")
