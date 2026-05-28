@@ -49,6 +49,7 @@ defmodule DemoApp.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "demo.reset": ["ecto.drop", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "assets.build": ["tailwind default", "esbuild demo_app"],
       "assets.deploy": ["tailwind default --minify", "esbuild demo_app --minify", "phx.digest"]
     ]
