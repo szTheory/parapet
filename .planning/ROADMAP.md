@@ -191,7 +191,13 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   4. The demo seed is replayable via `mix demo.reset` — adopters can run the recovery smoke test repeatedly without manual database cleanup.
 
 **UI hint**: yes
-**Plans**: TBD
+**Plans**: 5 plans in 3 waves
+
+  - [ ] 28-01-PLAN.md — Author the two compiled demo modules: `DemoApp.Runbooks.StalledExecutor` (use Parapet.Runbook, `:retry_item` capability step) and `DemoApp.Recovery.RetryAsyncItem` (use Parapet.Recovery, 4 callbacks, `execute/2` mutates an ActionItem) (DEMO-05) (Wave 1)
+  - [ ] 28-02-PLAN.md — Add the `mix demo.reset` alias (ecto.drop+create+migrate+seeds) for replayable seeding (DEMO-05) (Wave 1)
+  - [ ] 28-03-PLAN.md — Wire `Parapet.Capabilities` into the demo supervision tree + boot-time `Parapet.Recovery.attach([DemoApp.Recovery.RetryAsyncItem])` (DEMO-05, DEMO-06) (Wave 2)
+  - [ ] 28-04-PLAN.md — Add the capability-backed seeded incident with `runbook_data["module"]` => StalledExecutor (DEMO-05) (Wave 3)
+  - [ ] 28-05-PLAN.md — Author four `:smoke` recovery-loop scenarios (happy-path, preview-expired, resolved-mid-flow, sequential claim-conflict) through the Parapet.Operator API; confirm release_gate CI wiring needs no edits (DEMO-06) (Wave 3)
 
 ### Phase 29: Stability + Adopter Onboarding
 
