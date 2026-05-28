@@ -144,11 +144,14 @@ defmodule Parapet.Evidence.Retrospective do
   defp format_payload(%{"change_ref" => ref}), do: "Change marker: #{ref}"
 
   defp format_payload(%{"capability" => cap, "actor" => actor, "outcome" => %{"status" => "succeeded"}} = p) do
-    target_refs = Map.get(p, "target_refs", [])
-    "#{cap} confirmed by #{actor} on #{inspect(target_refs)}"
+    case Map.get(p, "target_refs", []) do
+      [] -> "#{cap} confirmed by #{actor}"
+      refs -> "#{cap} confirmed by #{actor} on #{Enum.join(refs, ", ")}"
+    end
   end
 
-  defp format_payload(%{"capability" => cap, "actor" => actor, "outcome" => %{"status" => "failed", "reason" => reason}}) do
+  defp format_payload(%{"capability" => cap, "actor" => actor, "outcome" => %{"status" => "failed"} = outcome}) do
+    reason = Map.get(outcome, "reason", "unknown reason")
     "Recovery failed: #{cap} by #{actor} — #{reason}"
   end
 
