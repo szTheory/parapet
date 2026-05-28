@@ -13,7 +13,11 @@ defmodule DemoApp.Application do
     ]
 
     opts = [strategy: :one_for_one, name: DemoApp.Supervisor]
-    Supervisor.start_link(children, opts)
+    {:ok, sup} = Supervisor.start_link(children, opts)
+    # Parapet.Capabilities is started by the :parapet OTP application (Parapet.Internal.Application).
+    # attach/1 is safe to call here because the named singleton is already running at this point.
+    {:ok, _} = Parapet.Recovery.attach([DemoApp.Recovery.RetryAsyncItem])
+    {:ok, sup}
   end
 
   @impl true
