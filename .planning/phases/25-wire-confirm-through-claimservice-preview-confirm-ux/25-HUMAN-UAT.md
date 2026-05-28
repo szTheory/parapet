@@ -20,8 +20,8 @@ result: [pending]
 expected: Decision resolved YES (ack-then-confirm is a valid workflow) and the code is fixed (commit 65e5ee5): the claim gate now accepts "investigating", so after Acknowledge → Preview → Confirm the operator sees the success flash and the capability executes — no more spurious "Incident already resolved". Covered by passing tests; confirm the success flash renders for the acknowledged path.
 result: [pending]
 
-### 3. Conflict-flash copy on single-node self-conflict
-expected: Flash reads "Another node is executing this recovery — refresh to see the outcome" (verbatim ROADMAP criterion #2). On a single-node self-conflict this copy is misleading (WR-WR05). Verify the copy is acceptable or schedule the WR-WR05 rewording.
+### 3. Conflict-flash copy (multi-node) — WR-04 self-conflict path now closed
+expected: WR-04 is FIXED (commit b39b402): after a successful Confirm the step is marked executed and the Confirm affordance clears, so the double-click self-conflict that made the multi-node copy misleading on a single node is no longer reachable. The verbatim "Another node is executing this recovery — refresh to see the outcome" string remains for genuine multi-node contention (ROADMAP criterion #2). Confirm the copy reads acceptably in the real multi-node case.
 result: [pending]
 
 ### 4. Preview-expired + re-Preview affordance
