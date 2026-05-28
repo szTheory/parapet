@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
-status: executing
-stopped_at: Phase 27 (Prebuilt Playbooks) complete — auto-advance pipeline halted (--no-transition)
-last_updated: "2026-05-28T18:16:58.322Z"
+status: verifying
+stopped_at: Phase 28 context gathered (assumptions mode)
+last_updated: "2026-05-28T18:29:37.131Z"
 last_activity: 2026-05-28
 progress:
   total_phases: 7
@@ -101,7 +101,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T17:35:29.893Z
-Stopped at: Phase 27 (Prebuilt Playbooks) complete — verified passed, pipeline halted (--no-transition)
-Resume file: .planning/phases/27-prebuilt-playbooks/27-VERIFICATION.md
+Last session: 2026-05-28T18:29:37.127Z
+Stopped at: Phase 28 context gathered (assumptions mode)
+Resume file: .planning/phases/28-demo-seed-ci-lane/28-CONTEXT.md
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
