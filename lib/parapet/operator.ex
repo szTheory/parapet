@@ -747,12 +747,22 @@ defmodule Parapet.Operator do
                       type: "recovery_confirmed",
                       payload: %{
                         "step_id" => to_string(step_id_atom),
+                        "actor" => payload.actor,
                         "capability" => to_string(capability_id),
-                        "result" => inspect(exec_result)
+                        "target_refs" => preview_entry.target_refs || [],
+                        "outcome" => %{"status" => "succeeded", "result" => inspect(exec_result)}
                       }
                     }
 
-                    audit_attrs = build_audit("operator_confirm_recovery", payload)
+                    audit_attrs =
+                      build_audit("operator_confirm_recovery", payload)
+                      |> Map.put(:output, %{"status" => "succeeded", "result" => inspect(exec_result)})
+                      |> Map.update!(:input, fn base ->
+                        Map.merge(base, %{
+                          "action_name" => to_string(capability_id),
+                          "target_refs" => preview_entry.target_refs || []
+                        })
+                      end)
 
                     Evidence.run_operator_command(
                       incident_changeset: Ecto.Changeset.change(incident, %{}),
@@ -761,6 +771,42 @@ defmodule Parapet.Operator do
                     )
 
                   {:error, reason} ->
+                    # Best-effort audit write before releasing the claim.
+                    # Result is discarded so the original {:error, reason} return
+                    # contract is preserved regardless of DB outcome (Pitfall 2 / D-06).
+                    failure_timeline_attrs = %{
+                      type: "recovery_failed",
+                      payload: %{
+                        "step_id" => to_string(step_id_atom),
+                        "actor" => payload.actor,
+                        "capability" => to_string(capability_id),
+                        "target_refs" => preview_entry.target_refs || [],
+                        "outcome" => %{"status" => "failed", "reason" => inspect(reason)}
+                      }
+                    }
+
+                    failure_audit_attrs = %{
+                      tool_name: "operator_confirm_recovery",
+                      success: false,
+                      input: %{
+                        "actor" => payload.actor,
+                        "reason" => payload.reason,
+                        "correlation_id" => payload.correlation_id,
+                        "idempotency_key" => payload.idempotency_key,
+                        "action_type" => Atom.to_string(payload.action_type),
+                        "action_name" => to_string(capability_id),
+                        "target_refs" => preview_entry.target_refs || []
+                      },
+                      output: %{"status" => "failed", "reason" => inspect(reason)}
+                    }
+
+                    _ =
+                      Evidence.run_operator_command(
+                        incident_changeset: Ecto.Changeset.change(incident, %{}),
+                        timeline_attrs: failure_timeline_attrs,
+                        audit_attrs: failure_audit_attrs
+                      )
+
                     # Release the claim so the operator can retry immediately
                     # rather than being locked out for the 5-minute lease window.
                     ClaimService.mark_failed(claim, reason)
