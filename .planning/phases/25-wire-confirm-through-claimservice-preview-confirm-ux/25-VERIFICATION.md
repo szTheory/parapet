@@ -1,21 +1,28 @@
 ---
 phase: 25-wire-confirm-through-claimservice-preview-confirm-ux
-verified: 2026-05-28T02:42:47Z
+verified: 2026-05-28T07:25:00Z
 status: human_needed
-score: 4/4 must-haves verified (criterion-level); 4/4 requirement IDs satisfied
+score: 4/4 must-haves verified (code/contract level); 4/4 requirement IDs satisfied; 3/3 code-review BLOCKERs FIXED
 overrides_applied: 0
 re_verification:
-  previous_status: none
-  note: "Initial verification. A 25-REVIEW.md (3 BLOCKER / 6 WARNING / 3 INFO) was completed by the code-reviewer immediately prior; this verification independently re-checked the 3 BLOCKERs against the code and the 4 ROADMAP success criteria."
+  previous_status: human_needed
+  previous_score: "4/4 (criterion-level); 4/4 requirement IDs; 3 BLOCKERs open as WARNINGs pending a product decision"
+  gaps_closed:
+    - "CR-01: incident_state_gate now accepts allowed_states (default [\"open\"]; operator passes [\"open\",\"investigating\"]) — Acknowledge-then-Confirm no longer short-circuits. Product decision (ack-then-confirm is valid) resolved YES; fix verified in claim_service.ex + operator.ex; covered by 2 new passing tests."
+    - "CR-02: ClaimService.mark_failed/2 added (status \"failed_retryable\" + last_error_*); steal_expired_claim re-grants failed_retryable rows; operator error arm releases the claim. No more 5-minute retry lockout. Verified in code + unboxed Postgres test (mark_failed-then-retry re-grants the same row)."
+    - "CR-03: capability.execute wrapped in try/rescue → {:error, {:capability_raised, msg}}; claim released via mark_failed. Verified in code + new passing structured-error test."
+  gaps_remaining: []
+  regressions: []
+  note: "Re-verification after commits 65e5ee5 + 790541b. Independently re-checked the 3 former BLOCKERs against the code and ran the new regression tests in-process. Full library suite re-run: 483 tests, 0 failures. mix compile --warnings-as-errors clean."
 human_verification:
-  - test: "Open-incident happy path in the demo app: open an OPEN incident, click Preview on a capability-backed runbook step, then click Confirm Recovery WITHOUT acknowledging first."
+  - test: "Open-incident happy path in the demo app: open an OPEN incident, click Preview on a capability-backed runbook step, then click Confirm Recovery."
     expected: "Preview panel shows Action name + Target Kind + Affected Count; Confirm flashes \"Mitigation confirmed and executed\" and the capability executes. (Code + unit/concurrency tests prove this returns {:ok, recovery_confirmed} on an open incident; visual render needs human eyes.)"
     why_human: "LiveView visual rendering (preview panel layout, flash appearance, blast-radius/diff fields) cannot be verified programmatically; demo app is not in the library mix test path (RESEARCH Pitfall 3)."
-  - test: "Acknowledge-then-Confirm path: on an incident, click Acknowledge Incident (moves state to investigating), then Preview, then Confirm."
-    expected: "DECISION POINT. With the current code, ClaimService.incident_state_gate/1 only passes state==\"open\"; after Acknowledge the incident is \"investigating\", so Confirm returns {:short_circuited, :incident_resolved} and the flash reads \"Incident already resolved — no action needed\" (mislabeled). Confirm directly whether your intended operator workflow permits Acknowledge-before-Confirm. If yes, this is a happy-path break (see WARNING WR-CR01) and the gate/mapping must be fixed before shipping. If operators Confirm directly on open incidents, this is a latent UX wart, not a blocker."
-    why_human: "The 'intended operator workflow' (whether Acknowledge precedes Confirm) is a product/design decision not encoded anywhere in the codebase or planning docs. The code does NOT force Acknowledge before Confirm (buttons gate on step.state + active_preview, not incident state), so the criterion is not mechanically broken — but the answer determines whether WR-CR01 is a blocker."
-  - test: "Conflict-flash copy on single-node self-conflict: trigger a {:conflicted, _} (e.g., double-click Confirm after a successful confirm, since WR-04 means the button never clears) on a single node."
-    expected: "Flash currently reads \"Another node is executing this recovery — refresh to see the outcome\" (verbatim ROADMAP criterion #2). On a single-node self-conflict this copy is misleading (WR-WR05). Verify the copy is acceptable or schedule the WR-WR05 rewording."
+  - test: "Acknowledge-then-Confirm path: click Acknowledge Incident (moves state to investigating), then Preview, then Confirm."
+    expected: "Confirm now SUCCEEDS — flashes \"Mitigation confirmed and executed\" and the capability executes (NOT the prior mislabeled \"Incident already resolved\"). CR-01 is FIXED: confirm_runbook_step/4 passes allowed_states: [\"open\",\"investigating\"] so the ClaimService state gate no longer short-circuits after Acknowledge. The CR-01 product DECISION is resolved (ack-then-confirm IS a valid workflow). This item is now a pure VISUAL render confirmation of the success flash, not a decision point."
+    why_human: "The fix is code-proven (preview_lifecycle_test.exs investigating-succeeds test passes), but confirming the operator sees the SUCCESS flash (not a stale short-circuit message) in the actual demo LiveView still needs human eyes; demo app is a separate Mix project outside the library test path."
+  - test: "Conflict-flash copy on single-node self-conflict: trigger a {:conflicted, _} (e.g., double-click Confirm after a successful confirm — WR-04 means the Confirm button never clears) on a single node."
+    expected: "Flash reads \"Another node is executing this recovery — refresh to see the outcome\" (verbatim ROADMAP criterion #2). On a single-node self-conflict this copy is misleading (WR-WR05). Verify the copy is acceptable or schedule the WR-WR05 rewording. NOTE: WR-04 (Confirm button not clearing after a successful confirm) was NOT in scope for this fix batch and remains open — the double-confirm path that produces a self-conflict still exists."
     why_human: "Whether the multi-node-worded copy is acceptable for single-node self-conflict is a UX judgment call; the verbatim string is contractually pinned by ROADMAP criterion #2."
   - test: "Preview-expired + re-Preview affordance: generate a Preview, wait past 5 minutes (or expire the stored expires_at), click Confirm."
     expected: "Flash reads \"Preview expired — please re-Preview before confirming\" and the Preview button on the runbook card reappears (the active preview clears via the load_detail re-derive). Confirm there is a usable re-Preview path. NOTE: CONTEXT D-11 mentioned a dedicated 'Re-Preview button'; the implementation instead reuses the existing Preview button (RESEARCH A7) — verify this affordance is discoverable."
@@ -25,9 +32,36 @@ human_verification:
 # Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX — Verification Report
 
 **Phase Goal:** Close the operator-path-skips-claim defect by routing `Parapet.Operator.confirm_runbook_step/4` through `Parapet.Automation.ClaimService.claim_action/1` (same path the Oban auto-execution uses), add the `{:short_circuited, reason}` and `{:conflicted, claim_id}` additive return variants, and render both branches in the LiveView with operator-actionable next steps. Preview tokens get a 5-minute expiry with `target_refs` hash gating.
-**Verified:** 2026-05-28T02:42:47Z
+**Verified:** 2026-05-28T07:25:00Z
 **Status:** human_needed
-**Re-verification:** No — initial verification (post code-review)
+**Re-verification:** Yes — after code-review gap closure (commits 65e5ee5 + 790541b). Previous status: human_needed.
+
+## Re-Verification Summary
+
+The prior verification (2026-05-28T02:42) was `human_needed` for two reasons: (1) the demo LiveView visual flows require human render confirmation, and (2) the CR-01 question — "does the intended operator workflow permit Acknowledge-before-Confirm?" — was an unresolved product DECISION POINT that, if answered "yes", escalated WR-CR01 to a blocker. The user decided **YES**, ack-then-confirm is a valid operator workflow, and the three code-review BLOCKERs were fixed.
+
+**All three BLOCKERs are now FIXED and independently verified against the code + new passing regression tests:**
+
+### CR-01 FIXED — incident_state_gate now allow-list driven; ack-then-confirm succeeds
+
+- `lib/parapet/automation/claim_service.ex:189-206`: `run_gates/4` reads `allowed_states = Keyword.get(opts, :allowed_states, ["open"])` and calls `incident_state_gate(incident, allowed_states)` which returns `:ok` when `state in allowed_states`, else `{:short_circuit, "already_#{state}"}`. The **default `["open"]` preserves Executor/Escalation behavior unchanged** (neither passes `allowed_states`).
+- `lib/parapet/operator.ex:721-731`: `confirm_runbook_step/4` passes `allowed_states: ["open", "investigating"]`. So after Acknowledge (state → "investigating"), Confirm no longer short-circuits.
+- **Tests (both pass):** `preview_lifecycle_test.exs:265-288` ("succeeds while the incident is investigating") asserts `{:ok, %{timeline_entry: %TimelineEntry{type: "recovery_confirmed"}}}`. `preview_lifecycle_test.exs:290-312` ("short-circuits :incident_resolved when resolved") asserts `{:short_circuited, :incident_resolved}` — proving the gate still honestly blocks the genuinely-resolved case while the `:incident_resolved` reason mapping (operator.ex:796-800) is now reached only via the resolved/open/suppressed paths, not the investigating happy path.
+
+### CR-02 FIXED — won claim released on execute failure; no 5-minute lockout
+
+- `lib/parapet/automation/claim_service.ex:87-96`: new `mark_failed/2` transitions the claim to `"failed_retryable"` (default) and records `last_error_kind`/`last_error_message`.
+- `lib/parapet/automation/claim_service.ex:146-167`: `steal_expired_claim` query now re-grants when `(status == "claimed" AND lease_until < now) OR status == "failed_retryable"`, resetting status to `"claimed"`, refreshing the lease, clearing the error fields, and incrementing `attempt_count`.
+- `lib/parapet/operator.ex:763-767`: the execute `{:error, reason}` arm now calls `ClaimService.mark_failed(claim, reason)` before returning `{:error, reason}`.
+- Schema support: `lib/parapet/spine/action_claim.ex:16-25,39-41,51-65` adds `"failed_retryable"`/`"failed_terminal"` to `@statuses` and `:last_error_kind`/`:last_error_message` fields + casts. Migration `priv/repo/migrations/20260521010000_create_parapet_action_claims.exs:18-19` already has the columns.
+- **Test (passes against real Postgres):** `claim_service_test.exs:181-224` (`@tag :unboxed`) wins a claim, calls `mark_failed`, asserts `status == "failed_retryable"` + `last_error_kind == "capability_raised"` + `last_error_message == "provider boom"`, then a retry **re-grants the SAME row** (`retried.id == claim.id`, `status == "claimed"`, `attempt_count == 2`, error fields nil, total claim count still 1). This is the direct CR-02 proof: a transient failure no longer locks the operator out for the lease window.
+
+### CR-03 FIXED — adopter capability.execute isolated in try/rescue
+
+- `lib/parapet/operator.ex:735-740`: `capability.execute.(incident, preview_entry.target_refs)` is wrapped in `try/rescue`; a raise becomes `{:error, {:capability_raised, Exception.message(e)}}`. The structured error then flows through the same `{:error, reason}` arm (operator.ex:763-767) that releases the claim via `mark_failed`, so a raised host closure both (a) cannot crash the operator/LiveView boundary and (b) does not strand the claim.
+- **Test (passes):** `preview_lifecycle_test.exs:341-368` registers a capability whose `execute` does `raise "boom from host"`, asserts `{:error, {:capability_raised, message}}` and `message =~ "boom from host"`.
+
+**Net:** the two former human-verification items that were *decision-dependent* (CR-01 ack-then-confirm decision, and conflict-flash-on-self-conflict insofar as it tied to CR-02's stranded-claim conflict) now resolve. CR-01 is fixed (not an open blocker); CR-02's stranded-claim path is fixed so a *failed* recovery no longer produces a spurious self-conflict. The remaining human items are pure LiveView visual/real-time render confirmations.
 
 ## Goal Achievement
 
@@ -35,23 +69,23 @@ human_verification:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | Preview renders action name + target args + blast-radius + diff before execution; Confirm without fresh Preview rejected with "re-Preview required" | ✓ VERIFIED (code) / ? render needs human | `preview_panel/1` (operator_components.ex:343-407) renders Action cell (line 357-358, sourced from `get_recovery(...).name`), Target Kind (363), Affected Count (367), warnings (371-380). Confirm-without-fresh-Preview is gated by `@detail.derived.active_preview` (operator_detail_live.ex:256) + `find_recent_preview/3` `{:error, :mismatched_preview}` (operator.ex:877). Happy-path Confirm on open incident → `{:ok, recovery_confirmed}` proven by operator_test.exs:593-594 + preview_lifecycle_test.exs:262. Visual layout/diff fields need human render check. |
-| 2 | Second operator's Confirm during in-flight claim sees verbatim "Another node is executing this recovery — refresh to see the outcome" (`:conflicted` branch, operator-actionable) | ✓ VERIFIED | `{:conflicted, _claim_id}` arm (operator_detail_live.ex:146-150) emits the verbatim string (grep count = 1). At the API level the conflict path is PROVEN by confirm_concurrency_test.exs (ran 3x, deterministic): exactly one `{:ok,_}` + one `{:conflicted, claim_id}`, claim_id resolves to a real `parapet_action_claims` row. |
-| 3 | Confirm on Preview older than 5 min, or against a resolved-since-Preview incident, returns `{:short_circuited, reason}`; LiveView renders reason ("Preview expired"/"Incident already resolved") with Re-Preview | ✓ VERIFIED | `cond` gate (operator.ex:709-710) → `{:short_circuited, :preview_expired}` proven by operator_test.exs:603-604 + preview_lifecycle_test.exs:201-202. Incident-state short-circuit via ClaimService gate → `map_short_circuit_reason("already_resolved") -> :incident_resolved` (operator.ex:780). `short_circuit_flash/1` (operator_detail_live.ex:161-164) renders all 4 reasons; verbatim strings present (grep each = 1). Re-Preview = reappearing Preview button (RESEARCH A7). 5-min expiry at compute_preview/3 (operator.ex:788). |
-| 4 | Every successful Confirm flows through `ActionPayload` + `ClaimService.claim_action/1` with `action_kind: "operator"` — observable in a multi-node concurrency test | ✓ VERIFIED | `confirm_runbook_step/4` dispatches `ClaimService.claim_action(action_kind: "operator", ...)` (operator.ex:721-727; grep `action_kind: "operator"` = 1). `{:won, claim}` → `capability.execute` → `ClaimService.mark_executed` (operator.ex:728-731). Concurrency test asserts the winner's claim row has `action_kind == "operator"`, `action_key == "op_step"`, `status == "executed"` (confirm_concurrency_test.exs:174-178). |
+| 1 | Preview renders action name + target args + blast-radius + diff before execution; Confirm without fresh Preview rejected with "re-Preview required" | ✓ VERIFIED (code) / ? render needs human | `preview_panel/1` (operator_components.ex) renders Action cell + Target Kind + Affected Count + warnings. Confirm-without-fresh-Preview gated by `active_preview` + `find_recent_preview/3` `{:error, :mismatched_preview}` (operator.ex:893). Happy-path Confirm on open incident → `{:ok, recovery_confirmed}` (preview_lifecycle_test.exs:232-263, 8 tests pass). Visual layout/diff fields need human render check. |
+| 2 | Second operator's Confirm during in-flight claim sees verbatim "Another node is executing this recovery — refresh to see the outcome" (`:conflicted` branch, operator-actionable) | ✓ VERIFIED | `{:conflicted, _claim_id}` arm (operator_detail_live.ex:146-149) emits the verbatim string (grep count = 1). Conflict path PROVEN by claim_service_test.exs:10-83 (unboxed): exactly one `{:won,_}` + one `{:conflicted, %ActionClaim{}}`, single durable row. |
+| 3 | Confirm on Preview older than 5 min, or against a resolved-since-Preview incident, returns `{:short_circuited, reason}`; LiveView renders reason with Re-Preview | ✓ VERIFIED | `cond` gate (operator.ex:709-710) → `{:short_circuited, :preview_expired}` proven by preview_lifecycle_test.exs:184-203. Incident-state short-circuit via ClaimService gate → `{:short_circuited, :incident_resolved}` proven by preview_lifecycle_test.exs:290-312 (now honestly reached only for resolved, NOT investigating — CR-01 fix). `short_circuit_flash/1` (operator_detail_live.ex:161-164) renders all 4 reasons (verbatim strings present). Re-Preview = reappearing Preview button (RESEARCH A7). 5-min expiry at compute_preview/3 (operator.ex:804). |
+| 4 | Every successful Confirm flows through `ActionPayload` + `ClaimService.claim_action/1` with `action_kind: "operator"` — observable in a multi-node concurrency test | ✓ VERIFIED | `confirm_runbook_step/4` dispatches `ClaimService.claim_action(action_kind: "operator", ...)` (operator.ex:721-731). `{:won, claim}` → isolated `capability.execute` → `ClaimService.mark_executed` (operator.ex:743-744). Multi-node race proven by claim_service_test.exs unboxed suite (4 tests, 0 failures). |
 
-**Score:** 4/4 success criteria met at the code/contract level. Criteria #1, #2, #3 require human render confirmation of the demo LiveView (see Human Verification).
+**Score:** 4/4 success criteria met at the code/contract level; 3/3 former BLOCKERs FIXED. Criteria #1, #2, #3 require human render confirmation of the demo LiveView (see Human Verification).
 
 ### Requirements Coverage
 
-All four requirement IDs from PLAN frontmatter cross-referenced against `.planning/REQUIREMENTS.md` (all map to Phase 25; none orphaned).
+All four requirement IDs cross-referenced against `.planning/REQUIREMENTS.md` (lines 30-33, 117-120; all map to Phase 25; none orphaned).
 
 | Requirement | Source Plan(s) | Description | Status | Evidence |
 |-------------|---------------|-------------|--------|----------|
-| UI-01 | 25-02 | Preview shows action name, target args, blast-radius, expected diff in a dedicated panel | ✓ SATISFIED | `preview_panel/1` Action cell + Target Kind + Affected Count + Warnings (operator_components.ex:355-380); action name via `get_recovery/1` (operator_detail_live.ex:186-200). |
-| UI-02 | 25-01, 25-03 | Confirm routes through `ActionPayload` + `ClaimService.claim_action/1` (closes operator-path-skips-claim defect) | ✓ SATISFIED | operator.ex:721-727 dispatch; concurrency test proves the claim-protected path with `action_kind: "operator"`. |
-| UI-03 | 25-01, 25-03 | 5-min preview expiry; stale detected via `target_refs` hash; expired prompts re-Preview | ✓ SATISFIED | `compute_preview/3` 300s expiry + `target_refs_hash` (operator.ex:788, 822); drift gate (operator.ex:712-715); `preview_lifecycle_test.exs` covers `:preview_expired`, `:target_refs_drift`, nil-hash legacy compat, Pitfall-5 canonicalization. |
-| UI-04 | 25-01, 25-02, 25-03 | Confirm returns `{:short_circuited, reason}` / `{:conflicted, claim_id}`; LiveView renders both branches with actionable next steps | ✓ SATISFIED | New return variants (operator.ex:710,715,755,758); 4-arm LiveView handler (operator_detail_live.ex:133-154); `short_circuit_flash/1` closed mapper; concurrency test proves the conflict path. |
+| UI-01 | 25-02 | Preview shows action name, target args, blast-radius, expected diff in a dedicated panel | ✓ SATISFIED | `preview_panel/1` Action cell + Target Kind + Affected Count + Warnings; action name via `get_recovery/1`. (Visual render → human.) |
+| UI-02 | 25-01, 25-03 | Confirm routes through `ActionPayload` + `ClaimService.claim_action/1` (closes operator-path-skips-claim defect) | ✓ SATISFIED | operator.ex:721-731 dispatch with `action_kind: "operator"`; unboxed concurrency test proves the claim-protected path. |
+| UI-03 | 25-01, 25-03 | 5-min preview expiry; stale detected via `target_refs` hash; expired prompts re-Preview | ✓ SATISFIED | `compute_preview/3` 300s expiry + `target_refs_hash` (operator.ex:804, 838); drift gate (operator.ex:712-715); preview_lifecycle_test covers `:preview_expired`, `:target_refs_drift`, nil-hash legacy compat, Pitfall-5 canonicalization. |
+| UI-04 | 25-01, 25-02, 25-03 | Confirm returns `{:short_circuited, reason}` / `{:conflicted, claim_id}`; LiveView renders both branches with actionable next steps | ✓ SATISFIED | New return variants (operator.ex:710,715,771,774); 4-arm LiveView handler (operator_detail_live.ex:133-154); `short_circuit_flash/1` closed mapper; conflict path proven. |
 
 No ORPHANED requirements: REQUIREMENTS.md maps exactly UI-01..UI-04 to Phase 25, and all four are claimed across the three plans.
 
@@ -59,92 +93,96 @@ No ORPHANED requirements: REQUIREMENTS.md maps exactly UI-01..UI-04 to Phase 25,
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `lib/parapet/operator.ex` | 4-arm `claim_action/1` dispatch + `map_short_circuit_reason/1` + `target_refs_hash/1` + hash write/surface | ✓ VERIFIED | All present (operator.ex:708-785, 822, 873). `:stale_preview` fully removed (grep=0). `alias ClaimService` (line 17). Compiles clean. |
-| `examples/demo_app/.../operator_detail_live.ex` | 4-arm `confirm_mitigation` handler + closed `short_circuit_flash/1` | ✓ VERIFIED | 4 arms (lines 133-154); verbatim conflict flash (grep=1); 4 closed flash clauses (grep=1 each); `load_detail/1` augmentation. Demo app compiles (only 3 pre-existing unrelated warnings). |
-| `examples/demo_app/.../operator_components.ex` | `preview_panel/1` with Action cell | ✓ VERIFIED | Action cell at lines 356-359, value `Map.get(preview, :action_name) \|\| preview.data["capability"]`. |
-| `test/parapet/operator/confirm_concurrency_test.exs` | Multi-node race proof | ✓ VERIFIED | 197 lines; substantive assertions; passes 3x deterministically. |
-| `test/parapet/operator/preview_lifecycle_test.exs` | `:preview_expired` + `:target_refs_drift` + legacy + canonicalization | ✓ VERIFIED | 308 lines; 4 tests, 0 failures. |
-| `test/parapet/operator_test.exs` | `:stale_preview` → `:preview_expired` + DummyRepo for raw-fun txn | ✓ VERIFIED | 14 tests, 0 failures; assertion updated (line 603). |
+| `lib/parapet/operator.ex` | 4-arm `claim_action/1` dispatch + `allowed_states` + try/rescue execute + `mark_failed` release + `map_short_circuit_reason/1` + `target_refs_hash` | ✓ VERIFIED | `allowed_states: ["open","investigating"]` (730); try/rescue (735-740); `mark_failed` on error arm (766); no debt markers; `mix compile --warnings-as-errors` clean. |
+| `lib/parapet/automation/claim_service.ex` | `allowed_states` opt (default `["open"]`); `mark_failed/2`; `steal_expired_claim` re-grants `failed_retryable` | ✓ VERIFIED | `run_gates` reads opt (190); `incident_state_gate/2` (200-206); `mark_failed/2` (87-96); steal query OR-clause (152-153). Executor/Escalation untouched (use default). |
+| `lib/parapet/spine/action_claim.ex` | `failed_retryable`/`failed_terminal` statuses + `last_error_*` fields | ✓ VERIFIED | `@statuses` (16-25); fields (39-41); cast list (51-65). Migration columns present (20260521010000:18-19). |
+| `examples/demo_app/.../operator_detail_live.ex` | 4-arm `confirm_mitigation` handler + closed `short_circuit_flash/1` + verbatim conflict copy | ✓ VERIFIED | 4 arms (133-154); verbatim conflict flash (149, grep=1); 4 closed flash clauses (161-164). |
+| `test/parapet/operator/preview_lifecycle_test.exs` | investigating-succeeds, resolved-short-circuits, execute-error-releases, execute-raise-structured-error (+ prior 4) | ✓ VERIFIED | 8 tests, 0 failures. New CR tests at lines 265-288, 290-312, 314-339, 341-368 — substantive (real Operator + ClaimService path, asserting concrete tuples), not stubs. |
+| `test/parapet/automation/claim_service_test.exs` | `mark_failed`-then-retry re-grant (@tag :unboxed, real Postgres) | ✓ VERIFIED | 4 tests, 0 failures (unboxed). New test at 181-224 asserts status transition + same-row re-grant + attempt_count increment + single durable row. |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|----|----|--------|---------|
-| `confirm_runbook_step/4` `{:won, claim}` arm | `ClaimService.mark_executed/1` | called after `capability.execute` returns `{:ok,_}` | ✓ WIRED | operator.ex:731 inside the `{:ok, exec_result}` branch. |
-| `map_short_circuit_reason/1` | `recovery_action.ex @short_circuit_reasons` frozen vocab | string→frozen atom (closed clauses) | ✓ WIRED (lossy — see WR-WR02) | Maps to `:incident_resolved`/`:breaker_open` (frozen atoms confirmed at recovery_action.ex:46-51). Lossy collapse of investigating/open→incident_resolved is a WARNING, not a break. |
-| `compute_preview/3` | `find_recent_preview/3` | `target_refs_hash` written at compute, read at confirm | ✓ WIRED | Hash written post-merge (operator.ex:822); surfaced nullable (operator.ex:873). |
+| `confirm_runbook_step/4` claim opts | `ClaimService.run_gates/4` `allowed_states` | `allowed_states: ["open","investigating"]` keyword | ✓ WIRED | operator.ex:730 → claim_service.ex:190. Default `["open"]` keeps Executor/Escalation behavior. |
+| `confirm_runbook_step/4` execute-error arm | `ClaimService.mark_failed/2` | called on `{:error, reason}` after isolated execute | ✓ WIRED | operator.ex:766. Releases claim to `failed_retryable`. |
+| `confirm_runbook_step/4` raised execute | `{:error, {:capability_raised, msg}}` | `try/rescue` around `capability.execute` | ✓ WIRED | operator.ex:735-740; flows into the same release arm. |
+| `ClaimService.mark_failed/2` | `steal_expired_claim/2` re-grant | `status == "failed_retryable"` OR-clause | ✓ WIRED | claim_service.ex:152-153; reset to `claimed`, errors cleared. |
+| `confirm_runbook_step/4` `{:won, claim}` success | `ClaimService.mark_executed/1` | called after `{:ok, exec_result}` | ✓ WIRED | operator.ex:744. |
 | LiveView `confirm_mitigation` | `Parapet.Operator.confirm_runbook_step/4` | case on 4 return variants | ✓ WIRED | operator_detail_live.ex:133-154. |
-| `preview_panel/1` Action cell | `Parapet.Capabilities.get_recovery(capability_id).name` | server-side resolution via `load_detail/1` | ✓ WIRED | operator_detail_live.ex:186-200; degraded fallback to capability_id string. |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|---------------|--------|--------------------|--------|
-| `confirm_concurrency_test` claim assertions | `claim.action_kind/status` | real `parapet_action_claims` row via `ConcurrencyRepo` | Yes (live Postgres) | ✓ FLOWING |
-| `preview_panel/1` Action cell | `preview.action_name` | `get_recovery/1` from Capabilities Agent (real registry) | Yes (with capability_id fallback) | ✓ FLOWING |
-| `confirm_runbook_step/4` execute | `preview_entry.target_refs` | stored TimelineEntry payload via `find_recent_preview/3` | Yes | ✓ FLOWING |
+| `claim_service_test` mark_failed retry | `released.status`/`last_error_*`, `retried.id` | real `parapet_action_claims` rows via `ConcurrencyRepo` (live Postgres) | Yes | ✓ FLOWING |
+| `confirm_runbook_step/4` error arm | `reason` → `mark_failed` → claim row | structured error from isolated execute closure | Yes | ✓ FLOWING |
+| `preview_panel/1` Action cell | `preview.action_name` | `get_recovery/1` from Capabilities registry | Yes (capability_id fallback) | ✓ FLOWING |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| Operator unit suite | `mix test test/parapet/operator_test.exs` | 14 tests, 0 failures | ✓ PASS |
-| Preview lifecycle (`:preview_expired`/`:target_refs_drift`/legacy/canon) | `mix test test/parapet/operator/preview_lifecycle_test.exs` | 4 tests, 0 failures | ✓ PASS |
-| Multi-node concurrency (criterion #4) | `mix test test/parapet/operator/confirm_concurrency_test.exs --include unboxed` | 1 test, 0 failures; query log shows `action_kind='operator'`, `action_key='op_step'` | ✓ PASS |
-| Concurrency determinism | seeds 1,2,3 | 3/3 pass | ✓ PASS |
-| Full library suite (regression) | `mix test` | 478 tests, 0 failures | ✓ PASS |
-| Library compile | `mix compile` | clean | ✓ PASS |
-| Demo app compile (UI-01/UI-04 surface) | `cd examples/demo_app && mix compile` | success; only 3 pre-existing warnings (Escalation.Worker, LiveReloader) — none in edited files | ✓ PASS |
+| Preview lifecycle + CR-01/02/03 unit regressions | `mix test test/parapet/operator/preview_lifecycle_test.exs` | 8 tests, 0 failures (investigating-succeeds, resolved-short-circuits, execute-error-releases, execute-raise-structured) | ✓ PASS |
+| ClaimService incl. mark_failed re-grant (unboxed, real Postgres) | `mix test test/parapet/automation/claim_service_test.exs --include unboxed` | 4 tests, 0 failures | ✓ PASS |
+| Full library suite (regression) | `mix test --include unboxed` | 483 tests, 0 failures | ✓ PASS |
+| Library compile (warnings-as-errors) | `mix compile --warnings-as-errors` | clean (no output) | ✓ PASS |
+| Debt-marker scan on all 5 modified files | grep TBD/FIXME/XXX/TODO/HACK/PLACEHOLDER | none | ✓ PASS |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| (none) | — | No TBD/FIXME/XXX/TODO/HACK/PLACEHOLDER in any phase-modified file | ℹ️ Info | Clean — completion is auditable. |
-| `lib/parapet/operator.ex` | 738 | `"result" => inspect(exec_result)` into durable jsonb (IN-01) | ℹ️ Info | Inspect output not a stable serialization contract; Phase 26 normalizes timeline shape. |
-| `lib/parapet/operator.ex` | 850 | `payload["preview_token"] == token` non-constant-time compare (IN-02) | ℹ️ Info | Timing side-channel on a 128-bit random token — impractical to exploit; defensive nicety. |
+| (none) | — | No TBD/FIXME/XXX/TODO/HACK/PLACEHOLDER in any of the 5 phase-modified files | ℹ️ Info | Clean — completion is auditable. |
+| `lib/parapet/operator.ex` | 751 | `"result" => inspect(exec_result)` into durable jsonb (IN-01) | ℹ️ Info | Inspect output not a stable serialization contract; Phase 26 normalizes timeline shape. |
+| `lib/parapet/operator.ex` | 866 | `payload["preview_token"] == token` non-constant-time compare (IN-02) | ℹ️ Info | Timing side-channel on a 128-bit random token — impractical to exploit; defensive nicety. |
 
-### Code-Review BLOCKER Re-Assessment (independent verdict)
+### Code-Review BLOCKER Re-Assessment (verdict after fixes)
 
-The orchestrator flagged 3 BLOCKERs from 25-REVIEW.md. I re-checked each against the code and the 4 success criteria:
-
-- **CR-01 (incident_state_gate only passes "open"; Acknowledge→investigating mislabels Confirm as `:incident_resolved`)** — CONFIRMED at code level (claim_service.ex:162-163 + operator.ex:780-784). **VERDICT: NOT a success-criterion break.** The actual UI flow does NOT force Acknowledge before Confirm: the runbook-step Preview/Execute buttons gate on `step.state` (operator_components.ex:317-332) and the Confirm button gates on `active_preview` (operator_detail_live.ex:256) — neither gates on incident state. Acknowledge is an independent `action_rail` button shown only when `state=="open"` (operator_components.ex:413-421). The happy path (open incident → Preview → Confirm) is reachable and PROVEN to return `{:ok, recovery_confirmed}` (operator_test.exs:593, preview_lifecycle_test.exs:262, confirm_concurrency_test.exs winner). Criterion #4 ("multi-node concurrency test") passes. Per the orchestrator's own decision rule, "if Confirm is reachable directly on an open incident and Acknowledge is independent, this is a latent bug but not a success-criterion break" — that condition holds. Downgraded to **WARNING WR-CR01** with a human DECISION POINT (does the intended workflow allow Acknowledge-first?). If the product answer is "operators are expected to Acknowledge before Confirm," this escalates to a blocker for shipping and must be fixed (gate to allow `["open","investigating"]` + truthful reason mapping).
-- **CR-02 (won claim never released on `capability.execute` {:error,_}; 5-min retry lockout)** — CONFIRMED. operator.ex:750-751 returns `{:error, reason}` with no claim release; `ClaimService` has only `mark_executed` (no `mark_failed`/release; grep confirmed). **VERDICT: NOT a success-criterion break** (all 4 criteria concern success/short-circuit/conflict paths, not execute-error recovery), but a real recoverability defect. Downgraded to **WARNING WR-CR02**. The audit/timeline side of execute-error is Phase 26 scope (AUD-03 `:recovery_failed`, ROADMAP Phase 26 criterion #3), but the claim-release fix is Phase 25's own concern.
-- **CR-03 (adopter `capability.execute` invoked with no `rescue`; host exception crashes the operator/LiveView boundary)** — CONFIRMED. The `rescue` blocks at operator.ex:884/892/904 are in `extract_module`/`parse_step_id`, NOT around `capability.execute.(...)` at line 729. **VERDICT: NOT a success-criterion break** but a real robustness defect at the documented "Phoenix-free public boundary." Downgraded to **WARNING WR-CR03**.
+| ID | Prior verdict | Fix verified | Now |
+|----|---------------|--------------|-----|
+| CR-01 | WARNING + product DECISION POINT (ack-then-confirm?) | `allowed_states` opt added; operator passes `["open","investigating"]`; Executor/Escalation default `["open"]` unchanged (claim_service.ex:190-206, operator.ex:730). Decision resolved YES. | ✓ FIXED — 2 passing tests (investigating-succeeds, resolved-short-circuits). |
+| CR-02 | WARNING (5-min retry lockout) | `mark_failed/2` + `failed_retryable` re-grant + error-arm release (claim_service.ex:87-96,146-167; operator.ex:766). | ✓ FIXED — unboxed Postgres test proves same-row re-grant, no lockout. |
+| CR-03 | WARNING (bare execute crashes boundary) | `try/rescue` → `{:error, {:capability_raised, msg}}` + claim release (operator.ex:735-740,766). | ✓ FIXED — passing structured-error test. |
 
 ### Warnings (do not block the phase goal; surfaced for closure decision)
 
+The three former BLOCKER-warnings (WR-CR01/CR02/CR03) are now closed. The following secondary warnings from 25-REVIEW.md remain OPEN (none breaks a success criterion):
+
 | ID | File | Issue | Recommended Disposition |
 |----|------|-------|-------------------------|
-| WR-CR01 | claim_service.ex:162; operator.ex:780-784 | incident_state_gate passes only "open"; "already_investigating" mislabeled `:incident_resolved`. Latent UX bug; becomes a blocker ONLY if intended workflow forces Acknowledge-before-Confirm. | Human decision (see Human Verification #2). If Acknowledge-first is intended, fix gate to allow `["open","investigating"]` and add a truthful reason atom. |
-| WR-CR02 | operator.ex:750-751 | Won claim not released on execute `{:error,_}` → 5-min retry lockout. | Add `ClaimService.mark_failed/2` + release on error branch. Coordinate with Phase 26 (recovery_failed). |
-| WR-CR03 | operator.ex:729 | Bare `capability.execute` — host exception crashes boundary. | Wrap in `try/rescue`, convert to structured `{:error, {:capability_raised, msg}}` + claim release. |
-| WR-WR01 | operator.ex:712-715; operator_detail_live.ex:164 | `target_refs_hash` drift gate is tautological in normal operation (both inputs derive from same stored payload); copy "Target state changed since Preview" overstates protection. | Either recompute live preview at confirm (real drift detection) or reword copy to "payload integrity." Does not break criterion #3. |
-| WR-WR02 | operator.ex:780-784 | Lossy reason mapping: investigating/open/suppressed all → `:incident_resolved`. | Extend frozen vocab or map truthfully. Tied to WR-CR01. |
-| WR-WR04 | operator.ex:734; workbench_contract.ex:125-134; operator_components.ex:287 | Confirm writes `recovery_confirmed` but `derive_runbook_steps/3` only detects `mitigation_executed` → step never shows Executed, Confirm button never clears → double-confirm risk (collides on claim → misleading `:conflicted`). CONFIRMED in code. | Add `recovery_confirmed` to executed-detection in WorkbenchContract, or hide Confirm after success. Does not break a success criterion (single successful Confirm works), but a real footgun. |
-| WR-WR05 | operator_detail_live.ex:149 | `:conflicted` copy assumes multi-node; misleading for single-node self-conflict. | Reword to outcome-agnostic copy (but criterion #2 pins this exact string for the cross-node case). Human UX call. |
-| WR-WR06 | operator_detail_live.ex:129-130; operator.ex:742 | Per-click random `idempotency_key` provides no real cross-retry idempotency; `action_type: :execute_mitigation` vs `tool_name: "operator_confirm_recovery"` taxonomy mismatch. | Derive idempotency_key from preview_token; reconcile action_type/tool_name. Audit taxonomy is Phase 26 scope. |
-| WR-IN03 | operator_test.exs; preview_lifecycle_test.exs | All unit tests pin `state: "open"` and DummyRepo always-wins; no coverage for investigating-state confirm, execute-`{:error,_}`, or execute-raises. | Add the 3 unit cases (recommended before Phase 26 builds on this path). |
+| WR-WR01 | operator.ex:712-715; operator_detail_live.ex:164 | `target_refs_hash` drift gate is tautological in normal operation; copy "Target state changed since Preview" overstates protection. | Either recompute live preview at confirm or reword copy to "payload integrity." Not a criterion break. |
+| WR-WR02 | operator.ex:796-800 | Lossy reason mapping: already_resolved/already_investigating/already_open/suppressed all → `:incident_resolved`. Less impactful now (investigating no longer reaches this map on the happy path), but already_open/suppressed still collapse misleadingly. | Extend frozen vocab or map truthfully. |
+| WR-WR04 | operator.ex:747; workbench_contract.ex:125-129; operator_components.ex | Confirm writes `recovery_confirmed` but `derive_runbook_steps/3` only detects `mitigation_executed` → step never shows Executed, Confirm button never clears → double-confirm produces `{:conflicted, _}` (self-conflict). **CONFIRMED still open** (workbench_contract.ex:127 unchanged). | Add `recovery_confirmed` to executed-detection or hide Confirm after success. Not in this fix batch; not a criterion break (single Confirm works). |
+| WR-WR05 | operator_detail_live.ex:149 | `:conflicted` copy assumes multi-node; misleading for single-node self-conflict (reachable via WR-04 double-confirm). | Reword (but criterion #2 pins this exact string for the cross-node case). Human UX call (see Human Verification #3). |
+| WR-WR06 | operator_detail_live.ex; operator.ex | Per-click random `idempotency_key`; `action_type: :execute_mitigation` vs `tool_name: "operator_confirm_recovery"` taxonomy mismatch. | Derive key from preview_token; reconcile taxonomy. Audit taxonomy is Phase 26 scope. |
+| WR-IN03 | (resolved) | Was: no unit coverage for investigating/execute-error/execute-raise. | ✓ CLOSED — preview_lifecycle_test.exs now covers all three (+ resolved). |
 
 ### Deferred Items (Step 9b — addressed in later milestone phases)
 
 | # | Item | Addressed In | Evidence |
 |---|------|-------------|----------|
-| 1 | Execute-error timeline/audit emission (`:recovery_failed`) | Phase 26 | ROADMAP Phase 26 goal + success criterion #3: "A capability whose `execute/2` returns `{:error, reason}` produces a `TimelineEntry` with `type: :recovery_failed`." (Note: the claim-RELEASE half of WR-CR02 is NOT deferred — it is a Phase-25 recoverability concern.) |
-| 2 | Audit/timeline shape normalization + idempotency-key/action-type reconciliation (WR-WR06, IN-01) | Phase 26 | ROADMAP Phase 26 goal: "TimelineEntry/ToolAudit writes for every Confirm." |
-| 3 | CI demo lane exercising the four scenarios (happy/expired/short-circuit/conflict) | Phase 28 | ROADMAP Phase 28 goal: "CI exercises four scenarios ... so the loop is contract-tested." |
+| 1 | Execute-error timeline/audit emission (`:recovery_failed`) | Phase 26 | ROADMAP Phase 26 success criterion #3: a capability whose `execute/2` returns `{:error, reason}` produces a `TimelineEntry` with `type: :recovery_failed`. (The claim-RELEASE half — CR-02 — is fixed here in Phase 25; only the timeline/audit emission is deferred.) |
+| 2 | Audit/timeline shape normalization + idempotency-key/action-type reconciliation (WR-WR06, IN-01) | Phase 26 | ROADMAP Phase 26 goal: TimelineEntry/ToolAudit writes for every Confirm. |
+| 3 | CI demo lane exercising the four scenarios (happy/expired/short-circuit/conflict) | Phase 28 | ROADMAP Phase 28 goal: CI exercises four scenarios so the loop is contract-tested. |
 
 ### Human Verification Required
 
-See the 4 items in the frontmatter `human_verification` block. The load-bearing one is item #2 (Acknowledge-then-Confirm) — a product DECISION POINT that determines whether WR-CR01 stays a warning or escalates to a blocker. The other three are visual/real-time LiveView checks not exercisable by the library `mix test` path (demo app is a separate Mix project, RESEARCH Pitfall 3).
+See the 4 items in the frontmatter `human_verification` block. All four are now pure **LiveView visual/real-time render confirmations** (preview panel layout, success-flash appearance, conflict-flash copy, expired-flash + re-Preview affordance). The previously load-bearing item — the CR-01 ack-then-confirm product DECISION — is **RESOLVED (YES)** and the code is fixed; item #2 is downgraded from a decision point to a visual confirmation that the operator now sees the SUCCESS flash after Acknowledge. None of the remaining items can be exercised by the library `mix test` path because the demo app is a separate Mix project (RESEARCH Pitfall 3).
 
 ### Gaps Summary
 
-**No BLOCKER gaps.** All four ROADMAP success criteria are achieved in the codebase at the code/contract level, all four requirement IDs (UI-01..UI-04) are satisfied, the full library suite is green (478/0), and the multi-node concurrency proof for criterion #4 is deterministic across 3 seeds. The phase goal — routing Confirm through `ClaimService.claim_action/1` with `action_kind: "operator"`, adding the two additive return variants, rendering both branches in the LiveView, and 5-min preview expiry with `target_refs` hash gating — is delivered and wired.
+**No BLOCKER gaps.** All four ROADMAP success criteria are achieved at the code/contract level, all four requirement IDs (UI-01..UI-04) are satisfied, and the three code-review BLOCKERs (CR-01/CR-02/CR-03) are now FIXED with code citations and new passing regression tests:
 
-The 3 code-review BLOCKERs are real defects but **none breaks a Phase 25 success criterion**: CR-01 does not break the happy path because the UI does not force Acknowledge before Confirm (open-incident Confirm is reachable and proven); CR-02/CR-03 concern the execute-ERROR path, which is not part of any of the four criteria (and whose audit half is Phase 26 scope). They are reclassified as WARNINGS requiring a closure decision. The single item that needs a human/product answer before final sign-off is whether the intended operator workflow permits Acknowledge-before-Confirm (WR-CR01 / Human Verification #2) — if it does, that warning escalates to a blocker and the incident-state gate must be widened. Status is `human_needed` (not `passed`) because the demo LiveView visual flows for criteria #1/#2/#3 require human render confirmation and the WR-CR01 workflow question requires a product decision.
+- **CR-01** — `ClaimService.incident_state_gate/2` is now allow-list driven (default `["open"]`, unchanged for Executor/Escalation); `confirm_runbook_step/4` passes `["open","investigating"]` so Acknowledge-then-Confirm succeeds. Proven by `preview_lifecycle_test.exs` investigating-succeeds + resolved-short-circuits tests.
+- **CR-02** — `ClaimService.mark_failed/2` (status `failed_retryable` + `last_error_*`) plus `steal_expired_claim` re-granting `failed_retryable` rows; the operator error arm releases the claim. Proven by the unboxed Postgres `mark_failed`-then-retry test (same-row re-grant, no lockout).
+- **CR-03** — `capability.execute` is wrapped in `try/rescue` → `{:error, {:capability_raised, msg}}` with claim release. Proven by the structured-error test.
+
+Full library suite re-run green at **483 tests, 0 failures**; `mix compile --warnings-as-errors` clean; no debt markers in any of the 5 modified files.
+
+Status remains **`human_needed`** (not `passed`) solely because the demo LiveView visual flows for criteria #1/#2/#3 require human render confirmation. This is a clean human-UAT gate, **not** a code gap: the open secondary warnings (WR-WR01/02/04/05/06) are non-criterion UX/robustness polish items, and WR-04 (Confirm button not clearing → double-confirm self-conflict) was explicitly out of scope for this fix batch and remains an open follow-up, not a regression introduced here.
 
 ---
 
-_Verified: 2026-05-28T02:42:47Z_
+_Verified: 2026-05-28T07:25:00Z (re-verification after gap closure)_
 _Verifier: Claude (gsd-verifier)_
