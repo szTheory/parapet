@@ -14,7 +14,8 @@ findings:
   warning: 3
   info: 1
   total: 5
-status: issues_found
+status: resolved
+resolution: "CR-01, WR-01, WR-02, WR-03 fixed in commits 874fc76 + 9b0cee1 (with CR-01 + WR-01/WR-02 regression tests). IN-01 left as-is (advisory)."
 ---
 
 # Phase 26: Code Review Report
@@ -22,7 +23,7 @@ status: issues_found
 **Reviewed:** 2026-05-28T00:00:00Z
 **Depth:** standard
 **Files Reviewed:** 5
-**Status:** issues_found
+**Status:** resolved (CR-01 + WR-01/02/03 fixed; IN-01 left advisory)
 
 ## Summary
 
