@@ -785,27 +785,31 @@ defmodule Parapet.Operator do
                       }
                     }
 
-                    failure_audit_attrs = %{
-                      tool_name: "operator_confirm_recovery",
-                      success: false,
-                      input: %{
-                        "actor" => payload.actor,
-                        "reason" => payload.reason,
-                        "correlation_id" => payload.correlation_id,
-                        "idempotency_key" => payload.idempotency_key,
-                        "action_type" => Atom.to_string(payload.action_type),
-                        "action_name" => to_string(capability_id),
-                        "target_refs" => preview_entry.target_refs || []
-                      },
-                      output: %{"status" => "failed", "reason" => inspect(reason)}
-                    }
+                    failure_audit_attrs =
+                      build_audit("operator_confirm_recovery", payload)
+                      |> Map.put(:success, false)
+                      |> Map.put(:output, %{"status" => "failed", "reason" => inspect(reason)})
+                      |> Map.update!(:input, fn base ->
+                        Map.merge(base, %{
+                          "action_name" => to_string(capability_id),
+                          "target_refs" => preview_entry.target_refs || []
+                        })
+                      end)
 
+                    # Ecto's Postgres adapter raises (not {:error, _}) on connection
+                    # failure, so the audit write must be rescued — otherwise an
+                    # exception skips ClaimService.mark_failed/2 below and the claim
+                    # stays "won" for the full lease window, locking out operator retry.
                     _ =
-                      Evidence.run_operator_command(
-                        incident_changeset: Ecto.Changeset.change(incident, %{}),
-                        timeline_attrs: failure_timeline_attrs,
-                        audit_attrs: failure_audit_attrs
-                      )
+                      try do
+                        Evidence.run_operator_command(
+                          incident_changeset: Ecto.Changeset.change(incident, %{}),
+                          timeline_attrs: failure_timeline_attrs,
+                          audit_attrs: failure_audit_attrs
+                        )
+                      rescue
+                        _ -> :ok
+                      end
 
                     # Release the claim so the operator can retry immediately
                     # rather than being locked out for the 5-minute lease window.

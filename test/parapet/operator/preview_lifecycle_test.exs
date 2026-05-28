@@ -97,6 +97,12 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     end
 
     def transaction(multi) do
+      # Simulate Ecto's Postgres adapter raising (not {:error, _}) on a
+      # connection failure, so CR-01 can assert the audit write is rescued.
+      if Process.get(:raise_on_transaction_multi) do
+        raise "simulated DB connection failure"
+      end
+
       result =
         multi
         |> Ecto.Multi.to_list()
@@ -371,6 +377,38 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     assert failed_write.timeline_entry.payload["outcome"]["status"] == "failed"
     assert failed_write.tool_audit.success == false
     assert failed_write.tool_audit.output["status"] == "failed"
+  end
+
+  test "confirm_runbook_step releases the claim even when the failure-path audit write raises (CR-01 regression)",
+       %{payload: payload, incident: incident} do
+    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+
+    Parapet.Capabilities.register_recovery(:retry_async_item,
+      name: "Retry Item",
+      target_kind: "async_item",
+      preview: fn _incident, _step -> {:ok, %{"target_refs" => ["item-a"]}} end,
+      execute: fn _incident, _refs -> {:error, :provider_unavailable} end
+    )
+
+    {:ok, %{preview: preview}} = Operator.preview_runbook_step(incident, :retry, payload)
+    token = preview["preview_token"]
+
+    entry = %TimelineEntry{
+      incident_id: incident.id,
+      type: "recovery_preview",
+      payload: preview,
+      inserted_at: DateTime.utc_now()
+    }
+
+    Process.put(:mock_entries, [entry])
+
+    # A raising DB error during the best-effort audit write must NOT prevent
+    # ClaimService.mark_failed/2 from running: confirm_runbook_step/4 still
+    # returns the original error rather than propagating the raise.
+    Process.put(:raise_on_transaction_multi, true)
+
+    assert {:error, :provider_unavailable} =
+             Operator.confirm_runbook_step(incident, :retry, token, payload)
   end
 
   test "confirm_runbook_step converts a raised capability into a structured error (CR-03)",
