@@ -97,33 +97,46 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     end
 
     def transaction(multi) do
-      multi
-      |> Ecto.Multi.to_list()
-      |> Enum.reduce_while({:ok, %{}}, fn
-        {name, {:update, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
-          {:cont, {:ok, Map.put(acc, name, Ecto.Changeset.apply_changes(changeset))}}
+      result =
+        multi
+        |> Ecto.Multi.to_list()
+        |> Enum.reduce_while({:ok, %{}}, fn
+          {name, {:update, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
+            {:cont, {:ok, Map.put(acc, name, Ecto.Changeset.apply_changes(changeset))}}
 
-        {name, {:insert, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
-          {:cont,
-           {:ok,
-            Map.put(
-              acc,
-              name,
-              Ecto.Changeset.apply_changes(changeset) |> Map.put(:id, Ecto.UUID.generate())
-            )}}
+          {name, {:insert, %Ecto.Changeset{} = changeset, _opts}}, {:ok, acc} ->
+            {:cont,
+             {:ok,
+              Map.put(
+                acc,
+                name,
+                Ecto.Changeset.apply_changes(changeset) |> Map.put(:id, Ecto.UUID.generate())
+              )}}
 
-        {name, {:insert, fun, _opts}}, {:ok, acc} ->
-          struct =
-            fun.(acc) |> Ecto.Changeset.apply_changes() |> Map.put(:id, Ecto.UUID.generate())
+          {name, {:insert, fun, _opts}}, {:ok, acc} ->
+            struct =
+              fun.(acc) |> Ecto.Changeset.apply_changes() |> Map.put(:id, Ecto.UUID.generate())
 
-          {:cont, {:ok, Map.put(acc, name, struct)}}
+            {:cont, {:ok, Map.put(acc, name, struct)}}
 
-        {name, {:run, fun}}, {:ok, acc} ->
-          case fun.(__MODULE__, acc) do
-            {:ok, value} -> {:cont, {:ok, Map.put(acc, name, value)}}
-            {:error, error} -> {:halt, {:error, name, error, acc}}
-          end
-      end)
+          {name, {:run, fun}}, {:ok, acc} ->
+            case fun.(__MODULE__, acc) do
+              {:ok, value} -> {:cont, {:ok, Map.put(acc, name, value)}}
+              {:error, error} -> {:halt, {:error, name, error, acc}}
+            end
+        end)
+
+      # Capture any timeline_entry / tool_audit inserts for AUD-03 assertions.
+      case result do
+        {:ok, acc} when is_map_key(acc, :timeline_entry) ->
+          existing = Process.get(:captured_writes, [])
+          Process.put(:captured_writes, existing ++ [acc])
+
+        _ ->
+          :ok
+      end
+
+      result
     end
   end
 
@@ -138,6 +151,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     Process.put(:mock_incidents, [])
     Process.put(:mock_entries, [])
     Process.put(:mock_action_items, [])
+    Process.put(:captured_writes, [])
 
     # Capabilities Agent is process-global — manually reset before each test
     # (Pitfall 4: ConcurrencyCase only resets DB tables; the unit harness
@@ -176,6 +190,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
       Application.delete_env(:parapet, :repo)
       Process.delete(:mock_incident)
       Process.delete(:mock_entries)
+      Process.delete(:captured_writes)
     end)
 
     %{payload: payload, incident: incident}
@@ -200,6 +215,13 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
 
     assert {:short_circuited, :preview_expired} =
              Operator.confirm_runbook_step(incident, :retry, token, payload)
+
+    # AUD-03 negative: short-circuit arms write NO recovery_confirmed or recovery_failed entries
+    captured = Process.get(:captured_writes, [])
+    refute Enum.any?(captured, fn acc ->
+      entry = Map.get(acc, :timeline_entry)
+      entry && entry.type in ["recovery_confirmed", "recovery_failed"]
+    end)
   end
 
   test "confirm_runbook_step returns :short_circuited with :target_refs_drift when stored target_refs no longer match recorded hash",
@@ -336,6 +358,19 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
 
     assert {:error, :provider_unavailable} =
              Operator.confirm_runbook_step(incident, :retry, token, payload)
+
+    # AUD-03: a recovery_failed TimelineEntry + ToolAudit with success: false
+    # are written before mark_failed (best-effort; captured via DummyRepo harness).
+    captured = Process.get(:captured_writes, [])
+    failed_write = Enum.find(captured, fn acc ->
+      entry = Map.get(acc, :timeline_entry)
+      entry && entry.type == "recovery_failed"
+    end)
+    assert failed_write != nil, "expected a recovery_failed write to be captured"
+    assert failed_write.timeline_entry.type == "recovery_failed"
+    assert failed_write.timeline_entry.payload["outcome"]["status"] == "failed"
+    assert failed_write.tool_audit.success == false
+    assert failed_write.tool_audit.output["status"] == "failed"
   end
 
   test "confirm_runbook_step converts a raised capability into a structured error (CR-03)",
@@ -365,6 +400,19 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
              Operator.confirm_runbook_step(incident, :retry, token, payload)
 
     assert message =~ "boom from host"
+
+    # AUD-03: raised capability also produces a recovery_failed write;
+    # the {:capability_raised, msg} reason is normalized via inspect/1.
+    captured = Process.get(:captured_writes, [])
+    failed_write = Enum.find(captured, fn acc ->
+      entry = Map.get(acc, :timeline_entry)
+      entry && entry.type == "recovery_failed"
+    end)
+    assert failed_write != nil, "expected a recovery_failed write for the raised capability"
+    assert failed_write.timeline_entry.type == "recovery_failed"
+    assert failed_write.tool_audit.success == false
+    reason_str = failed_write.timeline_entry.payload["outcome"]["reason"]
+    assert reason_str =~ "capability_raised", "reason should contain capability_raised, got: #{reason_str}"
   end
 
   test "target_refs canonicalization is stable across atom-vs-string round-trip (Pitfall 5 regression guard)",

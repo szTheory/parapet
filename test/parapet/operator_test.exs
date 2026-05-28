@@ -593,6 +593,20 @@ defmodule Parapet.OperatorTest do
       assert {:ok, result} = Operator.confirm_runbook_step(incident, :retry, token, payload)
       assert %TimelineEntry{type: "recovery_confirmed"} = result.timeline_entry
 
+      # AUD-01: TimelineEntry payload carries full operator identity + outcome
+      assert result.timeline_entry.payload["actor"] == payload.actor
+      assert result.timeline_entry.payload["capability"] == "retry_async_item"
+      assert is_list(result.timeline_entry.payload["target_refs"])
+      assert result.timeline_entry.payload["outcome"]["status"] == "succeeded"
+
+      # AUD-02: ToolAudit has output set, action_name + target_refs in input
+      assert result.tool_audit.success == true
+      assert result.tool_audit.input["action_name"] == "retry_async_item"
+      assert is_list(result.tool_audit.input["target_refs"])
+      assert result.tool_audit.input["actor"] == payload.actor
+      assert is_map(result.tool_audit.output)
+      assert result.tool_audit.output["status"] == "succeeded"
+
       # 3. Test stale preview (expired)
       expired_preview =
         Map.put(preview, "expires_at", DateTime.utc_now() |> DateTime.add(-10, :second))
