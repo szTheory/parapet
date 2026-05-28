@@ -4,8 +4,8 @@ milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
 stopped_at: Phase 25 context gathered (assumptions mode)
-last_updated: "2026-05-28T01:57:43.181Z"
-last_activity: 2026-05-28 -- Phase 25 planning complete
+last_updated: "2026-05-28T02:00:07.354Z"
+last_activity: 2026-05-28 -- Phase 25 execution started
 progress:
   total_phases: 3
   completed_phases: 2
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 24 — recovery-behaviour-capability-allowlist
+**Current focus:** Phase 25 — wire-confirm-through-claimservice-preview-confirm-ux
 
 ## Current Position
 
-Phase: 24
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-28 -- Phase 25 planning complete
+Phase: 25 (wire-confirm-through-claimservice-preview-confirm-ux) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 25
+Last activity: 2026-05-28 -- Phase 25 execution started
 
 ## Performance Metrics
 

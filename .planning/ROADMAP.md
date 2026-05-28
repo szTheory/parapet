@@ -76,7 +76,7 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 
 - [x] **Phase 23: Foundations — Telemetry Contract + `lease_until` Migration** — Lock the v1.1 telemetry event family under Experimental tier and add the claim-lease column before any capability ships (FND-01, FND-02) (completed 2026-05-27)
 - [x] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03) (completed 2026-05-27)
-- [ ] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04)
+- [x] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04) (completed 2026-05-28)
 - [ ] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03)
 - [ ] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06)
 - [ ] **Phase 28: Demo Seed + CI Lane** — Demo app seeded with a Preview-able + Confirm-able incident; CI exercises happy-path, preview-expiry, short-circuit, and claim-conflict scenarios (DEMO-05, DEMO-06)
@@ -149,9 +149,9 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 **UI hint**: yes
 **Plans**: 3 plans in 2 waves
 
-  - [ ] 25-01-PLAN.md — Operator API rewire in `lib/parapet/operator.ex`: 4-arm `ClaimService.claim_action/1` dispatch in `confirm_runbook_step/4` with `action_kind: "operator"`; string→atom `map_short_circuit_reason/1` mapper; `target_refs_hash/1` SHA-256 helper; `compute_preview/3` writes hash AFTER host_data merge (Pitfall 2) with atom-vs-string canonicalization (Pitfall 5); `find_recent_preview/3` surfaces hash (nullable for legacy previews); `:stale_preview` → `:preview_expired` (UI-02, UI-03, UI-04) (Wave 1)
-  - [ ] 25-02-PLAN.md — Demo LiveView: `handle_event("confirm_mitigation", ...)` grows 2→4 arms with verbatim conflict flash + closed `short_circuit_flash/1` mapper (no catch-all); `preview_panel/1` adds Action Name cell resolved via `Parapet.Capabilities.get_recovery/1`; no `phx-value-*` hash round-trip (Pitfall 6) (UI-01, UI-04) (Wave 2 — depends on 25-01)
-  - [ ] 25-03-PLAN.md — Test coverage: update `operator_test.exs:524` to `{:short_circuited, :preview_expired}`; new `preview_lifecycle_test.exs` (`:preview_expired`, `:target_refs_drift`, nil-hash legacy compat); new `confirm_concurrency_test.exs` (multi-node race using `ConcurrencyCase` + `unboxed_run` + Task rendezvous, asserts one `{:ok, _}` + one `{:conflicted, _claim_id}`, claim row `action_kind == "operator"`, Pitfall 4 Capabilities Agent reset) (UI-02, UI-03, UI-04) (Wave 2 — depends on 25-01)
+  - [x] 25-01-PLAN.md — Operator API rewire in `lib/parapet/operator.ex`: 4-arm `ClaimService.claim_action/1` dispatch in `confirm_runbook_step/4` with `action_kind: "operator"`; string→atom `map_short_circuit_reason/1` mapper; `target_refs_hash/1` SHA-256 helper; `compute_preview/3` writes hash AFTER host_data merge (Pitfall 2) with atom-vs-string canonicalization (Pitfall 5); `find_recent_preview/3` surfaces hash (nullable for legacy previews); `:stale_preview` → `:preview_expired` (UI-02, UI-03, UI-04) (Wave 1)
+  - [x] 25-02-PLAN.md — Demo LiveView: `handle_event("confirm_mitigation", ...)` grows 2→4 arms with verbatim conflict flash + closed `short_circuit_flash/1` mapper (no catch-all); `preview_panel/1` adds Action Name cell resolved via `Parapet.Capabilities.get_recovery/1`; no `phx-value-*` hash round-trip (Pitfall 6) (UI-01, UI-04) (Wave 2 — depends on 25-01)
+  - [x] 25-03-PLAN.md — Test coverage: update `operator_test.exs:524` to `{:short_circuited, :preview_expired}`; new `preview_lifecycle_test.exs` (`:preview_expired`, `:target_refs_drift`, nil-hash legacy compat); new `confirm_concurrency_test.exs` (multi-node race using `ConcurrencyCase` + `unboxed_run` + Task rendezvous, asserts one `{:ok, _}` + one `{:conflicted, _claim_id}`, claim row `action_kind == "operator"`, Pitfall 4 Capabilities Agent reset) (UI-02, UI-03, UI-04) (Wave 2 — depends on 25-01)
 
 ### Phase 26: Audit Propagation
 
@@ -224,7 +224,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 18. Adoption & Authoring Docs | v0.10 | 5/5 | Complete | 2026-05-24 |
 | 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete    | 2026-05-27 |
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 3/3 | Complete    | 2026-05-27 |
-| 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 0/0 | Not started | - |
+| 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete   | 2026-05-28 |
 | 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
 | 27. Prebuilt Playbooks | v1.1 | 0/0 | Not started | - |
 | 28. Demo Seed + CI Lane | v1.1 | 0/0 | Not started | - |
