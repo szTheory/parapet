@@ -78,7 +78,7 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 - [x] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03) (completed 2026-05-27)
 - [x] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04) (completed 2026-05-28)
 - [x] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03) (completed 2026-05-28)
-- [ ] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06)
+- [x] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (completed 2026-05-28)
 - [ ] **Phase 28: Demo Seed + CI Lane** — Demo app seeded with a Preview-able + Confirm-able incident; CI exercises happy-path, preview-expiry, short-circuit, and claim-conflict scenarios (DEMO-05, DEMO-06)
 - [ ] **Phase 29: Stability + Adopter Onboarding** — Declare `Parapet.Recovery` Stable; CHANGELOG migration notes; `mix parapet.gen.recovery` Igniter task; `mix parapet.doctor` adoption signal; `docs/recovery-actions.md` adopter guide (STAB-07, ADOP-01, ADOP-02, ADOP-03)
 
@@ -175,7 +175,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 
 **Plans**: 1 plan in 1 wave (single coherent PR — template authoring + suppression_drift hardening + generator wiring + test extension land atomically)
 
-  - [ ] 27-01-PLAN.md — Author two net-new capability templates (`deploy_tied_incident.ex.eex` via `:revert_feature_flag`, `cardinality_blowout.ex.eex` via `:disable_metric_label`); harden `suppression_drift.ex.eex` guidance-only warning; wire two `Igniter.copy_template` calls into `mix parapet.gen.runbooks`; extend the generator test (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (Wave 1)
+  - [x] 27-01-PLAN.md — Author two net-new capability templates (`deploy_tied_incident.ex.eex` via `:revert_feature_flag`, `cardinality_blowout.ex.eex` via `:disable_metric_label`); harden `suppression_drift.ex.eex` guidance-only warning; wire two `Igniter.copy_template` calls into `mix parapet.gen.runbooks`; extend the generator test (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (Wave 1)
 
 ### Phase 28: Demo Seed + CI Lane
 
@@ -220,7 +220,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 3/3 | Complete    | 2026-05-27 |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete    | 2026-05-28 |
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
-| 27. Prebuilt Playbooks | v1.1 | 0/1 | Planned     | - |
+| 27. Prebuilt Playbooks | v1.1 | 1/1 | Complete   | 2026-05-28 |
 | 28. Demo Seed + CI Lane | v1.1 | 0/0 | Not started | - |
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
 
