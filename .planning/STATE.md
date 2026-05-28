@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
-stopped_at: Phase 25 context gathered (assumptions mode)
-last_updated: "2026-05-28T11:28:41.243Z"
+stopped_at: Phase 26 context gathered (assumptions mode)
+last_updated: "2026-05-28T11:51:22.280Z"
 last_activity: 2026-05-28
 progress:
-  total_phases: 3
+  total_phases: 7
   completed_phases: 3
   total_plans: 8
   completed_plans: 8
-  percent: 100
+  percent: 43
 ---
 
 # Project State
@@ -99,7 +99,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T01:07:41.896Z
-Stopped at: Phase 25 context gathered (assumptions mode)
-Resume file: .planning/phases/25-wire-confirm-through-claimservice-preview-confirm-ux/25-CONTEXT.md
+Last session: 2026-05-28T11:51:22.276Z
+Stopped at: Phase 26 context gathered (assumptions mode)
+Resume file: .planning/phases/26-audit-propagation/26-CONTEXT.md
 Next step: `/gsd:discuss-phase 23` to begin planning Foundations (telemetry contract lock + `lease_until` schema migration).
