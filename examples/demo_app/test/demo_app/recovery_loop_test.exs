@@ -14,7 +14,38 @@ defmodule DemoApp.RecoveryLoopTest do
         state: "open",
         correlation_key: "stalled-executor-ci-#{System.unique_integer([:positive])}",
         runbook_data: %{
-          "module" => to_string(DemoApp.Runbooks.StalledExecutor)
+          "title" => "Stalled Executor Recovery",
+          "module" => to_string(DemoApp.Runbooks.StalledExecutor),
+          # Inline "steps" drive the operator UI render (WorkbenchContract.derive/3);
+          # "module" drives Preview/Confirm execution. Step ids must match the module.
+          "steps" => [
+            %{
+              "id" => "investigate_logs",
+              "label" => "Check Worker Logs",
+              "description" => "Verify if the worker crashed or is deadlocked.",
+              "type" => "manual",
+              "kind" => "guidance",
+              "preview_only" => true
+            },
+            %{
+              "id" => "retry_item",
+              "label" => "Retry Item",
+              "description" => "Force the async item to be retried.",
+              "type" => "mitigation",
+              "kind" => "capability",
+              "capability" => "retry_async_item",
+              "target_kind" => "async_item",
+              "requires_preview" => true
+            },
+            %{
+              "id" => "verify_recovery",
+              "label" => "Verify Recovery",
+              "description" => "Confirm the item completed after the retry.",
+              "type" => "manual",
+              "kind" => "guidance",
+              "preview_only" => true
+            }
+          ]
         }
       })
 
@@ -179,5 +210,48 @@ defmodule DemoApp.RecoveryLoopTest do
 
     assert {:ok, _} = result_1
     assert {:conflicted, _claim_id} = result_2
+  end
+
+  # --- Scenario 5: Browser Preview -> Confirm through the operator LiveView ---
+  # Drives the real LiveView (mount + handle_event + rendered DOM) headlessly,
+  # so the operator click-through is contract-tested in CI rather than left as a
+  # manual UAT item. No browser/Wallaby — Phoenix.LiveViewTest renders and clicks
+  # the same buttons an operator would.
+  test "operator drives Preview -> Confirm through the LiveView and the capability executes",
+       %{conn: conn, incident: incident} do
+    {:ok, view, _html} = live(conn, "/parapet/#{incident.id}")
+
+    # The runbook card renders a Preview button for the capability mitigate step.
+    preview_button = ~s{button[phx-click="preview_mitigation"][phx-value-step="retry_item"]}
+    assert has_element?(view, preview_button)
+
+    # Click Preview -> the preview panel renders with the capability's preview map.
+    preview_html = view |> element(preview_button) |> render_click()
+    assert preview_html =~ "Recovery Preview"
+    assert preview_html =~ "Retrying without root cause analysis"
+    assert has_element?(view, ~s{button[phx-click="confirm_mitigation"]})
+
+    # Click Confirm -> LiveViewTest sends the rendered phx-value-token; the
+    # capability executes against demo DB state.
+    confirm_html = view |> element(~s{button[phx-click="confirm_mitigation"]}) |> render_click()
+
+    # UI: the new recovery_confirmed entry renders in the incident timeline.
+    assert confirm_html =~ "Recovery confirmed"
+
+    # DB: the capability ran — TimelineEntry + ToolAudit written, ActionItem resolved.
+    import Ecto.Query
+
+    assert DemoApp.Repo.exists?(
+             from t in Parapet.Spine.TimelineEntry,
+               where: t.incident_id == ^incident.id and t.type == "recovery_confirmed"
+           )
+
+    assert DemoApp.Repo.exists?(
+             from a in Parapet.Spine.ToolAudit,
+               where: a.tool_name == "operator_confirm_recovery"
+           )
+
+    assert DemoApp.Repo.get_by(Parapet.Spine.ActionItem, incident_id: incident.id).state ==
+             "resolved"
   end
 end

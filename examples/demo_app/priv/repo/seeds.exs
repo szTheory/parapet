@@ -106,6 +106,44 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
 # ---------------------------------------------------------------------------
 # Incident 4: OPEN — stalled async executor (capability-backed, Preview/Confirm)
 # ---------------------------------------------------------------------------
+# The capability-backed runbook needs BOTH keys: "module" resolves the compiled
+# runbook for Preview/Confirm execution (extract_module/1), and "steps" drives the
+# operator UI render (WorkbenchContract.derive/3 reads inline "steps" to render the
+# Preview button). The inline steps mirror DemoApp.Runbooks.StalledExecutor — the
+# step ids MUST match so the rendered Preview button resolves to the module step.
+stalled_executor_steps = [
+  %{
+    "id" => "investigate_logs",
+    "label" => "Check Worker Logs",
+    "description" => "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
+    "type" => "manual",
+    "kind" => "guidance",
+    "preview_only" => true,
+    "guidance" => "Search your APM for the worker executing this item. Look for crash reports, timeout events, or lock-acquisition failures around the item's last-attempt timestamp.",
+    "warning" => "If logs show the item is still actively executing, do not retry — a concurrent retry will cause a duplicate execution race."
+  },
+  %{
+    "id" => "retry_item",
+    "label" => "Retry Item",
+    "description" => "Force the async item to be retried.",
+    "type" => "mitigation",
+    "kind" => "capability",
+    "capability" => "retry_async_item",
+    "target_kind" => "async_item",
+    "requires_preview" => true,
+    "warning" => "Retrying without identifying the root cause may reproduce the deadlock. Confirm the underlying resource or lock contention is resolved before proceeding."
+  },
+  %{
+    "id" => "verify_recovery",
+    "label" => "Verify Recovery",
+    "description" => "Confirm the item completed successfully after the retry.",
+    "type" => "manual",
+    "kind" => "guidance",
+    "preview_only" => true,
+    "guidance" => "Check the item's status in the job backend — it should transition from executing or scheduled to completed."
+  }
+]
+
 {:ok, incident_stalled} =
   Parapet.Evidence.create_incident(%{
     title: "Stalled async executor",
@@ -113,7 +151,10 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     state: "open",
     correlation_key: "stalled-async-executor",
     runbook_data: %{
-      "module" => to_string(DemoApp.Runbooks.StalledExecutor)
+      "title" => "Stalled Executor Recovery",
+      "description" => "Guidance and recovery actions for background jobs stuck in an executing state.",
+      "module" => to_string(DemoApp.Runbooks.StalledExecutor),
+      "steps" => stalled_executor_steps
     }
   })
 
