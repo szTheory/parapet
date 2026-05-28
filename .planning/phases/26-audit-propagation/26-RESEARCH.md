@@ -498,7 +498,7 @@ No claims in this research are tagged `[ASSUMED]`. All findings were verified di
 
 **All claims in this research were verified against live codebase files — no user confirmation needed.**
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`run_operator_command/1` on the failure path — should it be best-effort or hard-fail?**
    - What we know: The function returns `{:ok, %{...}}` or `{:error, step, reason, changes}`. In the failure path, we must always return `{:error, original_reason}` per D-06/D-11.

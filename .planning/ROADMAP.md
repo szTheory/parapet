@@ -156,7 +156,9 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   3. A capability whose `execute/2` returns `{:error, reason}` produces a `TimelineEntry` with `type: :recovery_failed` capturing the error reason; short-circuit and conflict outcomes produce no TimelineEntry (telemetry-only) because nothing was actually executed.
   4. The retrospective generator surfaces recovery actions inline in the canonical chronology — not in a sidebar audit log.
 
-**Plans**: TBD
+**Plans**: 1 plan in 1 wave (single coherent PR — the audit half of the Phase 25 Confirm path)
+
+  - [ ] 26-01-PLAN.md — Enrich the `recovery_confirmed` TimelineEntry + ToolAudit success write and add a new `recovery_failed` failure write in `confirm_runbook_step/4`; add two retrospective `format_payload/1` render clauses; extend three existing test files (AUD-01, AUD-02, AUD-03) (Wave 1)
 
 ### Phase 27: Prebuilt Playbooks
 
@@ -215,7 +217,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 23. Foundations — Telemetry Contract + `lease_until` Migration | v1.1 | 2/2 | Complete    | 2026-05-27 |
 | 24. Recovery Behaviour + Capability Allowlist | v1.1 | 3/3 | Complete    | 2026-05-27 |
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete    | 2026-05-28 |
-| 26. Audit Propagation | v1.1 | 0/0 | Not started | - |
+| 26. Audit Propagation | v1.1 | 0/1 | Planned | - |
 | 27. Prebuilt Playbooks | v1.1 | 0/0 | Not started | - |
 | 28. Demo Seed + CI Lane | v1.1 | 0/0 | Not started | - |
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
