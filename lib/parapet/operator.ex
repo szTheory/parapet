@@ -723,10 +723,23 @@ defmodule Parapet.Operator do
                    action_kind: "operator",
                    action_key: to_string(step_id_atom),
                    breaker_step_id: step_id_atom,
-                   idempotency_key: payload.idempotency_key
+                   idempotency_key: payload.idempotency_key,
+                   # Operator recovery is valid while the incident is open OR
+                   # being investigated (an operator typically Acknowledges,
+                   # moving state to "investigating", before Confirming).
+                   allowed_states: ["open", "investigating"]
                  ) do
               {:won, claim} ->
-                case capability.execute.(incident, preview_entry.target_refs) do
+                # Adopter-supplied execute closure: isolate exceptions so a host
+                # crash can't strand the won claim or crash the calling process.
+                exec_outcome =
+                  try do
+                    capability.execute.(incident, preview_entry.target_refs)
+                  rescue
+                    e -> {:error, {:capability_raised, Exception.message(e)}}
+                  end
+
+                case exec_outcome do
                   {:ok, exec_result} ->
                     ClaimService.mark_executed(claim)
 
@@ -748,6 +761,9 @@ defmodule Parapet.Operator do
                     )
 
                   {:error, reason} ->
+                    # Release the claim so the operator can retry immediately
+                    # rather than being locked out for the 5-minute lease window.
+                    ClaimService.mark_failed(claim, reason)
                     {:error, reason}
                 end
 
