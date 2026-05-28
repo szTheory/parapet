@@ -14,6 +14,7 @@ defmodule Parapet.Operator do
   alias Parapet.Spine.ActionItem
   alias Parapet.Operator.ActionPayload
   alias Parapet.Evidence
+  alias Parapet.Automation.ClaimService
 
   alias Parapet.Operator.WorkbenchContract
 
@@ -704,36 +705,61 @@ defmodule Parapet.Operator do
            capability when not is_nil(capability) <-
              Parapet.Capabilities.get_recovery(capability_id),
            {:ok, preview_entry} <- find_recent_preview(incident.id, step_id_atom, preview_token) do
-        if DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) == :gt do
-          # Execute the capability
-          if is_function(capability.execute, 2) do
-            case capability.execute.(incident, preview_entry.target_refs) do
-              {:ok, exec_result} ->
-                timeline_attrs = %{
-                  type: "recovery_confirmed",
-                  payload: %{
-                    "step_id" => to_string(step_id_atom),
-                    "capability" => to_string(capability_id),
-                    "result" => inspect(exec_result)
-                  }
-                }
+        cond do
+          DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) != :gt ->
+            {:short_circuited, :preview_expired}
 
-                audit_attrs = build_audit("operator_confirm_recovery", payload)
+          not is_nil(preview_entry.target_refs_hash) and
+              preview_entry.target_refs_hash !=
+                target_refs_hash(preview_entry.target_refs) ->
+            {:short_circuited, :target_refs_drift}
 
-                Evidence.run_operator_command(
-                  incident_changeset: Ecto.Changeset.change(incident, %{}),
-                  timeline_attrs: timeline_attrs,
-                  audit_attrs: audit_attrs
-                )
+          not is_function(capability.execute, 2) ->
+            {:error, :capability_no_execute_callback}
+
+          true ->
+            case ClaimService.claim_action(
+                   incident_id: incident.id,
+                   action_kind: "operator",
+                   action_key: to_string(step_id_atom),
+                   breaker_step_id: step_id_atom,
+                   idempotency_key: payload.idempotency_key
+                 ) do
+              {:won, claim} ->
+                case capability.execute.(incident, preview_entry.target_refs) do
+                  {:ok, exec_result} ->
+                    ClaimService.mark_executed(claim)
+
+                    timeline_attrs = %{
+                      type: "recovery_confirmed",
+                      payload: %{
+                        "step_id" => to_string(step_id_atom),
+                        "capability" => to_string(capability_id),
+                        "result" => inspect(exec_result)
+                      }
+                    }
+
+                    audit_attrs = build_audit("operator_confirm_recovery", payload)
+
+                    Evidence.run_operator_command(
+                      incident_changeset: Ecto.Changeset.change(incident, %{}),
+                      timeline_attrs: timeline_attrs,
+                      audit_attrs: audit_attrs
+                    )
+
+                  {:error, reason} ->
+                    {:error, reason}
+                end
+
+              {:short_circuited, _claim, reason_string} ->
+                {:short_circuited, map_short_circuit_reason(reason_string)}
+
+              {:conflicted, claim} ->
+                {:conflicted, claim.id}
 
               {:error, reason} ->
                 {:error, reason}
             end
-          else
-            {:error, :capability_no_execute_callback}
-          end
-        else
-          {:error, :stale_preview}
         end
       else
         nil -> {:error, :capability_unwired}
@@ -746,6 +772,17 @@ defmodule Parapet.Operator do
 
   defp validate_step_exists(nil), do: {:error, :step_not_found}
   defp validate_step_exists(step), do: {:ok, step}
+
+  # Maps ClaimService's internal short-circuit reason strings to the frozen
+  # public atom vocab in Parapet.Telemetry.RecoveryAction (@short_circuit_reasons
+  # at recovery_action.ex:46-51). Fallback returns :internal_error to avoid
+  # leaking raw strings to adopters (RESEARCH Pattern 3 + Security V7).
+  defp map_short_circuit_reason("already_resolved"), do: :incident_resolved
+  defp map_short_circuit_reason("already_investigating"), do: :incident_resolved
+  defp map_short_circuit_reason("already_open"), do: :incident_resolved
+  defp map_short_circuit_reason("circuit_breaker_tripped"), do: :breaker_open
+  defp map_short_circuit_reason("suppressed"), do: :incident_resolved
+  defp map_short_circuit_reason(_other), do: :internal_error
 
   defp compute_preview(capability, incident, step) do
     expires_at = DateTime.utc_now() |> DateTime.add(300, :second)
