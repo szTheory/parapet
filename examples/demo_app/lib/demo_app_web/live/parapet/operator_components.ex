@@ -353,6 +353,10 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         </div>
 
         <div class="p-4">
+          <div class="mb-4">
+            <p class="text-[10px] text-gray-500 uppercase font-bold">Action</p>
+            <p class="text-sm font-medium text-gray-900"><%= Map.get(preview, :action_name) || preview.data["capability"] %></p>
+          </div>
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
               <p class="text-[10px] text-gray-500 uppercase font-bold">Target Kind</p>
