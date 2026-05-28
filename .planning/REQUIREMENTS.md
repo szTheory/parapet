@@ -55,7 +55,7 @@ Six runbooks shipping with v1.1, matching JTBD-MAP failure modes.
 
 Demo app proves the loop end-to-end.
 
-- [ ] **DEMO-05**: Demo app (`examples/demo_app/`) is seeded with at least one capability-backed incident that exposes a Preview-able + Confirm-able action via the generated operator UI; the seed runs as part of `mix setup` so fresh clones demonstrate the loop on first open.
+- [x] **DEMO-05**: Demo app (`examples/demo_app/`) is seeded with at least one capability-backed incident that exposes a Preview-able + Confirm-able action via the generated operator UI; the seed runs as part of `mix setup` so fresh clones demonstrate the loop on first open.
 - [ ] **DEMO-06**: CI demo lane exercises four scenarios on the demo: happy-path Confirm, Preview-token-expired retry, short-circuit on resolved incident, and claim-conflict between two simulated operators; failures break the build.
 
 ### Stability (STAB)
@@ -127,7 +127,7 @@ Filled by the roadmapper. Each v1.1 requirement maps to exactly one phase (23–
 | PB-04 | Phase 27 | Complete |
 | PB-05 | Phase 27 | Complete |
 | PB-06 | Phase 27 | Complete |
-| DEMO-05 | Phase 28 | Pending |
+| DEMO-05 | Phase 28 | Complete |
 | DEMO-06 | Phase 28 | Pending |
 | STAB-07 | Phase 29 | Pending |
 | ADOP-01 | Phase 29 | Pending |

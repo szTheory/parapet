@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
-stopped_at: Phase 28 context gathered (assumptions mode)
-last_updated: "2026-05-28T18:55:39.784Z"
-last_activity: 2026-05-28 -- Phase 28 planning complete
+stopped_at: Completed 28-01-PLAN.md
+last_updated: "2026-05-28T19:03:56.174Z"
+last_activity: 2026-05-28
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 15
-  completed_plans: 10
-  percent: 67
+  completed_plans: 11
+  percent: 71
 ---
 
 # Project State
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 28 — demo-seed-+-ci-lane (not started)
+**Current focus:** Phase 28 — demo-seed-ci-lane
 
 ## Current Position
 
-Phase: 28
-Plan: Not started
+Phase: 28 (demo-seed-ci-lane) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-05-28 -- Phase 28 planning complete
+Last activity: 2026-05-28
 
 ## Performance Metrics
 
@@ -61,6 +61,7 @@ Last activity: 2026-05-28 -- Phase 28 planning complete
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 28 P01 | 8 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,7 @@ Recent decisions affecting current work:
 - Two of six prebuilt playbooks (Retry Storm, Suppression Drift) stay guidance-only by design — every obvious automated mitigation worsens the failure (continues v0.10 "guidance-only runbooks where no allowlisted capability fits" decision).
 - `Parapet.Recovery` ships Stable-tier from day one in Phase 29; the 4-callback shape is frozen because adding required callbacks in v1.2 would be breaking under the v1.0 stability promise.
 - Operator-clicked Confirm path is the v1.1 architectural defect closure: today it skips `ClaimService` while the Oban auto-execution path goes through it. Phase 25 closes the gap.
+- [Phase ?]: Reuse frozen-allowlist atom :retry_async_item in DemoApp.Recovery.RetryAsyncItem — non-allowlisted id raises ArgumentError at Parapet.Capabilities.register_recovery/2
 
 ### Pending Todos
 
@@ -101,7 +103,7 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-05-28T18:29:37.127Z
-Stopped at: Phase 28 context gathered (assumptions mode)
-Resume file: .planning/phases/28-demo-seed-ci-lane/28-CONTEXT.md
+Last session: 2026-05-28T19:03:56.171Z
+Stopped at: Completed 28-01-PLAN.md
+Resume file: None
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
