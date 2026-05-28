@@ -4,7 +4,7 @@ milestone: v1.1
 milestone_name: Actionable Recovery
 status: verifying
 stopped_at: Completed 28-04-PLAN.md
-last_updated: "2026-05-28T19:54:56.197Z"
+last_updated: "2026-05-28T20:35:56.218Z"
 last_activity: 2026-05-28
 progress:
   total_phases: 7
@@ -25,8 +25,8 @@ See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery miles
 
 ## Current Position
 
-Phase: 28 (demo-seed-ci-lane) — EXECUTING
-Plan: 5 of 5
+Phase: 29
+Plan: Not started
 Status: Phase complete — ready for verification
 Last activity: 2026-05-28
 
@@ -34,7 +34,7 @@ Last activity: 2026-05-28
 
 **Velocity:**
 
-- Total plans completed: 10 (v1.1 starting)
+- Total plans completed: 15 (v1.1 starting)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -54,6 +54,7 @@ Last activity: 2026-05-28
 | 25 | 3 | - | - |
 | 26 | 1 | - | - |
 | 27 | 1 | - | - |
+| 28 | 5 | - | - |
 
 **Recent Trend:**
 

@@ -227,7 +227,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete    | 2026-05-28 |
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 27. Prebuilt Playbooks | v1.1 | 1/1 | Complete    | 2026-05-28 |
-| 28. Demo Seed + CI Lane | v1.1 | 5/5 | Complete   | 2026-05-28 |
+| 28. Demo Seed + CI Lane | v1.1 | 5/5 | Complete    | 2026-05-28 |
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
 
 _Earlier milestone phases (1-22) are archived — see the milestone archives linked above._
