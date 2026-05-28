@@ -147,7 +147,11 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   4. Every successful Confirm flows through `Parapet.Operator.ActionPayload` + `ClaimService.claim_action/1` with `action_kind: "operator"` — the same circuit-breaker and multi-node claim semantics the v0.8 escalation path uses, observable in a multi-node concurrency test.
 
 **UI hint**: yes
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
+
+  - [ ] 25-01-PLAN.md — Operator API rewire in `lib/parapet/operator.ex`: 4-arm `ClaimService.claim_action/1` dispatch in `confirm_runbook_step/4` with `action_kind: "operator"`; string→atom `map_short_circuit_reason/1` mapper; `target_refs_hash/1` SHA-256 helper; `compute_preview/3` writes hash AFTER host_data merge (Pitfall 2) with atom-vs-string canonicalization (Pitfall 5); `find_recent_preview/3` surfaces hash (nullable for legacy previews); `:stale_preview` → `:preview_expired` (UI-02, UI-03, UI-04) (Wave 1)
+  - [ ] 25-02-PLAN.md — Demo LiveView: `handle_event("confirm_mitigation", ...)` grows 2→4 arms with verbatim conflict flash + closed `short_circuit_flash/1` mapper (no catch-all); `preview_panel/1` adds Action Name cell resolved via `Parapet.Capabilities.get_recovery/1`; no `phx-value-*` hash round-trip (Pitfall 6) (UI-01, UI-04) (Wave 2 — depends on 25-01)
+  - [ ] 25-03-PLAN.md — Test coverage: update `operator_test.exs:524` to `{:short_circuited, :preview_expired}`; new `preview_lifecycle_test.exs` (`:preview_expired`, `:target_refs_drift`, nil-hash legacy compat); new `confirm_concurrency_test.exs` (multi-node race using `ConcurrencyCase` + `unboxed_run` + Task rendezvous, asserts one `{:ok, _}` + one `{:conflicted, _claim_id}`, claim row `action_kind == "operator"`, Pitfall 4 Capabilities Agent reset) (UI-02, UI-03, UI-04) (Wave 2 — depends on 25-01)
 
 ### Phase 26: Audit Propagation
 
