@@ -764,19 +764,37 @@ defmodule Parapet.Operator do
       "preview_token" => preview_token
     }
 
-    if is_function(capability.preview, 2) do
-      case capability.preview.(incident, step) do
-        {:ok, host_data} ->
-          # Convert host_data keys to strings for consistency in timeline payload
-          host_data_str = for {k, v} <- host_data, into: %{}, do: {to_string(k), v}
-          Map.merge(base_preview, host_data_str)
+    merged =
+      if is_function(capability.preview, 2) do
+        case capability.preview.(incident, step) do
+          {:ok, host_data} ->
+            # Convert host_data keys to strings for consistency in timeline payload
+            host_data_str = for {k, v} <- host_data, into: %{}, do: {to_string(k), v}
+            Map.merge(base_preview, host_data_str)
 
-        _ ->
-          base_preview
+          _ ->
+            base_preview
+        end
+      else
+        base_preview
       end
-    else
-      base_preview
-    end
+
+    # Hash computed against the FINAL (post-merge) target_refs — Pitfall 2:
+    # hashing the [] default before host_data merge would cause permanent
+    # :target_refs_drift short-circuits in production.
+    Map.put(merged, "target_refs_hash", target_refs_hash(merged["target_refs"] || []))
+  end
+
+  # Canonicalize to strings + sort before hashing — jsonb roundtrips atoms to
+  # strings; canonicalization stability invariant (Pitfall 5).
+  defp target_refs_hash(target_refs) do
+    target_refs
+    |> List.wrap()
+    |> Enum.map(&to_string/1)
+    |> Enum.sort()
+    |> :erlang.term_to_binary()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16(case: :lower)
   end
 
   defp find_recent_preview(incident_id, step_id, token) do
@@ -811,7 +829,12 @@ defmodule Parapet.Operator do
               DateTime.utc_now()
           end
 
-        {:ok, %{expires_at: expires_at, target_refs: payload["target_refs"]}}
+        {:ok,
+         %{
+           expires_at: expires_at,
+           target_refs: payload["target_refs"],
+           target_refs_hash: payload["target_refs_hash"]
+         }}
 
       _ ->
         {:error, :mismatched_preview}
