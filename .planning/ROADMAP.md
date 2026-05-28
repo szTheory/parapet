@@ -196,7 +196,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   - [x] 28-01-PLAN.md — Author the two compiled demo modules: `DemoApp.Runbooks.StalledExecutor` (use Parapet.Runbook, `:retry_item` capability step) and `DemoApp.Recovery.RetryAsyncItem` (use Parapet.Recovery, 4 callbacks, `execute/2` mutates an ActionItem) (DEMO-05) (Wave 1)
   - [x] 28-02-PLAN.md — Add the `mix demo.reset` alias (ecto.drop+create+migrate+seeds) for replayable seeding (DEMO-05) (Wave 1)
   - [x] 28-03-PLAN.md — Wire `Parapet.Capabilities` into the demo supervision tree + boot-time `Parapet.Recovery.attach([DemoApp.Recovery.RetryAsyncItem])` (DEMO-05, DEMO-06) (Wave 2)
-  - [ ] 28-04-PLAN.md — Add the capability-backed seeded incident with `runbook_data["module"]` => StalledExecutor (DEMO-05) (Wave 3)
+  - [x] 28-04-PLAN.md — Add the capability-backed seeded incident with `runbook_data["module"]` => StalledExecutor (DEMO-05) (Wave 3)
   - [ ] 28-05-PLAN.md — Author four `:smoke` recovery-loop scenarios (happy-path, preview-expired, resolved-mid-flow, sequential claim-conflict) through the Parapet.Operator API; confirm release_gate CI wiring needs no edits (DEMO-06) (Wave 3)
 
 ### Phase 29: Stability + Adopter Onboarding
@@ -227,7 +227,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 25. Wire Confirm Through ClaimService + Preview/Confirm UX | v1.1 | 3/3 | Complete    | 2026-05-28 |
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 27. Prebuilt Playbooks | v1.1 | 1/1 | Complete    | 2026-05-28 |
-| 28. Demo Seed + CI Lane | v1.1 | 3/5 | In Progress|  |
+| 28. Demo Seed + CI Lane | v1.1 | 4/5 | In Progress|  |
 | 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
 
 _Earlier milestone phases (1-22) are archived — see the milestone archives linked above._
