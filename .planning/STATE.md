@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
-stopped_at: Phase 26 context gathered (assumptions mode)
+stopped_at: Phase 26 planned (1 plan, verified)
 last_updated: "2026-05-28T14:18:32.790Z"
 last_activity: 2026-05-28 -- Phase 26 planning complete
 progress:
@@ -21,12 +21,12 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 25 — wire-confirm-through-claimservice-preview-confirm-ux
+**Current focus:** Phase 26 — audit-propagation
 
 ## Current Position
 
-Phase: 25
-Plan: Not started
+Phase: 26
+Plan: 26-01 (planned, plan-checker passed)
 Status: Ready to execute
 Last activity: 2026-05-28 -- Phase 26 planning complete
 
@@ -100,6 +100,6 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 ## Session Continuity
 
 Last session: 2026-05-28T11:51:22.276Z
-Stopped at: Phase 26 context gathered (assumptions mode)
-Resume file: .planning/phases/26-audit-propagation/26-CONTEXT.md
-Next step: `/gsd:discuss-phase 23` to begin planning Foundations (telemetry contract lock + `lease_until` schema migration).
+Stopped at: Phase 26 planned (1 plan, plan-checker passed)
+Resume file: .planning/phases/26-audit-propagation/26-01-PLAN.md
+Next step: `/gsd:execute-phase 26` to execute the audit-propagation plan.
