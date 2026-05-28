@@ -123,6 +123,21 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     payload: %{"text" => "Job ID 8821 last heartbeat at 09:14 UTC — executor did not report completion"}
   })
 
+# Open action item linked to the stalled-executor incident, so the
+# Preview → Confirm flow has a real DB row to operate on: confirming the
+# capability flips this item's state (open → resolved).
+{:ok, _action_item} =
+  %Parapet.Spine.ActionItem{}
+  |> Parapet.Spine.ActionItem.changeset(%{
+    title: "async_job_8821",
+    integration: "demo",
+    external_id: "ext-8821",
+    kind: "stalled_workflow",
+    state: "open",
+    incident_id: incident_stalled.id
+  })
+  |> DemoApp.Repo.insert()
+
 # ---------------------------------------------------------------------------
 # Tool audit — records a doctor check against the demo environment
 # ---------------------------------------------------------------------------
@@ -135,4 +150,4 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     duration_ms: 23
   })
 
-IO.puts("Seeds complete: 4 incidents (open x2/investigating/resolved), 7 timeline entries, 1 tool audit")
+IO.puts("Seeds complete: 4 incidents (open x2/investigating/resolved), 7 timeline entries, 1 action item, 1 tool audit")

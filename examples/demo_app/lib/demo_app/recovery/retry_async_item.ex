@@ -39,7 +39,7 @@ defmodule DemoApp.Recovery.RetryAsyncItem do
         {n, _} =
           DemoApp.Repo.update_all(
             from(a in Parapet.Spine.ActionItem, where: a.id == ^item_id),
-            set: [state: "retrying"]
+            set: [state: "resolved"]
           )
 
         {:ok, %{retried_count: n}}

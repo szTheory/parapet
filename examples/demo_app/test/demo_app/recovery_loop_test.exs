@@ -24,7 +24,7 @@ defmodule DemoApp.RecoveryLoopTest do
         title: "async_job_#{System.unique_integer([:positive])}",
         integration: "demo",
         external_id: "ext-#{System.unique_integer([:positive])}",
-        kind: "async_item",
+        kind: "stalled_workflow",
         state: "open",
         incident_id: incident.id
       })
