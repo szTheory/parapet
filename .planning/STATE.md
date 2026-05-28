@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
-stopped_at: Phase 27 context gathered (assumptions mode)
+stopped_at: Phase 27 (Prebuilt Playbooks) complete — auto-advance pipeline halted (--no-transition)
 last_updated: "2026-05-28T18:16:58.322Z"
 last_activity: 2026-05-28
 progress:
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 27 — prebuilt-playbooks
+**Current focus:** Phase 28 — demo-seed-+-ci-lane (not started)
 
 ## Current Position
 
 Phase: 28
 Plan: Not started
-Status: Executing Phase 27
+Status: Phase 27 complete (verified, passed); Phase 28 not started
 Last activity: 2026-05-28
 
 ## Performance Metrics
@@ -102,6 +102,6 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 ## Session Continuity
 
 Last session: 2026-05-28T17:35:29.893Z
-Stopped at: Phase 27 context gathered (assumptions mode)
-Resume file: .planning/phases/27-prebuilt-playbooks/27-CONTEXT.md
-Next step: `/gsd:execute-phase 26` to execute the audit-propagation plan.
+Stopped at: Phase 27 (Prebuilt Playbooks) complete — verified passed, pipeline halted (--no-transition)
+Resume file: .planning/phases/27-prebuilt-playbooks/27-VERIFICATION.md
+Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
