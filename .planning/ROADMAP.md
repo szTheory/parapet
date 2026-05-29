@@ -214,9 +214,9 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 
 **Plans**: 4 plans in 2 waves (single coherent PR per D-18 — code surfaces land before the docs that name them)
 
-  - [ ] 29-01-PLAN.md — Graduate `Parapet.Recovery` to Stable: flip moduledoc admonition + move stability.md row + Deprecation Register additive-variant note + verify.public_api regression case (STAB-07) (Wave 1)
-  - [ ] 29-02-PLAN.md — `mix parapet.gen.recovery <NAME>` Igniter task + `recovery.ex.eex` template + Igniter.Test generator coverage (ADOP-01) (Wave 1)
-  - [ ] 29-03-PLAN.md — `check_recovery` doctor adoption signal (count/unregistered/host-health; zero-capability → :skip per A1) + six signal-condition tests (ADOP-02) (Wave 1)
+  - [x] 29-01-PLAN.md — Graduate `Parapet.Recovery` to Stable: flip moduledoc admonition + move stability.md row + Deprecation Register additive-variant note + verify.public_api regression case (STAB-07) (Wave 1)
+  - [x] 29-02-PLAN.md — `mix parapet.gen.recovery <NAME>` Igniter task + `recovery.ex.eex` template + Igniter.Test generator coverage (ADOP-01) (Wave 1)
+  - [x] 29-03-PLAN.md — `check_recovery` doctor adoption signal (count/unregistered/host-health; zero-capability → :skip per A1) + six signal-condition tests (ADOP-02) (Wave 1)
   - [ ] 29-04-PLAN.md — `docs/recovery-actions.md` adopter guide + ExDoc extras/Guides wiring + getting-started/operator-ui cross-links (ADOP-03) (Wave 2 — depends on 29-01, 29-02, 29-03)
 
 ## Progress
@@ -233,7 +233,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 27. Prebuilt Playbooks | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 28. Demo Seed + CI Lane | v1.1 | 5/5 | Complete    | 2026-05-28 |
-| 29. Stability + Adopter Onboarding | v1.1 | 0/0 | Not started | - |
+| 29. Stability + Adopter Onboarding | v1.1 | 3/4 | In Progress|  |
 
 _Earlier milestone phases (1-22) are archived — see the milestone archives linked above._
 

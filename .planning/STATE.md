@@ -4,8 +4,8 @@ milestone: v1.1
 milestone_name: Actionable Recovery
 status: executing
 stopped_at: Phase 29 context gathered (assumptions mode)
-last_updated: "2026-05-29T00:45:15.587Z"
-last_activity: 2026-05-29 -- Phase 29 planning complete
+last_updated: "2026-05-29T00:52:24.106Z"
+last_activity: 2026-05-29 -- Phase 29 execution started
 progress:
   total_phases: 7
   completed_phases: 6
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 28 — demo-seed-ci-lane
+**Current focus:** Phase 29 — stability-adopter-onboarding
 
 ## Current Position
 
-Phase: 29
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-05-29 -- Phase 29 planning complete
+Phase: 29 (stability-adopter-onboarding) — EXECUTING
+Plan: 1 of 4
+Status: Executing Phase 29
+Last activity: 2026-05-29 -- Phase 29 execution started
 
 ## Performance Metrics
 
