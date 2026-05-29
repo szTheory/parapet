@@ -62,15 +62,15 @@ Demo app proves the loop end-to-end.
 
 The v1.1 surface joins the v1.0 contract.
 
-- [ ] **STAB-07**: `Parapet.Recovery` behaviour and its 4 callbacks are declared Stable in `docs/stability.md`; CHANGELOG migration notes warn adopters who pattern-match `Parapet.Operator.confirm_runbook_step/4` return values that the new error tuple variants (`:short_circuited`, `:conflicted`) are additive and will not be removed in 1.x.
+- [x] **STAB-07**: `Parapet.Recovery` behaviour and its 4 callbacks are declared Stable in `docs/stability.md`; CHANGELOG migration notes warn adopters who pattern-match `Parapet.Operator.confirm_runbook_step/4` return values that the new error tuple variants (`:short_circuited`, `:conflicted`) are additive and will not be removed in 1.x.
 
 ### Adopter Onboarding (ADOP)
 
 The "shipped ≠ adopted" prevention.
 
-- [ ] **ADOP-01**: `mix parapet.gen.recovery <NAME>` Igniter task scaffolds a new host-application recovery module with the four required callbacks and a docstring template; flag-based, not interactive (matches the SLO-W1 idiom planned for v1.2).
-- [ ] **ADOP-02**: `mix parapet.doctor` reports a recovery-action adoption signal — count of attached capabilities, warnings for runbook steps that reference capabilities not in the registry, and per-capability check that the host module is loaded and has the expected callbacks.
-- [ ] **ADOP-03**: `docs/recovery-actions.md` adopter guide explains capability authoring, Preview/Confirm UX, error semantics, and four worked examples (one per capability-backed playbook); cross-linked from the existing operator-ui.md and getting-started.md.
+- [x] **ADOP-01**: `mix parapet.gen.recovery <NAME>` Igniter task scaffolds a new host-application recovery module with the four required callbacks and a docstring template; flag-based, not interactive (matches the SLO-W1 idiom planned for v1.2).
+- [x] **ADOP-02**: `mix parapet.doctor` reports a recovery-action adoption signal — count of attached capabilities, warnings for runbook steps that reference capabilities not in the registry, and per-capability check that the host module is loaded and has the expected callbacks.
+- [x] **ADOP-03**: `docs/recovery-actions.md` adopter guide explains capability authoring, Preview/Confirm UX, error semantics, and four worked examples (one per capability-backed playbook); cross-linked from the existing operator-ui.md and getting-started.md.
 
 ## Future Requirements
 
@@ -129,10 +129,10 @@ Filled by the roadmapper. Each v1.1 requirement maps to exactly one phase (23–
 | PB-06 | Phase 27 | Complete |
 | DEMO-05 | Phase 28 | Complete |
 | DEMO-06 | Phase 28 | Complete |
-| STAB-07 | Phase 29 | Pending |
-| ADOP-01 | Phase 29 | Pending |
-| ADOP-02 | Phase 29 | Pending |
-| ADOP-03 | Phase 29 | Pending |
+| STAB-07 | Phase 29 | Complete |
+| ADOP-01 | Phase 29 | Complete |
+| ADOP-02 | Phase 29 | Complete |
+| ADOP-03 | Phase 29 | Complete |
 
 **Coverage:**
 
