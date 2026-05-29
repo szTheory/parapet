@@ -212,7 +212,12 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   3. Running `mix parapet.doctor` reports a recovery-action adoption signal: count of attached capabilities, warnings for runbook steps that reference capabilities not in the registry, and per-capability check that the host module is loaded with the expected callbacks.
   4. `docs/recovery-actions.md` exists, explains capability authoring, Preview/Confirm UX, the error semantics (`:short_circuited`, `:conflicted`, `:recovery_failed`), and walks through four worked examples (one per capability-backed playbook); it is cross-linked from `docs/operator-ui.md` and `docs/getting-started.md`.
 
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves (single coherent PR per D-18 — code surfaces land before the docs that name them)
+
+  - [ ] 29-01-PLAN.md — Graduate `Parapet.Recovery` to Stable: flip moduledoc admonition + move stability.md row + Deprecation Register additive-variant note + verify.public_api regression case (STAB-07) (Wave 1)
+  - [ ] 29-02-PLAN.md — `mix parapet.gen.recovery <NAME>` Igniter task + `recovery.ex.eex` template + Igniter.Test generator coverage (ADOP-01) (Wave 1)
+  - [ ] 29-03-PLAN.md — `check_recovery` doctor adoption signal (count/unregistered/host-health; zero-capability → :skip per A1) + six signal-condition tests (ADOP-02) (Wave 1)
+  - [ ] 29-04-PLAN.md — `docs/recovery-actions.md` adopter guide + ExDoc extras/Guides wiring + getting-started/operator-ui cross-links (ADOP-03) (Wave 2 — depends on 29-01, 29-02, 29-03)
 
 ## Progress
 
