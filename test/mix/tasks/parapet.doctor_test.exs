@@ -271,13 +271,13 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
       assert Doctor.run(["--ci", "recovery"]) == :ok
     end
 
-    test "N healthy capabilities registered → :ok with count in message" do
+    test "N healthy capabilities registered → :info with count in message" do
       {:ok, _} = Parapet.Recovery.attach([HealthyRecovery])
 
       assert Doctor.run(["recovery"]) == :ok
 
       messages = get_all_shell_messages()
-      assert String.contains?(messages, "==> recovery: ok")
+      assert String.contains?(messages, "==> recovery: info")
       assert String.contains?(messages, "1")
     end
 
@@ -323,8 +323,8 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
       assert Doctor.run(["recovery"]) == :ok
 
       messages = get_all_shell_messages()
-      # Should be :ok (healthy cap, URL SLO skipped) — NOT :warn or :error
-      assert String.contains?(messages, "==> recovery: ok")
+      # Should be :info (healthy cap, URL SLO skipped) — NOT :warn or :error
+      assert String.contains?(messages, "==> recovery: info")
       refute String.contains?(messages, "==> recovery: warn")
       refute String.contains?(messages, "==> recovery: error")
     end
