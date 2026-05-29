@@ -80,7 +80,7 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 - [x] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03) (completed 2026-05-28)
 - [x] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (completed 2026-05-28)
 - [x] **Phase 28: Demo Seed + CI Lane** — Demo app seeded with a Preview-able + Confirm-able incident; CI exercises happy-path, preview-expiry, short-circuit, and claim-conflict scenarios (DEMO-05, DEMO-06) (completed 2026-05-28)
-- [ ] **Phase 29: Stability + Adopter Onboarding** — Declare `Parapet.Recovery` Stable; CHANGELOG migration notes; `mix parapet.gen.recovery` Igniter task; `mix parapet.doctor` adoption signal; `docs/recovery-actions.md` adopter guide (STAB-07, ADOP-01, ADOP-02, ADOP-03)
+- [x] **Phase 29: Stability + Adopter Onboarding** — Declare `Parapet.Recovery` Stable; CHANGELOG migration notes; `mix parapet.gen.recovery` Igniter task; `mix parapet.doctor` adoption signal; `docs/recovery-actions.md` adopter guide (STAB-07, ADOP-01, ADOP-02, ADOP-03) (completed 2026-05-29)
 
 ## Phase Details
 
@@ -217,7 +217,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
   - [x] 29-01-PLAN.md — Graduate `Parapet.Recovery` to Stable: flip moduledoc admonition + move stability.md row + Deprecation Register additive-variant note + verify.public_api regression case (STAB-07) (Wave 1)
   - [x] 29-02-PLAN.md — `mix parapet.gen.recovery <NAME>` Igniter task + `recovery.ex.eex` template + Igniter.Test generator coverage (ADOP-01) (Wave 1)
   - [x] 29-03-PLAN.md — `check_recovery` doctor adoption signal (count/unregistered/host-health; zero-capability → :skip per A1) + six signal-condition tests (ADOP-02) (Wave 1)
-  - [ ] 29-04-PLAN.md — `docs/recovery-actions.md` adopter guide + ExDoc extras/Guides wiring + getting-started/operator-ui cross-links (ADOP-03) (Wave 2 — depends on 29-01, 29-02, 29-03)
+  - [x] 29-04-PLAN.md — `docs/recovery-actions.md` adopter guide + ExDoc extras/Guides wiring + getting-started/operator-ui cross-links (ADOP-03) (Wave 2 — depends on 29-01, 29-02, 29-03)
 
 ## Progress
 
@@ -233,7 +233,7 @@ _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1
 | 26. Audit Propagation | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 27. Prebuilt Playbooks | v1.1 | 1/1 | Complete    | 2026-05-28 |
 | 28. Demo Seed + CI Lane | v1.1 | 5/5 | Complete    | 2026-05-28 |
-| 29. Stability + Adopter Onboarding | v1.1 | 3/4 | In Progress|  |
+| 29. Stability + Adopter Onboarding | v1.1 | 4/4 | Complete   | 2026-05-29 |
 
 _Earlier milestone phases (1-22) are archived — see the milestone archives linked above._
 
