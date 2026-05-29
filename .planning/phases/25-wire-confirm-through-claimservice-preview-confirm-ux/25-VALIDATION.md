@@ -1,11 +1,11 @@
 ---
 phase: 25
 slug: wire-confirm-through-claimservice-preview-confirm-ux
-status: planned
+status: validated
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-05-27
-updated: 2026-05-28
+updated: 2026-05-29
 ---
 
 # Phase 25 — Validation Strategy
@@ -41,15 +41,20 @@ updated: 2026-05-28
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 25-01-T1 | 25-01 | 1 | UI-03 | T-25-02 | target_refs_hash computed AFTER host_data merge; canonicalized via Enum.map(&to_string/1) (Pitfalls 2 + 5) | source assertion + compile | `mix compile --warnings-as-errors` + grep gates | lib/parapet/operator.ex (modify) | pending |
-| 25-01-T2 | 25-01 | 1 | UI-02, UI-04 | T-25-01, T-25-03, T-25-04 | 4-arm ClaimService.claim_action dispatch with action_kind: "operator"; string→atom mapper closes adopter-leak surface | source assertion + compile + dialyzer | `mix compile --warnings-as-errors` + `mix dialyzer` + grep gates | lib/parapet/operator.ex (modify) | pending |
-| 25-02-T1 | 25-02 | 2 | UI-04 | T-25-LV-01 | 4-arm LiveView handler; closed short_circuit_flash/1 (no catch-all clause) | source assertion + compile | `cd examples/demo_app && mix compile --warnings-as-errors` + grep gates for verbatim flash strings | examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex (modify) | pending |
-| 25-02-T2 | 25-02 | 2 | UI-01 | T-25-LV-02, T-25-LV-04 | Action Name resolved server-side via Parapet.Capabilities.get_recovery; no phx-value-* hash round-trip | source assertion + compile | `cd examples/demo_app && mix compile --warnings-as-errors` + grep gates | examples/demo_app/lib/demo_app_web/components/operator_components.ex OR live/parapet/operator_components.ex (modify) | pending |
-| 25-03-T1 | 25-03 | 2 | UI-03 | T-25-01 | Updated assertion proves :stale_preview replaced with :short_circuited :preview_expired | test command | `mix test test/parapet/operator_test.exs` | test/parapet/operator_test.exs (modify) | pending |
-| 25-03-T2 | 25-03 | 2 | UI-03 | T-25-01, T-25-02 | :preview_expired and :target_refs_drift branch coverage + nil-hash legacy compat | test command | `mix test test/parapet/operator/preview_lifecycle_test.exs` | test/parapet/operator/preview_lifecycle_test.exs (new) | pending |
-| 25-03-T3 | 25-03 | 2 | UI-02, UI-04 | T-25-04, T-25-T-01, T-25-T-02 | Multi-node race produces 1 {:ok, _} + 1 {:conflicted, _claim_id}; claim row action_kind == "operator" | test command (3x for flake check) | `mix test test/parapet/operator/confirm_concurrency_test.exs --include unboxed` | test/parapet/operator/confirm_concurrency_test.exs (new) | pending |
+| 25-01-T1 | 25-01 | 1 | UI-03 | T-25-02 | target_refs_hash computed AFTER host_data merge; canonicalized via Enum.map(&to_string/1) (Pitfalls 2 + 5) | source assertion + compile | `mix compile --warnings-as-errors` + grep gates | lib/parapet/operator.ex (modify) | green |
+| 25-01-T2 | 25-01 | 1 | UI-02, UI-04 | T-25-01, T-25-03, T-25-04 | 4-arm ClaimService.claim_action dispatch with action_kind: "operator"; string→atom mapper closes adopter-leak surface | source assertion + compile + dialyzer | `mix compile --warnings-as-errors` + `mix dialyzer` + grep gates | lib/parapet/operator.ex (modify) | green |
+| 25-02-T1 | 25-02 | 2 | UI-04 | T-25-LV-01 | 4-arm LiveView handler; closed short_circuit_flash/1 (no catch-all clause) | source assertion + compile | `cd examples/demo_app && mix compile --warnings-as-errors` + grep gates for verbatim flash strings | examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex (modify) | green (compile); visual → Manual-Only |
+| 25-02-T2 | 25-02 | 2 | UI-01 | T-25-LV-02, T-25-LV-04 | Action Name resolved server-side via Parapet.Capabilities.get_recovery; no phx-value-* hash round-trip | source assertion + compile | `cd examples/demo_app && mix compile --warnings-as-errors` + grep gates | examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex (modify) | green (compile); visual → Manual-Only |
+| 25-03-T1 | 25-03 | 2 | UI-03 | T-25-01 | Updated assertion proves :stale_preview replaced with :short_circuited :preview_expired | test command | `mix test test/parapet/operator_test.exs` | test/parapet/operator_test.exs (modify) | green |
+| 25-03-T2 | 25-03 | 2 | UI-03 | T-25-01, T-25-02 | :preview_expired and :target_refs_drift branch coverage + nil-hash legacy compat | test command | `mix test test/parapet/operator/preview_lifecycle_test.exs` | test/parapet/operator/preview_lifecycle_test.exs (new) | green |
+| 25-03-T3 | 25-03 | 2 | UI-02, UI-04 | T-25-04, T-25-T-01, T-25-T-02 | Multi-node race produces 1 {:ok, _} + 1 {:conflicted, _claim_id}; claim row action_kind == "operator" | test command (3x for flake check) | `mix test test/parapet/operator/confirm_concurrency_test.exs --include unboxed` | test/parapet/operator/confirm_concurrency_test.exs (new) | green |
+| 25-CR-01 | review | post | UI-02 | T-25-01 | incident_state_gate is allow-list driven; operator passes ["open","investigating"] so Acknowledge-then-Confirm succeeds; resolved still honestly short-circuits | test command | `mix test test/parapet/operator/preview_lifecycle_test.exs` | lib/parapet/automation/claim_service.ex + lib/parapet/operator.ex (commits 65e5ee5, 790541b) | green |
+| 25-CR-02 | review | post | UI-02 | T-25-04 | ClaimService.mark_failed/2 (status failed_retryable + last_error_*); steal_expired_claim re-grants; operator error arm releases claim → no 5-min lockout | test command | `mix test test/parapet/automation/claim_service_test.exs --include unboxed` | lib/parapet/automation/claim_service.ex + lib/parapet/spine/action_claim.ex | green |
+| 25-CR-03 | review | post | UI-04 | T-25-03 | capability.execute wrapped in try/rescue → {:error, {:capability_raised, msg}}; claim released via mark_failed; no raw string leak to adopters | test command | `mix test test/parapet/operator/preview_lifecycle_test.exs` | lib/parapet/operator.ex | green |
 
 *Status: pending · green · red · flaky*
+
+> **Audit note (2026-05-29):** Statuses promoted pending → green after empirically re-running the suites: `operator_test.exs` + `preview_lifecycle_test.exs` (26 tests, 0 failures incl. `--include unboxed`) and `confirm_concurrency_test.exs` (1 unboxed test, 0 failures). Full library suite was green at 483 tests, 0 failures at verification (2026-05-28T07:25Z); no lib/test drift since (commits 65e5ee5 + 790541b unchanged). Rows 25-CR-01..03 added to record the code-review fix coverage that landed after the original 7 tasks. Demo-app LiveView tasks (25-02-T1/T2) are compile-verified green; their visual rendering remains Manual-Only (demo app is outside the library `mix test` path — RESEARCH Pitfall 3; CI demo lane is explicit Phase 28 scope).
 
 ---
 
@@ -85,3 +90,15 @@ updated: 2026-05-28
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** approved
+
+---
+
+## Validation Audit 2026-05-29
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Resolved | 0 |
+| Escalated | 0 |
+
+**Verdict:** NYQUIST-COMPLIANT. Every Phase-25 requirement (UI-01..UI-04) has automated verification at the library-contract level, confirmed green by re-running the suites (operator + preview-lifecycle: 26 tests; confirm-concurrency: 1 unboxed test; all 0 failures). The three code-review fixes (CR-01/02/03) each carry green regression tests. The only un-automated items are demo-app LiveView visual renders, which are correctly recorded under Manual-Only Verifications and whose CI automation is an explicit Phase 28 deliverable (not a gap). No test files generated — nothing was missing.
