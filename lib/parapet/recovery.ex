@@ -13,11 +13,15 @@ defmodule Parapet.Recovery do
   contract a recovery action module must implement. The activation entry point is
   `Parapet.Recovery.attach/1`.
 
-  > #### Experimental {: .warning}
+  > #### Stable {: .info}
   >
-  > This module is **experimental** in v1.x. Its API may change in a minor release with a
-  > single-version notice in CHANGELOG.md. See
+  > This module is **stable** as of v1.1.0. Its public API will not change without a
+  > major-version bump and a full deprecation cycle. See
   > [Stability & Deprecation Policy](stability.html) for details.
+
+  The four callbacks — `id/0`, `label/0`, `preview/2`, and `execute/2` — are part of the
+  Stable contract and are frozen for 1.x: no required callback will be added or removed
+  within the 1.x line without a major-version bump and a full deprecation cycle.
   """
 
   @doc since: "1.1.0"
