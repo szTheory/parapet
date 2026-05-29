@@ -31,6 +31,7 @@ defmodule Parapet.Capabilities do
       capability = %{
         id: id,
         name: Keyword.fetch!(attrs, :name),
+        module: Keyword.get(attrs, :module),
         target_kind: Keyword.get(attrs, :target_kind),
         preview: Keyword.get(attrs, :preview),
         execute: Keyword.get(attrs, :execute),

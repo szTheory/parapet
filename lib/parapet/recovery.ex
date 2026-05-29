@@ -99,6 +99,7 @@ defmodule Parapet.Recovery do
         :ok =
           Parapet.Capabilities.register_recovery(id,
             name: label,
+            module: module,
             preview: &module.preview/2,
             execute: &module.execute/2
           )

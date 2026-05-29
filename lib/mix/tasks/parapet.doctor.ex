@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Parapet.Doctor do
   """
   use Mix.Task
 
-  @static_checks ~w(runbooks router operator_ui endpoint cardinality cluster_static)
+  @static_checks ~w(runbooks router operator_ui endpoint cardinality cluster_static recovery)
   @severity_order %{skip: 0, info: 0, warn: 1, error: 2}
 
   @impl Mix.Task
@@ -92,6 +92,7 @@ defmodule Mix.Tasks.Parapet.Doctor do
   defp run_static_check("endpoint"), do: check_endpoint()
   defp run_static_check("cardinality"), do: check_cardinality()
   defp run_static_check("cluster_static"), do: check_cluster_static()
+  defp run_static_check("recovery"), do: check_recovery()
 
   defp check_runbooks do
     slos = Parapet.SLO.all()
@@ -349,6 +350,96 @@ defmodule Mix.Tasks.Parapet.Doctor do
       %{status: status, messages: messages}
     end
   end
+
+  defp check_recovery do
+    # Guard: Capabilities Agent may not be running when Mix tasks load the app without starting OTP.
+    # In that case, skip the check gracefully (mirrors the :skip contract for unavailable checks).
+    if Process.whereis(Parapet.Capabilities) == nil do
+      %{status: :skip, messages: ["Recovery capabilities agent is not running; start the OTP app to enable this check."]}
+    else
+      caps = Parapet.Capabilities.capabilities(:recovery)
+
+      # Signal 1: COUNT — zero capabilities is :skip (A1 resolution; mirrors check_runbooks no-SLOs)
+      if caps == [] do
+        %{status: :skip, messages: ["No recovery capabilities attached, so recovery adoption checks were skipped."]}
+      else
+        warnings = []
+
+        # Signal 2: UNREGISTERED-IN-RUNBOOK — iterate SLOs, resolve runbook modules, cross-check capability atoms
+        warnings =
+          Enum.reduce(Parapet.SLO.all(), warnings, fn slo, acc ->
+            module = recovery_runbook_module(slo.runbook)
+
+            if module && Code.ensure_loaded?(module) &&
+                 function_exported?(module, :__runbook_schema__, 0) do
+              schema = apply(module, :__runbook_schema__, [])
+
+              steps = Map.get(schema, :steps, [])
+
+              Enum.reduce(steps, acc, fn step, step_acc ->
+                cap_atom = Map.get(step, :capability)
+
+                if cap_atom && Parapet.Capabilities.get_recovery(cap_atom) == nil do
+                  ["Runbook #{inspect(module)} step references unregistered capability: #{inspect(cap_atom)}" | step_acc]
+                else
+                  step_acc
+                end
+              end)
+            else
+              acc
+            end
+          end)
+
+        # Signal 3: PER-CAPABILITY HEALTH — check host module loadability and 4-callback presence
+        recovery_callbacks = [{:id, 0}, {:label, 0}, {:preview, 2}, {:execute, 2}]
+
+        warnings =
+          Enum.reduce(caps, warnings, fn cap, acc ->
+            case Map.get(cap, :module) do
+              nil ->
+                acc
+
+              mod ->
+                if not Code.ensure_loaded?(mod) do
+                  ["Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is not loadable" | acc]
+                else
+                  missing_callbacks =
+                    Enum.reject(recovery_callbacks, fn {fun, arity} ->
+                      function_exported?(mod, fun, arity)
+                    end)
+
+                  if missing_callbacks == [] do
+                    acc
+                  else
+                    missing_names = Enum.map(missing_callbacks, fn {fun, arity} -> "#{fun}/#{arity}" end)
+                    ["Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is missing callbacks: #{Enum.join(missing_names, ", ")}" | acc]
+                  end
+                end
+            end
+          end)
+
+        if warnings == [] do
+          count = length(caps)
+          noun = if count == 1, do: "capability", else: "capabilities"
+          %{status: :info, messages: ["#{count} recovery #{noun} registered and healthy."]}
+        else
+          %{status: :warn, messages: Enum.reverse(warnings)}
+        end
+      end
+    end
+  end
+
+  defp recovery_runbook_module(runbook) when is_atom(runbook), do: runbook
+
+  defp recovery_runbook_module(runbook) when is_binary(runbook) do
+    try do
+      String.to_existing_atom(runbook)
+    rescue
+      ArgumentError -> nil
+    end
+  end
+
+  defp recovery_runbook_module(_), do: nil
 
   defp run_cluster_probe do
     case Application.get_env(:parapet, :doctor_cluster_probe) do
