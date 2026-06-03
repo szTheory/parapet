@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Authoring DX & Maturity
-status: completed
-last_updated: "2026-06-03T17:01:37.709Z"
-last_activity: 2026-06-03 — Phase 31 completed
+status: verifying
+last_updated: "2026-06-03T17:24:36.390Z"
+last_activity: 2026-06-03
 progress:
   total_phases: 4
-  completed_phases: 2
-  total_plans: 2
-  completed_plans: 2
-  percent: 50
+  completed_phases: 3
+  total_plans: 4
+  completed_plans: 4
+  percent: 75
 ---
 
 # Project State
@@ -20,20 +20,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 29 — stability-adopter-onboarding
+**Current focus:** Phase 32 — ci-supply-chain-hardening
 
 ## Current Position
 
-Phase: 31-igniter-slo-task
-Plan: 31-01
-Status: Phase complete
-Last activity: 2026-06-03 — Phase 31 completed
+Phase: 32 (ci-supply-chain-hardening) — VERIFYING
+Plan: 2 of 2
+Status: Phase complete — ready for verification
+Last activity: 2026-06-03
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 19 (v1.1 starting)
+- Total plans completed: 21 (v1.1 starting)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -68,6 +68,8 @@ Last activity: 2026-06-03 — Phase 31 completed
 | Phase 28 P04 | 34 | 1 tasks | 1 files |
 | Phase 28 P05 | 40 | 2 tasks | 3 files |
 | Phase 31 P01 | 4m | 1 tasks | 2 files |
+| Phase 32 P01 | 0 min | 2 tasks | 2 files |
+| Phase 32 P02 | 0 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -89,6 +91,7 @@ Recent decisions affecting current work:
 - [Phase ?]: Do not double-start Parapet.Capabilities in demo app
 - [Phase ?]: runbook_data[module] string key is the only mechanism enabling Preview/Confirm; inline steps is display-only
 - [Phase ?]: Incident 4 added as always-insert alongside existing 3; replayability via mix demo.reset per D-10/D-11
+- [Phase 32]: Keep `release_gate` as the stable required status check while CI expands into an Elixir/OTP matrix.
 
 ### Pending Todos
 
@@ -113,10 +116,10 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-06-03T17:01:37.705Z
-Stopped at: Phase 32 context gathered (assumptions mode)
-Resume file: .planning/phases/32-ci-supply-chain-hardening/32-CONTEXT.md
-Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
+Last session: 2026-06-03T17:24:36.387Z
+Stopped at: Completed 32-02-PLAN.md
+Resume file: None
+Next step: `/gsd-verify-work 32` to verify CI supply-chain hardening.
 
 ## Operator Next Steps
 

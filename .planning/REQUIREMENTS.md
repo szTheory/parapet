@@ -7,10 +7,10 @@
 - [ ] **DX-04**: Deployment guide is added to `docs/`.
 
 ### Maturity & Supply Chain
-- [ ] **MAT-01**: Multi-version Elixir/OTP CI matrix is implemented in GitHub Actions.
-- [ ] **MAT-02**: GitHub Actions use SHA-pinned versions.
-- [ ] **MAT-03**: Dependabot configuration is added for Hex and GitHub Actions.
-- [ ] **MAT-04**: Branch protection rules strictly enforce the `release_gate` job.
+- [x] **MAT-01**: Multi-version Elixir/OTP CI matrix is implemented in GitHub Actions.
+- [x] **MAT-02**: GitHub Actions use SHA-pinned versions.
+- [x] **MAT-03**: Dependabot configuration is added for Hex and GitHub Actions.
+- [x] **MAT-04**: Branch protection rules strictly enforce the `release_gate` job.
 - [ ] **MAT-05**: `MAINTAINING.md` is added to document release procedures.
 - [ ] **MAT-06**: `CONTRIBUTING.md` includes the conventional commit taxonomy.
 - [ ] **MAT-07**: HexDocs includes a Parapet logo and favicon.
