@@ -14,7 +14,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
   lifecycle home; the legacy assertion in operator_test.exs remains as a
   regression marker against accidental contract drift.
   """
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Parapet.Operator
   alias Parapet.Operator.ActionPayload
