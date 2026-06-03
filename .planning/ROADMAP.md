@@ -33,6 +33,12 @@ Plans:
 2. CI runs on a matrix of supported Elixir/OTP versions.
 3. Dependabot is active.
 
+**Plans:** 2 plans
+
+Plans:
+- [ ] 32-01-PLAN.md — Harden CI pipeline with Elixir/OTP matrix and SHA pinning.
+- [ ] 32-02-PLAN.md — Configure Dependabot and document branch protection.
+
 ## Phase 33: Documentation & Polish
 **Goal:** Complete the 1.0 maturity artifacts.
 **Requirements:** DX-03, DX-04, MAT-05, MAT-06, MAT-07, MAT-08
