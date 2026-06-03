@@ -35,12 +35,12 @@ defmodule Mix.Tasks.Parapet.Gen.Recovery do
     name_camelized = Macro.camelize(name)
     name_underscored = Macro.underscore(name)
 
-    assigns = %{
+    assigns = [
       module_prefix: module_prefix,
       app_name: app_name,
       name_camelized: name_camelized,
       name_underscored: name_underscored
-    }
+    ]
 
     test_stub_content = """
     defmodule #{inspect(module_prefix)}.#{name_camelized}Test do
