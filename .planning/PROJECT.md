@@ -21,7 +21,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Next:** v1.2 Authoring DX & Maturity. SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement. Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+.
+**Next:** v1.2 Authoring DX & Maturity. SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task and CI supply-chain hardening are complete; missing-guides work, release-maintenance docs, and polish remain. Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+.
 
 ## Current Milestone: v1.2 Authoring DX & Maturity
 
