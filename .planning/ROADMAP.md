@@ -8,6 +8,11 @@
 2. `Application.put_env` is no longer used for SLO registry.
 3. All tests pass without isolation issues.
 
+**Plans:** 1 plans
+
+Plans:
+- [ ] 30-01-PLAN.md — Refactor Parapet.SLO.Registry and Parapet.Capabilities to use ETS test checkout pattern for isolation.
+
 ## Phase 31: Igniter SLO Task
 **Goal:** Provide a seamless, flag-based generator for SLOs.
 **Requirements:** DX-01
