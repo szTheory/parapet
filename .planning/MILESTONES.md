@@ -1,5 +1,18 @@
 # Milestones
 
+## v1.2 Authoring DX & Maturity (Shipped: 2026-06-03)
+
+**Phases completed:** 4 phases, 6 plans, 10 tasks
+
+**Key accomplishments:**
+
+- Elixir/OTP CI matrix with SHA-pinned GitHub Actions and version-isolated caches
+- Dependabot supply-chain monitoring plus branch protection instructions for required release_gate enforcement
+- Adopter migration and deployment guides published through HexDocs with docs-local Parapet branding assets
+- Maintainer release checklist, contributor commit taxonomy, and reproducible demo Compose smoke path
+
+---
+
 ## v1.1 Actionable Recovery (Shipped: 2026-06-03)
 
 **Phases completed:** 7 phases, 19 plans, 23 tasks

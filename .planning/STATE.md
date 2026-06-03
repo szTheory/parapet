@@ -2,9 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Authoring DX & Maturity
-status: verifying
-last_updated: "2026-06-03T18:16:11.222Z"
-last_activity: 2026-06-03
+status: Awaiting next milestone
+last_updated: "2026-06-03T18:50:38.664Z"
+last_activity: 2026-06-03 — Milestone v1.2 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -17,17 +17,17 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
+See: .planning/PROJECT.md (updated 2026-06-03 — v1.2 Authoring DX & Maturity milestone complete)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 33 — documentation-polish
+**Current focus:** No active milestone
 
 ## Current Position
 
-Phase: 33 (documentation-polish) — READY FOR VERIFICATION
-Plan: 2 of 2
-Status: Phase complete — ready for verification
-Last activity: 2026-06-03
+Phase: Milestone v1.2 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-03 — Milestone v1.2 completed and archived
 
 ## Performance Metrics
 
@@ -108,11 +108,11 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 | Category | Item | Target | Status | Notes |
 |----------|------|--------|--------|-------|
-| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | deferred from v1.1 | Design resolved; build it after recovery loop closes |
-| Architecture | Move `Parapet.SLO` state off `Application` env (registry refactor; lands before SLO-W1) | v1.2 | candidate | See `.planning/threads/slo-state-off-application-env.md` |
-| CI | Multi-version Elixir/OTP CI matrix | v1.2 | candidate | Maturity signal |
-| Supply chain | SHA-pinned actions, Dependabot config, `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` |
-| Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | candidate | Adopter-facing trust work |
+| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | shipped | Delivered in Phase 31 |
+| Architecture | Move `Parapet.SLO` state off `Application` env (registry refactor; lands before SLO-W1) | v1.2 | shipped | Delivered in Phase 30; thread closed |
+| CI | Multi-version Elixir/OTP CI matrix | v1.2 | shipped | Delivered in Phase 32 |
+| Supply chain | SHA-pinned actions, Dependabot config, `MAINTAINING.md`, branch-protection enforcement | v1.2 | shipped | Delivered in Phases 32-33 |
+| Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | shipped | Delivered in Phase 33 |
 | Recovery extensions | MCP Preview surface (read-only) for recovery actions; per-capability cooldown rules; adapter-provided capabilities (Rulestead → `:revert_feature_flag`) | v1.2/v1.3 | deferred from v1.1 | Defer until MCP graduates from Experimental |
 | Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
 | Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |

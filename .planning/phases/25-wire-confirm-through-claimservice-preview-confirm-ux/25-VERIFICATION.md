@@ -1,7 +1,7 @@
 ---
 phase: 25-wire-confirm-through-claimservice-preview-confirm-ux
 verified: 2026-05-28T07:25:00Z
-status: human_needed
+status: passed
 score: 4/4 must-haves verified (code/contract level); 4/4 requirement IDs satisfied; 3/3 code-review BLOCKERs FIXED
 overrides_applied: 0
 re_verification:
@@ -14,6 +14,10 @@ re_verification:
   gaps_remaining: []
   regressions: []
   note: "Re-verification after commits 65e5ee5 + 790541b. Independently re-checked the 3 former BLOCKERs against the code and ran the new regression tests in-process. Full library suite re-run: 483 tests, 0 failures. mix compile --warnings-as-errors clean."
+milestone_closeout:
+  status: "accepted_with_deferred_visual_uat"
+  accepted_on: "2026-06-03"
+  note: "The remaining human_verification items are visual/real-time demo confirmations only. No code, contract, or requirement gaps remain; visual UAT remains documented in 25-HUMAN-UAT.md for post-close follow-up."
 human_verification:
   - test: "Open-incident happy path in the demo app: open an OPEN incident, click Preview on a capability-backed runbook step, then click Confirm Recovery."
     expected: "Preview panel shows Action name + Target Kind + Affected Count; Confirm flashes \"Mitigation confirmed and executed\" and the capability executes. (Code + unit/concurrency tests prove this returns {:ok, recovery_confirmed} on an open incident; visual render needs human eyes.)"
@@ -33,7 +37,7 @@ human_verification:
 
 **Phase Goal:** Close the operator-path-skips-claim defect by routing `Parapet.Operator.confirm_runbook_step/4` through `Parapet.Automation.ClaimService.claim_action/1` (same path the Oban auto-execution uses), add the `{:short_circuited, reason}` and `{:conflicted, claim_id}` additive return variants, and render both branches in the LiveView with operator-actionable next steps. Preview tokens get a 5-minute expiry with `target_refs` hash gating.
 **Verified:** 2026-05-28T07:25:00Z
-**Status:** human_needed
+**Status:** passed (accepted with deferred visual UAT at v1.2 closeout pre-flight)
 **Re-verification:** Yes — after code-review gap closure (commits 65e5ee5 + 790541b). Previous status: human_needed.
 
 ## Re-Verification Summary

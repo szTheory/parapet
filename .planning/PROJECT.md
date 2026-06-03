@@ -10,10 +10,12 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.1 Actionable Recovery (2026-06-03) — Closed the action loop in the operator UI. Turned runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Shipped the capability-registration behaviour (`Parapet.Recovery`), 6 prebuilt recovery playbooks, audit propagation (TimelineEntry and ToolAudit), and a demo seed that proves the loop. `Parapet.Recovery` graduated to Stable.
+**Shipped:** v1.2 Authoring DX & Maturity (2026-06-03) — Completed the stable-line maturity pass: moved SLO and capability dynamic state to ETS-backed checkout isolation, shipped the flag-based `mix parapet.gen.slo` Igniter task, hardened CI with an Elixir/OTP matrix and SHA-pinned actions, added Dependabot and branch-protection guidance, published migration/deployment docs with HexDocs branding, and documented maintainer/contributor/demo Compose workflows.
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.1 Actionable Recovery (2026-06-03) — Closed the action loop in the operator UI. Turned runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Shipped the capability-registration behaviour (`Parapet.Recovery`), 6 prebuilt recovery playbooks, audit propagation (TimelineEntry and ToolAudit), and a demo seed that proves the loop. `Parapet.Recovery` graduated to Stable.
 
 **Previously shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release.
 
@@ -21,17 +23,17 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Next:** v1.2 Authoring DX & Maturity. SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task and CI supply-chain hardening are complete; missing-guides work, release-maintenance docs, and polish remain. Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+.
+**Next:** No active milestone. Candidate next work remains Team Workflow / responder coordination (v1.3) or Cross-boundary journey correlation (v1.4+) once a PR-shaped slice is chosen.
 
-## Current Milestone: v1.2 Authoring DX & Maturity
+## Last Milestone: v1.2 Authoring DX & Maturity
 
 **Goal:** Land additive DX and maturity work, fix technical debt in the SLO registry, and harden the CI pipeline to mark the library as functionally complete for Solo SaaS Operators without reopening the 1.0 stability freeze.
 
-**Target features:**
-- SLO-W1 flag-based `mix parapet.gen.slo` Igniter task
-- Move `Parapet.SLO` state off `Application` env (registry refactor)
-- Multi-version Elixir/OTP CI matrix & supply-chain hardening (Dependabot, SHA-pinned actions, branch protection)
-- v0.x -> v1.0 migration guide & deployment guide
+**Delivered:**
+- SLO-W1 flag-based `mix parapet.gen.slo` Igniter task.
+- `Parapet.SLO` and `Parapet.Capabilities` dynamic state moved to ETS-backed checkout isolation.
+- Multi-version Elixir/OTP CI matrix and supply-chain hardening (Dependabot, SHA-pinned actions, branch-protection documentation).
+- v0.x -> v1.0 migration guide, deployment guide, HexDocs logo/favicon, maintainer/contributor docs, and demo Compose validation.
 
 ## Previous Posture: Released Maintenance
 
@@ -73,6 +75,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ `Parapet.Recovery` declared Stable with CHANGELOG migration notes — v1.1 (STAB-07)
 - ✓ Scaffolding generator `mix parapet.gen.recovery` and `check_recovery` doctor check — v1.1 (ADOP-01, ADOP-02)
 - ✓ `docs/recovery-actions.md` adopter guide — v1.1 (ADOP-03)
+- ✓ Flag-based `mix parapet.gen.slo` Igniter task — v1.2 (DX-01)
+- ✓ `Parapet.SLO` registry state moved off global dynamic Application env mutation into ETS checkout isolation — v1.2 (DX-02)
+- ✓ v0.x -> v1.0 migration guide — v1.2 (DX-03)
+- ✓ Deployment guide — v1.2 (DX-04)
+- ✓ Multi-version Elixir/OTP CI matrix — v1.2 (MAT-01)
+- ✓ SHA-pinned GitHub Actions — v1.2 (MAT-02)
+- ✓ Dependabot for Hex and GitHub Actions — v1.2 (MAT-03)
+- ✓ Branch protection guidance enforcing `release_gate` — v1.2 (MAT-04)
+- ✓ `MAINTAINING.md` release procedures — v1.2 (MAT-05)
+- ✓ Conventional Commit taxonomy in `CONTRIBUTING.md` — v1.2 (MAT-06)
+- ✓ HexDocs logo and favicon — v1.2 (MAT-07)
+- ✓ Demo app Docker Compose path — v1.2 (MAT-08)
 - ✓ HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group — v0.1
 - ✓ Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker — v0.1
 - ✓ Login journey as the first business-critical SLO — auth success rate via `sigra` integration — v0.1
@@ -152,12 +166,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 <!-- v1.0 Stable Release shipped 2026-05-26. Quiet stable-line mode is the default until a new PR-shaped slice is explicitly opened. -->
 
-No active feature milestone by default. The shipped v1.0 requirements remain the current frozen baseline in `.planning/REQUIREMENTS.md`, and candidate post-1.0 work should open as explicit PR-scoped slices before it becomes active milestone state.
-
-Carried forward beyond v1.0:
-
-- **SLO-W1** (v1.1): `mix parapet.gen.slo` reshaped as a flag-based Igniter task (interactive-wizard form rejected as non-idiomatic — Igniter has no prompt API).
-- Multi-version Elixir/OTP CI matrix, logo/favicon, `MAINTAINING.md`, SHA-pinned CI actions, demo Docker Compose (post-1.0 maturity items).
+No active feature milestone by default. v1.2 requirements are archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; fresh active requirements should be created by `$gsd-new-milestone`.
 
 Dropped:
 
@@ -189,6 +198,7 @@ Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protecti
 Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime deps, Ecto schemas, or Oban queues) over 4 phases / 12 plans in ~2 days — hex.pm metadata + Release-Please CHANGELOG, one-line SLO starter packs, an end-to-end `warning:` runbook surface with deepened + new preview-first templates, and seven adoption guides backed by a uniform `Parapet.Integration` activation behaviour. ~764 LOC of source change + ~697 lines of docs. First audit returned `tech_debt`; a same-day closure pass resolved the adopter-facing items, and the milestone audit `passed`.
 
 Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution flow via Guidance → Preview → Confirm. Added the `Parapet.Recovery` behaviour, six prebuilt playbooks, and audit propagation. Demo seeded with a complete end-to-end confirm loop.
+Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/capability registries, a flag-based SLO Igniter task, CI matrix and supply-chain hardening, migration/deployment guides, release-maintenance docs, HexDocs branding, and a validated demo Compose path.
 
 ## Constraints
 
@@ -248,6 +258,8 @@ Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution
 | Guidance-only runbooks where no allowlisted capability fits | `retry_storm`/`suppression_drift` stay advisory rather than executing mitigations that worsen the failure (e.g., retrying a storm) | ✓ Good |
 | `Parapet.Integration` behaviour for uniform activation | Every adapter activates via the same `Parapet.attach(adapters: […])` line, crash-proof; fixes the Rulestead `attach/0` defect | ✓ Good |
 | Code surfaces land before the docs that name them | Phase 16/17 code shipped before Phase 18 docs, so guides never reference uncompilable code | ✓ Good |
+| ETS checkout isolation for dynamic library state | Avoids test bleed and keeps host-owned runtime behavior compatible with the stable API | ✓ Good |
+| `release_gate` remains the stable aggregate CI check | Lets branch protection stay stable while underlying jobs expand into an Elixir/OTP matrix | ✓ Good |
 
 ## Evolution
 
@@ -267,4 +279,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-03 — v1.1 Actionable Recovery milestone complete*
+*Last updated: 2026-06-03 — v1.2 Authoring DX & Maturity milestone complete*
