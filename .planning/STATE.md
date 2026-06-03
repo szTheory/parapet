@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Authoring DX & Maturity
-status: Defining requirements
-last_updated: "2026-06-03T15:14:15.570Z"
-last_activity: 2026-06-03 — Milestone v1.2 started
+status: completed
+last_updated: "2026-06-03T17:01:37.709Z"
+last_activity: 2026-06-03 — Phase 31 completed
 progress:
   total_phases: 4
-  completed_phases: 1
-  total_plans: 1
-  completed_plans: 1
-  percent: 25
+  completed_phases: 2
+  total_plans: 2
+  completed_plans: 2
+  percent: 50
 ---
 
 # Project State
@@ -113,9 +113,9 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-06-03T15:14:15.566Z
-Stopped at: Phase 29 context gathered (assumptions mode)
-Resume file: None
+Last session: 2026-06-03T17:01:37.705Z
+Stopped at: Phase 32 context gathered (assumptions mode)
+Resume file: .planning/phases/32-ci-supply-chain-hardening/32-CONTEXT.md
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
 
 ## Operator Next Steps
