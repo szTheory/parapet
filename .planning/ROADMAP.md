@@ -47,8 +47,8 @@ Plans:
 2. Logo/Favicon added to docs.
 3. Demo app docker-compose works.
 
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
-- [ ] 33-01-PLAN.md — Publish migration/deployment guides and wire HexDocs branding assets.
-- [ ] 33-02-PLAN.md — Add maintainer/contributor release docs and validate the demo Compose path.
+- [x] 33-01-PLAN.md — Publish migration/deployment guides and wire HexDocs branding assets.
+- [x] 33-02-PLAN.md — Add maintainer/contributor release docs and validate the demo Compose path.
