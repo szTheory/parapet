@@ -33,7 +33,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   end
 
   def handle_params(params, _uri, socket) do
-    queue_params = queue_params(params)
+    page_mode = page_mode(socket.assigns.live_action)
+    queue_params = queue_params(params, page_mode)
     queue_page = load_queue_page(queue_params)
 
     selected =
@@ -52,6 +53,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        visible_incidents: visible_incidents,
        queue_page: queue_page,
        queue_params: visible_queue_params(queue_params, queue_page),
+       page_mode: page_mode,
        queue_refresh_available?: false
      )
      |> stream(:incidents, visible_incidents, reset: true)}
@@ -115,11 +117,28 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   def render(assigns) do
     ~H"""
-    <div class="antialiased text-stone-900 flex flex-col md:flex-row h-screen bg-stone-50 overflow-hidden">
+    <div class="antialiased text-stone-900 flex h-screen flex-col overflow-hidden bg-stone-100">
+      <.operator_nav active={@page_mode} />
+
+      <div class="border-b border-stone-200 bg-stone-50 px-4 py-3 md:px-6">
+        <.operator_overview
+          queue_page={@queue_page}
+          visible_incidents={@visible_incidents}
+          action_items={@action_items}
+          journeys={@journeys}
+          page_mode={@page_mode}
+        />
+      </div>
+
+      <%= if @page_mode == :actions do %>
+        <main class="min-h-0 flex-1 overflow-y-auto bg-stone-50 px-4 py-6 md:px-8">
+          <div class="mx-auto max-w-5xl">
+            <.action_center items={@action_items} />
+          </div>
+        </main>
+      <% else %>
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
       <div class={"w-full md:w-80 border-r border-stone-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
-        <div class="p-4 border-b border-stone-200 bg-stone-50">
-          <.critical_journeys journeys={@journeys} />
-        </div>
         <div class="p-4 border-b border-stone-200 bg-stone-50">
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -130,7 +149,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
             </div>
             <.link
-              patch={queue_path(@queue_params, %{"status" => "resolved", "cursor" => nil, "direction" => "next", "id" => nil})}
+              patch={history_path()}
               class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
             >
               History
@@ -189,7 +208,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
       <div class={"flex-1 flex flex-col md:flex-row min-w-0 bg-stone-50 #{if @selected_incident, do: "flex", else: "hidden md:flex"}"}>
         <div class="md:hidden p-4 border-b border-stone-200 bg-white">
           <.link patch={queue_path(@queue_params, %{})} class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium">
-            &larr; Back to Queue
+            &larr; Back to active response
           </.link>
         </div>
 
@@ -219,6 +238,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           </div>
         <% end %>
       </div>
+        </div>
+      <% end %>
     </div>
     """
   end
@@ -231,14 +252,44 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   defp queue_stream_item(item) do
     item
-    |> Map.put(:id, item.incident_id)
-    |> Map.put_new(:title, item.title || item.incident_id)
+    |> Map.put(:id, queue_item_id(item))
+    |> Map.put_new(:incident_id, queue_item_id(item))
+    |> Map.put_new(:title, item.title || queue_item_id(item))
+    |> Map.put_new(:secondary_line, Map.get(item, :description))
+    |> Map.put_new(:severity, nil)
+    |> Map.put_new(:attention_chip, nil)
+    |> Map.put_new(:updated_at_label, relative_time(Map.get(item, :updated_at)))
   end
+
+  defp queue_item_id(%{incident_id: incident_id}) when is_binary(incident_id), do: incident_id
+  defp queue_item_id(%{id: id}) when is_binary(id), do: id
+
+  defp relative_time(%DateTime{} = updated_at) do
+    seconds = max(DateTime.diff(DateTime.utc_now(), updated_at, :second), 0)
+
+    cond do
+      seconds < 60 -> "#{seconds}s ago"
+      seconds < 3_600 -> "#{div(seconds, 60)}m ago"
+      true -> "#{div(seconds, 3_600)}h ago"
+    end
+  end
+
+  defp relative_time(_updated_at), do: "Updated recently"
 
   defp incident_dom_id(%{incident_id: incident_id}), do: "incident-#{incident_id}"
   defp incident_dom_id(%{id: incident_id}), do: "incident-#{incident_id}"
 
-  defp queue_params(params) do
+  defp page_mode(:actions), do: :actions
+  defp page_mode(:history), do: :history
+  defp page_mode(_live_action), do: :response
+
+  defp queue_params(params, :history) do
+    params
+    |> queue_params(:response)
+    |> Map.put("status", "resolved")
+  end
+
+  defp queue_params(params, _page_mode) do
     %{
       "page_size" => @default_page_size,
       "direction" => Map.get(params, "direction", "next"),
@@ -304,10 +355,15 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
       |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
 
     case params do
-      [] -> "/parapet"
-      _ -> "/parapet?" <> URI.encode_query(params)
+      [] -> queue_base_path(queue_params)
+      _ -> queue_base_path(queue_params) <> "?" <> URI.encode_query(params)
     end
   end
+
+  defp queue_base_path(%{"status" => "resolved"}), do: "/parapet/history"
+  defp queue_base_path(_queue_params), do: "/parapet"
+
+  defp history_path, do: "/parapet/history"
 
   defp pagination_link_class(true),
     do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:ring-teal-700 hover:text-teal-700"

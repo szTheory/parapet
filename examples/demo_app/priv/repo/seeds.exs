@@ -57,6 +57,15 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     payload: %{"new_state" => "open", "actor" => "alert_system"}
   })
 
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_open.id, %{
+    type: "external_link",
+    payload: %{
+      "label" => "Grafana login burn-rate panel",
+      "url" => "https://grafana.example.test/d/parapet-login"
+    }
+  })
+
 # ---------------------------------------------------------------------------
 # Incident 2: INVESTIGATING — checkout webhook failures
 # ---------------------------------------------------------------------------
@@ -65,7 +74,37 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     title: "Checkout webhook delivery failures",
     description: "Payment webhook callbacks timing out after 5 seconds",
     state: "investigating",
-    correlation_key: "checkout-webhook-timeout"
+    correlation_key: "checkout-webhook-timeout",
+    runbook_data: %{
+      "escalation" => %{
+        "pending_trigger" => true,
+        "trigger_requested_at" =>
+          DateTime.utc_now() |> DateTime.add(-300, :second) |> DateTime.to_iso8601(),
+        "next_escalation_at" =>
+          DateTime.utc_now() |> DateTime.add(900, :second) |> DateTime.to_iso8601(),
+        "current_step_id" => "provider-owner",
+        "chain" => [
+          %{
+            "id" => "primary",
+            "label" => "Primary operator",
+            "delay" => "now",
+            "status" => "completed"
+          },
+          %{
+            "id" => "provider-owner",
+            "label" => "Provider owner",
+            "delay" => "15m",
+            "status" => "current"
+          },
+          %{
+            "id" => "billing-owner",
+            "label" => "Billing owner",
+            "delay" => "30m",
+            "status" => "pending"
+          }
+        ]
+      }
+    }
   })
 
 {:ok, _} =
@@ -80,6 +119,15 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     payload: %{"new_state" => "investigating", "actor" => "operator_ui"}
   })
 
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_inv.id, %{
+    type: "escalation_trigger_requested",
+    payload: %{
+      "actor" => "operator_ui",
+      "reason" => "Checkout owner should review provider timeout pattern"
+    }
+  })
+
 # ---------------------------------------------------------------------------
 # Incident 3: RESOLVED — signup email delivery degraded
 # ---------------------------------------------------------------------------
@@ -88,7 +136,14 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     title: "Signup email delivery degraded",
     description: "Transactional email provider returning 429s; new user signups delayed",
     state: "resolved",
-    correlation_key: "signup-email-429"
+    correlation_key: "signup-email-429",
+    runbook_data: %{
+      "retrospective" => """
+      # Signup email delivery degraded
+
+      Impact stopped after provider rate limits cleared. Timeline shows alert, provider confirmation, and operator resolution. Follow-up: keep delivery-provider SLO thresholds unchanged; this was external throttling, not internal backlog drift.
+      """
+    }
   })
 
 {:ok, _} =
@@ -103,6 +158,12 @@ Application.put_env(:parapet, :repo, DemoApp.Repo)
     payload: %{"text" => "All metrics nominal — marking resolved"}
   })
 
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_resolved.id, %{
+    type: "escalation_executed",
+    payload: %{"mode" => "scheduled", "policy" => "delivery-provider-owner"}
+  })
+
 # ---------------------------------------------------------------------------
 # Incident 4: OPEN — stalled async executor (capability-backed, Preview/Confirm)
 # ---------------------------------------------------------------------------
@@ -115,12 +176,15 @@ stalled_executor_steps = [
   %{
     "id" => "investigate_logs",
     "label" => "Check Worker Logs",
-    "description" => "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
+    "description" =>
+      "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
     "type" => "manual",
     "kind" => "guidance",
     "preview_only" => true,
-    "guidance" => "Search your APM for the worker executing this item. Look for crash reports, timeout events, or lock-acquisition failures around the item's last-attempt timestamp.",
-    "warning" => "If logs show the item is still actively executing, do not retry — a concurrent retry will cause a duplicate execution race."
+    "guidance" =>
+      "Search your APM for the worker executing this item. Look for crash reports, timeout events, or lock-acquisition failures around the item's last-attempt timestamp.",
+    "warning" =>
+      "If logs show the item is still actively executing, do not retry — a concurrent retry will cause a duplicate execution race."
   },
   %{
     "id" => "retry_item",
@@ -131,7 +195,8 @@ stalled_executor_steps = [
     "capability" => "retry_async_item",
     "target_kind" => "async_item",
     "requires_preview" => true,
-    "warning" => "Retrying without identifying the root cause may reproduce the deadlock. Confirm the underlying resource or lock contention is resolved before proceeding."
+    "warning" =>
+      "Retrying without identifying the root cause may reproduce the deadlock. Confirm the underlying resource or lock contention is resolved before proceeding."
   },
   %{
     "id" => "verify_recovery",
@@ -140,7 +205,8 @@ stalled_executor_steps = [
     "type" => "manual",
     "kind" => "guidance",
     "preview_only" => true,
-    "guidance" => "Check the item's status in the job backend — it should transition from executing or scheduled to completed."
+    "guidance" =>
+      "Check the item's status in the job backend — it should transition from executing or scheduled to completed."
   }
 ]
 
@@ -152,8 +218,30 @@ stalled_executor_steps = [
     correlation_key: "stalled-async-executor",
     runbook_data: %{
       "title" => "Stalled Executor Recovery",
-      "description" => "Guidance and recovery actions for background jobs stuck in an executing state.",
+      "description" =>
+        "Guidance and recovery actions for background jobs stuck in an executing state.",
       "module" => to_string(DemoApp.Runbooks.StalledExecutor),
+      "escalation" => %{
+        "suppressed_until" =>
+          DateTime.utc_now() |> DateTime.add(1_800, :second) |> DateTime.to_iso8601(),
+        "suppressed_by" => "operator_ui",
+        "suppression_reason" =>
+          "Recovery preview is active; avoid paging while operator validates target state",
+        "chain" => [
+          %{
+            "id" => "operator",
+            "label" => "Primary operator",
+            "delay" => "now",
+            "status" => "current"
+          },
+          %{
+            "id" => "backend-owner",
+            "label" => "Backend owner",
+            "delay" => "30m",
+            "status" => "pending"
+          }
+        ]
+      },
       "steps" => stalled_executor_steps
     }
   })
@@ -161,7 +249,20 @@ stalled_executor_steps = [
 {:ok, _} =
   Parapet.Evidence.append_timeline(incident_stalled.id, %{
     type: "note",
-    payload: %{"text" => "Job ID 8821 last heartbeat at 09:14 UTC — executor did not report completion"}
+    payload: %{
+      "text" => "Job ID 8821 last heartbeat at 09:14 UTC — executor did not report completion"
+    }
+  })
+
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_stalled.id, %{
+    type: "escalation_suppressed",
+    payload: %{
+      "actor" => "operator_ui",
+      "suppressed_until" =>
+        DateTime.utc_now() |> DateTime.add(1_800, :second) |> DateTime.to_iso8601(),
+      "reason" => "Operator is validating preview target refs"
+    }
   })
 
 # Open action item linked to the stalled-executor incident, so the
@@ -180,6 +281,64 @@ stalled_executor_steps = [
   |> DemoApp.Repo.insert()
 
 # ---------------------------------------------------------------------------
+# Incident 5: OPEN — guidance-only retry storm with short-circuited escalation
+# ---------------------------------------------------------------------------
+{:ok, incident_retry_storm} =
+  Parapet.Evidence.create_incident(%{
+    title: "Retry storm detected on delivery workers",
+    description: "Delivery workers retrying too aggressively after provider outage",
+    state: "open",
+    correlation_key: "delivery-retry-storm",
+    runbook_data: %{
+      "title" => "Retry Storm Guidance",
+      "description" =>
+        "Do not retry blindly. Reduce pressure and verify provider recovery first.",
+      "escalation" => %{
+        "current_step_id" => "operator",
+        "chain" => [
+          %{
+            "id" => "operator",
+            "label" => "Primary operator",
+            "delay" => "now",
+            "status" => "current"
+          },
+          %{
+            "id" => "infra-owner",
+            "label" => "Infrastructure owner",
+            "delay" => "20m",
+            "status" => "pending"
+          }
+        ]
+      },
+      "steps" => [
+        %{
+          "id" => "stop_retry_pressure",
+          "label" => "Stop retry pressure",
+          "description" => "Pause new retries until provider health and backlog shape are clear.",
+          "type" => "manual",
+          "kind" => "guidance",
+          "guidance" =>
+            "Check provider status and backlog age before changing retry configuration.",
+          "warning" => "Retrying a storm usually worsens user impact and provider throttling.",
+          "preview_only" => true
+        }
+      ]
+    }
+  })
+
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_retry_storm.id, %{
+    type: "escalation_short_circuited",
+    payload: %{"reason" => "circuit breaker open after repeated retry attempts"}
+  })
+
+{:ok, _} =
+  Parapet.Evidence.append_timeline(incident_retry_storm.id, %{
+    type: "note",
+    payload: %{"text" => "Circuit breaker prevented a third retry wave; monitor backlog drain."}
+  })
+
+# ---------------------------------------------------------------------------
 # Tool audit — records a doctor check against the demo environment
 # ---------------------------------------------------------------------------
 {:ok, _} =
@@ -191,4 +350,6 @@ stalled_executor_steps = [
     duration_ms: 23
   })
 
-IO.puts("Seeds complete: 4 incidents (open x2/investigating/resolved), 7 timeline entries, 1 action item, 1 tool audit")
+IO.puts(
+  "Seeds complete: 5 incidents with active, investigating, resolved, recovery-previewable, guidance-only, warning, action-item, escalation, audit, external-link, retrospective, and tool-audit states"
+)

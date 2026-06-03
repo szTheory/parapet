@@ -175,13 +175,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   attr :detail, :map, required: true
   def incident_summary(assigns) do
     ~H"""
-    <div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <h1 class="text-2xl font-bold text-stone-900 text-balance text-balance"><%%= @detail.incident.title %></h1>
-          <p class="text-sm text-stone-500 mt-1"><span class="tabular-nums font-mono"><%%= @detail.incident.id %></span></p>
+    <div class="min-w-0 overflow-hidden">
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h1 class="max-w-xs whitespace-normal break-words text-2xl font-bold text-stone-900 sm:max-w-none sm:text-balance"><%%= @detail.incident.title %></h1>
+          <p class="text-sm text-stone-500 mt-1"><span class="break-all tabular-nums font-mono"><%%= @detail.incident.id %></span></p>
         </div>
-        <span class={["px-3 py-1 text-sm font-medium rounded-full", state_color(@detail.incident.state)]}>
+        <span class={["self-start px-3 py-1 text-sm font-medium rounded-full", state_color(@detail.incident.state)]}>
           <%%= @detail.incident.state %>
         </span>
       </div>
@@ -194,14 +194,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       </div>
 
       <div class="shadow-sm ring-1 ring-amber-900/5 bg-amber-50 rounded-xl p-4 mb-6">
-        <div class="flex items-start justify-between gap-3 mb-3">
-          <div>
+        <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
             <h4 class="text-sm font-semibold text-amber-950">Escalation Status</h4>
             <p class="text-sm text-amber-900 mt-1">
               <%%= escalation_status_copy(@detail.escalation_summary.status) %>
             </p>
           </div>
-          <span class="px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
+          <span class="self-start px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
             <%%= escalation_status_badge(@detail.escalation_summary.status) %>
           </span>
         </div>
@@ -213,14 +213,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
               <dd class="mt-2">
                 <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
                   <%%= for step <- @detail.escalation_summary.escalation_chain do %>
-                    <li class="flex items-center justify-between rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2">
-                      <div>
+                    <li class="flex flex-col gap-2 rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div class="min-w-0">
                         <p class="text-sm font-medium text-amber-950"><%%= step.label %></p>
                         <%%= if step.delay do %>
                           <p class="text-xs text-amber-800 mt-0.5">After <%%= step.delay %></p>
                         <%% end %>
                       </div>
-                      <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
+                      <span class={["self-start px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
                         <%%= escalation_chain_status_copy(step.status) %>
                       </span>
                     </li>
@@ -232,24 +232,24 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           <%%= if @detail.escalation_summary.time_until_next_escalation do %>
             <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3 sm:col-span-2">
               <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Time Until Next Escalation</dt>
-              <dd class="mt-1 text-amber-950"><span class="tabular-nums font-mono"><%%= countdown_copy(@detail.escalation_summary.time_until_next_escalation) %></span></dd>
+              <dd class="mt-1 break-words text-amber-950"><span class="tabular-nums font-mono"><%%= countdown_copy(@detail.escalation_summary.time_until_next_escalation) %></span></dd>
             </div>
           <%% end %>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Next Step</dt>
-            <dd class="mt-1 text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
           </div>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">System Action</dt>
-            <dd class="mt-1 text-amber-950"><%%= system_action_copy(@detail.escalation_summary.system_action) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= system_action_copy(@detail.escalation_summary.system_action) %></dd>
           </div>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Suppression</dt>
-            <dd class="mt-1 text-amber-950"><%%= suppression_copy(@detail.escalation_summary.suppression) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= suppression_copy(@detail.escalation_summary.suppression) %></dd>
           </div>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Latest Evidence</dt>
-            <dd class="mt-1 text-amber-950"><%%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
           </div>
         </dl>
       </div>

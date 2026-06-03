@@ -52,11 +52,16 @@ scope "/admin", MyAppWeb do
   live_session :parapet_operator,
     on_mount: [{MyAppWeb.UserAuth, :ensure_authenticated}] do
 
-    live "/parapet", Parapet.OperatorLive.Index, :index
-    live "/parapet/:id", Parapet.OperatorDetailLive.Show, :show
+    live "/parapet", MyAppWeb.Parapet.OperatorLive, :index
+    live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions
+    live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history
+    live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+    live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
   end
 end
 ```
+
+The route map keeps `/parapet` as the active response workbench, `/parapet/actions` as pending action items, and `/parapet/history` as resolved history. /parapet/incidents/:id is the preferred incident detail route, while /parapet/:id remains available for compatibility with existing deep links.
 
 ## Security and Verification
 

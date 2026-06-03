@@ -25,7 +25,7 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:info, "Incident acknowledged successfully")
-         |> push_navigate(to: "/parapet/#{id}")}
+         |> push_navigate(to: "/parapet/incidents/#{id}")}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
@@ -44,7 +44,7 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
 
     case Parapet.Operator.resolve_incident(incident, payload) do
       {:ok, _result} ->
-        {:noreply, push_navigate(socket, to: "/parapet/#{id}")}
+        {:noreply, push_navigate(socket, to: "/parapet/incidents/#{id}")}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to resolve")}
@@ -193,20 +193,28 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
 
   def render(assigns) do
     ~H"""
-    <div class="antialiased text-stone-900 flex flex-col min-h-screen bg-stone-50 md:hidden">
-      <div class="p-4 bg-white border-b border-stone-200 sticky top-0 z-10">
-        <.link navigate={"/parapet"} class="text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-2 mb-4 font-medium">
-          <span>&larr; Back to Queue</span>
+    <div class="antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
+      <.operator_nav active={:response} />
+
+      <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
+        <.link navigate={"/parapet"} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
+          <span>&larr; Back to active response</span>
         </.link>
+      </div>
+
+      <main class="grid min-h-0 w-full max-w-full flex-1 gap-0 overflow-x-hidden md:grid-cols-[minmax(0,1fr)_22rem]">
+        <section class="min-w-0 max-w-full overflow-x-hidden bg-white">
+          <div class="border-b border-stone-200 p-4 md:p-6">
         <.incident_summary detail={@incident} />
       </div>
 
-      <div class="p-4 bg-white border-b border-stone-200">
-        <h3 class="text-lg font-semibold mb-4">Timeline</h3>
+          <div class="border-b border-stone-200 p-4 md:p-6">
+        <h3 class="mb-4 text-lg font-semibold">Timeline</h3>
         <.incident_timeline detail={@incident} />
       </div>
+        </section>
       
-      <div class="p-4 bg-stone-50 pb-24">
+        <aside class="min-w-0 max-w-full overflow-x-hidden bg-stone-50 p-4 md:overflow-y-auto">
         <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
 
         <%= if @incident.incident.state == "resolved" && is_map(@incident.incident.runbook_data) && Map.get(@incident.incident.runbook_data, "retrospective") do %>
@@ -234,9 +242,10 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
           <.preview_panel detail={@incident} />
         <% end %>
 
-        <h3 class="text-lg font-semibold mb-4">Actions</h3>
+        <h3 class="mb-4 text-lg font-semibold">Actions</h3>
         <.action_rail detail={@incident} />
-      </div>
+        </aside>
+      </main>
     </div>
     """
   end
