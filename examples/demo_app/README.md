@@ -40,7 +40,7 @@ For example:
 
 ```bash
 WEB_PORT=4001 DB_PORT=5433 docker compose up --build
-curl -f http://localhost:${WEB_PORT:-4000}/parapet
+WEB_PORT=4001 curl -f http://localhost:${WEB_PORT:-4000}/parapet
 docker compose down -v
 ```
 
