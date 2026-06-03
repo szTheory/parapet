@@ -36,6 +36,46 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert doctor_code =~ "has_auth_plug?"
     end
 
+    test "generated workbench uses active-response selected-detail copy" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_live.ex.eex")
+
+      assert content =~ "Back to active response"
+      refute content =~ "Back to Queue"
+    end
+
+    test "generated direct detail prefers incident detail route after actions" do
+      content = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
+
+      assert content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
+      assert content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert content =~ "Parapet.Operator.acknowledge_incident"
+      assert content =~ "Parapet.Operator.resolve_incident"
+      assert content =~ "Parapet.Operator.incident_detail(id)"
+    end
+
+    test "generated router guidance pins the active-response route map" do
+      router_content = File.read!("priv/templates/parapet.gen.ui/router_snippet.ex.eex")
+      task_content = File.read!("lib/mix/tasks/parapet.gen.ui.ex")
+      components_content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+
+      for route <- [
+            ~S|live "/parapet"|,
+            ~S|live "/parapet/actions"|,
+            ~S|live "/parapet/history"|,
+            ~S|live "/parapet/incidents/:id"|,
+            ~S|live "/parapet/:id"|
+          ] do
+        assert router_content =~ route
+      end
+
+      assert task_content =~ ~S|live "/parapet/incidents/:id"|
+      assert task_content =~ ~S|live "/parapet/:id"|
+      assert components_content =~ "Respond"
+      assert components_content =~ "Actions"
+      assert components_content =~ "History"
+      assert components_content =~ ~S|aria-current={if @active, do: "page", else: nil}|
+    end
+
     test "generated UI templates enforce responsive layout contracts" do
       template_path = "priv/templates/parapet.gen.ui/operator_live.ex.eex"
       content = File.read!(template_path)
@@ -58,8 +98,91 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "New incidents or queue changes are available."
       assert content =~ "Load latest changes"
       assert content =~ "History"
+      assert content =~ "Respond"
+      assert content =~ "Actions"
+      assert content =~ "Active response workbench"
       assert content =~ "Previous"
       assert content =~ "Next"
+    end
+
+    test "generated UI exposes polished IA and audit-safe action copy" do
+      live_content = File.read!("priv/templates/parapet.gen.ui/operator_live.ex.eex")
+      components_content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+      detail_content = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
+      content = live_content <> "\n" <> components_content <> "\n" <> detail_content
+
+      assert content =~ "Parapet Operator"
+      assert content =~ "Active response"
+      assert content =~ "Action center"
+      assert content =~ "Resolved history"
+      assert content =~ "Writes a durable audit record"
+      assert content =~ "Every request is audited"
+      assert content =~ "Back to active response"
+      assert content =~ "surface_class(:action_card)"
+      assert content =~ "control_class(:recovery"
+      assert content =~ "chip_class(:state"
+      assert content =~ "focus:outline-none focus:ring-2"
+
+      assert content =~
+               "Preview scoped changes before execution. No recovery action runs until confirm."
+
+      assert content =~
+               "Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome."
+
+      assert content =~
+               "Request the next escalation only after reviewing current status and the canonical timeline. Every request is audited."
+
+      assert content =~
+               "Suppress pending escalation for the displayed bounded window. Every request is audited."
+
+      refute content =~ "transition-all"
+      refute components_content =~ "bg-white shadow-sm ring-1 ring-stone-900/5 bg-white"
+      refute detail_content =~ "md:hidden"
+    end
+
+    test "demo copied LiveViews stay aligned with generated IA contract" do
+      live_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex")
+
+      detail_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex")
+
+      components_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex")
+
+      assert live_content =~ "Back to active response"
+      refute live_content =~ "Back to Queue"
+      assert detail_content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
+      assert detail_content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert components_content =~ "surface_class(:action_card)"
+      assert components_content =~ "control_class(:recovery"
+      assert components_content =~ "chip_class(:state"
+
+      assert components_content =~
+               "Preview scoped changes before execution. No recovery action runs until confirm."
+
+      assert components_content =~
+               "Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome."
+
+      refute components_content =~ "bg-white shadow-sm ring-1 ring-stone-900/5 bg-white"
+    end
+
+    test "operator UI docs show preferred and compatibility route map" do
+      content = File.read!("docs/operator-ui.md")
+
+      for route <- [
+            ~S|live "/parapet", MyAppWeb.Parapet.OperatorLive, :index|,
+            ~S|live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions|,
+            ~S|live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history|,
+            ~S|live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show|,
+            ~S|live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show|
+          ] do
+        assert content =~ route
+      end
+
+      assert content =~ "/parapet/incidents/:id is the preferred incident detail route"
+      assert content =~ "/parapet/:id remains available for compatibility"
+      assert content =~ "Parapet does **not** provide its own authentication system"
     end
 
     test "generated queue rows render bounded triage fields instead of raw ids only" do
