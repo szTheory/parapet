@@ -56,6 +56,8 @@ defmodule Parapet.MixProject do
       main: "getting-started",
       source_url: @source_url,
       source_ref: "v#{@version}",
+      logo: "docs/assets/parapet-logo.svg",
+      favicon: "docs/assets/favicon.svg",
       extras: [
         "README.md",
         "CHANGELOG.md",
@@ -66,6 +68,8 @@ defmodule Parapet.MixProject do
         "docs/slo-reference.md",
         "docs/telemetry.md",
         "docs/getting-started.md",
+        "docs/migration-v1.md",
+        "docs/deployment.md",
         "docs/troubleshooting.md",
         "docs/slo-authoring-guide.md",
         "docs/recovery-actions.md",
@@ -85,6 +89,8 @@ defmodule Parapet.MixProject do
         Guides: [
           "docs/adopter-flows.md",
           "docs/operator-ui.md",
+          "docs/migration-v1.md",
+          "docs/deployment.md",
           "docs/slo-authoring-guide.md",
           "docs/recovery-actions.md",
           "docs/troubleshooting.md",
