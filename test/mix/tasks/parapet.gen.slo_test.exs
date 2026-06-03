@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Parapet.Gen.SloTest do
              )
 
       source_content =
-        Rewrite.source!(igniter.rewrite, "lib/test/test/slo/test_journey.ex")
+        Rewrite.source!(igniter.rewrite, "lib/test/slo/test_journey.ex")
         |> Rewrite.Source.get(:content)
 
       assert source_content =~ "defmodule Test.SLO.TestJourney do"
@@ -50,7 +50,7 @@ defmodule Mix.Tasks.Parapet.Gen.SloTest do
     end
 
     test "missing NAME raises ArgumentError" do
-      assert_raise OptionParser.ParseError, fn ->
+      assert_raise ArgumentError, fn ->
         test_project(app_name: :test)
         |> run_slo(["--objective", "99.9"])
       end
