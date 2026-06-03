@@ -14,6 +14,8 @@ defmodule Parapet.Operator do
   alias Parapet.Spine.ActionItem
   alias Parapet.Operator.ActionPayload
   alias Parapet.Evidence
+  alias Parapet.Automation.ClaimService
+  alias Parapet.Telemetry.RecoveryAction
 
   alias Parapet.Operator.WorkbenchContract
 
@@ -21,6 +23,27 @@ defmodule Parapet.Operator do
   @default_queue_page_size 30
   @max_queue_page_size 100
   @queue_page_telemetry_event [:parapet, :operator, :queue, :page]
+  @recovery_action_prefix [:parapet, :operator, :recovery_action]
+
+  @typedoc """
+  Closed vocabulary of reasons a recovery Confirm can be short-circuited without
+  executing. Additive within 1.x — new reasons may be added in a minor release,
+  but existing reasons will not be removed. Callers should handle unknown reasons
+  defensively (see `Parapet.Operator.UI.short_circuit_flash/1`).
+  """
+  @type short_circuit_reason ::
+          :preview_expired
+          | :target_refs_drift
+          | :incident_resolved
+          | :breaker_open
+          | :internal_error
+
+  @typedoc "Return contract of `confirm_runbook_step/4`."
+  @type confirm_result ::
+          {:ok, map()}
+          | {:short_circuited, short_circuit_reason()}
+          | {:conflicted, binary()}
+          | {:error, term()}
 
   @doc since: "1.0.0"
   @doc """
@@ -670,8 +693,30 @@ defmodule Parapet.Operator do
           audit_attrs: audit_attrs
         )
         |> case do
-          {:ok, result} -> {:ok, Map.put(result, :preview, preview_data)}
-          error -> error
+          {:ok, result} ->
+            emit_recovery_event(:previewed, %{
+              capability_id: capability_id,
+              action_kind: :operator,
+              outcome: :previewed,
+              actor_kind: :human,
+              incident_id: incident.id,
+              step_id: to_string(step_id_atom)
+            })
+
+            {:ok, Map.put(result, :preview, preview_data)}
+
+          error ->
+            emit_recovery_event(:preview_failed, %{
+              capability_id: capability_id,
+              action_kind: :operator,
+              outcome: :failed,
+              failure_class: :internal_error,
+              actor_kind: :human,
+              incident_id: incident.id,
+              step_id: to_string(step_id_atom)
+            })
+
+            error
         end
       else
         nil -> {:error, :capability_unwired}
@@ -682,11 +727,25 @@ defmodule Parapet.Operator do
     end
   end
 
+  @doc since: "1.1.0"
+  @doc """
+  Returns the closed list of `t:short_circuit_reason/0` atoms that
+  `confirm_runbook_step/4` may return inside a `{:short_circuited, reason}` tuple.
+
+  Generated operator UIs and tests enumerate this list to verify they handle
+  every reason. The list is additive within 1.x.
+  """
+  @spec short_circuit_reasons() :: [short_circuit_reason()]
+  def short_circuit_reasons,
+    do: [:preview_expired, :target_refs_drift, :incident_resolved, :breaker_open, :internal_error]
+
   @doc since: "1.0.0"
   @doc """
   Confirms and executes a recovery action.
   Validates the preview_token and requires an idempotency_key in the payload.
   """
+  @spec confirm_runbook_step(Incident.t(), atom() | String.t(), String.t(), ActionPayload.t()) ::
+          confirm_result()
   def confirm_runbook_step(
         %Incident{} = incident,
         step_id,
@@ -704,36 +763,194 @@ defmodule Parapet.Operator do
            capability when not is_nil(capability) <-
              Parapet.Capabilities.get_recovery(capability_id),
            {:ok, preview_entry} <- find_recent_preview(incident.id, step_id_atom, preview_token) do
-        if DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) == :gt do
-          # Execute the capability
-          if is_function(capability.execute, 2) do
-            case capability.execute.(incident, preview_entry.target_refs) do
-              {:ok, exec_result} ->
-                timeline_attrs = %{
-                  type: "recovery_confirmed",
-                  payload: %{
-                    "step_id" => to_string(step_id_atom),
-                    "capability" => to_string(capability_id),
-                    "result" => inspect(exec_result)
-                  }
-                }
+        cond do
+          DateTime.compare(preview_entry.expires_at, DateTime.utc_now()) != :gt ->
+            emit_short_circuit(:preview_expired, capability_id, incident.id, step_id_atom)
+            {:short_circuited, :preview_expired}
 
-                audit_attrs = build_audit("operator_confirm_recovery", payload)
+          not is_nil(preview_entry.target_refs_hash) and
+              preview_entry.target_refs_hash !=
+                target_refs_hash(preview_entry.target_refs) ->
+            emit_short_circuit(:target_refs_drift, capability_id, incident.id, step_id_atom)
+            {:short_circuited, :target_refs_drift}
 
-                Evidence.run_operator_command(
-                  incident_changeset: Ecto.Changeset.change(incident, %{}),
-                  timeline_attrs: timeline_attrs,
-                  audit_attrs: audit_attrs
-                )
+          not is_function(capability.execute, 2) ->
+            {:error, :capability_no_execute_callback}
+
+          true ->
+            case ClaimService.claim_action(
+                   incident_id: incident.id,
+                   action_kind: "operator",
+                   action_key: to_string(step_id_atom),
+                   breaker_step_id: step_id_atom,
+                   idempotency_key: payload.idempotency_key,
+                   # Operator recovery is valid while the incident is open OR
+                   # being investigated (an operator typically Acknowledges,
+                   # moving state to "investigating", before Confirming).
+                   allowed_states: ["open", "investigating"]
+                 ) do
+              {:won, claim} ->
+                emit_recovery_event(:confirmed, %{
+                  capability_id: capability_id,
+                  action_kind: :operator,
+                  outcome: :confirmed,
+                  actor_kind: :human,
+                  incident_id: incident.id,
+                  claim_id: claim.id
+                })
+
+                # Adopter-supplied execute closure: isolate exceptions so a host
+                # crash can't strand the won claim or crash the calling process.
+                # The span measures only the execute call; the rescue keeps a host
+                # raise from surfacing as a :telemetry :exception sub-event (which is
+                # reserved for genuinely uncaught raises) and from stranding the claim.
+                exec_outcome =
+                  :telemetry.span(
+                    @recovery_action_prefix ++ [:executed],
+                    RecoveryAction.shape_metadata(:executed, %{
+                      capability_id: capability_id,
+                      action_kind: :operator,
+                      actor_kind: :human,
+                      incident_id: incident.id,
+                      claim_id: claim.id
+                    }),
+                    fn ->
+                      result =
+                        try do
+                          capability.execute.(incident, preview_entry.target_refs)
+                        rescue
+                          e -> {:error, {:capability_raised, Exception.message(e)}}
+                        end
+
+                      stop_meta =
+                        case result do
+                          {:ok, _} ->
+                            RecoveryAction.shape_metadata(:executed, %{
+                              capability_id: capability_id,
+                              action_kind: :operator,
+                              actor_kind: :human,
+                              outcome: :succeeded,
+                              incident_id: incident.id,
+                              claim_id: claim.id
+                            })
+
+                          {:error, _} ->
+                            RecoveryAction.shape_metadata(:executed, %{
+                              capability_id: capability_id,
+                              action_kind: :operator,
+                              actor_kind: :human,
+                              outcome: :failed,
+                              failure_class: :internal_error,
+                              incident_id: incident.id,
+                              claim_id: claim.id
+                            })
+                        end
+
+                      {result, stop_meta}
+                    end
+                  )
+
+                case exec_outcome do
+                  {:ok, exec_result} ->
+                    ClaimService.mark_executed(claim)
+
+                    timeline_attrs = %{
+                      type: "recovery_confirmed",
+                      payload: %{
+                        "step_id" => to_string(step_id_atom),
+                        "actor" => payload.actor,
+                        "capability" => to_string(capability_id),
+                        "target_refs" => preview_entry.target_refs || [],
+                        "outcome" => %{"status" => "succeeded", "result" => inspect(exec_result)}
+                      }
+                    }
+
+                    audit_attrs =
+                      build_audit("operator_confirm_recovery", payload)
+                      |> Map.put(:output, %{
+                        "status" => "succeeded",
+                        "result" => inspect(exec_result)
+                      })
+                      |> Map.update!(:input, fn base ->
+                        Map.merge(base, %{
+                          "action_name" => to_string(capability_id),
+                          "target_refs" => preview_entry.target_refs || []
+                        })
+                      end)
+
+                    Evidence.run_operator_command(
+                      incident_changeset: Ecto.Changeset.change(incident, %{}),
+                      timeline_attrs: timeline_attrs,
+                      audit_attrs: audit_attrs
+                    )
+
+                  {:error, reason} ->
+                    # Best-effort audit write before releasing the claim.
+                    # Result is discarded so the original {:error, reason} return
+                    # contract is preserved regardless of DB outcome (Pitfall 2 / D-06).
+                    failure_timeline_attrs = %{
+                      type: "recovery_failed",
+                      payload: %{
+                        "step_id" => to_string(step_id_atom),
+                        "actor" => payload.actor,
+                        "capability" => to_string(capability_id),
+                        "target_refs" => preview_entry.target_refs || [],
+                        "outcome" => %{"status" => "failed", "reason" => inspect(reason)}
+                      }
+                    }
+
+                    failure_audit_attrs =
+                      build_audit("operator_confirm_recovery", payload)
+                      |> Map.put(:success, false)
+                      |> Map.put(:output, %{"status" => "failed", "reason" => inspect(reason)})
+                      |> Map.update!(:input, fn base ->
+                        Map.merge(base, %{
+                          "action_name" => to_string(capability_id),
+                          "target_refs" => preview_entry.target_refs || []
+                        })
+                      end)
+
+                    # Ecto's Postgres adapter raises (not {:error, _}) on connection
+                    # failure, so the audit write must be rescued — otherwise an
+                    # exception skips ClaimService.mark_failed/2 below and the claim
+                    # stays "won" for the full lease window, locking out operator retry.
+                    _ =
+                      try do
+                        Evidence.run_operator_command(
+                          incident_changeset: Ecto.Changeset.change(incident, %{}),
+                          timeline_attrs: failure_timeline_attrs,
+                          audit_attrs: failure_audit_attrs
+                        )
+                      rescue
+                        _ -> :ok
+                      end
+
+                    # Release the claim so the operator can retry immediately
+                    # rather than being locked out for the 5-minute lease window.
+                    ClaimService.mark_failed(claim, reason)
+                    {:error, reason}
+                end
+
+              {:short_circuited, _claim, reason_string} ->
+                reason = map_short_circuit_reason(reason_string)
+                emit_short_circuit(reason, capability_id, incident.id, step_id_atom)
+                {:short_circuited, reason}
+
+              {:conflicted, claim} ->
+                emit_recovery_event(:conflicted, %{
+                  capability_id: capability_id,
+                  action_kind: :operator,
+                  outcome: :conflicted,
+                  actor_kind: :human,
+                  incident_id: incident.id,
+                  claim_id: claim.id
+                })
+
+                {:conflicted, claim.id}
 
               {:error, reason} ->
                 {:error, reason}
             end
-          else
-            {:error, :capability_no_execute_callback}
-          end
-        else
-          {:error, :stale_preview}
         end
       else
         nil -> {:error, :capability_unwired}
@@ -746,6 +963,42 @@ defmodule Parapet.Operator do
 
   defp validate_step_exists(nil), do: {:error, :step_not_found}
   defp validate_step_exists(step), do: {:ok, step}
+
+  # Emits a discrete recovery_action telemetry event. shape_metadata/2 enforces
+  # redaction by construction (Map.take of allowlisted keys), so only the closed
+  # vocabulary + IDs-as-refs ever reach a subscriber — never the incident struct,
+  # raw target_refs, the actor string, or the execute result (those go to the
+  # durable ToolAudit/TimelineEntry, keeping telemetry separate from audit).
+  defp emit_recovery_event(family, metadata) do
+    :telemetry.execute(
+      @recovery_action_prefix ++ [family],
+      %{count: 1},
+      RecoveryAction.shape_metadata(family, metadata)
+    )
+  end
+
+  defp emit_short_circuit(reason, capability_id, incident_id, step_id_atom) do
+    emit_recovery_event(:short_circuited, %{
+      capability_id: capability_id,
+      action_kind: :operator,
+      outcome: :short_circuited,
+      short_circuit_reason: reason,
+      actor_kind: :human,
+      incident_id: incident_id,
+      step_id: to_string(step_id_atom)
+    })
+  end
+
+  # Maps ClaimService's internal short-circuit reason strings to the frozen
+  # public atom vocab in Parapet.Telemetry.RecoveryAction (@short_circuit_reasons)
+  # — also the t:short_circuit_reason/0 type. Fallback returns :internal_error to
+  # avoid leaking raw strings to adopters (RESEARCH Pattern 3 + Security V7).
+  defp map_short_circuit_reason("already_resolved"), do: :incident_resolved
+  defp map_short_circuit_reason("already_investigating"), do: :incident_resolved
+  defp map_short_circuit_reason("already_open"), do: :incident_resolved
+  defp map_short_circuit_reason("circuit_breaker_tripped"), do: :breaker_open
+  defp map_short_circuit_reason("suppressed"), do: :incident_resolved
+  defp map_short_circuit_reason(_other), do: :internal_error
 
   defp compute_preview(capability, incident, step) do
     expires_at = DateTime.utc_now() |> DateTime.add(300, :second)
@@ -764,19 +1017,37 @@ defmodule Parapet.Operator do
       "preview_token" => preview_token
     }
 
-    if is_function(capability.preview, 2) do
-      case capability.preview.(incident, step) do
-        {:ok, host_data} ->
-          # Convert host_data keys to strings for consistency in timeline payload
-          host_data_str = for {k, v} <- host_data, into: %{}, do: {to_string(k), v}
-          Map.merge(base_preview, host_data_str)
+    merged =
+      if is_function(capability.preview, 2) do
+        case capability.preview.(incident, step) do
+          {:ok, host_data} ->
+            # Convert host_data keys to strings for consistency in timeline payload
+            host_data_str = for {k, v} <- host_data, into: %{}, do: {to_string(k), v}
+            Map.merge(base_preview, host_data_str)
 
-        _ ->
-          base_preview
+          _ ->
+            base_preview
+        end
+      else
+        base_preview
       end
-    else
-      base_preview
-    end
+
+    # Hash computed against the FINAL (post-merge) target_refs — Pitfall 2:
+    # hashing the [] default before host_data merge would cause permanent
+    # :target_refs_drift short-circuits in production.
+    Map.put(merged, "target_refs_hash", target_refs_hash(merged["target_refs"] || []))
+  end
+
+  # Canonicalize to strings + sort before hashing — jsonb roundtrips atoms to
+  # strings; canonicalization stability invariant (Pitfall 5).
+  defp target_refs_hash(target_refs) do
+    target_refs
+    |> List.wrap()
+    |> Enum.map(&to_string/1)
+    |> Enum.sort()
+    |> :erlang.term_to_binary()
+    |> then(&:crypto.hash(:sha256, &1))
+    |> Base.encode16(case: :lower)
   end
 
   defp find_recent_preview(incident_id, step_id, token) do
@@ -811,7 +1082,12 @@ defmodule Parapet.Operator do
               DateTime.utc_now()
           end
 
-        {:ok, %{expires_at: expires_at, target_refs: payload["target_refs"]}}
+        {:ok,
+         %{
+           expires_at: expires_at,
+           target_refs: payload["target_refs"],
+           target_refs_hash: payload["target_refs_hash"]
+         }}
 
       _ ->
         {:error, :mismatched_preview}

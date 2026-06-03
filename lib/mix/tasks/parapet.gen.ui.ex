@@ -94,8 +94,11 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
         #   live_session :parapet_operator,
         #     on_mount: [{#{inspect(assigns[:web_module])}.UserAuth, :ensure_authenticated}] do
         #
-        #     live "/parapet", Parapet.OperatorLive.Index, :index
-        #     live "/parapet/:id", Parapet.OperatorDetailLive.Show, :show
+        #     live "/parapet", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :index
+        #     live "/parapet/actions", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :actions
+        #     live "/parapet/history", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :history
+        #     live "/parapet/incidents/:id", #{inspect(assigns[:web_module])}.Parapet.OperatorDetailLive, :show
+        #     live "/parapet/:id", #{inspect(assigns[:web_module])}.Parapet.OperatorDetailLive, :show
         #   end
         # end
         """

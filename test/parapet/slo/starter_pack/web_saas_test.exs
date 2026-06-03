@@ -80,18 +80,18 @@ defmodule Parapet.SLO.StarterPack.WebSaaSTest do
 end
 
 defmodule Parapet.SLO.StarterPack.WebSaaSRegistrationTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Parapet.SLO.Generator
   alias Parapet.SLO.StarterPack.WebSaaS
 
-  test "registering WebSaaS as provider generates alerts with denominator guard and recording rules" do
-    Application.put_env(:parapet, :providers, [WebSaaS])
+  setup do
+    Parapet.SLO.Registry.checkout()
+    :ok
+  end
 
-    on_exit(fn ->
-      Application.put_env(:parapet, :slos, [])
-      Application.put_env(:parapet, :providers, [])
-    end)
+  test "registering WebSaaS as provider generates alerts with denominator guard and recording rules" do
+    Parapet.SLO.Registry.register_providers([WebSaaS])
 
     artifacts = Generator.provider_artifacts()
 

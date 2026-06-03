@@ -1,3 +1,36 @@
+# Fixture modules for check_recovery health check tests.
+# Healthy module with all 4 Recovery callbacks:
+defmodule Mix.Tasks.Parapet.DoctorTest.HealthyRecovery do
+  use Parapet.Recovery
+  def id, do: :retry_async_item
+  def label, do: "Retry (Fixture)"
+  def preview(_incident, _step), do: {:ok, %{}}
+  def execute(_incident, _target_refs), do: {:ok, %{}}
+end
+
+# Broken module — missing the execute/2 callback:
+defmodule Mix.Tasks.Parapet.DoctorTest.BrokenCallbackRecovery do
+  use Parapet.Recovery
+  def id, do: :requeue_dead_letter
+  def label, do: "Broken (Fixture)"
+  def preview(_incident, _step), do: {:ok, %{}}
+  # deliberately omitting execute/2 to trigger the missing-callback :warn
+end
+
+# Fixture runbook that references an unregistered capability atom:
+defmodule Mix.Tasks.Parapet.DoctorTest.RunbookWithUnregisteredCap do
+  use Parapet.Runbook
+  title("Runbook with Unregistered Cap")
+  step(:check, label: "Check", capability: :disable_metric_label)
+end
+
+# Fixture runbook whose step has NO capability (guidance-only):
+defmodule Mix.Tasks.Parapet.DoctorTest.RunbookGuidanceOnly do
+  use Parapet.Runbook
+  title("Guidance Only Runbook")
+  step(:guide, label: "Guide")
+end
+
 defmodule Mix.Tasks.Parapet.DoctorTest do
   use ExUnit.Case, async: false
 
@@ -9,7 +42,8 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
 
   setup do
     Mix.shell(Mix.Shell.Process)
-    Application.put_env(:parapet, :slos, [])
+    Parapet.SLO.Registry.checkout()
+    Parapet.Capabilities.checkout()
     Application.delete_env(:parapet, :escalation_policy)
     Application.delete_env(:parapet, :doctor_cluster_probe)
     Application.delete_env(:parapet, :repo)
@@ -20,7 +54,6 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
     worker_source = File.read!(@worker_path)
 
     on_exit(fn ->
-      Application.put_env(:parapet, :slos, [])
       Application.delete_env(:parapet, :escalation_policy)
       Application.delete_env(:parapet, :doctor_cluster_probe)
       Application.delete_env(:parapet, :repo)
@@ -206,6 +239,117 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
 
       messages = get_all_shell_messages()
       assert String.contains?(messages, "probe failed")
+    end
+  end
+
+  describe "check_recovery" do
+    alias Mix.Tasks.Parapet.DoctorTest.HealthyRecovery
+    alias Mix.Tasks.Parapet.DoctorTest.BrokenCallbackRecovery
+    alias Mix.Tasks.Parapet.DoctorTest.RunbookWithUnregisteredCap
+    alias Parapet.Capabilities
+
+    setup do
+      :ok
+    end
+
+    test "zero capabilities attached → :skip; --ci exits 0 (A1 fresh-install invariant)" do
+      # No capabilities registered — Capabilities Agent is empty from setup
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      assert String.contains?(messages, "==> recovery: skip")
+
+      # --ci must NOT exit non-zero when recovery is :skip
+      assert Doctor.run(["--ci", "recovery"]) == :ok
+    end
+
+    test "N healthy capabilities registered → :info with count in message" do
+      {:ok, _} = Parapet.Recovery.attach([HealthyRecovery])
+
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      assert String.contains?(messages, "==> recovery: info")
+      assert String.contains?(messages, "1")
+    end
+
+    test "runbook step referencing unregistered capability → :warn naming the capability atom" do
+      # Register the HealthyRecovery capability (for :retry_async_item)
+      # but NOT :disable_metric_label — so RunbookWithUnregisteredCap's step will warn
+      {:ok, _} = Parapet.Recovery.attach([HealthyRecovery])
+
+      # Seed an SLO pointing to the runbook with an unregistered capability step
+      module_name = to_string(RunbookWithUnregisteredCap)
+
+      Parapet.SLO.Registry.store(%Parapet.SLO{
+        name: :test_slo_unregistered_cap,
+        objective: 99.9,
+        good_events: "rate(events[5m])",
+        total_events: "sum(rate(events[5m]))",
+        runbook: module_name
+      })
+
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      assert String.contains?(messages, "==> recovery: warn")
+      assert String.contains?(messages, "disable_metric_label")
+    end
+
+    test "URL-valued runbook → SKIP for that SLO; no recovery :warn or :error" do
+      # Register a healthy capability so we get past the zero-cap early return
+      {:ok, _} = Parapet.Recovery.attach([HealthyRecovery])
+
+      Parapet.SLO.Registry.store(%Parapet.SLO{
+        name: :url_runbook_slo,
+        objective: 99.9,
+        good_events: "rate(events[5m])",
+        total_events: "sum(rate(events[5m]))",
+        runbook: "https://wiki.example.com/runbook"
+      })
+
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      # Should be :info (healthy cap, URL SLO skipped) — NOT :warn or :error
+      assert String.contains?(messages, "==> recovery: info")
+      refute String.contains?(messages, "==> recovery: warn")
+      refute String.contains?(messages, "==> recovery: error")
+    end
+
+    test "registered capability whose host module is not loaded → :warn naming the module" do
+      # Register a capability directly with a module that does not exist
+      # so Code.ensure_loaded? returns false
+      ghost_module = :"Elixir.Mix.Tasks.Parapet.DoctorTest.GhostModule"
+
+      Capabilities.register_recovery(:revert_feature_flag,
+        name: "Ghost",
+        module: ghost_module,
+        preview: fn _, _ -> {:ok, %{}} end,
+        execute: fn _, _ -> {:ok, %{}} end
+      )
+
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      assert String.contains?(messages, "==> recovery: warn")
+      assert String.contains?(messages, "GhostModule")
+    end
+
+    test "registered capability whose host module is missing a callback → :warn naming the callback" do
+      # BrokenCallbackRecovery is loaded but missing execute/2
+      Capabilities.register_recovery(:requeue_dead_letter,
+        name: "Broken",
+        module: BrokenCallbackRecovery,
+        preview: &BrokenCallbackRecovery.preview/2,
+        execute: fn _, _ -> {:ok, %{}} end
+      )
+
+      assert Doctor.run(["recovery"]) == :ok
+
+      messages = get_all_shell_messages()
+      assert String.contains?(messages, "==> recovery: warn")
+      assert String.contains?(messages, "execute")
     end
   end
 end

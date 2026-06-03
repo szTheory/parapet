@@ -33,6 +33,7 @@ defmodule Parapet.Spine.ActionClaim do
     field(:idempotency_key, :string)
     field(:attempt_count, :integer, default: 1)
     field(:claimed_at, :utc_datetime_usec)
+    field(:lease_until, :utc_datetime_usec)
     field(:finished_at, :utc_datetime_usec)
     field(:short_circuit_reason, :string)
     field(:last_error_kind, :string)
@@ -55,6 +56,7 @@ defmodule Parapet.Spine.ActionClaim do
       :idempotency_key,
       :attempt_count,
       :claimed_at,
+      :lease_until,
       :finished_at,
       :short_circuit_reason,
       :last_error_kind,
@@ -68,7 +70,8 @@ defmodule Parapet.Spine.ActionClaim do
       :status,
       :idempotency_key,
       :attempt_count,
-      :claimed_at
+      :claimed_at,
+      :lease_until
     ])
     |> validate_inclusion(:status, @statuses)
     |> validate_number(:attempt_count, greater_than_or_equal_to: 1)

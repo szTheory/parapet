@@ -50,4 +50,98 @@ defmodule Parapet.Evidence.RetrospectiveTest do
     assert markdown =~ "State changed to resolved"
     assert markdown =~ "2026-05-11 10:01:00 UTC"
   end
+
+  test "renders recovery_confirmed and recovery_failed entries with human-readable copy" do
+    incident = %Incident{
+      id: "inc-2",
+      title: "Recovery Test Incident",
+      description: "Provider outage",
+      state: "resolved",
+      inserted_at: ~U[2026-05-28 10:00:00Z],
+      updated_at: ~U[2026-05-28 10:10:00Z]
+    }
+
+    entries = [
+      %TimelineEntry{
+        id: "te-10",
+        incident_id: incident.id,
+        type: "recovery_confirmed",
+        payload: %{
+          "capability" => "retry_async_item",
+          "actor" => "ops@example.com",
+          "target_refs" => ["job-1"],
+          "outcome" => %{"status" => "succeeded", "result" => ":executed"}
+        },
+        inserted_at: ~U[2026-05-28 10:01:00Z]
+      },
+      %TimelineEntry{
+        id: "te-11",
+        incident_id: incident.id,
+        type: "recovery_failed",
+        payload: %{
+          "capability" => "retry_async_item",
+          "actor" => "ops@example.com",
+          "target_refs" => ["job-2"],
+          "outcome" => %{"status" => "failed", "reason" => ":provider_unavailable"}
+        },
+        inserted_at: ~U[2026-05-28 10:02:00Z]
+      }
+    ]
+
+    markdown = Retrospective.generate_markdown(incident, entries)
+
+    # Success entry renders human-readable copy naming capability + actor (SC-4)
+    assert markdown =~ "retry_async_item confirmed by ops@example.com"
+
+    # Failure entry renders with the distinct "Recovery failed:" prefix
+    assert markdown =~ "Recovery failed:"
+    assert markdown =~ "retry_async_item"
+
+    # No raw inspect(payload) fallback — the new clauses matched both entries
+    refute markdown =~ "%{"
+
+    # target_refs render as a joined string, not raw Elixir list syntax
+    assert markdown =~ "retry_async_item confirmed by ops@example.com on job-1"
+    refute markdown =~ "[\"job-"
+
+    # Both entries appear inline in the chronological entry list (not a separate section)
+    confirmed_pos =
+      :binary.match(markdown, "retry_async_item confirmed by ops@example.com") |> elem(0)
+
+    failed_pos = :binary.match(markdown, "Recovery failed:") |> elem(0)
+
+    assert confirmed_pos < failed_pos,
+           "recovery_confirmed should appear before recovery_failed in chronological order"
+  end
+
+  test "recovery_failed without a reason key still renders human-readable copy" do
+    incident = %Incident{
+      id: "inc-3",
+      title: "Reasonless Failure",
+      description: "Provider outage",
+      state: "open",
+      inserted_at: ~U[2026-05-28 10:00:00Z],
+      updated_at: ~U[2026-05-28 10:10:00Z]
+    }
+
+    entries = [
+      %TimelineEntry{
+        id: "te-12",
+        incident_id: incident.id,
+        type: "recovery_failed",
+        payload: %{
+          "capability" => "retry_async_item",
+          "actor" => "ops@example.com",
+          "target_refs" => ["job-9"],
+          "outcome" => %{"status" => "failed"}
+        },
+        inserted_at: ~U[2026-05-28 10:03:00Z]
+      }
+    ]
+
+    markdown = Retrospective.generate_markdown(incident, entries)
+
+    assert markdown =~ "Recovery failed: retry_async_item by ops@example.com — unknown reason"
+    refute markdown =~ "%{"
+  end
 end

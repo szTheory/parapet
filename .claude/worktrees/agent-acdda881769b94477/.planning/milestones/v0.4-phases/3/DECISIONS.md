@@ -1,0 +1,4 @@
+# Phase 3 Decisions: AI Deploy Correlation & MCP SLIs
+
+- **2026-05-13**: AI Config Change markers will be written as Ecto `Parapet.Spine.Incident` records (type: `config_change`). This enables direct querying from Elixir for embedded AI copilot features without requiring round-trips to external observability backends, aligning with Parapet's "exact truth" design. Grafana will visualize these via its Postgres data source.
+- **2026-05-13**: MCP tool failure modes (e.g., `timeout`, `execution_failed`) will be extracted from SRE telemetry, mapped to bounded atoms to prevent cardinality explosion, and emitted as Prometheus labels on a dedicated error metric (e.g., `scoria_mcp_errors_total{reason="timeout"}`). This protects the Ecto database from high-volume telemetry while enabling efficient SLO math.

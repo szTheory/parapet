@@ -1,5 +1,65 @@
 # Project Retrospective
 
+## Milestone: v1.1 — Actionable Recovery
+
+**Shipped:** 2026-06-03
+**Phases:** 7 | **Plans:** 19
+
+### What Was Built
+- Capability registration behaviour (`Parapet.Recovery`) with `attach/1` logic.
+- claim-protected operator execution (`Preview → Confirm` via `ClaimService`).
+- 6 prebuilt recovery playbooks matching JTBD-MAP scenarios.
+- Audit propagation (`TimelineEntry` + `ToolAudit` per Confirm, with success/failed variants).
+- End-to-end `demo_app` loop + `check_recovery` static analysis.
+
+### What Worked
+- Freezing public capabilities API first to avoid cascading breaks.
+- Writing test infrastructure/harnesses specifically for race conditions before implementing the fix.
+- Reusing `ClaimService` for human operators instead of inventing a new lock system.
+
+### What Was Inefficient
+- Post-1.0 documentation took slightly more iterations to wire back into the existing generated files properly.
+- UI visual iterations required multiple manual testing loops until they were automated in Phase 28 CI lane.
+
+### Patterns Established
+- "Code lands before the docs that name them" — preventing guides pointing to uncompilable methods.
+- Dual-track UI automation (Smoke lane validating what a browser sees) alongside unit tests.
+
+### Key Lessons
+- Additive API extensions (e.g. new return variants for `confirm_runbook_step/4`) inside a Stable tier must clearly signal that consumers should have a catch-all if they pattern match.
+- Even if something is operator-initiated, wrap it in the same claim-protection as automation.
+
+### Cost Observations
+- Notable: Fast delivery (7 phases in ~2 days) directly linked to rigorous prep and clear bounds set in `NEXT-STEP-ASSESSMENT.md`.
+
+## Milestone: v1.2 — Authoring DX & Maturity
+
+**Shipped:** 2026-06-03
+**Phases:** 4 | **Plans:** 6
+
+### What Was Built
+- ETS-backed checkout isolation for `Parapet.SLO.Registry` and `Parapet.Capabilities`.
+- Flag-based `mix parapet.gen.slo` Igniter task.
+- Elixir/OTP CI matrix, SHA-pinned actions, Dependabot, and branch-protection guidance.
+- Migration/deployment guides, HexDocs branding, maintainer/contributor docs, and demo Compose documentation.
+
+### What Worked
+- Keeping the public API stable while moving mutable registry internals behind existing calls.
+- Treating `release_gate` as the stable branch-protection handle while expanding underlying CI jobs.
+- Verifying docs through ExDoc and focused source tests instead of relying only on manual review.
+
+### What Was Inefficient
+- Phase 30 and Phase 33 needed closeout verification artifacts backfilled after execution summaries already existed.
+- The milestone closeout audit surfaced stale bookkeeping rather than functional gaps.
+
+### Patterns Established
+- ETS checkout isolation is now the preferred pattern for dynamic test state.
+- Source-verifiable docs tests are useful for maintainer/adopter documentation milestones.
+
+### Key Lessons
+- Closeout is smoother when every phase has `SUMMARY`, `VERIFICATION`, and `VALIDATION` artifacts before milestone audit.
+- Runtime-compatible internal refactors still need explicit planning evidence when they satisfy public requirements.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -12,6 +72,7 @@
 | v0.8 | 4 / 8 | 1 | ~13900 | 8 plans / 1 day |
 | v0.9 | 14 / 36 | 5 | ~20274 | 36 plans / 5 days |
 | v0.10 | 4 / 12 | 2 | ~21038 | 12 plans / 2 days (docs-heavy) |
+| v1.2 | 4 / 6 | 1 | - | 6 plans / 1 day (maturity/docs-heavy) |
 
 ## Milestone: v0.10 — Adopter Success
 

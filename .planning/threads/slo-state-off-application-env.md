@@ -2,7 +2,7 @@
 thread: slo-state-off-application-env
 opened: "2026-05-27"
 target_milestone: v1.2 (Authoring DX & Maturity) — candidate
-status: open
+status: closed
 priority: high (graduation candidate from 2026-05-27 grafana_test fix)
 links:
   - lib/parapet/slo.ex
@@ -87,3 +87,7 @@ Once the registry exists:
 ## Next concrete step
 
 When v1.2 opens, this thread is one of its planned phases. Probably the FIRST phase of v1.2, before SLO-W1, since SLO-W1 builds on top of the registry. Don't auto-open; wait for the user's v1.2 kickoff signal.
+
+## Closure
+
+Closed 2026-06-03. Phase 30 completed the architectural fix: `Parapet.SLO.Registry` and `Parapet.Capabilities` now use ETS-backed checkout isolation, and `DX-02` is complete. See `.planning/phases/30-registry-decoupling/30-01-SUMMARY.md`.

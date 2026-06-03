@@ -134,3 +134,121 @@ Emitted when callback or reconciliation delay is distinct from internal backlog.
 - `retryable_failed` is not the same as `discarded`.
 - Callback or reconciliation delay is not the same as queue backlog.
 - Public metadata is intentionally narrower than the upstream integration payloads.
+
+## Recovery Action Family (Experimental)
+
+> #### Experimental {: .warning}
+>
+> This event family is **experimental** in v1.x. Event names, measurement keys, and
+> metadata keys may change in a minor release with a single CHANGELOG entry. See
+> [Stability & Deprecation Policy](stability.html) for details.
+
+Parapet emits this family when an operator or automation takes a recovery action via the
+Preview → Confirm flow. The contract module `Parapet.Telemetry.RecoveryAction` provides
+machine-readable introspection of the family, its metadata keys, and its closed vocabularies.
+
+### `[:parapet, :operator, :recovery_action, :previewed]`
+
+Emitted when an operator opens a Preview panel for a recovery action.
+
+**Measurements:**
+- `count` (integer) - Defaults to `1`.
+
+**Metadata:**
+- `capability_id` - Atom from the registered capabilities allowlist.
+- `action_kind` - One of `"operator"`, `"automation"`, `"escalation"`.
+- `outcome` - Always `:previewed` at this seam.
+- `actor_kind` - `:human` or `:system`.
+
+### `[:parapet, :operator, :recovery_action, :preview_failed]`
+
+Emitted when the Preview render itself errors (e.g. capability lookup or dry-run failure).
+
+**Measurements:**
+- `count` (integer) - Defaults to `1`.
+
+**Metadata:**
+- `capability_id`
+- `action_kind`
+- `outcome` - Always `:failed` at this seam.
+- `failure_class` - One of `:precondition_failed`, `:provider_unavailable`, `:partial_failure`, `:internal_error`.
+- `actor_kind`
+
+### `[:parapet, :operator, :recovery_action, :confirmed]`
+
+Emitted when the operator clicks Confirm (before claim acquisition).
+
+**Measurements:**
+- `count` (integer) - Defaults to `1`.
+
+**Metadata:**
+- `capability_id`
+- `action_kind`
+- `outcome` - Always `:confirmed` at this seam.
+- `actor_kind`
+
+### `[:parapet, :operator, :recovery_action, :short_circuited]`
+
+Emitted when a Confirm request is rejected by a gate (preview expired, circuit breaker open,
+target refs drift, or incident already resolved).
+
+**Measurements:**
+- `count` (integer) - Defaults to `1`.
+
+**Metadata:**
+- `capability_id`
+- `action_kind`
+- `outcome` - Always `:short_circuited` at this seam.
+- `short_circuit_reason` - One of `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`, `:internal_error`.
+- `actor_kind`
+
+### `[:parapet, :operator, :recovery_action, :conflicted]`
+
+Emitted when `ClaimService` returns `{:conflicted, claim_id}` (another node or operator
+holds an active claim for the same action).
+
+**Measurements:**
+- `count` (integer) - Defaults to `1`.
+
+**Metadata:**
+- `capability_id`
+- `action_kind`
+- `outcome` - Always `:conflicted` at this seam.
+- `actor_kind`
+
+### `[:parapet, :operator, :recovery_action, :executed]` (span family)
+
+Emitted as a `:telemetry.span/3` triplet covering the capability `execute/2` call. Three
+sub-event tuples are emitted in sequence:
+
+- `[:parapet, :operator, :recovery_action, :executed, :start]`
+- `[:parapet, :operator, :recovery_action, :executed, :stop]`
+- `[:parapet, :operator, :recovery_action, :executed, :exception]` (on error)
+
+**Measurements:**
+- `:start` sub-event: `system_time` (integer) — monotonic system time at execution start.
+- `:stop` and `:exception` sub-events: `duration_ms` (integer) and `duration_native` (integer).
+
+`duration_ms` and `duration_native` are the project's measurement convention — the project
+instrumenter converts the raw `:telemetry.span/3` `duration` (native units) into both keys
+before downstream subscribers see the payload.
+
+**Metadata (applied to all three sub-events):**
+- `capability_id`
+- `action_kind`
+- `outcome` - One of `:succeeded`, `:failed` on `:stop`/`:exception`; absent on `:start`.
+- `failure_class` - Present when `outcome` is `:failed`.
+- `actor_kind`
+
+### Closed Vocabularies
+
+The following atom vocabularies are frozen as of v1.1. Adding new atoms is additive (minor
+version change); removing or renaming is breaking (major version change). See
+[Stability & Deprecation Policy](stability.html) for details.
+
+- **`outcome`**: `:previewed`, `:confirmed`, `:short_circuited`, `:conflicted`, `:succeeded`, `:failed`
+- **`short_circuit_reason`**: `:incident_resolved`, `:breaker_open`, `:preview_expired`, `:target_refs_drift`, `:internal_error`
+- **`failure_class`**: `:precondition_failed`, `:provider_unavailable`, `:partial_failure`, `:internal_error`
+- **`actor_kind`**: `:human`, `:system`
+- **`action_kind`**: `"operator"`, `"automation"`, `"escalation"`
+- **`refs` keys**: `:incident_ref`, `:claim_ref`, `:step_ref`, `:preview_ref`

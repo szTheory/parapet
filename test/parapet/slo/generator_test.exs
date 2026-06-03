@@ -38,22 +38,17 @@ defmodule Parapet.SLO.GeneratorTest do
   end
 
   test "provider artifacts use active providers only" do
-    Application.put_env(:parapet, :slos, [
-      %SLO{
-        name: :legacy_only,
-        objective: 99.0,
-        good_events: "legacy_good",
-        total_events: "legacy_total",
-        runbook: "https://example.com/runbooks/legacy"
-      }
-    ])
+    Parapet.SLO.Registry.checkout()
 
-    Application.put_env(:parapet, :providers, [MailglassDelivery])
+    Parapet.SLO.Registry.store(%SLO{
+      name: :legacy_only,
+      objective: 99.0,
+      good_events: "legacy_good",
+      total_events: "legacy_total",
+      runbook: "https://example.com/runbooks/legacy"
+    })
 
-    on_exit(fn ->
-      Application.put_env(:parapet, :slos, [])
-      Application.put_env(:parapet, :providers, [])
-    end)
+    Parapet.SLO.Registry.register_providers([MailglassDelivery])
 
     artifacts = Generator.provider_artifacts()
 

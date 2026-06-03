@@ -1,0 +1,113 @@
+---
+phase: 16
+slug: slo-starter-packs-low-traffic-guardrails
+status: validated
+nyquist_compliant: true
+wave_0_complete: true
+created: 2026-05-24
+validated: 2026-05-24
+---
+
+# Phase 16 — Validation Strategy
+
+> Per-phase validation contract for feedback sampling during execution.
+> Derived from `16-RESEARCH.md` § Validation Architecture.
+
+---
+
+## Test Infrastructure
+
+| Property | Value |
+|----------|-------|
+| **Framework** | ExUnit (Elixir built-in) |
+| **Config file** | `test/test_helper.exs` (existing) |
+| **Quick run command** | `mix test test/parapet/slo/starter_pack/` |
+| **Full suite command** | `mix test` |
+| **Estimated runtime** | ~10s (starter_pack subset); full suite a few seconds more |
+
+---
+
+## Sampling Rate
+
+- **After every task commit:** Run `mix test test/parapet/slo/starter_pack/`
+- **After every plan wave:** Run `mix test && mix verify.public_api`
+- **Before `/gsd:verify-work`:** Full suite must be green AND `mix verify.public_api` passes
+- **Max feedback latency:** ~30 seconds
+
+---
+
+## Per-Task Verification Map
+
+> Task IDs are assigned by the planner; link them here during execution. Rows below
+> map each phase requirement to its automated proof (from RESEARCH § Validation Architecture).
+
+| Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
+|---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
+| TBD | — | 0 | SLO-01 | — | N/A | unit | `mix test test/parapet/slo/starter_pack/web_saas_test.exs` | ✅ | ✅ green |
+| TBD | — | 1 | SLO-01 | — | `WebSaaS.slos/0` returns exactly 3 SliceSpecs (HTTP avail, login, Oban) with documented objectives | unit | `mix test test/parapet/slo/starter_pack/web_saas_test.exs` | ✅ | ✅ green |
+| TBD | — | 1 | SLO-01 | T-dead-alert | HTTP slice targets `parapet_http_request_count` w/ `status_class=~"2xx\|3xx"`; Oban `parapet_oban_jobs_total` state="success"; login `parapet_journey_login_count` outcome="success" | unit | same | ✅ | ✅ green |
+| TBD | — | 1 | SLO-01 | T-cardinality | Every WebSaaS slice matcher key passes `LabelPolicy.assert_safe!` | unit | same | ✅ | ✅ green |
+| TBD | — | 1 | SLO-01 | T-flap | Each WebSaaS slice has non-zero `min_total_rate`; generator output contains denominator guard `> <min_total_rate>` | integration | same | ✅ | ✅ green |
+| TBD | — | 0 | SLO-02 | — | N/A | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ✅ | ✅ green |
+| TBD | — | 1 | SLO-02 | — | `DeliverySaaS.slos/0` returns WebSaaS 3 + Mailglass + Chimeway slices when stubs present | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ✅ | ✅ green |
+| TBD | — | 1 | SLO-02 | T-compileout | `DeliverySaaS.delivery_slices(absent_atom, absent_atom)` returns `[]` (BEHAVIORAL absent-branch test, not a structural grep) — so `WebSaaS.slos() ++ delivery_slices(absent, absent)` yields only the 3 WebSaaS slices | unit | `mix test test/parapet/slo/starter_pack/delivery_saas_test.exs` | ✅ | ✅ green |
+| TBD | — | 1 | SLO-02 | T-drift | Delivery slices delegate to `MailglassDelivery.slos()` / `ChimewayDelivery.slos()` — no duplicated SliceSpec names | unit | same | ✅ | ✅ green |
+| TBD | — | 1 | SLO-01, SLO-02 | — | New pack modules are fully documented (`mix verify.public_api` / `mix docs --warnings-as-errors` passes) | integration | `mix verify.public_api` | ✅ | ✅ green |
+
+*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+
+---
+
+## Wave 0 Requirements
+
+- [x] `test/parapet/slo/starter_pack/` — create test directory
+- [x] `test/parapet/slo/starter_pack/web_saas_test.exs` — stubs for SLO-01 (metric names, objectives, LabelPolicy, denominator guard, generator output, provider registration)
+- [x] `test/parapet/slo/starter_pack/delivery_saas_test.exs` — stubs for SLO-02 (conditional loading with/without `test/support` stubs, delegation, no SliceSpec drift)
+
+*ExUnit already configured (`test/test_helper.exs`) — no framework install needed.*
+
+---
+
+## Manual-Only Verifications
+
+| Behavior | Requirement | Why Manual | Test Instructions |
+|----------|-------------|------------|-------------------|
+| — | — | — | — |
+
+*All phase behaviors have automated verification (ExUnit + `mix verify.public_api`).*
+
+---
+
+## Validation Sign-Off
+
+- [x] All tasks have `<automated>` verify or Wave 0 dependencies
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify
+- [x] Wave 0 covers all MISSING references
+- [x] No watch-mode flags
+- [x] Feedback latency < 30s
+- [x] `nyquist_compliant: true` set in frontmatter
+
+**Approval:** validated 2026-05-24
+
+---
+
+## Validation Audit 2026-05-24
+
+Retroactive Nyquist audit (State A) during the milestone v0.10 audit. SLO-01 and SLO-02 are
+covered by `web_saas_test.exs` (7 tests) and `delivery_saas_test.exs` (9 tests).
+
+**Gap found and fixed:** the D-09 always-loadable test asserted `function_exported?(DeliverySaaS,
+:slos, 0)` without first loading the module. `function_exported?/3` returns `false` for a
+not-yet-loaded module even when the function exists, so the test failed intermittently
+(~1 in 5–18 isolated runs) depending on test order. Fixed by forcing the load with
+`Code.ensure_loaded?/1` first (commit `ef519e3`). Confirmed deterministic across 30
+consecutive isolated runs + full suite (311/0).
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 1 |
+| Resolved | 1 |
+| Escalated | 0 |
+
+The gsd-nyquist-auditor was not spawned — coverage already existed; the single gap was a
+test-determinism defect fixed in place.

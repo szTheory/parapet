@@ -1,39 +1,40 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Actionable Recovery
-status: planning
-last_updated: "2026-05-27T09:51:16.529Z"
-last_activity: 2026-05-27
+milestone: v1.3
+milestone_name: Operator UI Polish & Design System
+status: milestone_complete
+last_updated: 2026-06-03T22:52:35Z
+last_activity: 2026-06-03 -- Phase 36 browser verification complete
 progress:
-  total_phases: 7
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
-  percent: 0
+  total_phases: 14
+  completed_phases: 14
+  total_plans: 29
+  completed_plans: 29
+  percent: 100
+stopped_at: Milestone complete (Phase 36 was final phase)
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery milestone opened)
+See: .planning/PROJECT.md (updated 2026-06-03 — v1.3 Operator UI Polish & Design System milestone active)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** v1.1 Actionable Recovery — close the operator-UI action loop with Preview → Confirm executable recovery actions.
+**Current focus:** Milestone complete
 
 ## Current Position
 
-Phase: 23 — Foundations — Telemetry Contract + `lease_until` Migration
-Plan: —
-Status: Roadmap complete; awaiting `/gsd:discuss-phase 23`
-Last activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requirements mapped, 0 unmapped)
+Phase: 36
+Plan: Not started
+Status: Milestone complete
+Last activity: 2026-06-03
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0 (v1.1 starting)
+- Total plans completed: 29 (v1.1 starting)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -48,6 +49,15 @@ Last activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requiremen
 | Phase 27 | 0 | — | — |
 | Phase 28 | 0 | — | — |
 | Phase 29 | 0 | — | — |
+| 23 | 2 | - | - |
+| 24 | 3 | - | - |
+| 25 | 3 | - | - |
+| 26 | 1 | - | - |
+| 27 | 1 | - | - |
+| 28 | 5 | - | - |
+| 29 | 4 | - | - |
+| 32 | 2 | - | - |
+| 35 | 1 | - | - |
 
 **Recent Trend:**
 
@@ -55,6 +65,18 @@ Last activity: 2026-05-27 — v1.1 roadmap landed (Phases 23–29, 24 requiremen
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 28 P01 | 8 | 2 tasks | 2 files |
+| Phase 28 P02 | 33s | 1 tasks | 1 files |
+| Phase 28-demo-seed-ci-lane P03 | 4 | 1 tasks | 1 files |
+| Phase 28 P04 | 34 | 1 tasks | 1 files |
+| Phase 28 P05 | 40 | 2 tasks | 3 files |
+| Phase 31 P01 | 4m | 1 tasks | 2 files |
+| Phase 32 P01 | 0 min | 2 tasks | 2 files |
+| Phase 32 P02 | 0 min | 2 tasks | 2 files |
+| Phase 33 P01 | 11min | 3 tasks | 5 files |
+| Phase 33 P02 | 12min | 3 tasks | 4 files |
+| Phase 35 P01 | 7 min | 3 tasks | 4 files |
+| Phase 36 P01 | 10 min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -71,6 +93,13 @@ Recent decisions affecting current work:
 - Two of six prebuilt playbooks (Retry Storm, Suppression Drift) stay guidance-only by design — every obvious automated mitigation worsens the failure (continues v0.10 "guidance-only runbooks where no allowlisted capability fits" decision).
 - `Parapet.Recovery` ships Stable-tier from day one in Phase 29; the 4-callback shape is frozen because adding required callbacks in v1.2 would be breaking under the v1.0 stability promise.
 - Operator-clicked Confirm path is the v1.1 architectural defect closure: today it skips `ClaimService` while the Oban auto-execution path goes through it. Phase 25 closes the gap.
+- [Phase ?]: Reuse frozen-allowlist atom :retry_async_item in DemoApp.Recovery.RetryAsyncItem — non-allowlisted id raises ArgumentError at Parapet.Capabilities.register_recovery/2
+- [Phase ?]: demo.reset leads with ecto.drop so seeds stay always-insert and replayability comes from the drop (D-10)
+- [Phase ?]: Do not double-start Parapet.Capabilities in demo app
+- [Phase ?]: runbook_data[module] string key is the only mechanism enabling Preview/Confirm; inline steps is display-only
+- [Phase ?]: Incident 4 added as always-insert alongside existing 3; replayability via mix demo.reset per D-10/D-11
+- [Phase 32]: Keep `release_gate` as the stable required status check while CI expands into an Elixir/OTP matrix.
+- [Phase 36]: Browser screenshot proof uses local Chromium automation against the demo app and writes durable PNG evidence under the Phase 36 planning directory without adding repo dependencies.
 
 ### Pending Todos
 
@@ -84,18 +113,22 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 | Category | Item | Target | Status | Notes |
 |----------|------|--------|--------|-------|
-| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | deferred from v1.1 | Design resolved; build it after recovery loop closes |
-| Architecture | Move `Parapet.SLO` state off `Application` env (registry refactor; lands before SLO-W1) | v1.2 | candidate | See `.planning/threads/slo-state-off-application-env.md` |
-| CI | Multi-version Elixir/OTP CI matrix | v1.2 | candidate | Maturity signal |
-| Supply chain | SHA-pinned actions, Dependabot config, `MAINTAINING.md`, branch-protection enforcement | v1.2 | candidate | See `.planning/threads/release-gate-enforcement.md` |
-| Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | candidate | Adopter-facing trust work |
+| SLO tooling | SLO-W1 flag-based `mix parapet.gen.slo` Igniter task | v1.2 | shipped | Delivered in Phase 31 |
+| Architecture | Move `Parapet.SLO` state off `Application` env (registry refactor; lands before SLO-W1) | v1.2 | shipped | Delivered in Phase 30; thread closed |
+| CI | Multi-version Elixir/OTP CI matrix | v1.2 | shipped | Delivered in Phase 32 |
+| Supply chain | SHA-pinned actions, Dependabot config, `MAINTAINING.md`, branch-protection enforcement | v1.2 | shipped | Delivered in Phases 32-33 |
+| Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | shipped | Delivered in Phase 33 |
 | Recovery extensions | MCP Preview surface (read-only) for recovery actions; per-capability cooldown rules; adapter-provided capabilities (Rulestead → `:revert_feature_flag`) | v1.2/v1.3 | deferred from v1.1 | Defer until MCP graduates from Experimental |
 | Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
 | Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |
 
 ## Session Continuity
 
-Last session: 2026-05-27T09:51:16.529Z
-Stopped at: v1.1 roadmap landed (Phases 23–29, 24/24 requirements mapped). STATE.md updated to point at Phase 23.
-Resume file: .planning/ROADMAP.md
-Next step: `/gsd:discuss-phase 23` to begin planning Foundations (telemetry contract lock + `lease_until` schema migration).
+Last session: 2026-06-03T22:52:35Z
+Stopped at: Completed 36-01-PLAN.md
+Resume file: None
+Next step: /gsd-new-milestone when ready to open the next milestone
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

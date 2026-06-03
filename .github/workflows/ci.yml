@@ -9,27 +9,31 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.19.0']
+        otp: ['26.x', '27.x', '28.x']
     env:
       MIX_ENV: test
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
-          elixir-version: '1.19.0'
-          otp-version: '27.2'
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Cache _build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: _build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-build-
+          key: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Install dependencies
         run: mix deps.get
       - name: Check Formatting
@@ -51,6 +55,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        elixir: ['1.19.0']
+        otp: ['26.x', '27.x', '28.x']
     env:
       MIX_ENV: test
     services:
@@ -68,24 +76,24 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
-          elixir-version: '1.19.0'
-          otp-version: '27.2'
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: deps
-          key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-
+          key: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Cache _build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: _build
-          key: ${{ runner.os }}-build-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-build-
+          key: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Install dependencies
         run: mix deps.get
       - name: Test
@@ -94,6 +102,10 @@ jobs:
   demo:
     runs-on: ubuntu-latest
     needs: [lint, test]
+    strategy:
+      matrix:
+        elixir: ['1.19.0']
+        otp: ['26.x', '27.x', '28.x']
     env:
       MIX_ENV: test
     services:
@@ -111,24 +123,24 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
-          elixir-version: '1.19.0'
-          otp-version: '27.2'
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
       - name: Cache demo dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: examples/demo_app/deps
-          key: ${{ runner.os }}-demo-mix-${{ hashFiles('examples/demo_app/mix.lock') }}
-          restore-keys: ${{ runner.os }}-demo-mix-
+          key: ${{ runner.os }}-demo-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('examples/demo_app/mix.lock') }}
+          restore-keys: ${{ runner.os }}-demo-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Cache demo _build
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: examples/demo_app/_build
-          key: ${{ runner.os }}-demo-build-${{ hashFiles('examples/demo_app/mix.lock') }}
-          restore-keys: ${{ runner.os }}-demo-build-
+          key: ${{ runner.os }}-demo-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('examples/demo_app/mix.lock') }}
+          restore-keys: ${{ runner.os }}-demo-build-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Install demo dependencies
         run: cd examples/demo_app && mix deps.get
       - name: Create and migrate demo database

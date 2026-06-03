@@ -2,6 +2,7 @@ defmodule Parapet.TelemetryContractTest do
   use ExUnit.Case, async: true
 
   alias Parapet.Telemetry.AsyncDelivery
+  alias Parapet.Telemetry.RecoveryAction
 
   # ---------------------------------------------------------------------------
   # Group 1: Derived from AsyncDelivery at compile time (D-07)
@@ -9,6 +10,13 @@ defmodule Parapet.TelemetryContractTest do
   # in AsyncDelivery.event_families/0. Any change there propagates automatically.
   # ---------------------------------------------------------------------------
   @async_delivery_families AsyncDelivery.event_families()
+
+  # ---------------------------------------------------------------------------
+  # Group 1b: Recovery action family — derived from RecoveryAction at compile time.
+  # Same single-source-of-truth discipline as AsyncDelivery: the 8 event names
+  # (5 discrete + the 3-sub-event :executed span) come straight from the module.
+  # ---------------------------------------------------------------------------
+  @recovery_action_families RecoveryAction.event_families()
 
   # ---------------------------------------------------------------------------
   # Groups 2-7: Hardcoded fixtures — this is a MANUAL snapshot, not an automated
@@ -50,7 +58,8 @@ defmodule Parapet.TelemetryContractTest do
     [:parapet, :rulestead, :flag_change]
   ]
 
-  @all_documented_families @async_delivery_families ++ @other_documented_families
+  @all_documented_families @async_delivery_families ++
+                             @recovery_action_families ++ @other_documented_families
 
   # ---------------------------------------------------------------------------
   # Per-family measurement key fixtures
@@ -193,22 +202,32 @@ defmodule Parapet.TelemetryContractTest do
                "Update docs/telemetry.md and this fixture together."
     end
 
-    test "all documented event families total 27" do
-      assert length(@all_documented_families) == 27,
-             "Expected 27 total documented families (6 async/delivery + 21 others). " <>
+    test "RecoveryAction.event_families/0 returns exactly 8 recovery families" do
+      assert length(@recovery_action_families) == 8,
+             "RecoveryAction.event_families/0 must return exactly 8 families " <>
+               "(5 discrete + the 3-sub-event :executed span). " <>
                "Update docs/telemetry.md and this fixture together."
     end
 
-    test "no family is documented in both async_delivery and other lists" do
-      overlap =
-        MapSet.intersection(
-          MapSet.new(@async_delivery_families),
-          MapSet.new(@other_documented_families)
-        )
+    test "all documented event families total 35" do
+      assert length(@all_documented_families) == 35,
+             "Expected 35 total documented families (6 async/delivery + 8 recovery + 21 others). " <>
+               "Update docs/telemetry.md and this fixture together."
+    end
 
-      assert MapSet.size(overlap) == 0,
-             "Families appear in both lists: #{inspect(MapSet.to_list(overlap))}. " <>
-               "Families should appear in exactly one list."
+    test "no family is documented in more than one list" do
+      lists = [@async_delivery_families, @recovery_action_families, @other_documented_families]
+
+      duplicates =
+        lists
+        |> Enum.flat_map(& &1)
+        |> Enum.frequencies()
+        |> Enum.filter(fn {_family, count} -> count > 1 end)
+        |> Enum.map(&elem(&1, 0))
+
+      assert duplicates == [],
+             "Families appear in more than one list: #{inspect(duplicates)}. " <>
+               "Each family should appear in exactly one list."
     end
 
     test "event_name/1 round-trips every family from event_families/0" do

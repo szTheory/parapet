@@ -1,20 +1,13 @@
 defmodule Parapet.SLOTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
   import ExUnit.CaptureIO
 
   alias Parapet.SLO
   alias Parapet.SLO.Generator
 
   setup do
-    # Clear the SLOs before each test
-    Application.put_env(:parapet, :slos, [])
-    Application.put_env(:parapet, :providers, [])
-
-    on_exit(fn ->
-      Application.put_env(:parapet, :slos, [])
-      Application.put_env(:parapet, :providers, [])
-    end)
-
+    Parapet.SLO.Registry.checkout()
+    Parapet.SLO.Registry.register_providers([])
     :ok
   end
 
@@ -89,7 +82,7 @@ defmodule Parapet.SLOTest do
       ])
 
       # Set up provider
-      Application.put_env(:parapet, :providers, [DummyProvider])
+      Parapet.SLO.Registry.register_providers([DummyProvider])
 
       all_slos = SLO.all()
 

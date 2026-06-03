@@ -6,6 +6,21 @@ defmodule Parapet.OperatorTest do
   alias Parapet.Spine.{Incident, TimelineEntry, ToolAudit}
 
   defmodule DummyRepo do
+    @moduledoc false
+
+    # Test double that backs Parapet.Operator's `Evidence.repo()` lookup.
+    #
+    # Supports two transaction protocols:
+    #   - `transaction(%Ecto.Multi{})` for `Evidence.run_operator_command/1`
+    #     (the existing Ecto.Multi-driven seam).
+    #   - `transaction(fun)` for `Parapet.Automation.ClaimService.claim_action/1`
+    #     (the raw-function seam introduced in Phase 25, plan 25-01). The raw fun
+    #     runs `acquire_claim` -> `lock_incident` -> gates -> result construction
+    #     and may invoke `insert_all/3`, `one!/1`, `update!/1`, and
+    #     `aggregate/3` on this module. Each is stubbed to deliver the
+    #     "first caller wins the claim" code path so the operator's happy-path
+    #     test can flow through ClaimService and reach `capability.execute`.
+
     def all(query) do
       send(self(), {:repo_all, query})
 
@@ -21,6 +36,17 @@ defmodule Parapet.OperatorTest do
 
     def one(_query), do: nil
 
+    # Used by `Parapet.Automation.ClaimService.lock_incident/3` (acquired claim
+    # path) and by the test setup's bare incident lookups.
+    def one!(_query) do
+      Process.get(:mock_incident) ||
+        %Parapet.Spine.Incident{
+          id: Process.get(:claim_incident_id) || Ecto.UUID.generate(),
+          state: "open",
+          updated_at: ~U[2026-05-10 10:00:00Z]
+        }
+    end
+
     def get!(Parapet.Spine.Incident, id) do
       Process.get(:mock_incident) ||
         %Incident{id: id, state: "open", updated_at: ~U[2026-05-10 10:00:00Z]}
@@ -30,8 +56,54 @@ defmodule Parapet.OperatorTest do
       {:ok, Ecto.Changeset.apply_changes(changeset) |> Map.put(:id, Ecto.UUID.generate())}
     end
 
+    # Plain-update (used by `ClaimService.update_claim_status/4` via the changeset
+    # path). Returns the applied struct (NOT wrapped in `{:ok, _}`), matching
+    # `Ecto.Repo.update!/1` semantics.
+    def update!(changeset) do
+      Ecto.Changeset.apply_changes(changeset)
+    end
+
     def update(changeset, _opts \\ []) do
       {:ok, Ecto.Changeset.apply_changes(changeset)}
+    end
+
+    # Called by `ClaimService.acquire_claim/2`. Always grant the claim to the
+    # first (and only) caller — there are no concurrent contenders in this
+    # synchronous unit harness. Returns `{1, [%ActionClaim{}]}` as Ecto.Repo
+    # would on a successful `insert_all` with `returning:` set.
+    def insert_all(Parapet.Spine.ActionClaim, [attrs], _opts) do
+      now = DateTime.utc_now() |> DateTime.truncate(:microsecond)
+
+      claim = %Parapet.Spine.ActionClaim{
+        id: Ecto.UUID.generate(),
+        incident_id: attrs.incident_id,
+        action_kind: attrs.action_kind,
+        action_key: attrs.action_key,
+        status: attrs.status,
+        idempotency_key: attrs.idempotency_key,
+        attempt_count: attrs.attempt_count,
+        claimed_at: attrs.claimed_at,
+        lease_until: attrs.lease_until,
+        inserted_at: attrs[:inserted_at] || now,
+        updated_at: attrs[:updated_at] || now,
+        error_metadata: %{}
+      }
+
+      {1, [claim]}
+    end
+
+    # Called by `Parapet.Automation.CircuitBreaker.execution_count/4` via the
+    # `breaker_gate`. Returning 0 keeps the breaker open (i.e., not tripped).
+    def aggregate(_query, :count, :id), do: 0
+
+    # Two-shape transaction:
+    #
+    #   - `Ecto.Multi`: drives `Evidence.run_operator_command/1` (existing).
+    #   - 0-arity function: drives `ClaimService.claim_action/1` (new in Phase 25
+    #     plan 25-01). The fun's return value is wrapped in `{:ok, _}` to mirror
+    #     `Ecto.Repo.transaction/1` semantics on success.
+    def transaction(fun) when is_function(fun, 0) do
+      {:ok, fun.()}
     end
 
     def transaction(multi) do
@@ -452,7 +524,7 @@ defmodule Parapet.OperatorTest do
 
     setup do
       # Ensure registry is fresh (manual reset for tests)
-      Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+      Parapet.Capabilities.checkout()
 
       Parapet.Capabilities.register_recovery(:retry_async_item,
         name: "Retry Item",
@@ -478,6 +550,12 @@ defmodule Parapet.OperatorTest do
         runbook_data: %{"module" => to_string(MockRunbook)}
       }
 
+      # Stash the incident so DummyRepo.one!/1 (used by
+      # Parapet.Automation.ClaimService.lock_incident/3) returns the same
+      # struct ClaimService claimed against, keeping the gate (open-state)
+      # green for the happy-path confirm test.
+      Process.put(:mock_incident, incident)
+
       %{payload: payload, incident: incident}
     end
 
@@ -492,10 +570,11 @@ defmodule Parapet.OperatorTest do
       assert %TimelineEntry{type: "recovery_preview"} = result.timeline_entry
     end
 
-    test "confirm_runbook_step executes and rejects stale previews", %{
-      payload: payload,
-      incident: incident
-    } do
+    test "confirm_runbook_step executes and short-circuits expired previews with :preview_expired",
+         %{
+           payload: payload,
+           incident: incident
+         } do
       # 1. Preview first
       {:ok, %{preview: preview}} = Operator.preview_runbook_step(incident, :retry, payload)
       token = preview["preview_token"]
@@ -514,6 +593,20 @@ defmodule Parapet.OperatorTest do
       assert {:ok, result} = Operator.confirm_runbook_step(incident, :retry, token, payload)
       assert %TimelineEntry{type: "recovery_confirmed"} = result.timeline_entry
 
+      # AUD-01: TimelineEntry payload carries full operator identity + outcome
+      assert result.timeline_entry.payload["actor"] == payload.actor
+      assert result.timeline_entry.payload["capability"] == "retry_async_item"
+      assert is_list(result.timeline_entry.payload["target_refs"])
+      assert result.timeline_entry.payload["outcome"]["status"] == "succeeded"
+
+      # AUD-02: ToolAudit has output set, action_name + target_refs in input
+      assert result.tool_audit.success == true
+      assert result.tool_audit.input["action_name"] == "retry_async_item"
+      assert is_list(result.tool_audit.input["target_refs"])
+      assert result.tool_audit.input["actor"] == payload.actor
+      assert is_map(result.tool_audit.output)
+      assert result.tool_audit.output["status"] == "succeeded"
+
       # 3. Test stale preview (expired)
       expired_preview =
         Map.put(preview, "expires_at", DateTime.utc_now() |> DateTime.add(-10, :second))
@@ -521,7 +614,7 @@ defmodule Parapet.OperatorTest do
       expired_entry = %TimelineEntry{entry | payload: expired_preview}
       Process.put(:mock_entries, [expired_entry])
 
-      assert {:error, :stale_preview} =
+      assert {:short_circuited, :preview_expired} =
                Operator.confirm_runbook_step(incident, :retry, token, payload)
     end
 

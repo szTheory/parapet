@@ -63,6 +63,25 @@ defmodule Mix.Tasks.Verify.PublicApiTest do
     end
   end
 
+  describe "Parapet.Recovery stable reclassification (Wave-0 regression guard — STAB-07)" do
+    test "Parapet.Recovery moduledoc is classified :stable by detect_tier_from_text/1" do
+      # Regression guard: if recovery.ex admonition is ever reverted to Experimental,
+      # this test fails. The live moduledoc is fetched via Code.fetch_docs/1 so the
+      # assertion targets the actual compiled module, not a hardcoded constant.
+      {:docs_v1, _, _, _, %{"en" => moduledoc_text}, _, _} = Code.fetch_docs(Parapet.Recovery)
+      assert PublicApi.detect_tier_from_text(moduledoc_text) == :stable
+    end
+
+    test "detect_tier_from_text/1 returns :experimental for the old Recovery admonition string" do
+      # Confirms the regression guard is real: the old Experimental string would have
+      # returned :experimental, not :stable. Reversing the flip would break the test above.
+      old_admonition =
+        "> #### Experimental {: .warning}\n>\n> This module is experimental in v1.x."
+
+      assert PublicApi.detect_tier_from_text(old_admonition) == :experimental
+    end
+  end
+
   describe "manifest tier field" do
     test "manifest includes 'tier' key in output (verified via detect_tier_from_text/1 contract)" do
       # The check_module/1 private function returns %{module: _, has_docs: _, tier: _}.

@@ -2,7 +2,7 @@
 thread: actionable-recovery-design
 opened: "2026-05-27"
 target_milestone: v1.1
-status: open
+status: closed
 links:
   - .planning/NEXT-STEP-ASSESSMENT.md
   - docs/operator-ui.md
@@ -81,3 +81,7 @@ Fresh `iex -S mix phx.server` in `examples/demo_app/` currently shows an empty i
 ## Next concrete step
 
 When the user opens v1.1, this thread should be the seed for `gsd-discuss-phase` or `gsd-plan-phase`. Don't auto-open; wait for the user's signal.
+
+## Closure
+
+Closed 2026-06-03. This v1.1 design thread was implemented by the Actionable Recovery milestone: `Parapet.Recovery`, capability-backed playbooks, Preview -> Confirm, audit propagation, and demo seed coverage shipped in v1.1. See `.planning/milestones/v1.1-ROADMAP.md` and the current `.planning/PROJECT.md` state.

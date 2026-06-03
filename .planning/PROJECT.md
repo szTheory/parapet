@@ -10,24 +10,40 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release with Hex + HexDocs resolution and post-cut cleanup on `main`. `main` now returns to steady-state release config with no one-off `release-as` pin. See `.planning/ROADMAP.md` and `docs/release-policy.md`.
+**Shipped:** v1.2 Authoring DX & Maturity (2026-06-03) — Completed the stable-line maturity pass: moved SLO and capability dynamic state to ETS-backed checkout isolation, shipped the flag-based `mix parapet.gen.slo` Igniter task, hardened CI with an Elixir/OTP matrix and SHA-pinned actions, added Dependabot and branch-protection guidance, published migration/deployment docs with HexDocs branding, and documented maintainer/contributor/demo Compose workflows.
 
-**Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
+<details>
+<summary><b>Archived State Updates</b></summary>
 
-**Next:** Quiet stable-line maintenance by default. The 2026-05-27 strategic assessment (`.planning/NEXT-STEP-ASSESSMENT.md`) identified Actionable Recovery as the highest-leverage v1.1 wedge: wire the operator UI to actually execute runbook steps (Preview → Confirm) with 4–6 prebuilt recovery playbooks, audit propagation, and a demo seed that proves the loop. SLO-W1, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement move to v1.2 (Authoring DX & Maturity). Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+. None of these activate until a concrete PR-shaped slice opens.
+**Previously shipped:** v1.1 Actionable Recovery (2026-06-03) — Closed the action loop in the operator UI. Turned runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Shipped the capability-registration behaviour (`Parapet.Recovery`), 6 prebuilt recovery playbooks, audit propagation (TimelineEntry and ToolAudit), and a demo seed that proves the loop. `Parapet.Recovery` graduated to Stable.
 
-## Current Milestone: v1.1 Actionable Recovery
+**Previously shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release.
 
-**Goal:** Close the action loop in the operator UI — turn runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
+**Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface.
+
+</details>
+
+**Next:** Active milestone v1.3 Operator UI Polish & Design System — a systematic generated Operator UI refresh focused on active-response information architecture, reusable Tailwind design-system primitives, richer demo seed states, and browser-backed responsive polish.
+
+## Current Milestone: v1.3 Operator UI Polish & Design System
+
+**Goal:** Make Parapet's generated Operator UI a deliberate, high-polish active-response workbench that clearly orients operators from health state to evidence to safe action.
 
 **Target features:**
-- Runbook capability-registration API (Behaviour-based, mirrors `Parapet.Integration`) so host apps declare named recovery actions parapet can dispatch
-- Operator UI Guidance → Preview → Confirm flow (no auto-execution; Confirm wraps in `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free)
-- 4–6 prebuilt recovery playbooks for JTBD-MAP failure modes: retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout
-- Audit propagation — every action emits a `TimelineEntry` (`type: :recovery_action`) + `ToolAudit` row
-- Demo seed — fresh demo app shows at least one runbook with a Preview-able + Confirm-able action wired up
+- Active-response-first `/parapet` orientation with explicit navigation lanes for response, actions, and history.
+- Generated Tailwind design-system consolidation for operator surfaces, states, action affordances, focus/motion, and audit-safe controls.
+- Rich demo seed coverage that expresses active, investigating, resolved, recovery, escalation, action-item, retrospective, and external-evidence states.
+- Browser-backed responsive UI verification for desktop and mobile touchpoints.
 
-**Started:** 2026-05-27. Seed thread: `.planning/threads/actionable-recovery-design.md`. Strategic context: `.planning/NEXT-STEP-ASSESSMENT.md`.
+## Last Milestone: v1.2 Authoring DX & Maturity
+
+**Goal:** Land additive DX and maturity work, fix technical debt in the SLO registry, and harden the CI pipeline to mark the library as functionally complete for Solo SaaS Operators without reopening the 1.0 stability freeze.
+
+**Delivered:**
+- SLO-W1 flag-based `mix parapet.gen.slo` Igniter task.
+- `Parapet.SLO` and `Parapet.Capabilities` dynamic state moved to ETS-backed checkout isolation.
+- Multi-version Elixir/OTP CI matrix and supply-chain hardening (Dependabot, SHA-pinned actions, branch-protection documentation).
+- v0.x -> v1.0 migration guide, deployment guide, HexDocs logo/favicon, maintainer/contributor docs, and demo Compose validation.
 
 ## Previous Posture: Released Maintenance
 
@@ -39,12 +55,10 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 - **v1.1 — Actionable Recovery (the wedge):** Operator UI executes runbook steps via Guidance → Preview → Confirm; 4–6 prebuilt recovery playbooks (retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout); audit propagation via `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free; demo seed wires at least one Preview-able + Confirm-able action. **In scope:** operator-in-the-loop execution only. **Out of scope:** autonomous remediation, cross-app correlation, multi-tenant action scoping. Thread: `.planning/threads/actionable-recovery-design.md`.
 - **v1.2 — Authoring DX & Maturity:** SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task; multi-version Elixir/OTP CI matrix; supply-chain hardening (SHA-pinned actions, Dependabot, `MAINTAINING.md`, hexdocs logo/favicon); v0.x → v1.0 migration guide; deployment guide; branch-protection enforcement (make `release_gate` truly required, close the admin bypass) + conventional-commit taxonomy codified in `CONTRIBUTING.md` + PR template. Thread: `.planning/threads/release-gate-enforcement.md`.
-- **v1.3 — Team Workflow & Coordination (JTBD #2):** Responder model, handoff/acknowledgement formalization, on-call rotation hooks (PagerDuty/Opsgenie/webhook adapter).
-- **v1.4+ — Cross-boundary journey correlation (JTBD #4) + vertical starter packs** for non-Phoenix-default verticals.
 
 **Decisions surfaced 2026-05-27:**
 - **In scope (v1.1):** operator UI executes runbooks; preview-before-mutate is the safety posture.
-- **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane.
+- **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane; Team Workflow & Coordination (JTBD #2) such as PagerDuty routing, as the target audience is strictly solo operators; Cross-boundary journey correlation.
 - **Deferred to v1.4+:** multi-tenant SLO scoping and per-org operator views.
 - **Dropped earlier:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
 
@@ -58,6 +72,31 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 - ✓ Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist — v0.1
 - ✓ Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default — v0.1
+- ✓ Add `lease_until` column to `parapet_action_claims` — v1.1 (FND-01)
+- ✓ Define `Parapet.Telemetry.RecoveryAction` event family — v1.1 (FND-02)
+- ✓ Expose `Parapet.Recovery` behaviour for capability registration — v1.1 (RCV-01)
+- ✓ `Parapet.Recovery.attach/1` gracefully skips unloaded modules — v1.1 (RCV-02)
+- ✓ Widen `Parapet.Capabilities` allowlist for v1.1 capabilities — v1.1 (RCV-03)
+- ✓ LiveView UI displays preview of mitigation (target args, expected diff) — v1.1 (UI-01)
+- ✓ LiveView renders conflict and short-circuit variants with actionable next steps — v1.1 (UI-02, UI-03, UI-04)
+- ✓ Every executed runbook step writes a `TimelineEntry` and `ToolAudit` — v1.1 (AUD-01, AUD-02, AUD-03)
+- ✓ Prebuilt runbook templates for JTBD-MAP failure modes (retry storm, stalled async, etc.) — v1.1 (PB-01 to PB-06)
+- ✓ Demo app seeded with a capability-backed open incident — v1.1 (DEMO-05, DEMO-06)
+- ✓ `Parapet.Recovery` declared Stable with CHANGELOG migration notes — v1.1 (STAB-07)
+- ✓ Scaffolding generator `mix parapet.gen.recovery` and `check_recovery` doctor check — v1.1 (ADOP-01, ADOP-02)
+- ✓ `docs/recovery-actions.md` adopter guide — v1.1 (ADOP-03)
+- ✓ Flag-based `mix parapet.gen.slo` Igniter task — v1.2 (DX-01)
+- ✓ `Parapet.SLO` registry state moved off global dynamic Application env mutation into ETS checkout isolation — v1.2 (DX-02)
+- ✓ v0.x -> v1.0 migration guide — v1.2 (DX-03)
+- ✓ Deployment guide — v1.2 (DX-04)
+- ✓ Multi-version Elixir/OTP CI matrix — v1.2 (MAT-01)
+- ✓ SHA-pinned GitHub Actions — v1.2 (MAT-02)
+- ✓ Dependabot for Hex and GitHub Actions — v1.2 (MAT-03)
+- ✓ Branch protection guidance enforcing `release_gate` — v1.2 (MAT-04)
+- ✓ `MAINTAINING.md` release procedures — v1.2 (MAT-05)
+- ✓ Conventional Commit taxonomy in `CONTRIBUTING.md` — v1.2 (MAT-06)
+- ✓ HexDocs logo and favicon — v1.2 (MAT-07)
+- ✓ Demo app Docker Compose path — v1.2 (MAT-08)
 - ✓ HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group — v0.1
 - ✓ Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker — v0.1
 - ✓ Login journey as the first business-critical SLO — auth success rate via `sigra` integration — v0.1
@@ -137,12 +176,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 <!-- v1.0 Stable Release shipped 2026-05-26. Quiet stable-line mode is the default until a new PR-shaped slice is explicitly opened. -->
 
-No active feature milestone by default. The shipped v1.0 requirements remain the current frozen baseline in `.planning/REQUIREMENTS.md`, and candidate post-1.0 work should open as explicit PR-scoped slices before it becomes active milestone state.
-
-Carried forward beyond v1.0:
-
-- **SLO-W1** (v1.1): `mix parapet.gen.slo` reshaped as a flag-based Igniter task (interactive-wizard form rejected as non-idiomatic — Igniter has no prompt API).
-- Multi-version Elixir/OTP CI matrix, logo/favicon, `MAINTAINING.md`, SHA-pinned CI actions, demo Docker Compose (post-1.0 maturity items).
+No active feature milestone by default. v1.2 requirements are archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; fresh active requirements should be created by `$gsd-new-milestone`.
 
 Dropped:
 
@@ -152,6 +186,8 @@ Dropped:
 
 <!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
 
+- Team Workflow & Coordination (e.g., PagerDuty routing, shift handoffs) — Target audience is solo operators, not ops teams
+- Cross-boundary journey correlation — Better handled by dedicated tracing tools (e.g. OpenTelemetry)
 - Hosted observability SaaS — Parapet is host-owned infrastructure, not a vendor product
 - APM backend, log database, or trace store — Parapet composes existing systems; it does not replace them
 - Replacement for Phoenix Telemetry, OpenTelemetry, LiveDashboard, or vendor SDKs — composing these is the point
@@ -171,6 +207,9 @@ Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parap
 Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protection, database scale & pruning (resolved-only archiver), a responsive Operator UI proven against 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Codebase now ~20,274 LOC (Elixir/EEx, lib+priv+test). The milestone took 14 phases — 5 core deliverables plus 9 closure/reconciliation phases that hardened the verification surfaces after the first audit returned `gaps_found`.
 Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime deps, Ecto schemas, or Oban queues) over 4 phases / 12 plans in ~2 days — hex.pm metadata + Release-Please CHANGELOG, one-line SLO starter packs, an end-to-end `warning:` runbook surface with deepened + new preview-first templates, and seven adoption guides backed by a uniform `Parapet.Integration` activation behaviour. ~764 LOC of source change + ~697 lines of docs. First audit returned `tech_debt`; a same-day closure pass resolved the adopter-facing items, and the milestone audit `passed`.
 
+Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution flow via Guidance → Preview → Confirm. Added the `Parapet.Recovery` behaviour, six prebuilt playbooks, and audit propagation. Demo seeded with a complete end-to-end confirm loop.
+Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/capability registries, a flag-based SLO Igniter task, CI matrix and supply-chain hardening, migration/deployment guides, release-maintenance docs, HexDocs branding, and a validated demo Compose path.
+
 ## Constraints
 
 - **Tech stack**: Elixir/Phoenix only — ecosystem-native is a hard constraint, not a preference
@@ -184,7 +223,13 @@ Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
-|----------|-----------|---------|
+| Operator-in-the-loop execution only | Safety posture for v1.1 avoids autonomous remediation risks | ✓ Good |
+| Telemetry contract locked before capability ship | Irreversible on publish under v1.0 freeze | ✓ Good |
+| Capabilities Agent, not Application env | Avoids repeating the SLO config mistake and prevents state bleeding | ✓ Good |
+| Route Confirm through ClaimService | Ensures identical claim-protection and circuit-breaking as Oban execution | ✓ Good |
+| 5-minute Preview expiry | Ensures operator acts on fresh target state | ✓ Good |
+| Guidance-only runbooks | Retry Storm and Suppression Drift intentionally lack capability references to avoid worsening failures | ✓ Good |
+| Code surfaces land before the docs | Ensures guides never reference uncompilable code | ✓ Good |
 | Dynamic Repo lookup via `Application.get_env` | Decouples library from specific host database | ✓ Good |
 | Ecto schema changesets tested purely without DB | Ensures decoupling from specific host application databases | ✓ Good |
 | Strict boundary between telemetry and Ecto | Prevents Ecto from being used for raw high-volume telemetry | ✓ Good |
@@ -223,6 +268,8 @@ Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime
 | Guidance-only runbooks where no allowlisted capability fits | `retry_storm`/`suppression_drift` stay advisory rather than executing mitigations that worsen the failure (e.g., retrying a storm) | ✓ Good |
 | `Parapet.Integration` behaviour for uniform activation | Every adapter activates via the same `Parapet.attach(adapters: […])` line, crash-proof; fixes the Rulestead `attach/0` defect | ✓ Good |
 | Code surfaces land before the docs that name them | Phase 16/17 code shipped before Phase 18 docs, so guides never reference uncompilable code | ✓ Good |
+| ETS checkout isolation for dynamic library state | Avoids test bleed and keeps host-owned runtime behavior compatible with the stable API | ✓ Good |
+| `release_gate` remains the stable aggregate CI check | Lets branch protection stay stable while underlying jobs expand into an Elixir/OTP matrix | ✓ Good |
 
 ## Evolution
 
@@ -242,4 +289,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-25 — v1.0 Stable Release milestone defined*
+*Last updated: 2026-06-03 — v1.2 Authoring DX & Maturity milestone complete*

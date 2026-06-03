@@ -34,6 +34,7 @@ defmodule DemoApp.MixProject do
       {:bandit, "~> 1.5"},
       {:phoenix_html, "~> 4.1"},
       {:jason, "~> 1.2"},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
       {:heroicons,
@@ -49,6 +50,7 @@ defmodule DemoApp.MixProject do
   defp aliases do
     [
       setup: ["deps.get", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
+      "demo.reset": ["ecto.drop", "ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "assets.build": ["tailwind default", "esbuild demo_app"],
       "assets.deploy": ["tailwind default --minify", "esbuild demo_app --minify", "phx.digest"]
     ]

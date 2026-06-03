@@ -16,7 +16,18 @@ All three must pass with no errors. CI runs the same checks and will fail the PR
 
 ## Commit conventions
 
-Follow [Conventional Commits](https://www.conventionalcommits.org/): use one of `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, or `chore:` as your commit prefix.
+Parapet uses [Conventional Commits](https://www.conventionalcommits.org/) because Release Please turns commit prefixes into release notes and version decisions. Choose the prefix that matches the work class you are actually shipping:
+
+- `feat:` — deliberate additive behavior or a scoped feature-work slice, such as adding a new stable provider or operator capability.
+- `fix:` — bug fixes and correctness repairs on the stable line.
+- `docs:` — documentation-only changes, guide updates, examples, and release-policy wording.
+- `refactor:` — behavior-preserving code movement, extraction, or cleanup.
+- `test:` — proof-only changes, regression tests, or CI test coverage that does not change runtime behavior.
+- `chore:` — maintenance, CI, packaging truth, dependency metadata, and repository operations.
+
+Use `feat:` on the stable line only when the PR intentionally adds behavior and the additive surface is described in the PR's `Feature work` context. Routine stable-line maintenance should usually be `fix:`, `docs:`, `test:`, or `chore:`.
+
+Breaking markers (`!` in the type or `BREAKING CHANGE:` in the footer) are not routine maintenance. They mean explicit major-version planning and should appear only when the PR is scoped as intentional major-version work.
 
 Examples:
 
@@ -26,7 +37,7 @@ fix: correct label cardinality check in doctor
 docs: add rindle integration guide
 refactor: extract common telemetry handler
 test: add multi-node circuit breaker concurrency test
-chore: update credo to 1.8
+chore: update release gate workflow
 ```
 
 Run `mix format` before committing — CI fails on unformatted code.

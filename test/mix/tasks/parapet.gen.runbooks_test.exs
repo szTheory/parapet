@@ -41,6 +41,16 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
                &String.contains?(&1, "lib/test/parapet/runbooks/partial_backlog_drain.ex")
              )
 
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/deploy_tied_incident.ex")
+             )
+
+      assert Enum.any?(
+               files,
+               &String.contains?(&1, "lib/test/parapet/runbooks/cardinality_blowout.ex")
+             )
+
       stalled_executor_source =
         Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/stalled_executor.ex")
         |> Rewrite.Source.get(:content)
@@ -87,6 +97,9 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
 
       assert suppression_drift_source =~ "defmodule Test.Parapet.Runbooks.SuppressionDrift do"
       assert suppression_drift_source =~ "warning:"
+      # Guidance-only contract (success criterion #2): no capability may ever be wired in.
+      assert suppression_drift_source =~ "kind: :guidance"
+      refute suppression_drift_source =~ "capability:"
 
       partial_backlog_drain_source =
         Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/partial_backlog_drain.ex")
@@ -97,6 +110,28 @@ defmodule Mix.Tasks.Parapet.Gen.RunbooksTest do
 
       assert partial_backlog_drain_source =~ "capability: :retry_async_item"
       assert partial_backlog_drain_source =~ "warning:"
+
+      deploy_tied_incident_source =
+        Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/deploy_tied_incident.ex")
+        |> Rewrite.Source.get(:content)
+
+      assert deploy_tied_incident_source =~
+               "defmodule Test.Parapet.Runbooks.DeployTiedIncident do"
+
+      assert deploy_tied_incident_source =~ "use Parapet.Runbook"
+      assert deploy_tied_incident_source =~ "capability: :revert_feature_flag"
+      assert deploy_tied_incident_source =~ "warning:"
+
+      cardinality_blowout_source =
+        Rewrite.source!(igniter.rewrite, "lib/test/parapet/runbooks/cardinality_blowout.ex")
+        |> Rewrite.Source.get(:content)
+
+      assert cardinality_blowout_source =~
+               "defmodule Test.Parapet.Runbooks.CardinalityBlowout do"
+
+      assert cardinality_blowout_source =~ "use Parapet.Runbook"
+      assert cardinality_blowout_source =~ "capability: :disable_metric_label"
+      assert cardinality_blowout_source =~ "warning:"
     end
   end
 end

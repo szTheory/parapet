@@ -70,11 +70,11 @@ defmodule Parapet.SLO do
   end
 
   def legacy do
-    Application.get_env(:parapet, :slos, [])
+    Parapet.SLO.Registry.all()
   end
 
   def provider_catalog do
-    Application.get_env(:parapet, :providers, [])
+    Parapet.SLO.Registry.providers()
     |> Enum.flat_map(fn provider -> provider.slos() end)
   end
 
@@ -84,10 +84,7 @@ defmodule Parapet.SLO do
   end
 
   defp store(slo) do
-    slos = Application.get_env(:parapet, :slos, [])
-    # remove existing with same name and append new
-    slos = Enum.reject(slos, &(&1.name == slo.name)) ++ [slo]
-    Application.put_env(:parapet, :slos, slos)
+    Parapet.SLO.Registry.store(slo)
   end
 
   defp append_if_missing(list, nil, field), do: [field | list]

@@ -11,6 +11,39 @@ The demo serves the Operator UI at http://localhost:4000/parapet.
 
 If seeds fail, verify PostgreSQL is running on localhost:5432 with user `postgres` / password `postgres`.
 
+## Docker Compose
+
+From the demo app directory, start the containerized demo:
+
+```bash
+docker compose up --build
+```
+
+In another shell, smoke-check the Operator UI:
+
+```bash
+curl -f http://localhost:${WEB_PORT:-4000}/parapet
+```
+
+Then stop the demo and remove its volumes:
+
+```bash
+docker compose down -v
+```
+
+The Compose file uses two host port overrides:
+
+- `WEB_PORT` controls the Phoenix HTTP port and defaults to `4000`.
+- `DB_PORT` controls the Postgres host port and defaults to `5432`.
+
+For example:
+
+```bash
+WEB_PORT=4001 DB_PORT=5433 docker compose up --build
+WEB_PORT=4001 curl -f http://localhost:${WEB_PORT:-4000}/parapet
+docker compose down -v
+```
+
 ## Styling
 
 The Operator UI uses Tailwind CSS. In development, styles are built automatically via the

@@ -21,7 +21,7 @@ defmodule <%= inspect(@module_prefix) %>.SuppressionDrift do
     kind: :guidance,
     preview_only: true,
     guidance: "For each stale suppression, expire or delete the record using your host application's admin tooling or a targeted database update. Document each change with a note referencing this incident for the audit trail.",
-    warning: "Clearing a suppression may immediately trigger escalation for the affected incident — ensure on-call is aware and ready to respond before proceeding."
+    warning: "Automated bulk clearing is architecturally unsafe for two reasons: (1) it can mass-trigger escalations simultaneously across all previously-suppressed incidents, overwhelming on-call with a sudden burst of pages for events that may no longer require action; and (2) automated logic cannot determine which suppression windows should remain active — for example, a suppression intentionally covering a known flapping alert — risking incorrect re-suppression of valid incidents that then silently drop from the escalation path again. The safe path is operator review of each suppression window individually, verifying its original intent before clearing it."
   )
 
   step(:verify_escalation_restored,

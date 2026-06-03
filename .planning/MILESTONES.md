@@ -1,5 +1,79 @@
 # Milestones
 
+## v1.2 Authoring DX & Maturity (Shipped: 2026-06-03)
+
+**Phases completed:** 4 phases, 6 plans, 10 tasks
+
+**Key accomplishments:**
+
+- Elixir/OTP CI matrix with SHA-pinned GitHub Actions and version-isolated caches
+- Dependabot supply-chain monitoring plus branch protection instructions for required release_gate enforcement
+- Adopter migration and deployment guides published through HexDocs with docs-local Parapet branding assets
+- Maintainer release checklist, contributor commit taxonomy, and reproducible demo Compose smoke path
+
+---
+
+## v1.1 Actionable Recovery (Shipped: 2026-06-03)
+
+**Phases completed:** 7 phases, 19 plans, 23 tasks
+
+**Key accomplishments:**
+
+- lease_until column backfill migration, ClaimService expired-claim self-heal (UPDATE-in-place), and automated Ecto.Migrator backfill integration test — FND-01 delivered end-to-end with zero human verification.
+- `Parapet.Recovery` behaviour module with 4 frozen callbacks, minimal `__using__/1` macro, and crash-proof `attach/1` activation function that silently skips unloaded modules and registers loaded ones via function-capture bridge into `Parapet.Capabilities`
+- 107 tests in `test/parapet/recovery_test.exs`: 7-sync + 100-async sweep covering all Phase 24 success criteria, with Pitfall 13 avoidance rationale embedded as comments in the async sweep module
+- `Parapet.Operator.confirm_runbook_step/4` now routes through `ClaimService.claim_action/1` with `action_kind: "operator"`, surfaces two new additive return variants (`{:short_circuited, atom}` and `{:conflicted, uuid_string}`), and gates Confirm on a SHA-256 `target_refs_hash` consistency check — closing the v1.1 architectural defect where the operator-clicked path skipped the same claim protection the Oban auto-execution path already uses.
+- The demo LiveView now renders all four return-tuple arms from `Parapet.Operator.confirm_runbook_step/4` with operator-actionable flash copy (including the verbatim ROADMAP-pinned conflict flash), and the Preview panel displays the capability's user-facing action name above the existing target/count grid — closing UI-01 ("action name in dedicated panel") and UI-04 ("LiveView renders both new branches with operator-actionable next steps").
+- Provides unit coverage for the two new short-circuit branches (`:preview_expired`, `:target_refs_drift`) and a multi-node concurrency proof for the operator-confirm path. Closes the Wave 1 known red (operator_test.exs:495 happy-path) by extending the inline `DummyRepo` to handle `ClaimService.claim_action/1`'s raw-function transaction protocol.
+- Six JTBD-MAP prebuilt runbook templates fully wired: two new capability templates (deploy_tied_incident via :revert_feature_flag, cardinality_blowout via :disable_metric_label) authored in the stalled_executor 3-step shape, suppression_drift guidance-only warning hardened with architectural rationale, generator updated to emit all six, test suite green at 491/0.
+- Two compiled demo modules wiring :retry_async_item capability to a 3-step StalledExecutor runbook — the load-bearing prerequisites for boot registration (Plan 02) and CI scenarios (Plan 04)
+- One-liner:
+- One-liner:
+- Parapet.Recovery graduated from Experimental to Stable via two-anchor flip: moduledoc admonition to `Stable {: .info}`, docs/stability.md row moved to Stable table, additive confirm_runbook_step/4 variants named in Deprecation Register, and Wave-0 regression guard added to verify.public_api tests
+- One-liner:
+- One-liner:
+- One-liner:
+
+---
+
+## v1.0 Stable Release
+
+**Date:** 2026-05-26 (`v1.0.0` tag; point releases `v1.0.1`–`v1.0.3` on 2026-05-27)
+**Stats:**
+
+- Phases: 19-22 (4 phases)
+- Plans: 19 (18 with SUMMARY.md; 22-04 plan-only — see Known Gaps)
+- Code change (v1.0.0 cut): 208 files, +13,670/−459
+- Code change (incl. v1.0.1–v1.0.3 point releases): 230 files, +16,312/−536
+- Timeline: 2026-05-25 → 2026-05-26 (~2 days for `v1.0.0`; +1 day for `v1.0.1`–`v1.0.3` point releases)
+- Commits: 128 incl. planning (Phase 19 start through `v1.0.3`)
+- Archive: [`milestones/v1.0-ROADMAP.md`](milestones/v1.0-ROADMAP.md), [`milestones/v1.0-REQUIREMENTS.md`](milestones/v1.0-REQUIREMENTS.md)
+
+### Accomplishments
+
+1. Froze Parapet's public surface under three named stability tiers (Stable / Experimental / Internal) and a written deprecation policy — every public module declares its tier via an ExDoc callout, every Stable function carries `@doc since: "1.0.0"`, `mix verify.public_api` is a hard gate, and `docs/stability.md` enumerates the surface with semver semantics and the soft-deprecation → hard-deprecation → removal cycle.
+2. Locked the telemetry contract as a public API artifact: a `telemetry_contract_test` fails CI when any of the 27 frozen `[:parapet, …]` event families drifts on event name, measurement keys, metadata keys, or outcome atoms. `Parapet.SLO.define/2` is hard-deprecated with a compile-time warning naming `Parapet.SLO.Provider` as the replacement.
+3. Closed the OSS-governance and integration-docs gaps blocking adopter trust: `CONTRIBUTING.md` + `SECURITY.md` shipped (GOV-03 `CODE_OF_CONDUCT.md` intentionally omitted), README states the 1.0 semver commitment and Elixir/OTP/Postgres compatibility matrix, four previously missing integration guides (Chimeway, Mailglass, Rindle, Scoria) match the established five-section template, the SLO authoring guide documents the Provider-as-bundle pattern, and HexDocs ships grouped extras with the getting-started guide as the landing page.
+4. Shipped a runnable demo Phoenix app (`examples/demo_app/`) as a live CI contract test: path-dep on parapet, seeded with realistic evidence via the Evidence Stable API (open/investigating/resolved incidents, timeline entries, a tool audit, a runbook with a `warning:` step, registered WebSaaS SLO state), exposes the Operator UI at `/parapet`, runs a `demo` smoke job that's a required check in `release_gate`, and is excluded from the published Hex package. v1.0.1 closed the post-cut CR-02 gap by wiring the LiveView JS pipeline (esbuild + `assets/js/app.js` + deferred script tag).
+5. Hardened CI into a release-quality contract: dedicated `lint` lane runs `compile --warnings-as-errors`, `compile --no-optional-deps --warnings-as-errors`, `docs --warnings-as-errors`, `credo --strict`, `dialyzer`, and `verify.public_api`; `release_gate` fan-in requires `lint` + `test` + `demo`; the Release Please workflow gates a Hex publish job on `release_created` with dry-run, publish, and post-publish package/HexDocs verification.
+6. Cut `1.0.0` honestly through Release Please: staged `0.10.0 → 1.0.0` graduation via a one-time `release-as: "1.0.0"` pin (no manifest hand-edits), live `v1.0.0` tag on 2026-05-26, `https://hex.pm/packages/parapet` and `https://hexdocs.pm/parapet/1.0.0/` resolve, and `main` returned to steady-state Release Please config with the one-time pin and pre-1.0 `bump-minor-pre-major` + `bump-patch-for-minor-pre-major` flags removed.
+7. Hardened the auto-publish chain in the v1.0.x point-release train: v1.0.1 (LiveView JS bundle fix), v1.0.2 (auto-merge Release Please PRs + `workflow_dispatch` step + `actions:write` permission), v1.0.3 (PAT-validated end-to-end publish chain). Codified a "quiet stable-line release posture" — `main` stays green, releases happen via Release Please PRs, not ad-hoc tagging.
+
+### Audit
+
+**No `/gsd:audit-milestone` ran for v1.0.** This is documented honestly rather than fabricated. Phase 21 ran a `verification` lane (`21-VERIFICATION.md` returned `gaps_found`); the gaps it enumerated (CR-01 resolved-history KeyError; CR-02 missing LiveView JS pipeline; release_gate not yet required on `main`) were all closed via plan 21-05 (pre-cut, commit `551ef05`), plan 21-06 (branch protection), and v1.0.1 (JS pipeline, commit `885e7d7`). The verification file itself was not re-run, but the closure is documented in 21-05/21-06 SUMMARY.md files and the shipped point releases.
+
+### Known Gaps
+
+- **No formal milestone audit** — the `/gsd:audit-milestone` step was skipped at v1.0 close (work proceeded directly into v1.1 Phase 23 on 2026-05-27). No `v1.0-MILESTONE-AUDIT.md` exists. Live evidence (HexDocs resolution, the `v1.0.0` tag, passing CI, the demo app smoke test) is the audit surrogate.
+- **Plan 22-04 has no SUMMARY.md** — Task 2 was a `checkpoint:human-verify` blocking gate that was satisfied externally by the actual `v1.0.0` cut. Completion is provable via `git tag v1.0.0` and the live Hex package; the bookkeeping file was simply never written.
+- **`21-VERIFICATION.md` reads `status: gaps_found`** — the file itself was not refreshed after 21-05/21-06 + v1.0.1 closed every gap. State is stale, not factual.
+- **`.planning/REQUIREMENTS.md` for v1.0 was overwritten** by the v1.1 requirements drop on 2026-05-27 before `/gsd:complete-milestone` ran. The v1.0 REQUIREMENTS archive at `milestones/v1.0-REQUIREMENTS.md` is a retroactive reconstruction (provenance documented in that file) — recovered from commit `d482552` with completion checkboxes synchronized against per-phase SUMMARY.md evidence and v1.0.0–v1.0.3 git tags.
+- **GOV-03 (`CODE_OF_CONDUCT.md`)** — intentionally omitted per user decision (content-filter issue). Not a gap, documented as a decision.
+- **SLO state on `Application` env** — bandaged in v1.0.1 via `fa26ac2` (test isolation); the registry move off `Application.put_env` is the v1.2 graduation candidate before SLO-W1. Thread: `.planning/threads/slo-state-off-application-env.md`.
+
+---
+
 ## v0.10 Adopter Success
 
 **Date:** 2026-05-24

@@ -2,6 +2,119 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   @moduledoc false
   use <%= inspect(@web_module) %>, :html
 
+  attr :active, :atom, required: true
+
+  def operator_nav(assigns) do
+    ~H"""
+    <header class="border-b border-stone-900/10 bg-stone-950 text-stone-50">
+      <div class="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">Parapet Operator</p>
+          <h1 class="mt-1 text-lg font-semibold text-white">Active response workbench</h1>
+        </div>
+        <nav aria-label="Parapet operator sections" class="flex flex-wrap gap-2">
+          <.nav_item href="/parapet" active={@active == :response}>Respond</.nav_item>
+          <.nav_item href="/parapet/actions" active={@active == :actions}>Actions</.nav_item>
+          <.nav_item href="/parapet/history" active={@active == :history}>History</.nav_item>
+        </nav>
+      </div>
+    </header>
+    """
+  end
+
+  attr :href, :string, required: true
+  attr :active, :boolean, default: false
+  slot :inner_block, required: true
+
+  def nav_item(assigns) do
+    ~H"""
+    <.link
+      navigate={@href}
+      aria-current={if @active, do: "page", else: nil}
+      class={[
+        "flex min-h-[40px] items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950",
+        if(@active, do: "bg-teal-400 text-stone-950", else: "text-stone-200 hover:bg-stone-800 hover:text-white")
+      ]}
+    >
+      <%%= render_slot(@inner_block) %>
+    </.link>
+    """
+  end
+
+  attr :queue_page, :map, required: true
+  attr :visible_incidents, :list, required: true
+  attr :action_items, :list, required: true
+  attr :journeys, :list, required: true
+  attr :page_mode, :atom, required: true
+
+  def operator_overview(assigns) do
+    ~H"""
+    <section aria-label="Operational overview" class="grid gap-3 md:grid-cols-[1.2fr_1fr_1fr]">
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500"><%%= overview_mode_label(@page_mode) %></p>
+        <div class="mt-2 flex items-end justify-between gap-4">
+          <div>
+            <p class="text-2xl font-semibold tabular-nums text-stone-950"><%%= Enum.count(@visible_incidents) %></p>
+            <p class="mt-1 text-sm text-stone-600">incidents in the current queue window</p>
+          </div>
+          <span class="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800 ring-1 ring-teal-200">
+            Evidence first
+          </span>
+        </div>
+      </div>
+
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Pending actions</p>
+        <p class="mt-2 text-2xl font-semibold tabular-nums text-stone-950"><%%= Enum.count(@action_items) %></p>
+        <p class="mt-1 text-sm text-stone-600">open recovery or review items</p>
+      </div>
+
+      <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5">
+        <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Critical journeys</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <%%= for journey <- @journeys do %>
+            <span class={chip_class(:journey, journey.status)}>
+              <%%= journey.name %>: <%%= journey.status %>
+            </span>
+          <%% end %>
+        </div>
+      </div>
+    </section>
+    """
+  end
+
+  attr :items, :list, required: true
+
+  def action_center(assigns) do
+    ~H"""
+    <section>
+      <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Recovery work</p>
+          <h2 class="mt-1 text-2xl font-semibold text-stone-950 text-balance">Pending action items</h2>
+          <p class="mt-2 max-w-2xl text-sm text-stone-600">
+            Items here are the operator-facing work queue behind preview and recovery flows. Review the linked incident before executing a mutating action.
+          </p>
+        </div>
+        <.link navigate="/parapet" class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+          Return to response
+        </.link>
+      </div>
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <%%= for item <- @items do %>
+          <.action_item_card item={item} />
+        <%% end %>
+        <%%= if Enum.empty?(@items) do %>
+          <div class="rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+            <p class="text-sm font-semibold text-stone-800">No pending action items</p>
+            <p class="mt-2 text-sm text-stone-500">Recovery work appears here when an incident has a concrete item to inspect or resolve.</p>
+          </div>
+        <%% end %>
+      </div>
+    </section>
+    """
+  end
+
   attr :incidents, :list, required: true
   attr :selected, :map, default: nil
   attr :queue_params, :map, default: %{}
@@ -20,11 +133,11 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0 flex-1">
               <div class="flex flex-wrap items-center gap-2">
-                <span class={["px-2 py-1 text-xs font-semibold rounded-full", state_color(incident.state)]}>
+                <span class={chip_class(:state, incident.state)}>
                   <%%= incident.state %>
                 </span>
                 <%%= if incident.severity do %>
-                  <span class={["px-2 py-1 text-xs font-semibold rounded-full border", severity_color(incident.severity)]}>
+                  <span class={chip_class(:severity, incident.severity)}>
                     <%%= incident.severity %>
                   </span>
                 <%% end %>
@@ -62,52 +175,52 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   attr :detail, :map, required: true
   def incident_summary(assigns) do
     ~H"""
-    <div>
-      <div class="flex justify-between items-start mb-4">
-        <div>
-          <h1 class="text-2xl font-bold text-gray-900"><%%= @detail.incident.title %></h1>
-          <p class="text-sm text-gray-500 mt-1"><%%= @detail.incident.id %></p>
+    <div class="min-w-0 overflow-hidden">
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="min-w-0">
+          <h1 class="max-w-xs whitespace-normal break-words text-2xl font-bold text-stone-900 sm:max-w-none sm:text-balance"><%%= @detail.incident.title %></h1>
+          <p class="text-sm text-stone-500 mt-1"><span class="break-all tabular-nums font-mono"><%%= @detail.incident.id %></span></p>
         </div>
-        <span class={["px-3 py-1 text-sm font-medium rounded-full", state_color(@detail.incident.state)]}>
+        <span class={["self-start px-3 py-1 text-sm font-medium rounded-full", state_color(@detail.incident.state)]}>
           <%%= @detail.incident.state %>
         </span>
       </div>
       
-      <div class="bg-blue-50 p-4 rounded-md mb-6">
-        <h4 class="text-sm font-medium text-blue-900 mb-2">Impact Summary</h4>
-        <p class="text-sm text-blue-800">
+      <div class="bg-violet-50/50 p-4 rounded-xl mb-6 shadow-sm ring-1 ring-violet-900/5">
+        <h4 class="text-sm font-medium text-violet-900 mb-2">Impact Summary</h4>
+        <p class="text-sm text-violet-800">
           <%%= @detail.derived.impact || "No impact summary recorded." %>
         </p>
       </div>
 
-      <div class="border border-amber-200 bg-amber-50 rounded-lg p-4 mb-6">
-        <div class="flex items-start justify-between gap-3 mb-3">
-          <div>
+      <div class="shadow-sm ring-1 ring-amber-900/5 bg-amber-50 rounded-xl p-4 mb-6">
+        <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
             <h4 class="text-sm font-semibold text-amber-950">Escalation Status</h4>
             <p class="text-sm text-amber-900 mt-1">
               <%%= escalation_status_copy(@detail.escalation_summary.status) %>
             </p>
           </div>
-          <span class="px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
+          <span class="self-start px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
             <%%= escalation_status_badge(@detail.escalation_summary.status) %>
           </span>
         </div>
 
         <dl class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           <%%= if @detail.escalation_summary.escalation_chain do %>
-            <div class="rounded-md border border-amber-100 bg-white/80 p-3 sm:col-span-2">
+            <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3 sm:col-span-2">
               <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Escalation Chain</dt>
               <dd class="mt-2">
                 <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
                   <%%= for step <- @detail.escalation_summary.escalation_chain do %>
-                    <li class="flex items-center justify-between rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2">
-                      <div>
+                    <li class="flex flex-col gap-2 rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                      <div class="min-w-0">
                         <p class="text-sm font-medium text-amber-950"><%%= step.label %></p>
                         <%%= if step.delay do %>
                           <p class="text-xs text-amber-800 mt-0.5">After <%%= step.delay %></p>
                         <%% end %>
                       </div>
-                      <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
+                      <span class={["self-start px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
                         <%%= escalation_chain_status_copy(step.status) %>
                       </span>
                     </li>
@@ -117,34 +230,34 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             </div>
           <%% end %>
           <%%= if @detail.escalation_summary.time_until_next_escalation do %>
-            <div class="rounded-md border border-amber-100 bg-white/80 p-3 sm:col-span-2">
+            <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3 sm:col-span-2">
               <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Time Until Next Escalation</dt>
-              <dd class="mt-1 text-amber-950"><%%= countdown_copy(@detail.escalation_summary.time_until_next_escalation) %></dd>
+              <dd class="mt-1 break-words text-amber-950"><span class="tabular-nums font-mono"><%%= countdown_copy(@detail.escalation_summary.time_until_next_escalation) %></span></dd>
             </div>
           <%% end %>
-          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+          <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Next Step</dt>
-            <dd class="mt-1 text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
           </div>
-          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+          <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">System Action</dt>
-            <dd class="mt-1 text-amber-950"><%%= system_action_copy(@detail.escalation_summary.system_action) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= system_action_copy(@detail.escalation_summary.system_action) %></dd>
           </div>
-          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+          <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Suppression</dt>
-            <dd class="mt-1 text-amber-950"><%%= suppression_copy(@detail.escalation_summary.suppression) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= suppression_copy(@detail.escalation_summary.suppression) %></dd>
           </div>
-          <div class="rounded-md border border-amber-100 bg-white/80 p-3">
+          <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
             <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Latest Evidence</dt>
-            <dd class="mt-1 text-amber-950"><%%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
+            <dd class="mt-1 break-words text-amber-950"><%%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
           </div>
         </dl>
       </div>
       
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="border border-gray-200 rounded-md p-4">
-          <h4 class="text-sm font-medium text-gray-700 mb-2">Top Facts</h4>
-          <ul class="text-sm text-gray-600 list-disc pl-5">
+        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
+          <h4 class="text-sm font-medium text-stone-700 mb-2">Top Facts</h4>
+          <ul class="text-sm text-stone-600 list-disc pl-5">
             <li>Created at <%%= @detail.incident.inserted_at %></li>
             <%%= if @detail.derived.fault_plane do %>
               <li>Likely fault plane: <%%= @detail.derived.fault_plane %></li>
@@ -154,15 +267,15 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <%% end %>
           </ul>
         </div>
-        <div class="border border-gray-200 rounded-md p-4">
-          <h4 class="text-sm font-medium text-gray-700 mb-2">Observability</h4>
+        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
+          <h4 class="text-sm font-medium text-stone-700 mb-2">Observability</h4>
           <div class="flex flex-col gap-2">
             <%%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
               <%% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
               <%% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
               <a href={url} class="text-sm text-indigo-700 hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <span>Trace: <%%= trace_id %></span> &nearr;
+                <span>Trace: <span class="tabular-nums font-mono"><%%= trace_id %></span></span> &nearr;
               </a>
             <%% end %>
             <%%= for link <- @detail.external_links do %>
@@ -171,7 +284,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
               </a>
             <%% end %>
             <%%= if Enum.empty?(@detail.external_links) && is_nil(Map.get(@detail.incident, :trace_id)) do %>
-              <span class="text-sm text-gray-500">No external links attached.</span>
+              <span class="text-sm text-stone-500">No external links attached.</span>
             <%% end %>
           </div>
         </div>
@@ -191,7 +304,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           <%% presentation = item.presentation %>
           <li>
             <div class="relative pb-8">
-              <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+              <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-stone-200" aria-hidden="true"></span>
               <div class="relative flex space-x-3">
                 <div>
                   <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white text-[11px] font-semibold", timeline_entry_badge_class(presentation)]}>
@@ -201,17 +314,17 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                 <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                   <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                      <p class="text-sm font-medium text-gray-900"><%%= timeline_entry_title(entry, presentation) %></p>
+                      <p class="text-sm font-medium text-stone-900"><%%= timeline_entry_title(entry, presentation) %></p>
                       <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
                         <%%= timeline_actor_copy(presentation.actor_class) %>
                       </span>
                     </div>
-                    <p class="text-sm text-gray-600 mt-1">
+                    <p class="text-sm text-stone-600 mt-1">
                       <%%= timeline_entry_body(entry, presentation) %>
                     </p>
                   </div>
-                  <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                    <time datetime={entry.inserted_at}><%%= entry.inserted_at %></time>
+                  <div class="whitespace-nowrap text-right text-sm text-stone-500">
+                    <time datetime={entry.inserted_at} class="tabular-nums font-mono"><%%= entry.inserted_at %></time>
                   </div>
                 </div>
               </div>
@@ -227,14 +340,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   def suspect_changes_card(assigns) do
     ~H"""
     <%%= if not Enum.empty?(@entries) do %>
-      <div class="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-3">Recent System Changes (&plusmn; 60 mins)</h3>
+      <div class="bg-violet-50/50 ring-1 ring-violet-900/5 shadow-sm rounded-xl p-4 mb-6">
+        <h3 class="text-lg font-semibold text-stone-900 mb-3">Recent System Changes (&plusmn; 60 mins)</h3>
         <div class="flex flex-col gap-3">
           <%%= for entry <- @entries do %>
             <%% actor = Map.get(entry.payload, "actor") || Map.get(entry.payload, :actor) || "System" %>
             <%% flag = Map.get(entry.payload, "flag") || Map.get(entry.payload, :flag) %>
             <%% scope = Map.get(entry.payload, "scope") || Map.get(entry.payload, :scope) %>
-            <div class="flex justify-between items-start bg-white border border-blue-100 rounded p-3 shadow-sm">
+            <div class="flex justify-between items-start bg-white ring-1 ring-stone-900/5 rounded-lg p-3 shadow-sm">
               <div class="flex items-start gap-3">
                 <div class="mt-0.5">
                   <span class="h-6 w-6 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-bold ring-2 ring-white">
@@ -244,19 +357,19 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                   </span>
                 </div>
                 <div>
-                  <p class="text-sm font-medium text-gray-900">
-                    Flag <span class="font-mono text-xs bg-gray-100 px-1 rounded border border-gray-200"><%%= flag %></span> updated
+                  <p class="text-sm font-medium text-stone-900">
+                    Flag <span class="font-mono text-xs bg-stone-100 px-1 rounded border border-stone-200"><span class="tabular-nums font-mono"><%%= flag %></span></span> updated
                   </p>
-                  <p class="text-xs text-gray-500 mt-0.5">
+                  <p class="text-xs text-stone-500 mt-0.5">
                     <%%= actor %> published ruleset
                   </p>
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1">
-                <span class="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                <span class="px-2 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-800 ring-1 ring-violet-200/50">
                   <%%= inspect(scope) %>
                 </span>
-                <time datetime={entry.inserted_at} class="text-xs text-gray-500"><%%= entry.inserted_at %></time>
+                <time datetime={entry.inserted_at} class="text-xs text-stone-500"><%%= entry.inserted_at %></time>
               </div>
             </div>
           <%% end %>
@@ -269,29 +382,29 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   attr :detail, :map, required: true
   def runbook_card(assigns) do
     ~H"""
-    <div class="bg-white border border-gray-200 rounded-md p-4 mb-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-1">
+    <div class={surface_class(:runbook_card)}>
+      <h3 class="text-lg font-semibold text-stone-900 mb-1">
         <%%= @detail.derived.runbook_title || "Runbook" %>
       </h3>
-      <p class="text-sm text-gray-600 mb-4">
+      <p class="text-sm text-stone-600 mb-4">
         <%%= @detail.derived.runbook_description || "No description provided." %>
       </p>
 
       <div class="flex flex-col gap-3">
         <%%= for step <- @detail.derived.runbook_steps do %>
-          <div class="border border-gray-100 bg-gray-50 rounded p-3">
+          <div class="ring-1 ring-stone-900/5 bg-stone-50 rounded-lg p-3">
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <div class="flex items-center gap-2">
-                  <h4 class="text-sm font-medium text-gray-900"><%%= step.label %></h4>
+                  <h4 class="text-sm font-medium text-stone-900"><%%= step.label %></h4>
                   <%%= if step.state == :executed do %>
-                    <span class="px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded bg-green-100 text-green-700 border border-green-200">Executed</span>
+                  <span class={chip_class(:execution, :executed)}>Executed</span>
                   <%% end %>
                 </div>
-                <p class="text-xs text-gray-500 mt-1"><%%= step.description %></p>
+                <p class="text-xs text-stone-500 mt-1"><%%= step.description %></p>
                 
                 <%%= if step.state == :guidance && step.guidance do %>
-                  <div class="mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs text-blue-800 italic">
+                  <div class="mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs text-violet-800 italic">
                     <%%= step.guidance %>
                   </div>
                 <%% end %>
@@ -306,7 +419,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                   <div class="mt-2 flex flex-wrap gap-1">
                     <%%= for hint <- step.targeting_hints do %>
                       <span class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-purple-50 text-purple-700 border border-purple-100" title={hint.title}>
-                        <%%= hint.kind %>:<%%= String.slice(to_string(hint.external_id), 0..7) %>
+                        <%%= hint.kind %>:<span class="tabular-nums font-mono"><%%= String.slice(to_string(hint.external_id), 0..7) %></span>
                       </span>
                     <%% end %>
                   </div>
@@ -316,16 +429,17 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
               <div class="ml-4">
                 <%%= case step.state do %>
                   <%% :previewable -> %>
-                    <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
+                    <p class="mb-2 max-w-48 text-xs text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
+                    <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
                       Preview
                     </button>
                   <%% :executable -> %>
-                     <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-1.5 px-3 rounded text-xs transition-colors">
+                    <p class="mb-2 max-w-48 text-xs text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
+                     <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
                       Execute
                     </button>
                   <%% :executed -> %>
-                    <div class="text-[10px] text-gray-400 text-right">
-                      <%%# show time if available %>
+                    <div class="text-[10px] text-stone-400 text-right">
                     </div>
                   <%% _ -> %>
                   <% # No button for guidance %>
@@ -344,7 +458,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     ~H"""
     <%% preview = @detail.derived.active_preview %>
     <div class="fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
-      <div class="bg-white border-2 border-indigo-500 rounded-lg shadow-xl overflow-hidden">
+      <div class="bg-white ring-1 ring-indigo-500 rounded-xl shadow-xl overflow-hidden">
         <div class="bg-indigo-500 px-4 py-2 flex justify-between items-center">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
           <button phx-click="cancel_preview" class="text-white hover:text-indigo-100">
@@ -355,12 +469,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <div class="p-4">
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p class="text-[10px] text-gray-500 uppercase font-bold">Target Kind</p>
-              <p class="text-sm font-medium text-gray-900"><%%= preview.data["target_kind"] %></p>
+              <p class="text-[10px] text-stone-500 uppercase font-bold">Target Kind</p>
+              <p class="text-sm font-medium text-stone-900"><%%= preview.data["target_kind"] %></p>
             </div>
             <div>
-              <p class="text-[10px] text-gray-500 uppercase font-bold">Affected Count</p>
-              <p class="text-sm font-medium text-gray-900"><%%= preview.data["count"] %></p>
+              <p class="text-[10px] text-stone-500 uppercase font-bold">Affected Count</p>
+              <p class="text-sm font-medium text-stone-900"><%%= preview.data["count"] %></p>
             </div>
           </div>
 
@@ -377,23 +491,26 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
 
           <%%= if preview.data["idempotency_caveats"] do %>
             <div class="mb-4">
-              <p class="text-[10px] text-gray-500 uppercase font-bold mb-1">Idempotency</p>
-              <p class="text-xs text-gray-600"><%%= preview.data["idempotency_caveats"] %></p>
+              <p class="text-[10px] text-stone-500 uppercase font-bold mb-1">Idempotency</p>
+              <p class="text-xs text-stone-600"><%%= preview.data["idempotency_caveats"] %></p>
             </div>
           <%% end %>
 
           <div class="flex gap-2">
+            <p class="mb-3 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-900 ring-1 ring-indigo-100">
+              Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome.
+            </p>
             <button 
               phx-click="confirm_mitigation" 
               phx-value-step={preview.step_id} 
               phx-value-incident_id={@detail.incident.id}
               phx-value-token={preview.preview_token}
-              class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded text-sm shadow-md transition-all active:scale-95"
+              class={["flex-1", control_class(:recovery)]}
             >
               Confirm Recovery
             </button>
           </div>
-          <p class="text-[10px] text-center text-gray-400 mt-2 italic">
+          <p class="text-[10px] text-center text-stone-400 mt-2 italic">
             Preview is active.
           </p>
         </div>
@@ -407,34 +524,35 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     ~H"""
     <div class="flex flex-col gap-4">
       <%%= if @detail.incident.state == "open" do %>
-        <div class="bg-white border border-gray-200 rounded-md p-4">
-          <h4 class="text-sm font-medium text-gray-900 mb-2">Acknowledge</h4>
-          <p class="text-xs text-gray-500 mb-3">Take ownership of this incident.</p>
-          <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+        <div class={surface_class(:action_card)}>
+          <h4 class="text-sm font-medium text-stone-900 mb-2">Acknowledge</h4>
+          <p class="text-xs text-stone-500 mb-3">Take ownership of this incident. Writes a durable audit record and timeline entry.</p>
+          <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class={control_class(:recovery, :full)}>
             Acknowledge Incident
           </button>
         </div>
       <%% end %>
 
-      <div class="bg-white border border-gray-200 rounded-md p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">Escalation Controls</h4>
-        <p class="text-xs text-gray-500 mb-3">Use bounded controls only after reviewing current status and the canonical timeline.</p>
+      <div class={surface_class(:action_card)}>
+        <h4 class="text-sm font-medium text-stone-900 mb-2">Escalation Controls</h4>
         <%%= if escalation_controls_enabled?(@detail.incident) do %>
-          <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class="w-full bg-amber-600 hover:bg-amber-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors mb-2">
+          <p class="text-xs text-stone-500 mb-3">Request the next escalation only after reviewing current status and the canonical timeline. Every request is audited.</p>
+          <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class={["mb-2", control_class(:warning, :full)]}>
             Trigger Next Escalation
           </button>
-          <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class="w-full bg-white border border-amber-300 hover:bg-amber-50 text-amber-900 font-medium py-2 px-4 rounded text-sm transition-colors">
+          <p class="text-xs text-stone-500 mb-3">Suppress pending escalation for the displayed bounded window. Every request is audited.</p>
+          <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class={control_class(:warning_secondary, :full)}>
             Suppress Pending Escalation
           </button>
         <%% else %>
-          <p class="text-sm text-gray-600">Escalation controls are available only while the incident is open.</p>
+          <p class="text-sm text-stone-600">Escalation controls are available only while the incident is open.</p>
         <%% end %>
       </div>
 
-      <div class="bg-white border border-gray-200 rounded-md p-4">
-        <h4 class="text-sm font-medium text-gray-900 mb-2">Resolve</h4>
-        <p class="text-xs text-gray-500 mb-3">Mark incident as resolved.</p>
-        <button phx-click="resolve" phx-value-id={@detail.incident.id} class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+      <div class={surface_class(:action_card)}>
+        <h4 class="text-sm font-medium text-stone-900 mb-2">Resolve</h4>
+        <p class="text-xs text-stone-500 mb-3">Mark incident as resolved only after user impact has stopped and evidence is complete. Writes audit record.</p>
+        <button phx-click="resolve" phx-value-id={@detail.incident.id} class={control_class(:success, :full)}>
           Resolve Incident
         </button>
       </div>
@@ -450,7 +568,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <.action_item_card item={item} />
       <%% end %>
       <%%= if Enum.empty?(@items) do %>
-        <p class="text-sm text-gray-500 italic">No action items pending.</p>
+        <p class="text-sm text-stone-500 italic">No action items pending.</p>
       <%% end %>
     </div>
     """
@@ -467,20 +585,23 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     assigns = assign(assigns, :url, url)
 
     ~H"""
-    <div class="bg-white border border-gray-200 rounded-md p-4">
+    <div class={surface_class(:action_card)}>
       <div class="flex justify-between items-start mb-2">
-        <h4 class="text-sm font-medium text-gray-900"><%%= @item.title || "Action Item" %></h4>
-        <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+        <h4 class="text-sm font-medium text-stone-900"><%%= @item.title || "Action Item" %></h4>
+        <span class="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800 ring-1 ring-amber-200/50">
           <%%= @item.state %>
         </span>
       </div>
-      <p class="text-xs text-gray-500 mb-3"><%%= @item.integration %>:<%%= @item.external_id %></p>
+      <p class="text-xs text-stone-500 mb-3"><%%= @item.integration %>:<%%= @item.external_id %></p>
+      <p class="mb-3 rounded-lg bg-stone-50 px-3 py-2 text-xs text-stone-600 ring-1 ring-stone-900/5">
+        Review the linked incident evidence before recovery. Capability confirms write audit records.
+      </p>
       <%%= if @url do %>
-        <a href={@url} target="_blank" rel="noopener noreferrer" class="w-full block text-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded text-sm transition-colors">
+        <a href={@url} target="_blank" rel="noopener noreferrer" class={control_class(:recovery, :full)}>
           Review in UI &nearr;
         </a>
       <%% else %>
-        <div class="text-xs text-gray-500 text-center py-2 border border-dashed border-gray-300 rounded">No resolver configured</div>
+        <div class="text-xs text-stone-500 text-center py-2 border border-dashed border-stone-300 rounded">No resolver configured</div>
       <%% end %>
     </div>
     """
@@ -489,13 +610,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   attr :journeys, :list, required: true
   def critical_journeys(assigns) do
     ~H"""
-    <div class="bg-white border border-gray-200 rounded-md p-4 mb-4">
-      <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">Critical Journeys</h3>
+    <div class={surface_class(:compact_card)}>
+      <h3 class="text-sm font-semibold text-stone-700 uppercase tracking-wider mb-3">Critical Journeys</h3>
       <div class="flex flex-col gap-2">
         <%%= for journey <- @journeys do %>
-          <div class="flex items-center justify-between p-2 rounded bg-gray-50 border border-gray-100">
-            <span class="text-sm font-medium text-gray-800"><%%= journey.name %></span>
-            <span class={["px-2 py-0.5 text-xs font-medium rounded-full", journey_color(journey.status)]}>
+          <div class="flex items-center justify-between p-2 rounded-lg bg-stone-50 ring-1 ring-stone-900/5">
+            <span class="text-sm font-medium text-stone-800"><%%= journey.name %></span>
+            <span class={chip_class(:journey, journey.status)}>
               <%%= journey.status %>
             </span>
           </div>
@@ -505,10 +626,35 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     """
   end
 
-  defp journey_color(:healthy), do: "bg-green-100 text-green-800"
-  defp journey_color(:degraded), do: "bg-yellow-100 text-yellow-800"
-  defp journey_color(:down), do: "bg-red-100 text-red-800"
-  defp journey_color(_), do: "bg-gray-100 text-gray-800"
+  defp surface_class(:action_card), do: "rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5"
+  defp surface_class(:runbook_card), do: "mb-6 rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5"
+  defp surface_class(:compact_card), do: "mb-4 rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5"
+  defp control_class(kind), do: control_class(kind, nil)
+
+  defp control_class(:recovery, width), do: control_width(width) <> " " <> control_base() <> " bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-300"
+  defp control_class(:warning, width), do: control_width(width) <> " " <> control_base() <> " bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-300"
+  defp control_class(:warning_secondary, width), do: control_width(width) <> " " <> control_base() <> " bg-white text-amber-900 ring-1 ring-amber-300 hover:bg-amber-50 focus:ring-amber-300"
+  defp control_class(:success, width), do: control_width(width) <> " " <> control_base() <> " bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-300"
+  defp control_base do
+    "flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-transform duration-100 ease-out active:scale-[0.96] focus:outline-none focus:ring-2"
+  end
+
+  defp control_width(:full), do: "w-full"
+  defp control_width(_), do: "inline-flex"
+
+  defp chip_class(:state, state), do: ["rounded-full px-2 py-1 text-xs font-semibold", state_color(state)]
+  defp chip_class(:severity, severity), do: ["rounded-full border px-2 py-1 text-xs font-semibold", severity_color(severity)]
+  defp chip_class(:journey, status), do: ["rounded-full px-2.5 py-1 text-xs font-semibold ring-1", journey_color(status)]
+  defp chip_class(:execution, :executed), do: "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200/50"
+
+  defp journey_color(:healthy), do: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/50"
+  defp journey_color(:degraded), do: "bg-amber-100 text-amber-800 ring-1 ring-amber-200/50"
+  defp journey_color(:down), do: "bg-rose-100 text-rose-800 ring-1 ring-rose-200/50"
+  defp journey_color(_), do: "bg-stone-100 text-stone-800"
+
+  defp overview_mode_label(:history), do: "Resolved history"
+  defp overview_mode_label(:actions), do: "Action center"
+  defp overview_mode_label(_), do: "Active response"
 
   defp queue_item_path(queue_params, incident) do
     params =
@@ -530,10 +676,10 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     end
   end
 
-  defp state_color("open"), do: "bg-red-100 text-red-800"
-  defp state_color("acknowledged"), do: "bg-yellow-100 text-yellow-800"
-  defp state_color("resolved"), do: "bg-green-100 text-green-800"
-  defp state_color(_), do: "bg-gray-100 text-gray-800"
+  defp state_color("open"), do: "bg-rose-100 text-rose-800 ring-1 ring-rose-200/50"
+  defp state_color("acknowledged"), do: "bg-amber-100 text-amber-800 ring-1 ring-amber-200/50"
+  defp state_color("resolved"), do: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/50"
+  defp state_color(_), do: "bg-stone-100 text-stone-800"
 
   defp severity_color("critical"), do: "border-rose-200 bg-rose-50 text-rose-900"
   defp severity_color("high"), do: "border-orange-200 bg-orange-50 text-orange-900"
@@ -608,7 +754,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp timeline_entry_badge_class(%{actor_class: :operator}), do: "bg-blue-600"
   defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "bg-violet-600"
   defp timeline_entry_badge_class(%{actor_class: :external}), do: "bg-slate-600"
-  defp timeline_entry_badge_class(_), do: "bg-gray-500"
+  defp timeline_entry_badge_class(_), do: "bg-stone-500"
 
   defp timeline_entry_badge_text(%{actor_class: :system}), do: "SYS"
   defp timeline_entry_badge_text(%{actor_class: :operator}), do: "OP"
@@ -617,10 +763,10 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp timeline_entry_badge_text(_), do: "EV"
 
   defp timeline_entry_actor_class(%{actor_class: :system}), do: "bg-amber-100 text-amber-900 border-amber-200"
-  defp timeline_entry_actor_class(%{actor_class: :operator}), do: "bg-blue-100 text-blue-900 border-blue-200"
+  defp timeline_entry_actor_class(%{actor_class: :operator}), do: "bg-violet-100 text-violet-900 border-blue-200"
   defp timeline_entry_actor_class(%{actor_class: :copilot}), do: "bg-violet-100 text-violet-900 border-violet-200"
   defp timeline_entry_actor_class(%{actor_class: :external}), do: "bg-slate-100 text-slate-900 border-slate-200"
-  defp timeline_entry_actor_class(_), do: "bg-gray-100 text-gray-900 border-gray-200"
+  defp timeline_entry_actor_class(_), do: "bg-stone-100 text-stone-900 border-stone-200"
 
   defp timeline_actor_copy(:system), do: "System"
   defp timeline_actor_copy(:operator), do: "Operator"
@@ -633,13 +779,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp escalation_chain_status_copy(_), do: "Pending"
 
   defp escalation_chain_status_class(:completed),
-    do: "bg-green-100 text-green-900 border-green-200"
+    do: "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200/50"
 
   defp escalation_chain_status_class(:current),
     do: "bg-amber-100 text-amber-900 border-amber-200"
 
   defp escalation_chain_status_class(_),
-    do: "bg-gray-100 text-gray-900 border-gray-200"
+    do: "bg-stone-100 text-stone-900 border-stone-200"
 
   defp escalation_controls_enabled?(%{state: "open"}), do: true
   defp escalation_controls_enabled?(_incident), do: false

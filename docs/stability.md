@@ -32,6 +32,7 @@ and a full deprecation cycle.
 | `Parapet.Notifier` | Notifier behaviour for incident broadcasts |
 | `Parapet.Evidence` | Core evidence recording API |
 | `Parapet.Operator` | Operator dashboard and action surface |
+| `Parapet.Recovery` | Host-app-facing recovery action behaviour + activation function; the four callbacks (`id/0`, `label/0`, `preview/2`, `execute/2`) are part of the frozen Stable contract |
 | `Parapet.Deploy` | Deploy correlation marker (`mark/1`) |
 | `Parapet.SLO.StarterPack.WebSaaS` | One-line WebSaaS SLO registration pack |
 | `Parapet.SLO.StarterPack.DeliverySaaS` | One-line DeliverySaaS SLO registration pack |
@@ -46,6 +47,8 @@ in a minor release; a single CHANGELOG entry will accompany any breaking change.
 |--------|-------------|
 | `Parapet.MCP.Server` | Read-only MCP server surface |
 | `Parapet.MCP.PrometheusClient` | Prometheus query client for MCP |
+| `Parapet.Operator.UI` | Operator recovery-action UI copy helpers for generated LiveViews |
+| `Parapet.Telemetry.RecoveryAction` | Machine-readable recovery action telemetry contract |
 | `Parapet.Automation.CircuitBreaker` | Ecto-backed circuit breaker for mitigations |
 | `Parapet.Automation.ClaimService` | Action claim and idempotency service |
 | `Parapet.Automation.Executor` | Async runbook execution via Oban |
@@ -192,6 +195,7 @@ or advances a deprecation.
 | Module / Function | Kind | Replacement | Deprecation Stage | Removal Target |
 |-------------------|------|-------------|-------------------|---------------|
 | `Parapet.SLO.define/2` | Hard `@deprecated` | `Parapet.SLO.Provider` — implement the behaviour and pass the module to `Parapet.attach/1` | Hard deprecation (compile-time warning active) | Next major version |
+| `Parapet.Operator.confirm_runbook_step/4` | Compatibility note — Additive | N/A (no replacement; the function is not deprecated) | Adopters who pattern-match the return value must handle the additive `{:short_circuited, reason}` and `{:conflicted, claim_id}` variants (per the outcome-vocabulary-freeze doctrine: these return atoms are permanent and will **not** be removed in 1.x) | Not removed in 1.x |
 
 ### `Parapet.SLO.define/2` deprecation window
 

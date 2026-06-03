@@ -141,6 +141,7 @@ defmodule Parapet.Automation.ExecutorConcurrencyTest do
 
       assert audit.tool_name == "operator_execute_mitigation"
       assert audit.input["idempotency_key"] == "auto_exec_#{incident.id}_auto_step"
+      assert audit.input["actor"] == "system:automation:executor"
     end)
   end
 end

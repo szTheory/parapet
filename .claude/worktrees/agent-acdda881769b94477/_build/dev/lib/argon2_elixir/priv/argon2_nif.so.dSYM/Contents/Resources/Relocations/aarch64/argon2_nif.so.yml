@@ -1,0 +1,5 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     '/Users/jon/projects/parapet/.claude/worktrees/agent-acdda881769b94477/_build/dev/lib/argon2_elixir/priv/argon2_nif.so'
+relocations:     []
+...

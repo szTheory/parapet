@@ -4,7 +4,6 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   import Ecto.Query
   import DemoAppWeb.Parapet.OperatorComponents
-  alias Parapet.Operator.WorkbenchContract
 
   @default_page_size 30
 
@@ -34,7 +33,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   end
 
   def handle_params(params, _uri, socket) do
-    queue_params = queue_params(params)
+    page_mode = page_mode(socket.assigns.live_action)
+    queue_params = queue_params(params, page_mode)
     queue_page = load_queue_page(queue_params)
 
     selected =
@@ -53,6 +53,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        visible_incidents: visible_incidents,
        queue_page: queue_page,
        queue_params: visible_queue_params(queue_params, queue_page),
+       page_mode: page_mode,
        queue_refresh_available?: false
      )
      |> stream(:incidents, visible_incidents, reset: true)}
@@ -116,12 +117,29 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   def render(assigns) do
     ~H"""
-    <div class="flex flex-col md:flex-row h-screen bg-gray-50 overflow-hidden">
-      <div class={"w-full md:w-80 border-r border-gray-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
-        <div class="p-4 border-b border-gray-200 bg-gray-50">
-          <.critical_journeys journeys={@journeys} />
-        </div>
-        <div class="p-4 border-b border-gray-200 bg-stone-50">
+    <div class="antialiased text-stone-900 flex h-screen flex-col overflow-hidden bg-stone-100">
+      <.operator_nav active={@page_mode} />
+
+      <div class="border-b border-stone-200 bg-stone-50 px-4 py-3 md:px-6">
+        <.operator_overview
+          queue_page={@queue_page}
+          visible_incidents={@visible_incidents}
+          action_items={@action_items}
+          journeys={@journeys}
+          page_mode={@page_mode}
+        />
+      </div>
+
+      <%= if @page_mode == :actions do %>
+        <main class="min-h-0 flex-1 overflow-y-auto bg-stone-50 px-4 py-6 md:px-8">
+          <div class="mx-auto max-w-5xl">
+            <.action_center items={@action_items} />
+          </div>
+        </main>
+      <% else %>
+        <div class="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
+      <div class={"w-full md:w-80 border-r border-stone-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
+        <div class="p-4 border-b border-stone-200 bg-stone-50">
           <div class="flex items-start justify-between gap-3">
             <div>
               <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
@@ -131,7 +149,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
             </div>
             <.link
-              patch={queue_path(@queue_params, %{"status" => "resolved", "cursor" => nil, "direction" => "next", "id" => nil})}
+              patch={history_path()}
               class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
             >
               History
@@ -144,13 +162,13 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
             <button
               type="button"
               phx-click="queue_refresh"
-              class="mt-3 inline-flex min-h-11 items-center justify-center rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-800"
+              class="mt-3 flex min-h-[40px] items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-teal-800"
             >
               Load latest changes
             </button>
           </div>
         <% end %>
-        <div class="flex-1 overflow-y-auto border-b border-gray-200">
+        <div class="flex-1 overflow-y-auto border-b border-stone-200">
           <.incident_list
             incidents={@visible_incidents}
             selected={selected_queue_incident(@selected_incident)}
@@ -161,7 +179,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           <.link
             patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
             class={[
-              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
               pagination_link_class(@queue_page.has_previous_page?)
             ]}
           >
@@ -171,7 +189,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           <.link
             patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
             class={[
-              "inline-flex min-h-11 items-center justify-center rounded-md border px-3 py-2 text-sm font-semibold transition",
+              "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
               pagination_link_class(@queue_page.has_next_page?)
             ]}
           >
@@ -179,40 +197,40 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           </.link>
         </div>
 
-        <div class="p-4 border-b border-gray-200 bg-gray-50">
-          <h2 class="text-lg font-semibold text-gray-800">Action Items</h2>
+        <div class="p-4 border-b border-stone-200 bg-stone-50">
+          <h2 class="text-lg font-semibold text-stone-900">Action Items</h2>
         </div>
-        <div class="flex-1 overflow-y-auto bg-gray-50">
+        <div class="flex-1 overflow-y-auto bg-stone-50">
           <.action_item_list items={@action_items} />
         </div>
       </div>
 
-      <div class={"flex-1 flex flex-col md:flex-row min-w-0 bg-gray-50 #{if @selected_incident, do: "flex", else: "hidden md:flex"}"}>
-        <div class="md:hidden p-4 border-b border-gray-200 bg-white">
-          <.link patch={queue_path(@queue_params, %{})} class="text-blue-600 hover:text-blue-800 font-medium">
-            &larr; Back to Queue
+      <div class={"flex-1 flex flex-col md:flex-row min-w-0 bg-stone-50 #{if @selected_incident, do: "flex", else: "hidden md:flex"}"}>
+        <div class="md:hidden p-4 border-b border-stone-200 bg-white">
+          <.link patch={queue_path(@queue_params, %{})} class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium">
+            &larr; Back to active response
           </.link>
         </div>
 
-        <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-gray-200">
+        <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-stone-200">
           <%= if @selected_incident do %>
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-6 border-b border-stone-200">
               <.incident_summary detail={@selected_incident} />
             </div>
             <div class="flex-1 overflow-y-auto p-6">
               <.incident_timeline detail={@selected_incident} />
             </div>
           <% else %>
-            <div class="flex-1 flex items-center justify-center text-gray-500">
+            <div class="flex-1 flex items-center justify-center text-stone-500">
               Select an incident to review details
             </div>
           <% end %>
         </div>
 
         <%= if @selected_incident do %>
-          <div class="w-full md:w-80 bg-gray-50 flex flex-col flex-shrink-0">
-            <div class="p-4 border-b border-gray-200 bg-white md:bg-transparent">
-              <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wider">Actions</h3>
+          <div class="w-full md:w-80 bg-stone-50 flex flex-col flex-shrink-0">
+            <div class="p-4 border-b border-stone-200 bg-white md:bg-transparent">
+              <h3 class="text-sm font-semibold text-stone-700 uppercase tracking-wider">Actions</h3>
             </div>
             <div class="p-4 overflow-y-auto">
               <.action_rail detail={@selected_incident} />
@@ -220,6 +238,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           </div>
         <% end %>
       </div>
+        </div>
+      <% end %>
     </div>
     """
   end
@@ -232,14 +252,44 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   defp queue_stream_item(item) do
     item
-    |> Map.put(:id, item.incident_id)
-    |> Map.put_new(:title, item.title || item.incident_id)
+    |> Map.put(:id, queue_item_id(item))
+    |> Map.put_new(:incident_id, queue_item_id(item))
+    |> Map.put_new(:title, item.title || queue_item_id(item))
+    |> Map.put_new(:secondary_line, Map.get(item, :description))
+    |> Map.put_new(:severity, nil)
+    |> Map.put_new(:attention_chip, nil)
+    |> Map.put_new(:updated_at_label, relative_time(Map.get(item, :updated_at)))
   end
+
+  defp queue_item_id(%{incident_id: incident_id}) when is_binary(incident_id), do: incident_id
+  defp queue_item_id(%{id: id}) when is_binary(id), do: id
+
+  defp relative_time(%DateTime{} = updated_at) do
+    seconds = max(DateTime.diff(DateTime.utc_now(), updated_at, :second), 0)
+
+    cond do
+      seconds < 60 -> "#{seconds}s ago"
+      seconds < 3_600 -> "#{div(seconds, 60)}m ago"
+      true -> "#{div(seconds, 3_600)}h ago"
+    end
+  end
+
+  defp relative_time(_updated_at), do: "Updated recently"
 
   defp incident_dom_id(%{incident_id: incident_id}), do: "incident-#{incident_id}"
   defp incident_dom_id(%{id: incident_id}), do: "incident-#{incident_id}"
 
-  defp queue_params(params) do
+  defp page_mode(:actions), do: :actions
+  defp page_mode(:history), do: :history
+  defp page_mode(_live_action), do: :response
+
+  defp queue_params(params, :history) do
+    params
+    |> queue_params(:response)
+    |> Map.put("status", "resolved")
+  end
+
+  defp queue_params(params, _page_mode) do
     %{
       "page_size" => @default_page_size,
       "direction" => Map.get(params, "direction", "next"),
@@ -259,7 +309,9 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   defp normalized_status("resolved"), do: "resolved"
   defp normalized_status(_status), do: "active"
 
-  defp load_queue_page(%{"status" => "resolved"} = queue_params), do: resolved_history_page(queue_params)
+  defp load_queue_page(%{"status" => "resolved"} = queue_params),
+    do: resolved_history_page(queue_params)
+
   defp load_queue_page(queue_params), do: Parapet.Operator.list_incident_queue(queue_params)
 
   defp queue_scope_label("resolved"), do: "Resolved History"
@@ -303,16 +355,21 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
       |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
 
     case params do
-      [] -> "/parapet"
-      _ -> "/parapet?" <> URI.encode_query(params)
+      [] -> queue_base_path(queue_params)
+      _ -> queue_base_path(queue_params) <> "?" <> URI.encode_query(params)
     end
   end
 
+  defp queue_base_path(%{"status" => "resolved"}), do: "/parapet/history"
+  defp queue_base_path(_queue_params), do: "/parapet"
+
+  defp history_path, do: "/parapet/history"
+
   defp pagination_link_class(true),
-    do: "border-stone-300 bg-white text-stone-900 hover:border-teal-700 hover:text-teal-700"
+    do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:ring-teal-700 hover:text-teal-700"
 
   defp pagination_link_class(false),
-    do: "pointer-events-none border-stone-200 bg-stone-100 text-stone-400"
+    do: "pointer-events-none ring-1 ring-stone-200 bg-stone-100 text-stone-400"
 
   defp resolved_history_page(queue_params) do
     direction = queue_direction(queue_params)
@@ -334,7 +391,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     %{
       scope: :resolved,
       direction: direction,
-      items: Enum.map(visible_items, fn incident -> incident |> WorkbenchContract.queue_row() |> queue_stream_item() end),
+      items: Enum.map(visible_items, &queue_stream_item/1),
       has_next_page?: history_has_next_page?(direction, has_more?, visible_items, cursor),
       has_previous_page?: history_has_previous_page?(direction, has_more?, visible_items, cursor),
       next_cursor: history_next_cursor(direction, visible_items, has_more?, cursor),
@@ -378,8 +435,11 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     )
   end
 
-  defp apply_history_order(query, :previous), do: order_by(query, [incident], [asc: incident.updated_at, asc: incident.id])
-  defp apply_history_order(query, _direction), do: order_by(query, [incident], [desc: incident.updated_at, desc: incident.id])
+  defp apply_history_order(query, :previous),
+    do: order_by(query, [incident], asc: incident.updated_at, asc: incident.id)
+
+  defp apply_history_order(query, _direction),
+    do: order_by(query, [incident], desc: incident.updated_at, desc: incident.id)
 
   defp maybe_reverse_history_items(items, :previous), do: Enum.reverse(items)
   defp maybe_reverse_history_items(items, _direction), do: items
@@ -399,12 +459,20 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
   defp history_next_cursor(:next, items, true, _cursor), do: encode_queue_cursor(List.last(items))
   defp history_next_cursor(:previous, _items, _has_more?, nil), do: nil
-  defp history_next_cursor(:previous, items, _has_more?, _cursor), do: encode_queue_cursor(List.last(items))
+
+  defp history_next_cursor(:previous, items, _has_more?, _cursor),
+    do: encode_queue_cursor(List.last(items))
+
   defp history_next_cursor(_direction, _items, _has_more?, _cursor), do: nil
 
   defp history_previous_cursor(:next, _items, _has_more?, nil), do: nil
-  defp history_previous_cursor(:next, items, _has_more?, _cursor), do: encode_queue_cursor(List.first(items))
-  defp history_previous_cursor(:previous, items, true, _cursor), do: encode_queue_cursor(List.first(items))
+
+  defp history_previous_cursor(:next, items, _has_more?, _cursor),
+    do: encode_queue_cursor(List.first(items))
+
+  defp history_previous_cursor(:previous, items, true, _cursor),
+    do: encode_queue_cursor(List.first(items))
+
   defp history_previous_cursor(_direction, _items, _has_more?, _cursor), do: nil
 
   defp encode_queue_cursor(nil), do: nil

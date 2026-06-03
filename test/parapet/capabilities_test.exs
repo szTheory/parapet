@@ -1,18 +1,10 @@
 defmodule Parapet.CapabilitiesTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Parapet.Capabilities
 
   setup do
-    case start_supervised(Capabilities) do
-      {:ok, _pid} ->
-        :ok
-
-      {:error, {:already_started, _pid}} ->
-        Agent.update(Capabilities, fn _ -> %{recovery: %{}} end)
-        :ok
-    end
-
+    Parapet.Capabilities.checkout()
     :ok
   end
 

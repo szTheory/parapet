@@ -28,6 +28,14 @@ defmodule Parapet.Operator.ActionPayload do
     )
   end
 
+  @type t :: %__MODULE__{
+          actor: String.t() | nil,
+          reason: String.t() | nil,
+          correlation_id: String.t() | nil,
+          idempotency_key: String.t() | nil,
+          action_type: atom() | nil
+        }
+
   @doc """
   Builds and validates an action payload changeset.
   """

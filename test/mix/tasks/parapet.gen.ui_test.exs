@@ -35,9 +35,16 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "def handle_params"
       assert operator_live_source =~ "stream("
       assert operator_live_source =~ "History"
+      assert operator_live_source =~ "operator_nav"
+      assert operator_live_source =~ "operator_overview"
+      assert operator_live_source =~ "action_center"
+      assert operator_live_source =~ "page_mode(:actions)"
+      assert operator_live_source =~ "page_mode(:history)"
       assert operator_live_source =~ "Previous"
       assert operator_live_source =~ "Next"
       assert operator_live_source =~ "Load latest changes"
+      assert operator_live_source =~ "Back to active response"
+      refute operator_live_source =~ "Back to Queue"
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
       assert operator_live_source =~ "Parapet.Operator.resolve_incident(incident, payload)"
@@ -53,6 +60,27 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_components_source =~ "incident.updated_at_label"
       assert operator_components_source =~ "incident.attention_chip"
       assert operator_components_source =~ "incident.severity"
+      assert operator_components_source =~ "surface_class(:action_card)"
+      assert operator_components_source =~ "control_class(:recovery"
+      assert operator_components_source =~ "chip_class(:state"
+
+      assert operator_components_source =~
+               "Preview scoped changes before execution. No recovery action runs until confirm."
+
+      assert operator_components_source =~
+               "Execute bounded recovery. Writes a durable audit record"
+
+      refute operator_components_source =~ "transition-all"
+
+      operator_detail_source =
+        Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_detail_live.ex")
+        |> Rewrite.Source.get(:content)
+
+      assert operator_detail_source =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
+      assert operator_detail_source =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert operator_detail_source =~ "Parapet.Operator.acknowledge_incident"
+      assert operator_detail_source =~ "Parapet.Operator.resolve_incident"
+      assert operator_detail_source =~ "Parapet.Operator.incident_detail(id)"
     end
 
     test "emits authenticated-scope router guidance" do
@@ -74,6 +102,11 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
              )
 
       assert Enum.any?(igniter.notices, &String.contains?(&1, "live_session :parapet_operator"))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet\""))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/actions\""))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/history\""))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/incidents/:id\""))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/:id\""))
     end
 
     test "is idempotent and does not duplicate files" do
