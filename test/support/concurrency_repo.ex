@@ -14,6 +14,7 @@ defmodule Parapet.TestSupport.ConcurrencyRepo do
       database: System.get_env("PARAPET_CONCURRENCY_DB_NAME", "parapet_concurrency_test"),
       pool: Ecto.Adapters.SQL.Sandbox,
       pool_size: 10,
+      prepare: :unnamed,
       ownership_timeout: 30_000,
       stacktrace: true,
       show_sensitive_data_on_connection_error: true
