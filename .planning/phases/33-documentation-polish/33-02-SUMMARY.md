@@ -53,6 +53,7 @@ completed: 2026-06-03
 ## Task Commits
 
 1. **Tasks 1-3: Maintainer docs, contributor taxonomy, and demo Compose guidance** - `ad5c39d` (docs)
+2. **Review fix: Demo Compose custom-port smoke example** - `9333cae` (fix)
 
 ## Files Created/Modified
 
@@ -69,7 +70,18 @@ completed: 2026-06-03
 
 ## Deviations from Plan
 
-None - plan executed within the planned file scope.
+### Auto-fixed Issues
+
+**1. [Rule 1 - Bug] Corrected custom-port smoke-check example**
+- **Found during:** Advisory code review
+- **Issue:** The custom-port example set `WEB_PORT=4001` only for `docker compose up`, then ran `curl` without the same variable, which would check port 4000 instead of the override.
+- **Fix:** Added `WEB_PORT=4001` to the example `curl` command.
+- **Files modified:** `examples/demo_app/README.md`
+- **Verification:** `rg -q 'WEB_PORT=4001 curl -f http://localhost:\$\{WEB_PORT:-4000\}/parapet' examples/demo_app/README.md`
+- **Committed in:** `9333cae`
+
+**Total deviations:** 1 auto-fixed (1 bug).
+**Impact on plan:** The fix keeps the documented demo smoke path accurate and does not change runtime behavior.
 
 ## Verification
 
@@ -77,6 +89,7 @@ None - plan executed within the planned file scope.
 - `rg -q 'Release Please|ReleasePlease' CONTRIBUTING.md && rg -q 'feat:' CONTRIBUTING.md && rg -q 'fix:' CONTRIBUTING.md && rg -q 'docs:' CONTRIBUTING.md && rg -q 'refactor:' CONTRIBUTING.md && rg -q 'test:' CONTRIBUTING.md && rg -q 'chore:' CONTRIBUTING.md && rg -q 'BREAKING CHANGE' CONTRIBUTING.md && rg -q 'Stable-line maintenance|stable-line maintenance' CONTRIBUTING.md`
 - `rg -q 'docker compose up --build' examples/demo_app/README.md && rg -q 'curl -f http://localhost:\$\{WEB_PORT:-4000\}/parapet' examples/demo_app/README.md && rg -q 'docker compose down -v' examples/demo_app/README.md && rg -q 'WEB_PORT' examples/demo_app/README.md && rg -q 'DB_PORT' examples/demo_app/README.md && rg -q 'demo only' examples/demo_app/README.md && rg -q '^up:' examples/demo_app/Makefile && rg -q 'docker compose' examples/demo_app/Makefile && rg -q 'docker-compose' examples/demo_app/Makefile && rg -q 'WEB_PORT' examples/demo_app/docker-compose.yml && rg -q 'DB_PORT' examples/demo_app/docker-compose.yml`
 - `cd examples/demo_app && docker compose config >/dev/null` passed. Docker emitted a non-blocking warning that the Compose `version` attribute is obsolete.
+- `rg -q 'WEB_PORT=4001 curl -f http://localhost:\$\{WEB_PORT:-4000\}/parapet' examples/demo_app/README.md`
 - `MIX_ENV=dev mix docs --warnings-as-errors`
 - `mix format --check-formatted mix.exs`
 
