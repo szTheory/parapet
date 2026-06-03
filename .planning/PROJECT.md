@@ -23,7 +23,17 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Next:** No active milestone. Candidate next work remains Team Workflow / responder coordination (v1.3) or Cross-boundary journey correlation (v1.4+) once a PR-shaped slice is chosen.
+**Next:** Active milestone v1.3 Operator UI Polish & Design System — a systematic generated Operator UI refresh focused on active-response information architecture, reusable Tailwind design-system primitives, richer demo seed states, and browser-backed responsive polish.
+
+## Current Milestone: v1.3 Operator UI Polish & Design System
+
+**Goal:** Make Parapet's generated Operator UI a deliberate, high-polish active-response workbench that clearly orients operators from health state to evidence to safe action.
+
+**Target features:**
+- Active-response-first `/parapet` orientation with explicit navigation lanes for response, actions, and history.
+- Generated Tailwind design-system consolidation for operator surfaces, states, action affordances, focus/motion, and audit-safe controls.
+- Rich demo seed coverage that expresses active, investigating, resolved, recovery, escalation, action-item, retrospective, and external-evidence states.
+- Browser-backed responsive UI verification for desktop and mobile touchpoints.
 
 ## Last Milestone: v1.2 Authoring DX & Maturity
 

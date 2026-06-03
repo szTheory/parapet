@@ -17,10 +17,10 @@
 
 ## Demo & Verification
 
-- [ ] **UI-DEMO-01**: Demo seed data expresses active, investigating, resolved, recovery-previewable, guidance-only, warning, action-item, escalation, audit, external-link, and retrospective states.
-- [ ] **UI-DEMO-02**: Demo routes expose the same generated Operator UI shape that adopters receive from `mix parapet.gen.ui`.
-- [ ] **UI-VERIFY-01**: Tests cover generated route guidance, generated component contracts, and demo route smoke behavior.
-- [ ] **UI-VERIFY-02**: Browser automation captures desktop and mobile screenshots for the response, actions, history, and detail paths.
+- [x] **UI-DEMO-01**: Demo seed data expresses active, investigating, resolved, recovery-previewable, guidance-only, warning, action-item, escalation, audit, external-link, and retrospective states.
+- [x] **UI-DEMO-02**: Demo routes expose the same generated Operator UI shape that adopters receive from `mix parapet.gen.ui`.
+- [x] **UI-VERIFY-01**: Tests cover generated route guidance, generated component contracts, and demo route smoke behavior.
+- [x] **UI-VERIFY-02**: Browser automation captures desktop and mobile screenshots for the response, actions, history, and detail paths.
 
 ## Future Requirements
 

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.3
 milestone_name: Operator UI Polish & Design System
 status: milestone_complete
-last_updated: 2026-06-03T22:42:26.444Z
-last_activity: 2026-06-03 -- Phase 35 planning complete
+last_updated: 2026-06-03T22:52:35Z
+last_activity: 2026-06-03 -- Phase 36 browser verification complete
 progress:
-  total_phases: 13
-  completed_phases: 13
-  total_plans: 28
-  completed_plans: 28
+  total_phases: 14
+  completed_phases: 14
+  total_plans: 29
+  completed_plans: 29
   percent: 100
-stopped_at: Milestone complete (Phase 35 was final phase)
+stopped_at: Milestone complete (Phase 36 was final phase)
 ---
 
 # Project State
@@ -25,7 +25,7 @@ See: .planning/PROJECT.md (updated 2026-06-03 — v1.3 Operator UI Polish & Desi
 
 ## Current Position
 
-Phase: 35
+Phase: 36
 Plan: Not started
 Status: Milestone complete
 Last activity: 2026-06-03
@@ -34,7 +34,7 @@ Last activity: 2026-06-03
 
 **Velocity:**
 
-- Total plans completed: 24 (v1.1 starting)
+- Total plans completed: 29 (v1.1 starting)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -76,6 +76,7 @@ Last activity: 2026-06-03
 | Phase 33 P01 | 11min | 3 tasks | 5 files |
 | Phase 33 P02 | 12min | 3 tasks | 4 files |
 | Phase 35 P01 | 7 min | 3 tasks | 4 files |
+| Phase 36 P01 | 10 min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -98,6 +99,7 @@ Recent decisions affecting current work:
 - [Phase ?]: runbook_data[module] string key is the only mechanism enabling Preview/Confirm; inline steps is display-only
 - [Phase ?]: Incident 4 added as always-insert alongside existing 3; replayability via mix demo.reset per D-10/D-11
 - [Phase 32]: Keep `release_gate` as the stable required status check while CI expands into an Elixir/OTP matrix.
+- [Phase 36]: Browser screenshot proof uses local Chromium automation against the demo app and writes durable PNG evidence under the Phase 36 planning directory without adding repo dependencies.
 
 ### Pending Todos
 
@@ -122,10 +124,10 @@ None. v1.1 starts on a green `main`, 24 v1.1 requirements mapped 100% across 7 p
 
 ## Session Continuity
 
-Last session: 2026-06-03T22:40:26.013Z
-Stopped at: Completed 35-01-PLAN.md
+Last session: 2026-06-03T22:52:35Z
+Stopped at: Completed 36-01-PLAN.md
 Resume file: None
-Next step: /gsd-verify-work 33 to verify documentation-polish
+Next step: /gsd-new-milestone when ready to open the next milestone
 
 ## Operator Next Steps
 
