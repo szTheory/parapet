@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Parapet.DoctorTest.RunbookGuidanceOnly do
 end
 
 defmodule Mix.Tasks.Parapet.DoctorTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   alias Mix.Tasks.Parapet.Doctor
 
