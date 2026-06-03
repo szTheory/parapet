@@ -1,5 +1,37 @@
 # Project Retrospective
 
+## Milestone: v1.1 — Actionable Recovery
+
+**Shipped:** 2026-06-03
+**Phases:** 7 | **Plans:** 19
+
+### What Was Built
+- Capability registration behaviour (`Parapet.Recovery`) with `attach/1` logic.
+- claim-protected operator execution (`Preview → Confirm` via `ClaimService`).
+- 6 prebuilt recovery playbooks matching JTBD-MAP scenarios.
+- Audit propagation (`TimelineEntry` + `ToolAudit` per Confirm, with success/failed variants).
+- End-to-end `demo_app` loop + `check_recovery` static analysis.
+
+### What Worked
+- Freezing public capabilities API first to avoid cascading breaks.
+- Writing test infrastructure/harnesses specifically for race conditions before implementing the fix.
+- Reusing `ClaimService` for human operators instead of inventing a new lock system.
+
+### What Was Inefficient
+- Post-1.0 documentation took slightly more iterations to wire back into the existing generated files properly.
+- UI visual iterations required multiple manual testing loops until they were automated in Phase 28 CI lane.
+
+### Patterns Established
+- "Code lands before the docs that name them" — preventing guides pointing to uncompilable methods.
+- Dual-track UI automation (Smoke lane validating what a browser sees) alongside unit tests.
+
+### Key Lessons
+- Additive API extensions (e.g. new return variants for `confirm_runbook_step/4`) inside a Stable tier must clearly signal that consumers should have a catch-all if they pattern match.
+- Even if something is operator-initiated, wrap it in the same claim-protection as automation.
+
+### Cost Observations
+- Notable: Fast delivery (7 phases in ~2 days) directly linked to rigorous prep and clear bounds set in `NEXT-STEP-ASSESSMENT.md`.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
