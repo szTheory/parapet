@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: demo_app_dev
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ../../
+      dockerfile: examples/demo_app/Dockerfile.dev
+    ports:
+      - "${WEB_PORT:-4000}:4000"
+    environment:
+      - PGHOST=db
+      - PGUSER=postgres
+      - PGPASSWORD=postgres
+      - MIX_ENV=dev
+    depends_on:
+      db:
+        condition: service_healthy
+    # We mount the source code so UI tweaks trigger Phoenix LiveReload instantly
+    # without needing to rebuild the Docker image.
+    volumes:
+      - ../../lib:/app/lib:ro
+      - ../../priv:/app/priv:ro
+      - .:/app/examples/demo_app
+      # Named volumes for deps and _build to prevent cross-OS NIF compilation issues
+      # between the host (macOS) and the container (Linux).
+      - mix_deps:/app/deps
+      - mix_build:/app/_build
+      - demo_mix_deps:/app/examples/demo_app/deps
+      - demo_mix_build:/app/examples/demo_app/_build
+
+volumes:
+  pgdata:
+  mix_deps:
+  mix_build:
+  demo_mix_deps:
+  demo_mix_build:
