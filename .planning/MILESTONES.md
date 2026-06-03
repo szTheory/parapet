@@ -1,5 +1,28 @@
 # Milestones
 
+## v1.1 Actionable Recovery (Shipped: 2026-06-03)
+
+**Phases completed:** 7 phases, 19 plans, 23 tasks
+
+**Key accomplishments:**
+
+- lease_until column backfill migration, ClaimService expired-claim self-heal (UPDATE-in-place), and automated Ecto.Migrator backfill integration test — FND-01 delivered end-to-end with zero human verification.
+- `Parapet.Recovery` behaviour module with 4 frozen callbacks, minimal `__using__/1` macro, and crash-proof `attach/1` activation function that silently skips unloaded modules and registers loaded ones via function-capture bridge into `Parapet.Capabilities`
+- 107 tests in `test/parapet/recovery_test.exs`: 7-sync + 100-async sweep covering all Phase 24 success criteria, with Pitfall 13 avoidance rationale embedded as comments in the async sweep module
+- `Parapet.Operator.confirm_runbook_step/4` now routes through `ClaimService.claim_action/1` with `action_kind: "operator"`, surfaces two new additive return variants (`{:short_circuited, atom}` and `{:conflicted, uuid_string}`), and gates Confirm on a SHA-256 `target_refs_hash` consistency check — closing the v1.1 architectural defect where the operator-clicked path skipped the same claim protection the Oban auto-execution path already uses.
+- The demo LiveView now renders all four return-tuple arms from `Parapet.Operator.confirm_runbook_step/4` with operator-actionable flash copy (including the verbatim ROADMAP-pinned conflict flash), and the Preview panel displays the capability's user-facing action name above the existing target/count grid — closing UI-01 ("action name in dedicated panel") and UI-04 ("LiveView renders both new branches with operator-actionable next steps").
+- Provides unit coverage for the two new short-circuit branches (`:preview_expired`, `:target_refs_drift`) and a multi-node concurrency proof for the operator-confirm path. Closes the Wave 1 known red (operator_test.exs:495 happy-path) by extending the inline `DummyRepo` to handle `ClaimService.claim_action/1`'s raw-function transaction protocol.
+- Six JTBD-MAP prebuilt runbook templates fully wired: two new capability templates (deploy_tied_incident via :revert_feature_flag, cardinality_blowout via :disable_metric_label) authored in the stalled_executor 3-step shape, suppression_drift guidance-only warning hardened with architectural rationale, generator updated to emit all six, test suite green at 491/0.
+- Two compiled demo modules wiring :retry_async_item capability to a 3-step StalledExecutor runbook — the load-bearing prerequisites for boot registration (Plan 02) and CI scenarios (Plan 04)
+- One-liner:
+- One-liner:
+- Parapet.Recovery graduated from Experimental to Stable via two-anchor flip: moduledoc admonition to `Stable {: .info}`, docs/stability.md row moved to Stable table, additive confirm_runbook_step/4 variants named in Deprecation Register, and Wave-0 regression guard added to verify.public_api tests
+- One-liner:
+- One-liner:
+- One-liner:
+
+---
+
 ## v1.0 Stable Release
 
 **Date:** 2026-05-26 (`v1.0.0` tag; point releases `v1.0.1`–`v1.0.3` on 2026-05-27)

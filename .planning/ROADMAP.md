@@ -13,10 +13,26 @@
 - ✅ **v0.9 Performance, Scale & DX** — Phases 1-14 (shipped 2026-05-23) ([archive](milestones/v0.9-ROADMAP.md))
 - ✅ **v0.10 Adopter Success** — Phases 15-18 (shipped 2026-05-24) ([archive](milestones/v0.10-ROADMAP.md))
 - ✅ **v1.0 Stable Release** — Phases 19-22 (shipped 2026-05-26) ([archive](milestones/v1.0-ROADMAP.md))
-- 🚧 **v1.1 Actionable Recovery** — Phases 23-29 (in progress; started 2026-05-27)
+- ✅ **v1.1 Actionable Recovery** — shipped 2026-06-03 ([archive](milestones/v1.1-ROADMAP.md))
 - 📌 **v1.2 Authoring DX & Maturity** — candidate; SLO-W1, Elixir/OTP matrix, supply-chain hardening, branch-protection enforcement
 
 ## Phases
+
+<details>
+<summary>✅ v1.1 Actionable Recovery (Phases 23-29) — SHIPPED 2026-06-03</summary>
+
+Closed the action loop the operator UI already implies. Turn runbook steps into executable, audited, host-registered recovery actions with a safe Preview → Confirm flow. Pure additive on the v1.0 frozen surface. Full per-phase detail, success criteria, and closure evidence in [milestones/v1.1-ROADMAP.md](milestones/v1.1-ROADMAP.md).
+
+- [x] Phase 23: Foundations — Telemetry Contract + `lease_until` Migration (2/2 plans)
+- [x] Phase 24: Recovery Behaviour + Capability Allowlist (3/3 plans)
+- [x] Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX (3/3 plans)
+- [x] Phase 26: Audit Propagation (1/1 plan)
+- [x] Phase 27: Prebuilt Playbooks (1/1 plan)
+- [x] Phase 28: Demo Seed + CI Lane (5/5 plans)
+- [x] Phase 29: Stability + Adopter Onboarding (4/4 plans)
+
+</details>
+
 
 <details>
 <summary>✅ v0.10 Adopter Success (Phases 15-18) — SHIPPED 2026-05-24</summary>
@@ -70,154 +86,9 @@ Froze Parapet's public API and telemetry contract under a written stability + de
 
 </details>
 
-### 🚧 v1.1 Actionable Recovery (In Progress — Started 2026-05-27)
-
-**Milestone Goal:** Close the action loop the operator UI already implies. Turn runbook steps into executable, audited, host-registered recovery actions with a safe Preview → Confirm flow. Pure additive on the v1.0 frozen surface — most infrastructure already in `lib/`. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
-
-- [x] **Phase 23: Foundations — Telemetry Contract + `lease_until` Migration** — Lock the v1.1 telemetry event family under Experimental tier and add the claim-lease column before any capability ships (FND-01, FND-02) (completed 2026-05-27)
-- [x] **Phase 24: Recovery Behaviour + Capability Allowlist** — `Parapet.Recovery` behaviour mirroring `Parapet.Integration`; widen `Parapet.Capabilities` allowlist by 2 atoms; crash-proof `attach/1` (RCV-01, RCV-02, RCV-03) (completed 2026-05-27)
-- [x] **Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX** — Close the operator-path-skips-claim defect; surface short-circuit/conflict return variants in the LiveView with operator-actionable next steps (UI-01, UI-02, UI-03, UI-04) (completed 2026-05-28)
-- [x] **Phase 26: Audit Propagation** — TimelineEntry/ToolAudit writes for every Confirm; new `:recovery_failed` type for capability execution errors (AUD-01, AUD-02, AUD-03) (completed 2026-05-28)
-- [x] **Phase 27: Prebuilt Playbooks** — Six runbook templates covering JTBD-MAP failure modes; two guidance-only by design, four capability-backed (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (completed 2026-05-28)
-- [x] **Phase 28: Demo Seed + CI Lane** — Demo app seeded with a Preview-able + Confirm-able incident; CI exercises happy-path, preview-expiry, short-circuit, and claim-conflict scenarios (DEMO-05, DEMO-06) (completed 2026-05-28)
-- [x] **Phase 29: Stability + Adopter Onboarding** — Declare `Parapet.Recovery` Stable; CHANGELOG migration notes; `mix parapet.gen.recovery` Igniter task; `mix parapet.doctor` adoption signal; `docs/recovery-actions.md` adopter guide (STAB-07, ADOP-01, ADOP-02, ADOP-03) (completed 2026-05-29)
-
 ## Phase Details
 
 _Phase 19–22 (v1.0 Stable Release) details are archived — see [milestones/v1.0-ROADMAP.md](milestones/v1.0-ROADMAP.md)._
-
-### Phase 23: Foundations — Telemetry Contract + `lease_until` Migration
-
-**Goal**: Lock the v1.1 telemetry event family under the Experimental stability tier and add the `lease_until` claim-lease column to `parapet_action_claims` before any capability code ships — both decisions are irreversible-on-publish under the v1.0 freeze, so they land first.
-**Depends on**: Phase 22 (v1.0 stability machinery)
-**Requirements**: FND-01, FND-02
-**Complexity**: S (low-code, high-leverage; single coherent PR)
-**Success Criteria** (what must be TRUE):
-
-  1. Running `mix ecto.migrate` on a database that already has `parapet_action_claims` rows succeeds and backfills `lease_until` with a sensible default so no operator-claim ordering breaks.
-  2. `docs/telemetry.md` enumerates the full `[:parapet, :operator, :recovery_action, ...]` event family under the Experimental stability tier — every event name, measurement key, and metadata key is explicit and distinguishable from the v1.0 frozen Stable telemetry.
-  3. `ClaimService.claim_action/1` self-heals an expired-lease row atomically (`UPDATE ... WHERE lease_until < now() RETURNING *`), proven by a concurrency test that wins a claim against a stale claim left behind by a simulated node crash.
-  4. A future capability addition can wire a new emit-site to a documented telemetry event without inventing a new event name.
-
-**Plans**: 2 plans in 1 wave (single coherent PR per D-17)
-
-  - [x] 23-01-PLAN.md — Telemetry contract module `Parapet.Telemetry.RecoveryAction` (Experimental tier) + contract test + docs/telemetry.md Recovery Action section + docs/stability.md Experimental row (FND-02) (Wave 1)
-  - [x] 23-02-PLAN.md — `lease_until` migration + schema field + `ClaimService` self-heal + `concurrency_bootstrap.ex` DDL update + expired-lease self-heal concurrency test (FND-01) (Wave 1)
-
-### Phase 24: Recovery Behaviour + Capability Allowlist
-
-**Goal**: Ship the `Parapet.Recovery` behaviour (the host-app-facing capability registration API) and widen the `Parapet.Capabilities` allowlist by two atoms (`:revert_feature_flag`, `:disable_metric_label`) so every downstream phase has a stable public-API foundation to compile against.
-**Depends on**: Phase 23 (telemetry contract + schema migration locked in)
-**Requirements**: RCV-01, RCV-02, RCV-03
-**Complexity**: M (new behaviour module + activation function + allowlist widening; mirrors `Parapet.Integration` pattern)
-**Success Criteria** (what must be TRUE):
-
-  1. A host application can declare a recovery action by writing a module with `use Parapet.Recovery` and implementing `id/0`, `label/0`, `preview/2`, `execute/2` — Dialyzer surfaces missing callbacks at compile time.
-  2. Calling `Parapet.Recovery.attach([SomeMissingModule, RealModule])` registers `RealModule` and silently skips `SomeMissingModule` (the optional-dependency compile-out-cleanly contract holds).
-  3. Attempting to register a capability id outside the 5-atom allowlist (`:retry_async_item`, `:requeue_dead_letter`, `:request_manual_provider_check`, `:revert_feature_flag`, `:disable_metric_label`) raises `ArgumentError` with a clear message naming the valid ids.
-  4. 100 async tests registering distinct recovery modules into `Parapet.Capabilities` all pass without bleeding state (the v0.10 SLO Application-env mistake is not repeated — the new registry uses the existing supervised Agent).
-
-**Plans**: 3 plans in 2 waves
-
-  - [x] 24-01-PLAN.md — Behaviour module `Parapet.Recovery` at `lib/parapet/recovery.ex` (4 `@callback`s + minimal `__using__/1` + crash-proof `attach/1` with `Code.ensure_loaded?` skip + `{:ok, registered_ids}` return + verbatim Experimental admonition) (RCV-01, RCV-02) (Wave 1)
-  - [x] 24-02-PLAN.md — Allowlist widening: append `:revert_feature_flag, :disable_metric_label` to `@valid_capabilities` in `lib/parapet/capabilities.ex` + add `Parapet.Recovery` row to `docs/stability.md` Experimental Modules table (alphabetical between `Parapet.MCP.PrometheusClient` and `Parapet.Telemetry.RecoveryAction`) (RCV-03) (Wave 1)
-  - [x] 24-03-PLAN.md — `test/parapet/recovery_test.exs` sync sweep (all 4 success criteria via `attach/1` integration tests) + 100-async sweep parameterized cyclically over the 5 allowlisted atoms (Pitfall 13 avoidance) (RCV-01, RCV-02, RCV-03) (Wave 2 — depends on 24-01 + 24-02)
-
-### Phase 25: Wire Confirm Through ClaimService + Preview/Confirm UX
-
-**Goal**: Close the operator-path-skips-claim defect by routing `Parapet.Operator.confirm_runbook_step/4` through `Parapet.Automation.ClaimService.claim_action/1` (same path the Oban auto-execution uses), add the `{:short_circuited, reason}` and `{:conflicted, claim_id}` additive return variants, and render both branches in the LiveView with operator-actionable next steps. Preview tokens get a 5-minute expiry with `target_refs` hash gating.
-**Depends on**: Phase 24 (behaviour module is the stable shape we wire against)
-**Requirements**: UI-01, UI-02, UI-03, UI-04
-**Complexity**: L (architectural defect closure spanning Operator API + ClaimService routing + generated LiveView template + idempotency-key lifecycle)
-**Success Criteria** (what must be TRUE):
-
-  1. Clicking "Preview" on a runbook step renders a panel showing action name, target args, blast-radius indicator, and the expected diff before any execution; clicking Confirm without a fresh Preview rejects the action with a clear "re-Preview required" message.
-  2. A second operator clicking Confirm on the same step while the first operator's claim is in-flight sees a flash message "Another node is executing this recovery — refresh to see the outcome" (the `:conflicted` branch renders with operator-actionable next steps).
-  3. Clicking Confirm on a Preview older than 5 minutes, or against an incident that resolved since Preview, returns `{:short_circuited, reason}` and the LiveView renders the reason ("Preview expired", "Incident already resolved") with a "Re-Preview" button.
-  4. Every successful Confirm flows through `Parapet.Operator.ActionPayload` + `ClaimService.claim_action/1` with `action_kind: "operator"` — the same circuit-breaker and multi-node claim semantics the v0.8 escalation path uses, observable in a multi-node concurrency test.
-
-**UI hint**: yes
-**Plans**: 3 plans in 2 waves
-
-  - [x] 25-01-PLAN.md — Operator API rewire in `lib/parapet/operator.ex`: 4-arm `ClaimService.claim_action/1` dispatch in `confirm_runbook_step/4` with `action_kind: "operator"`; string→atom `map_short_circuit_reason/1` mapper; `target_refs_hash/1` SHA-256 helper; `compute_preview/3` writes hash AFTER host_data merge (Pitfall 2) with atom-vs-string canonicalization (Pitfall 5); `find_recent_preview/3` surfaces hash (nullable for legacy previews); `:stale_preview` → `:preview_expired` (UI-02, UI-03, UI-04) (Wave 1)
-  - [x] 25-02-PLAN.md — Demo LiveView: `handle_event("confirm_mitigation", ...)` grows 2→4 arms with verbatim conflict flash + closed `short_circuit_flash/1` mapper (no catch-all); `preview_panel/1` adds Action Name cell resolved via `Parapet.Capabilities.get_recovery/1`; no `phx-value-*` hash round-trip (Pitfall 6) (UI-01, UI-04) (Wave 2 — depends on 25-01)
-  - [x] 25-03-PLAN.md — Test coverage: update `operator_test.exs:524` to `{:short_circuited, :preview_expired}`; new `preview_lifecycle_test.exs` (`:preview_expired`, `:target_refs_drift`, nil-hash legacy compat); new `confirm_concurrency_test.exs` (multi-node race using `ConcurrencyCase` + `unboxed_run` + Task rendezvous, asserts one `{:ok, _}` + one `{:conflicted, _claim_id}`, claim row `action_kind == "operator"`, Pitfall 4 Capabilities Agent reset) (UI-02, UI-03, UI-04) (Wave 2 — depends on 25-01)
-
-### Phase 26: Audit Propagation
-
-**Goal**: Every successful recovery action writes a `TimelineEntry` (`type: :recovery_confirmed`) AND a `ToolAudit` row capturing operator identity, action name, args, outcome, and timestamps. Add the `:recovery_failed` TimelineEntry type emitted on capability execution error — distinct from short-circuit/conflict states which write no entry because nothing executed.
-**Depends on**: Phase 25 (Confirm path must be claim-protected before audit shape is finalized)
-**Requirements**: AUD-01, AUD-02, AUD-03
-**Complexity**: M (three-tier audit contract enforcement; new timeline entry type; dedup rules to keep timeline readable)
-**Success Criteria** (what must be TRUE):
-
-  1. Querying `TimelineEntry` after a successful Confirm returns a row with `type: :recovery_confirmed`, the operator's URN, the capability id, the resolved target args, outcome data, and accurate timestamps.
-  2. Querying `ToolAudit` after the same Confirm returns a row with the matching operator identity, action name, args, outcome, and timestamps — the durable spine records what was done by whom, regardless of which surface (operator UI vs. automation) triggered it.
-  3. A capability whose `execute/2` returns `{:error, reason}` produces a `TimelineEntry` with `type: :recovery_failed` capturing the error reason; short-circuit and conflict outcomes produce no TimelineEntry (telemetry-only) because nothing was actually executed.
-  4. The retrospective generator surfaces recovery actions inline in the canonical chronology — not in a sidebar audit log.
-
-**Plans**: 1 plan in 1 wave (single coherent PR — the audit half of the Phase 25 Confirm path)
-
-  - [x] 26-01-PLAN.md — Enrich the `recovery_confirmed` TimelineEntry + ToolAudit success write and add a new `recovery_failed` failure write in `confirm_runbook_step/4`; add two retrospective `format_payload/1` render clauses; extend three existing test files (AUD-01, AUD-02, AUD-03) (Wave 1)
-
-### Phase 27: Prebuilt Playbooks
-
-**Goal**: Ship six runbook templates covering JTBD-MAP failure modes. Two are guidance-only by design (Retry Storm, Suppression Drift — every obvious automated mitigation worsens the failure). Four are capability-backed (Stalled Async, Dead-Letter Drain, Deploy-Tied Incident, Cardinality Blowout) and exercise the claim-protected Confirm path.
-**Depends on**: Phase 26 (audit propagation must work end-to-end before templates ship)
-**Requirements**: PB-01, PB-02, PB-03, PB-04, PB-05, PB-06
-**Complexity**: M (six EEx templates following established `priv/templates/parapet.gen.runbooks/` pattern; two reference existing capability ids, two reference new ones)
-**Success Criteria** (what must be TRUE):
-
-  1. An adopter running `mix parapet.gen.runbook retry_storm` (or any of the six templates) gets a host-owned runbook module that compiles cleanly under `if Code.ensure_loaded?(HostDep)`.
-  2. The two guidance-only templates (Retry Storm, Suppression Drift) include explicit `warning:` blocks documenting why every obvious automated mitigation worsens the failure — adopters cannot accidentally wire a capability into them.
-  3. The four capability-backed templates (Stalled Async via `:retry_async_item`, Dead-Letter Drain via `:requeue_dead_letter`, Deploy-Tied Incident via `:revert_feature_flag`, Cardinality Blowout via `:disable_metric_label`) demonstrate the Preview → Confirm flow against realistic preview output (count, target_refs, preconditions, warnings, summary).
-  4. Adopters can map any of the six templates to a specific SLO or alert name using the existing `Parapet.Runbook` DSL without modification.
-
-**Plans**: 1 plan in 1 wave (single coherent PR — template authoring + suppression_drift hardening + generator wiring + test extension land atomically)
-
-  - [x] 27-01-PLAN.md — Author two net-new capability templates (`deploy_tied_incident.ex.eex` via `:revert_feature_flag`, `cardinality_blowout.ex.eex` via `:disable_metric_label`); harden `suppression_drift.ex.eex` guidance-only warning; wire two `Igniter.copy_template` calls into `mix parapet.gen.runbooks`; extend the generator test (PB-01, PB-02, PB-03, PB-04, PB-05, PB-06) (Wave 1)
-
-### Phase 28: Demo Seed + CI Lane
-
-**Goal**: The demo app (`examples/demo_app/`) is seeded with at least one capability-backed incident demonstrating Preview → Confirm end-to-end on a fresh clone. CI exercises four scenarios (happy-path Confirm, preview-token-expired retry, short-circuit on resolved incident, claim-conflict between two simulated operators) so the loop is contract-tested.
-**Depends on**: Phase 27 (templates exist to generate the demo's capability against)
-**Requirements**: DEMO-05, DEMO-06
-**Complexity**: M (extends the existing Phase 21 demo CI contract; new seeded incident; concurrency test for two-operator race)
-**Success Criteria** (what must be TRUE):
-
-  1. Running `cd examples/demo_app && mix setup && mix phx.server` on a fresh clone surfaces a seeded open incident with a Preview-able + Confirm-able runbook step; clicking through Preview → Confirm in the browser executes the capability against demo DB state.
-  2. The CI demo lane runs four scenarios: happy-path Confirm produces TimelineEntry + ToolAudit; expired Preview token forces re-Preview; short-circuit branch fires when the incident is resolved between Preview and Confirm; claim-conflict resolves cleanly when two simulated operators race on Confirm.
-  3. Any scenario failure breaks the `demo` CI job, which is wired into `release_gate` as a required check (continuing the v1.0 Phase 21 contract).
-  4. The demo seed is replayable via `mix demo.reset` — adopters can run the recovery smoke test repeatedly without manual database cleanup.
-
-**UI hint**: yes
-**Plans**: 5 plans in 3 waves
-
-  - [x] 28-01-PLAN.md — Author the two compiled demo modules: `DemoApp.Runbooks.StalledExecutor` (use Parapet.Runbook, `:retry_item` capability step) and `DemoApp.Recovery.RetryAsyncItem` (use Parapet.Recovery, 4 callbacks, `execute/2` mutates an ActionItem) (DEMO-05) (Wave 1)
-  - [x] 28-02-PLAN.md — Add the `mix demo.reset` alias (ecto.drop+create+migrate+seeds) for replayable seeding (DEMO-05) (Wave 1)
-  - [x] 28-03-PLAN.md — Wire `Parapet.Capabilities` into the demo supervision tree + boot-time `Parapet.Recovery.attach([DemoApp.Recovery.RetryAsyncItem])` (DEMO-05, DEMO-06) (Wave 2)
-  - [x] 28-04-PLAN.md — Add the capability-backed seeded incident with `runbook_data["module"]` => StalledExecutor (DEMO-05) (Wave 3)
-  - [x] 28-05-PLAN.md — Author four `:smoke` recovery-loop scenarios (happy-path, preview-expired, resolved-mid-flow, sequential claim-conflict) through the Parapet.Operator API; confirm release_gate CI wiring needs no edits (DEMO-06) (Wave 3)
-
-### Phase 29: Stability + Adopter Onboarding
-
-**Goal**: Declare `Parapet.Recovery` Stable in `docs/stability.md`; ship CHANGELOG migration notes for adopters who pattern-match `confirm_runbook_step/4` return values; ship `mix parapet.gen.recovery` Igniter task that scaffolds a custom capability module; add `mix parapet.doctor` recovery-action adoption signal; write `docs/recovery-actions.md` adopter guide. Closes the "shipped ≠ adopted" gap from the v0.10 LEARN-22-C lesson.
-**Depends on**: Phase 28 (demo proves the loop end-to-end before docs name what shipped)
-**Requirements**: STAB-07, ADOP-01, ADOP-02, ADOP-03
-**Complexity**: M (combined stability declaration + Igniter task + doctor check + adopter guide; following the v0.10 Phase 18 "code lands before docs" pattern)
-**Success Criteria** (what must be TRUE):
-
-  1. `docs/stability.md` lists `Parapet.Recovery` and its 4 callbacks under the Stable tier; the CHANGELOG entry warns adopters who pattern-match `confirm_runbook_step/4` that the new `:short_circuited` and `:conflicted` error tuple variants are additive and will not be removed in 1.x.
-  2. Running `mix parapet.gen.recovery RetryDLQ` scaffolds `lib/<host>/recovery/retry_dlq.ex` with the four required callbacks, a docstring template, and a unit test stub — flag-based, not interactive (matches the SLO-W1 idiom planned for v1.2).
-  3. Running `mix parapet.doctor` reports a recovery-action adoption signal: count of attached capabilities, warnings for runbook steps that reference capabilities not in the registry, and per-capability check that the host module is loaded with the expected callbacks.
-  4. `docs/recovery-actions.md` exists, explains capability authoring, Preview/Confirm UX, the error semantics (`:short_circuited`, `:conflicted`, `:recovery_failed`), and walks through four worked examples (one per capability-backed playbook); it is cross-linked from `docs/operator-ui.md` and `docs/getting-started.md`.
-
-**Plans**: 4 plans in 2 waves (single coherent PR per D-18 — code surfaces land before the docs that name them)
-
-  - [x] 29-01-PLAN.md — Graduate `Parapet.Recovery` to Stable: flip moduledoc admonition + move stability.md row + Deprecation Register additive-variant note + verify.public_api regression case (STAB-07) (Wave 1)
-  - [x] 29-02-PLAN.md — `mix parapet.gen.recovery <NAME>` Igniter task + `recovery.ex.eex` template + Igniter.Test generator coverage (ADOP-01) (Wave 1)
-  - [x] 29-03-PLAN.md — `check_recovery` doctor adoption signal (count/unregistered/host-health; zero-capability → :skip per A1) + six signal-condition tests (ADOP-02) (Wave 1)
-  - [x] 29-04-PLAN.md — `docs/recovery-actions.md` adopter guide + ExDoc extras/Guides wiring + getting-started/operator-ui cross-links (ADOP-03) (Wave 2 — depends on 29-01, 29-02, 29-03)
 
 ## Progress
 

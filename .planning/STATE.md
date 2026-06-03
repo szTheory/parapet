@@ -2,10 +2,9 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Actionable Recovery
-status: executing
-stopped_at: Phase 29 context gathered (assumptions mode)
-last_updated: "2026-05-29T01:45:52.981Z"
-last_activity: 2026-05-29
+status: Awaiting next milestone
+last_updated: "2026-06-03T00:12:59.742Z"
+last_activity: 2026-06-03 — Milestone v1.1 completed and archived
 progress:
   total_phases: 7
   completed_phases: 7
@@ -25,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery miles
 
 ## Current Position
 
-Phase: 29
-Plan: Not started
-Status: Executing Phase 29
-Last activity: 2026-05-29
+Phase: Milestone v1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-03 — Milestone v1.1 completed and archived
 
 ## Performance Metrics
 
@@ -117,3 +116,7 @@ Last session: 2026-05-28T21:03:58.275Z
 Stopped at: Phase 29 context gathered (assumptions mode)
 Resume file: .planning/phases/29-stability-adopter-onboarding/29-CONTEXT.md
 Next step: `/gsd:discuss-phase 28` to gather context for Demo Seed + CI Lane (or `/gsd:plan-phase 28` to skip discuss).
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

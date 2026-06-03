@@ -10,26 +10,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release with Hex + HexDocs resolution and post-cut cleanup on `main`. `main` now returns to steady-state release config with no one-off `release-as` pin. See `.planning/ROADMAP.md` and `docs/release-policy.md`.
+**Shipped:** v1.1 Actionable Recovery (2026-06-03) — Closed the action loop in the operator UI. Turned runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Shipped the capability-registration behaviour (`Parapet.Recovery`), 6 prebuilt recovery playbooks, audit propagation (TimelineEntry and ToolAudit), and a demo seed that proves the loop. `Parapet.Recovery` graduated to Stable.
 
-**Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface: populated hex.pm metadata + `links:` and a Release-Please-owned `CHANGELOG.md`/retroactive `docs/HISTORY.md`; one-line `Parapet.SLO.StarterPack.WebSaaS`/`DeliverySaaS` packs (low-cardinality, low-traffic-safe, zero Generator changes); an end-to-end `warning:` runbook surface plus four deepened and three new preview-first runbook templates; and seven adoption guides (getting-started <30 min, troubleshooting, slo-authoring, four per-integration) backed by a `Parapet.Integration` behaviour that makes `Parapet.attach/1` uniform and crash-proof. Milestone audit `passed` (11/11 requirements, 4/4 phases, 5/5 integration, 5/5 flows; Nyquist compliant). See `.planning/MILESTONES.md`.
+<details>
+<summary><b>Archived State Updates</b></summary>
 
-**Next:** Quiet stable-line maintenance by default. The 2026-05-27 strategic assessment (`.planning/NEXT-STEP-ASSESSMENT.md`) identified Actionable Recovery as the highest-leverage v1.1 wedge: wire the operator UI to actually execute runbook steps (Preview → Confirm) with 4–6 prebuilt recovery playbooks, audit propagation, and a demo seed that proves the loop. SLO-W1, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement move to v1.2 (Authoring DX & Maturity). Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+. None of these activate until a concrete PR-shaped slice opens.
+**Previously shipped:** v1.0 Stable Release (2026-05-26) — froze the public API + telemetry contract under documented stability tiers and a deprecation policy, completed governance/docs trust surfaces, shipped a runnable demo app as a CI contract test, hardened CI into release-quality lanes, automated Hex publishing from Release Please, and cut the live `v1.0.0` release.
 
-## Current Milestone: v1.1 Actionable Recovery
+**Previously shipped:** v0.10 Adopter Success (2026-05-24) — closed the gap between "feature-complete" and "adoptable by a stranger" without expanding feature surface.
 
-**Goal:** Close the action loop in the operator UI — turn runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Replace today's hand-off-to-Grafana-or-Notion pattern with one-click in-UI mitigations.
+</details>
 
-**Target features:**
-- Runbook capability-registration API (Behaviour-based, mirrors `Parapet.Integration`) so host apps declare named recovery actions parapet can dispatch
-- Operator UI Guidance → Preview → Confirm flow (no auto-execution; Confirm wraps in `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free)
-- 4–6 prebuilt recovery playbooks for JTBD-MAP failure modes: retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout
-- Audit propagation — every action emits a `TimelineEntry` (`type: :recovery_action`) + `ToolAudit` row
-- Demo seed — fresh demo app shows at least one runbook with a Preview-able + Confirm-able action wired up
-
-**Started:** 2026-05-27. Seed thread: `.planning/threads/actionable-recovery-design.md`. Strategic context: `.planning/NEXT-STEP-ASSESSMENT.md`.
-
-**Progress:** Phase 23 (Foundations) complete 2026-05-27 — FND-01 (`lease_until` claim-lease column + `ClaimService` atomic self-heal, proven by automated migration-backfill + concurrency tests) and FND-02 (`Parapet.Telemetry.RecoveryAction` Experimental-tier event family + docs) shipped. Both decisions are irreversible-on-publish under the v1.0 freeze, so they land before any capability dispatch code. 366 tests / 0 failures. Phase 24 (Recovery Behaviour + Capability Allowlist) complete 2026-05-27 — RCV-01 (`Parapet.Recovery` behaviour at `lib/parapet/recovery.ex` with four `@callback`s + minimal `__using__/1`), RCV-02 (crash-proof `attach/1` that silently skips unloaded host modules and bridges to the supervised `Parapet.Capabilities` Agent via `&module.preview/2` / `&module.execute/2` captures), and RCV-03 (allowlist widened to 5 atoms) shipped under the Experimental tier. 111 phase-scoped tests (7 sync + 100 async sweep, Pitfall 13 avoidance proven) / 0 failures. Phase 25 (Wire Confirm Through ClaimService + Preview/Confirm UX) complete 2026-05-28 — UI-01..UI-04 shipped: `Parapet.Operator.confirm_runbook_step/4` now routes through `ClaimService.claim_action/1` (`action_kind: "operator"`) with additive `{:short_circuited, reason}` / `{:conflicted, claim_id}` variants, 5-minute preview expiry + `target_refs` hash gating, and a 4-arm demo LiveView surfacing both branches with an Action-name preview panel. Post-review hardening folded in: claim-protected confirm now permits the Acknowledge→investigating→Confirm path (parameterized `incident_state_gate` allowed_states), releases the claim on execute failure/raise via `ClaimService.mark_failed/2` + `failed_retryable` re-grant (no 5-minute lockout), and clears the Confirm affordance on `recovery_confirmed` (no double-confirm self-conflict). 484 tests / 0 failures; warnings-as-errors + dialyzer clean. 4 LiveView visual UAT items tracked in `25-HUMAN-UAT.md`. Phase 26 (Audit Propagation) complete 2026-05-28 — AUD-01/AUD-02/AUD-03 shipped: the success `{:ok}` arm of `confirm_runbook_step/4` writes an enriched `recovery_confirmed` TimelineEntry + ToolAudit (operator identity, action name, target args, outcome), the post-won `{:error, reason}` arm writes a new `recovery_failed` TimelineEntry + `success: false` ToolAudit before releasing the claim, and the retrospective generator renders both inline in the chronology. Short-circuit/conflict outcomes write nothing (nothing executed). Code review caught + fixed a blocker (the best-effort failure-path audit write now runs inside `try/rescue` so a raising DB error can't skip `ClaimService.mark_failed/2` and strand the claim for the lease window). 487 tests / 0 failures; warnings-as-errors clean. Phase 27 (Prebuilt Playbooks) complete 2026-05-28 — PB-01..PB-06 shipped: the two net-new capability-backed templates (`deploy_tied_incident.ex.eex` via `:revert_feature_flag`, `cardinality_blowout.ex.eex` via `:disable_metric_label`) mirror the 3-step investigate→mitigate→verify shape of `stalled_executor`, reference capability atoms only (zero optional-dep coupling), and declare `requires_preview: true` + `target_kind:` + `warning:` to structurally prove the Preview→Confirm path; `suppression_drift`'s guidance-only warning now states *why* automated clearing is unsafe (mass-escalation / incorrect re-suppression) and is machine-enforced capability-free (test `refute`s any `capability:`); both new templates are wired into the existing `mix parapet.gen.runbooks` generator with the test extended (incl. a `use Parapet.Runbook` guard). A doc-only `@doc` accuracy fix to the 5-atom `:capability` list in `runbook.ex` was the single accepted deviation from CONTEXT D-13 (no DSL/behavior change). 491 tests / 0 failures; `mix compile` clean. Phase 28 (Demo Seed + CI Lane) complete 2026-05-28 — DEMO-05/DEMO-06 shipped: the demo app gained a compiled `DemoApp.Runbooks.StalledExecutor` runbook + `DemoApp.Recovery.RetryAsyncItem` capability (allowlisted `:retry_async_item`, `execute/2` flips an `ActionItem` open→resolved), boot-time `Parapet.Recovery.attach/1` wiring (the `:parapet` OTP app already starts the `Capabilities` singleton, so only `attach/1` was needed), a capability-backed seeded incident, a `mix demo.reset` replay alias, and a missing `parapet_action_claims` demo migration. Key finding: the operator UI renders runbook steps from inline `runbook_data["steps"]` while Preview/Confirm execution uses `runbook_data["module"]` — a module-only incident renders no Preview button, so the seed + tests now carry both keys (latent core gap noted in `28-LEARNINGS.md` for a follow-up). The loop is contract-tested by five `:smoke` scenarios (happy-path Confirm, expired-preview, resolved-mid-flow short-circuit, sequential claim-conflict, and a `Phoenix.LiveViewTest` browser Preview→Confirm click-through that automates the former human UAT — **0 human verification required**). 7 demo smoke tests / 0 failures; `release_gate needs: [lint, test, demo]` unchanged; zero core edits. Verified passed (11/11 must-haves). Phase 29 (Stability + Adopter Onboarding) complete 2026-05-29 — STAB-07/ADOP-01/ADOP-02/ADOP-03 shipped, closing the v1.1 milestone: `Parapet.Recovery` graduated Experimental→Stable (moduledoc flipped to `Stable {: .info}`, row moved in `docs/stability.md`, the four callbacks `@doc since: "1.1.0"`-frozen for 1.x, and a Deprecation/Compatibility Register note that `confirm_runbook_step/4`'s `{:short_circuited, reason}`/`{:conflicted, claim_id}` variants are additive — CHANGELOG migration delivered via the release-please commit footer per D-05, not a hand-edit); `mix parapet.gen.recovery <NAME>` flag-based (non-interactive) Igniter scaffolder emitting the 4 frozen callbacks + docstring + test stub; a `check_recovery` signal added to `mix parapet.doctor` (attached-capability count, warnings for runbook steps referencing unregistered capabilities, per-capability host-module/callback health, zero-capability→`:skip` to keep `--ci` green) that threads a backward-compatible `module:` field through `Parapet.Capabilities`; and a 372-line `docs/recovery-actions.md` adopter guide (capability authoring, Preview/Confirm by reference, the three error semantics, four worked examples) wired into the ExDoc Guides group and cross-linked from getting-started/operator-ui. Code review's lone "blocker" (mix.exs `@version 1.0.3` vs `since: "1.1.0"`) was a false positive under release-please, which auto-bumps the version at release. 28 phase tests pass; full suite 501/502 (the 1 failure is a pre-existing `:peer.start_link` distributed-Erlang env flake in `ExecutorClusterSmokeTest`, untouched by this phase); `mix compile --warnings-as-errors` clean. Verified passed (4/4 must-haves).
+**Next:** v1.2 Authoring DX & Maturity. SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement. Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+.
 
 ## Previous Posture: Released Maintenance
 
@@ -60,6 +52,19 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 - ✓ Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist — v0.1
 - ✓ Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default — v0.1
+- ✓ Add `lease_until` column to `parapet_action_claims` — v1.1 (FND-01)
+- ✓ Define `Parapet.Telemetry.RecoveryAction` event family — v1.1 (FND-02)
+- ✓ Expose `Parapet.Recovery` behaviour for capability registration — v1.1 (RCV-01)
+- ✓ `Parapet.Recovery.attach/1` gracefully skips unloaded modules — v1.1 (RCV-02)
+- ✓ Widen `Parapet.Capabilities` allowlist for v1.1 capabilities — v1.1 (RCV-03)
+- ✓ LiveView UI displays preview of mitigation (target args, expected diff) — v1.1 (UI-01)
+- ✓ LiveView renders conflict and short-circuit variants with actionable next steps — v1.1 (UI-02, UI-03, UI-04)
+- ✓ Every executed runbook step writes a `TimelineEntry` and `ToolAudit` — v1.1 (AUD-01, AUD-02, AUD-03)
+- ✓ Prebuilt runbook templates for JTBD-MAP failure modes (retry storm, stalled async, etc.) — v1.1 (PB-01 to PB-06)
+- ✓ Demo app seeded with a capability-backed open incident — v1.1 (DEMO-05, DEMO-06)
+- ✓ `Parapet.Recovery` declared Stable with CHANGELOG migration notes — v1.1 (STAB-07)
+- ✓ Scaffolding generator `mix parapet.gen.recovery` and `check_recovery` doctor check — v1.1 (ADOP-01, ADOP-02)
+- ✓ `docs/recovery-actions.md` adopter guide — v1.1 (ADOP-03)
 - ✓ HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group — v0.1
 - ✓ Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker — v0.1
 - ✓ Login journey as the first business-critical SLO — auth success rate via `sigra` integration — v0.1
@@ -173,6 +178,8 @@ Shipped v0.8 adding Deterministic Escalation & Bounded Mitigation, proving Parap
 Shipped v0.9 adding Performance, Scale & DX: proactive TSDB cardinality protection, database scale & pruning (resolved-only archiver), a responsive Operator UI proven against 50k+ incidents, a unified `mix parapet.install` Day-1 path, and Ecto-backed multi-node safety. Codebase now ~20,274 LOC (Elixir/EEx, lib+priv+test). The milestone took 14 phases — 5 core deliverables plus 9 closure/reconciliation phases that hardened the verification surfaces after the first audit returned `gaps_found`.
 Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime deps, Ecto schemas, or Oban queues) over 4 phases / 12 plans in ~2 days — hex.pm metadata + Release-Please CHANGELOG, one-line SLO starter packs, an end-to-end `warning:` runbook surface with deepened + new preview-first templates, and seven adoption guides backed by a uniform `Parapet.Integration` activation behaviour. ~764 LOC of source change + ~697 lines of docs. First audit returned `tech_debt`; a same-day closure pass resolved the adopter-facing items, and the milestone audit `passed`.
 
+Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution flow via Guidance → Preview → Confirm. Added the `Parapet.Recovery` behaviour, six prebuilt playbooks, and audit propagation. Demo seeded with a complete end-to-end confirm loop.
+
 ## Constraints
 
 - **Tech stack**: Elixir/Phoenix only — ecosystem-native is a hard constraint, not a preference
@@ -186,7 +193,13 @@ Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
-|----------|-----------|---------|
+| Operator-in-the-loop execution only | Safety posture for v1.1 avoids autonomous remediation risks | ✓ Good |
+| Telemetry contract locked before capability ship | Irreversible on publish under v1.0 freeze | ✓ Good |
+| Capabilities Agent, not Application env | Avoids repeating the SLO config mistake and prevents state bleeding | ✓ Good |
+| Route Confirm through ClaimService | Ensures identical claim-protection and circuit-breaking as Oban execution | ✓ Good |
+| 5-minute Preview expiry | Ensures operator acts on fresh target state | ✓ Good |
+| Guidance-only runbooks | Retry Storm and Suppression Drift intentionally lack capability references to avoid worsening failures | ✓ Good |
+| Code surfaces land before the docs | Ensures guides never reference uncompilable code | ✓ Good |
 | Dynamic Repo lookup via `Application.get_env` | Decouples library from specific host database | ✓ Good |
 | Ecto schema changesets tested purely without DB | Ensures decoupling from specific host application databases | ✓ Good |
 | Strict boundary between telemetry and Ecto | Prevents Ecto from being used for raw high-volume telemetry | ✓ Good |
@@ -244,4 +257,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-29 — Phase 29 (v1.1 STAB-07/ADOP-01/ADOP-02/ADOP-03, Stability + Adopter Onboarding) complete — closes the v1.1 Actionable Recovery milestone*
+*Last updated: 2026-06-03 — v1.1 Actionable Recovery milestone complete*
