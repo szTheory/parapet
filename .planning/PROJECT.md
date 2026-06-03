@@ -23,6 +23,16 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Next:** v1.2 Authoring DX & Maturity. SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task, Elixir/OTP CI matrix, supply-chain hardening, missing-guides work, and branch-protection enforcement. Team workflow / responder coordination is v1.3. Cross-boundary journey correlation is v1.4+.
 
+## Current Milestone: v1.2 Authoring DX & Maturity
+
+**Goal:** Land additive DX and maturity work, fix technical debt in the SLO registry, and harden the CI pipeline to mark the library as functionally complete for Solo SaaS Operators without reopening the 1.0 stability freeze.
+
+**Target features:**
+- SLO-W1 flag-based `mix parapet.gen.slo` Igniter task
+- Move `Parapet.SLO` state off `Application` env (registry refactor)
+- Multi-version Elixir/OTP CI matrix & supply-chain hardening (Dependabot, SHA-pinned actions, branch protection)
+- v0.x -> v1.0 migration guide & deployment guide
+
 ## Previous Posture: Released Maintenance
 
 **Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
@@ -33,12 +43,10 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 - **v1.1 — Actionable Recovery (the wedge):** Operator UI executes runbook steps via Guidance → Preview → Confirm; 4–6 prebuilt recovery playbooks (retry storm, suppression drift, stalled async, dead-letter drain, deploy-tied incident, cardinality blowout); audit propagation via `Parapet.Operator.ActionPayload` so circuit breaker + multi-node claim service apply for free; demo seed wires at least one Preview-able + Confirm-able action. **In scope:** operator-in-the-loop execution only. **Out of scope:** autonomous remediation, cross-app correlation, multi-tenant action scoping. Thread: `.planning/threads/actionable-recovery-design.md`.
 - **v1.2 — Authoring DX & Maturity:** SLO-W1 as flag-based `mix parapet.gen.slo` Igniter task; multi-version Elixir/OTP CI matrix; supply-chain hardening (SHA-pinned actions, Dependabot, `MAINTAINING.md`, hexdocs logo/favicon); v0.x → v1.0 migration guide; deployment guide; branch-protection enforcement (make `release_gate` truly required, close the admin bypass) + conventional-commit taxonomy codified in `CONTRIBUTING.md` + PR template. Thread: `.planning/threads/release-gate-enforcement.md`.
-- **v1.3 — Team Workflow & Coordination (JTBD #2):** Responder model, handoff/acknowledgement formalization, on-call rotation hooks (PagerDuty/Opsgenie/webhook adapter).
-- **v1.4+ — Cross-boundary journey correlation (JTBD #4) + vertical starter packs** for non-Phoenix-default verticals.
 
 **Decisions surfaced 2026-05-27:**
 - **In scope (v1.1):** operator UI executes runbooks; preview-before-mutate is the safety posture.
-- **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane.
+- **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane; Team Workflow & Coordination (JTBD #2) such as PagerDuty routing, as the target audience is strictly solo operators; Cross-boundary journey correlation.
 - **Deferred to v1.4+:** multi-tenant SLO scoping and per-org operator views.
 - **Dropped earlier:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
 
@@ -159,6 +167,8 @@ Dropped:
 
 <!-- Explicit boundaries. Includes reasoning to prevent re-adding. -->
 
+- Team Workflow & Coordination (e.g., PagerDuty routing, shift handoffs) — Target audience is solo operators, not ops teams
+- Cross-boundary journey correlation — Better handled by dedicated tracing tools (e.g. OpenTelemetry)
 - Hosted observability SaaS — Parapet is host-owned infrastructure, not a vendor product
 - APM backend, log database, or trace store — Parapet composes existing systems; it does not replace them
 - Replacement for Phoenix Telemetry, OpenTelemetry, LiveDashboard, or vendor SDKs — composing these is the point

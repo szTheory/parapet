@@ -1,16 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Actionable Recovery
-status: Awaiting next milestone
-last_updated: "2026-06-03T00:12:59.742Z"
-last_activity: 2026-06-03 — Milestone v1.1 completed and archived
+milestone: v1.2
+milestone_name: Authoring DX & Maturity
+status: planning
+last_updated: "2026-06-03T01:03:59.391Z"
+last_activity: 2026-06-03
 progress:
-  total_phases: 7
-  completed_phases: 7
-  total_plans: 19
-  completed_plans: 19
-  percent: 100
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery miles
 
 ## Current Position
 
-Phase: Milestone v1.1 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-03 — Milestone v1.1 completed and archived
+Status: Defining requirements
+Last activity: 2026-06-03 — Milestone v1.2 started
 
 ## Performance Metrics
 
