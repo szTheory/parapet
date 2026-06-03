@@ -46,3 +46,9 @@ Plans:
 1. Migration and Deployment guides are present.
 2. Logo/Favicon added to docs.
 3. Demo app docker-compose works.
+
+**Plans:** 2 plans
+
+Plans:
+- [ ] 33-01-PLAN.md — Publish migration/deployment guides and wire HexDocs branding assets.
+- [ ] 33-02-PLAN.md — Add maintainer/contributor release docs and validate the demo Compose path.
