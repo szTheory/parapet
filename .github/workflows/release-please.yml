@@ -23,13 +23,13 @@ jobs:
       tag_name: ${{ steps.release.outputs.tag_name }}
       sha: ${{ steps.release.outputs.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Run Release Please
         id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@5c625bfb5d1ff62eadeeb3772007f7f66fdcf071
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
           config-file: release-please-config.json
@@ -50,13 +50,13 @@ jobs:
     env:
       HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
           ref: ${{ needs.release-please.outputs.sha }}
 
       - name: Setup Elixir
-        uses: erlef/setup-beam@v1
+        uses: erlef/setup-beam@fc68ffb90438ef2936bbb3251622353b3dcb2f93
         with:
           elixir-version: '1.19.0'
           otp-version: '27.2'
