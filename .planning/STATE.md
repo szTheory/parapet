@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-05-27 — v1.1 Actionable Recovery miles
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-03 — Milestone v1.2 started
+Phase: 31-igniter-slo-task
+Plan: 31-01
+Status: Phase complete
+Last activity: 2026-06-03 — Phase 31 completed
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Last activity: 2026-06-03 — Milestone v1.2 started
 | Phase 28-demo-seed-ci-lane P03 | 4 | 1 tasks | 1 files |
 | Phase 28 P04 | 34 | 1 tasks | 1 files |
 | Phase 28 P05 | 40 | 2 tasks | 3 files |
+| Phase 31 P01 | 4m | 1 tasks | 2 files |
 
 ## Accumulated Context
 

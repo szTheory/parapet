@@ -7,8 +7,8 @@ defmodule Mix.Tasks.Parapet.Gen.PrometheusTest do
 
   describe "mix parapet.gen.prometheus" do
     setup do
-      Application.put_env(:parapet, :providers, [MailglassDelivery])
-      on_exit(fn -> Application.put_env(:parapet, :providers, []) end)
+      Parapet.SLO.Registry.checkout()
+      Parapet.SLO.Registry.register_providers([MailglassDelivery])
       :ok
     end
 

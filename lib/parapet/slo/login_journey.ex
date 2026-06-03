@@ -49,9 +49,7 @@ defmodule Parapet.SLO.LoginJourney do
       runbook: runbook
     }
 
-    slos = Application.get_env(:parapet, :slos, [])
-    slos = Enum.reject(slos, &(&1.name == :login_journey)) ++ [slo]
-    Application.put_env(:parapet, :slos, slos)
+    Parapet.SLO.Registry.store(slo)
     slo
   end
 end

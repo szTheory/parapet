@@ -48,9 +48,7 @@ defmodule Parapet.SLO.Oban do
       runbook: runbook
     }
 
-    slos = Application.get_env(:parapet, :slos, [])
-    slos = Enum.reject(slos, &(&1.name == :oban)) ++ [slo]
-    Application.put_env(:parapet, :slos, slos)
+    Parapet.SLO.Registry.store(slo)
     slo
   end
 end

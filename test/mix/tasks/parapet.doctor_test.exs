@@ -32,7 +32,7 @@ defmodule Mix.Tasks.Parapet.DoctorTest.RunbookGuidanceOnly do
 end
 
 defmodule Mix.Tasks.Parapet.DoctorTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Mix.Tasks.Parapet.Doctor
 
@@ -42,7 +42,8 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
 
   setup do
     Mix.shell(Mix.Shell.Process)
-    Application.put_env(:parapet, :slos, [])
+    Parapet.SLO.Registry.checkout()
+    Parapet.Capabilities.checkout()
     Application.delete_env(:parapet, :escalation_policy)
     Application.delete_env(:parapet, :doctor_cluster_probe)
     Application.delete_env(:parapet, :repo)
@@ -53,7 +54,6 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
     worker_source = File.read!(@worker_path)
 
     on_exit(fn ->
-      Application.put_env(:parapet, :slos, [])
       Application.delete_env(:parapet, :escalation_policy)
       Application.delete_env(:parapet, :doctor_cluster_probe)
       Application.delete_env(:parapet, :repo)
@@ -249,14 +249,6 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
     alias Parapet.Capabilities
 
     setup do
-      # Reset the Capabilities Agent before each check_recovery test to prevent bleed
-      case start_supervised(Capabilities) do
-        {:ok, _pid} -> :ok
-        {:error, {:already_started, _pid}} ->
-          Agent.update(Capabilities, fn _ -> %{recovery: %{}} end)
-          :ok
-      end
-
       :ok
     end
 
@@ -289,15 +281,13 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
       # Seed an SLO pointing to the runbook with an unregistered capability step
       module_name = to_string(RunbookWithUnregisteredCap)
 
-      Application.put_env(:parapet, :slos, [
-        %Parapet.SLO{
-          name: :test_slo_unregistered_cap,
-          objective: 99.9,
-          good_events: "rate(events[5m])",
-          total_events: "sum(rate(events[5m]))",
-          runbook: module_name
-        }
-      ])
+      Parapet.SLO.Registry.store(%Parapet.SLO{
+        name: :test_slo_unregistered_cap,
+        objective: 99.9,
+        good_events: "rate(events[5m])",
+        total_events: "sum(rate(events[5m]))",
+        runbook: module_name
+      })
 
       assert Doctor.run(["recovery"]) == :ok
 
@@ -310,15 +300,13 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
       # Register a healthy capability so we get past the zero-cap early return
       {:ok, _} = Parapet.Recovery.attach([HealthyRecovery])
 
-      Application.put_env(:parapet, :slos, [
-        %Parapet.SLO{
-          name: :url_runbook_slo,
-          objective: 99.9,
-          good_events: "rate(events[5m])",
-          total_events: "sum(rate(events[5m]))",
-          runbook: "https://wiki.example.com/runbook"
-        }
-      ])
+      Parapet.SLO.Registry.store(%Parapet.SLO{
+        name: :url_runbook_slo,
+        objective: 99.9,
+        good_events: "rate(events[5m])",
+        total_events: "sum(rate(events[5m]))",
+        runbook: "https://wiki.example.com/runbook"
+      })
 
       assert Doctor.run(["recovery"]) == :ok
 

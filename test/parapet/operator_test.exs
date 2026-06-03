@@ -524,7 +524,7 @@ defmodule Parapet.OperatorTest do
 
     setup do
       # Ensure registry is fresh (manual reset for tests)
-      Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+      Parapet.Capabilities.checkout()
 
       Parapet.Capabilities.register_recovery(:retry_async_item,
         name: "Retry Item",

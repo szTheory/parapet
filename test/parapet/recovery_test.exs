@@ -51,23 +51,12 @@ end
 # ---------------------------------------------------------------------------
 
 defmodule Parapet.RecoveryTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Parapet.{Capabilities, Recovery}
 
-  # Verbatim setup from test/parapet/capabilities_test.exs:6-17 (per D-14 / Pattern 6).
-  # start_supervised/1 is idempotent: if the Agent is already running (it is supervised
-  # at boot), the :already_started branch resets state to a clean %{recovery: %{}}.
   setup do
-    case start_supervised(Capabilities) do
-      {:ok, _pid} ->
-        :ok
-
-      {:error, {:already_started, _pid}} ->
-        Agent.update(Capabilities, fn _ -> %{recovery: %{}} end)
-        :ok
-    end
-
+    Parapet.Capabilities.checkout()
     :ok
   end
 
@@ -165,6 +154,11 @@ defmodule Parapet.RecoveryAsyncSweepTest do
   use ExUnit.Case, async: true
 
   alias Parapet.Capabilities
+
+  setup do
+    Parapet.Capabilities.checkout()
+    :ok
+  end
 
   @allowlisted_ids [
     :retry_async_item,

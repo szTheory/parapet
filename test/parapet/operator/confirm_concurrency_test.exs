@@ -59,7 +59,7 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
         # Parapet.Capabilities Agent is process-global and survives between
         # tests. Explicitly clear it before registering this test's
         # capability to avoid leak-from-prior-test flakes.
-        Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+        Parapet.Capabilities.checkout()
 
         Parapet.Capabilities.register_recovery(:retry_async_item,
           name: "Retry Async Item",

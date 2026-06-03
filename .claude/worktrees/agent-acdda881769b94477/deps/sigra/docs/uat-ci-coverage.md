@@ -1,0 +1,61 @@
+# GA UAT — CI vs human coverage (SEED-001 shift-left)
+
+This document maps the eight **SEED-001** human GA items to **merge-blocking CI** substitutes, **library/integration tests**, and **residual** risk that still needs occasional human or vendor-assisted verification.
+
+| SEED | Topic | CI / automated substitute | Residual (not replaced by CI) |
+|------|--------|----------------------------|-------------------------------|
+| **1** | Lockout + suspicious-login email HTML | `Example.Accounts.EmailsSecurityHtmlTest` — structure, CTAs, IP/device copy; **`email_visual_regression` CI job** — Playwright visual baseline across Chromium + WebKit × light + dark; caniemail CSS lint; contrast gate ≥ 4.5:1; byte budget ≤ 100 KB; evidence in `.planning/uat-evidence/v1.20/email-phase-04/` (GAUAT-01) | Legacy Outlook desktop Word engine (Microsoft EOL Oct 2026); subjective copy tone; spam-folder placement |
+| **2** | Seven account-lifecycle templates | `Example.Accounts.EmailsLifecycleHtmlTest` — headings, CTAs, security footer strings; **`email_visual_regression` CI job** — 28-cell Playwright baseline (7 templates × 2 engines × 2 themes); caniemail CSS lint; contrast gate ≥ 4.5:1; byte budget ≤ 100 KB; evidence in `.planning/uat-evidence/v1.20/email-phase-08/` (GAUAT-02) | Legacy Outlook desktop Word engine (Microsoft EOL Oct 2026); subjective copy tone; spam-folder placement |
+| **3** | `mix sigra.gen.oauth` greenfield | **`install_smoke` CI job (Phase 87 extended)** → `scripts/ci/install-smoke.sh` (`mix phx.new` + `mix sigra.install` + `mix sigra.gen.oauth --providers google,github` + `mix compile --warnings-as-errors` + `MIX_ENV=test mix test`); emits `oauth-gen: 12/12 expected artifacts present, mix test green`; transcript at `.planning/uat-evidence/v1.20/oauth-gen/transcript.log` (CI artifact + GitHub release asset on `v*`). | Subjective “reads well” in generated files; major Phoenix generator churn between minors (`phx_new` archive pin in install-smoke catches the moment of bump). |
+| **4** | Google OAuth E2E | **`Sigra.OAuthTest`** + **`Sigra.OAuthCeremonyAuditTest`** (machine baseline; see § OA-01 below); **`oauth_e2e_playwright` CI job (Phase 87)** — `oauth-register.spec.ts` drives Sigra's example app against `Sigra.Testing.OAuthIssuer` (TestServer-backed in-process OIDC issuer; RS256 ID tokens; real PKCE) for the full register/login/logout/re-login cycle; evidence at `.planning/uat-evidence/v1.20/oauth-google/`. | Live consumer Google consent UX surface (architecturally located in adopter env via `mix sigra.oauth.smoketest --provider=google` + `docs/oauth-google-setup.md`); token refresh against live Google (deferred). |
+| **5** | Provider linking / last-method unlink | **`Sigra.OAuth.OAuthSettingsTemplateContractTest`** — template strings for D-03 last-provider + “Set a password first”; **`oauth_e2e_playwright` CI job (Phase 87)** — `oauth-link.spec.ts` covers four visual states (linked-with-password / disabled-tooltip / after-set-password / post-unlink) with one hero PNG of the disabled-tooltip state; evidence at `.planning/uat-evidence/v1.20/oauth-link/`. | Exact disabled-button styling in host CSS overrides (adopter responsibility). |
+| **6** | Email-match confirmation / invitation lock | **`ga-uat-shift-left.spec.ts`** — invitation signup path: tamper locked email → server-side `email_mismatch` form error; **`oauth_e2e_playwright` CI job (Phase 87)** — `oauth-email-match.spec.ts` covers verbatim flash text from `oauth_controller.ex:96` + redirect + identity row + `provider_linked_email` mailbox arrival; evidence at `.planning/uat-evidence/v1.20/oauth-email-match/`. | Other email-match surfaces (non-invitation, non-OAuth) if added later. |
+| **7** | Backup code regenerate wiring | **`mfa_e2e_playwright` CI job** — `mfa-backup-rotation.spec.ts` drives the real MFA settings flow in the example app (register/confirm/login → sudo → enroll → regenerate) and emits UI + DB-probe + audit evidence at `.planning/uat-evidence/v1.20/mfa-backup-rotation/`; **`example_unit_smoke`** still covers the lower-level rotation contract via `backup_code_rotation_test.exs`. | Optional spot-checks for host-app CSS chrome only; no release-gating human witness remains. |
+| **8** | Clean-machine getting started | **`install_smoke` CI job (Phase 88 extended)** — `scripts/ci/install-smoke.sh` now proves the real getting-started install/runtime path on a disposable Phoenix 1.8 host (`mix phx.new` → `mix sigra.install` → compile/migrate → generated-host auth lifecycle test → boot server and hit documented routes), with transcript + env + lifecycle evidence at `.planning/uat-evidence/v1.20/getting-started-clean-machine/`. | Subjective first-read speed and prose elegance are non-gating editorial concerns, not GA blockers. |
+
+## OA-01 / OA-02 — `library_tests` + `oauth_ceremony` machine baseline
+
+This subsection is the **grep-friendly** hub for **OA-01** (merge-blocking ceremony audit assertions) and **OA-02** (how we describe machine vs human coverage). It complements the SEED table row **SEED-4** and the **GA-03** bullet under **v1.4 GA** — those stay scannable; depth lives here.
+
+### Machine (merge-blocking)
+
+- **`Sigra.OAuthCeremonyAuditTest`** (`test/sigra/oauth/oauth_ceremony_audit_test.exs`) proves persisted `audit_events` for **`oauth.register_via_oauth`** (registration ceremony) and **`oauth.authorize`** on the successful **`Sigra.OAuth.authorize_url/3`** path, using **Postgres + Sandbox**, an in-process mock strategy, and **no live IdP HTTP**.
+- **`Sigra.Planning.Phase58OauthOa01CiContractTest`** (`test/sigra/planning/phase_58_oauth_oa01_ci_contract_test.exs`) is a **structural** CI gate: the **`library_tests`** GitHub Actions job runs plain `mix test` and asserts the OA-01 modules stay wired into CI — it does **not** replace the integration assertions in the audit test.
+- **`Sigra.OAuthTest`** (`test/sigra/oauth/oauth_test.exs`) covers the authorize/callback **contract** with Assent-shaped mock behavior (complement to the audit persistence proof above, not a duplicate).
+
+Discoverability: see **`.github/workflows/ci.yml`** job **`library_tests`** (“Run library tests”).
+
+### Human / live-provider residual
+
+- **Live Google** (consent UX, refresh flows, tenant-specific policy) is **not** asserted by the modules above.
+- Anything outside those named contracts remains occasional human or vendor-assisted verification.
+- Machine proofs above are **scoped** to the named tests; IdP-specific end-to-end behavior is **not** exhaustively automated in CI.
+
+## v1.4 GA (GA-02..GA-05)
+
+Human vs machine boundaries for **v1.4** are recorded in **`.planning/v1.4-GA-UAT.md`** (canonical **Executed / Waived / Blocked** table). This section **cross-links** that matrix only — it does **not** replace the SEED-1..8 table above or duplicate merge-blocking job lists.
+
+- **GA-01 (pointer):** Product proof lives in Phase 41 + **`example_unit_smoke`**; see `.planning/uat-evidence/v1.4/GA-01-pointer/README.md` and the GA-01 row in `.planning/v1.4-GA-UAT.md` — **no rotation re-run** in Phase 42.
+- **GA-02 (historical — v1.4):** Human = real MUAs when templates change; machine = **`library_tests`** / example HTML tests (`EmailsSecurityHtmlTest`, `EmailsLifecycleHtmlTest`) + **`example_unit_smoke`** per SEED-1/2. As of v1.20 (Phase 86), SEED-1/2 visual coverage is fully automated by the **`email_visual_regression`** CI job with committed Playwright baselines + GAUAT-01/02 evidence — real MUAs are no longer a GA requirement for these templates.
+- **GA-03:** Human = live Google OAuth; machine = **`Sigra.OAuthTest`** + **`MockStrategy`** contract path (SEED-4) **and** **`Sigra.OAuthCeremonyAuditTest`** for persisted audit rows — see **§ OA-01 / OA-02 — `library_tests` + `oauth_ceremony` machine baseline** (subsection owns depth).
+- **GA-04:** Human = witnessed `guides/introduction/getting-started.md` run; machine = **`getting_started_uat_contract`** + `scripts/ci/getting-started-contract.sh` (SEED-8).
+- **GA-05:** Consolidated matrix ownership — links **`.planning/v1.4-GA-UAT.md`** here and defers full CI graph to this file’s SEED rows.
+
+## v1.12 launch evidence (attestation)
+
+**v1.12** records per-SEED outcomes (**Executed** / **Waived with substitute** / **Deferred**) in the planning-only index **[`v1.12-UAT-EVIDENCE.md` on `main`](https://github.com/sztheory/sigra/blob/main/.planning/v1.12-UAT-EVIDENCE.md)** (**UAT-01**). That file is intentionally **not** a second SEED×CI matrix — the **machine substitute vs residual** catalog and **merge-blocking Policy** for SEED-1..8 remain **in this document** (table above + **§ Policy**).
+
+- **Catalog vs outcomes:** the SEED table above names **what CI proves and what humans might still check**; **v1.12-UAT-EVIDENCE** records **what we assert happened** for release engineering.
+- **Governance:** if an outcome row disagrees with **§ Policy** below, **edit `.planning/v1.12-UAT-EVIDENCE.md` first**, then align prose here.
+- **Downstream:** phase **75** links **`upgrading-to-v1.12.md`** to this path (**TRN-01**) — keep the filename stable.
+
+## Where to run this
+
+- **GitHub Actions:** `.github/workflows/ci.yml` — jobs `library_tests`, `example_unit_smoke`, `example_playwright_smoke` (includes `ga-uat-shift-left.spec.ts`), `install_smoke`, `getting_started_uat_contract`, **`email_visual_regression`** (SEED-1/2 visual baseline + GAUAT-01/02 evidence, Phase 86).
+- **Installer golden / idempotency contract:** locally run **`mix ci.install_golden`** (see [`MAINTAINING.md`](../MAINTAINING.md)); CI mirrors it with job **`install_golden_contract`** in [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (path-filtered on PRs, always on `main` pushes).
+- **Local:** same as CI: `PGUSER=postgres PGPASSWORD=postgres PGHOST=localhost` for Elixir tests; Playwright from `test/example/priv/playwright` with example app on port 4000.
+
+## Policy
+
+- **Merge-blocking:** Rows SEED-1 through SEED-8 are considered **machine-closed** for GA posture when the jobs above are green and their evidence bundles are present on the release SHA/tag.
+- **Residual:** Real mail clients and live Google OAuth remain **optional** pre-announcement spot checks; track separately (e.g. quarterly) if desired.

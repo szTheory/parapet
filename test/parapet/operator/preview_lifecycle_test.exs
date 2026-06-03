@@ -14,7 +14,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
   lifecycle home; the legacy assertion in operator_test.exs remains as a
   regression marker against accidental contract drift.
   """
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   alias Parapet.Operator
   alias Parapet.Operator.ActionPayload
@@ -159,11 +159,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     Process.put(:mock_action_items, [])
     Process.put(:captured_writes, [])
 
-    # Capabilities Agent is process-global — manually reset before each test
-    # (Pitfall 4: ConcurrencyCase only resets DB tables; the unit harness
-    # doesn't use ConcurrencyCase but the Agent is still shared with other
-    # tests in the suite, so explicit reset keeps ordering hazards out).
-    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+    Parapet.Capabilities.checkout()
 
     Parapet.Capabilities.register_recovery(:retry_async_item,
       name: "Retry Item",
@@ -342,7 +338,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
 
   test "confirm_runbook_step returns the capability error and releases the claim on execute failure (CR-02)",
        %{payload: payload, incident: incident} do
-    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+    Parapet.Capabilities.checkout()
 
     Parapet.Capabilities.register_recovery(:retry_async_item,
       name: "Retry Item",
@@ -385,7 +381,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
 
   test "confirm_runbook_step releases the claim even when the failure-path audit write raises (CR-01 regression)",
        %{payload: payload, incident: incident} do
-    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+    Parapet.Capabilities.checkout()
 
     Parapet.Capabilities.register_recovery(:retry_async_item,
       name: "Retry Item",
@@ -417,7 +413,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
 
   test "confirm_runbook_step converts a raised capability into a structured error (CR-03)",
        %{payload: payload, incident: incident} do
-    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+    Parapet.Capabilities.checkout()
 
     Parapet.Capabilities.register_recovery(:retry_async_item,
       name: "Retry Item",
@@ -470,7 +466,7 @@ defmodule Parapet.Operator.PreviewLifecycleTest do
     # appear as strings; the canonicalization in target_refs_hash/1
     # (`Enum.map(&to_string/1) |> Enum.sort`) must produce the same hash for
     # `[:item_a, :item_b]` and `["item_a", "item_b"]`.
-    Agent.update(Parapet.Capabilities, fn _ -> %{recovery: %{}} end)
+    Parapet.Capabilities.checkout()
 
     Parapet.Capabilities.register_recovery(:retry_async_item,
       name: "Retry Item",
