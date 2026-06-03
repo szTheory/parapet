@@ -54,6 +54,7 @@ Each task was committed atomically:
 
 1. **Task 1: Configure Dependabot** - `5d4e0dc` (chore)
 2. **Task 2: Document Branch Protection Rules** - `f58800b` (docs)
+3. **Verification fix: Branch protection JSON body** - `304f5fe` (fix)
 
 **Plan metadata:** committed separately after summary creation.
 
@@ -68,14 +69,22 @@ Each task was committed atomically:
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
 
-**Total deviations:** 0 auto-fixed.
-**Impact on plan:** No scope changes.
+**1. [Rule 1 - Bug] Corrected `gh api` nested JSON submission**
+- **Found during:** Phase verification
+- **Issue:** The original command used form flags for nested branch-protection objects, which can submit JSON as strings instead of an object body.
+- **Fix:** Switched the command to `gh api --input -` with an explicit JSON request body.
+- **Files modified:** `docs/branch-protection.md`
+- **Verification:** `grep -q -- '--input -' docs/branch-protection.md`
+- **Committed in:** `304f5fe`
+
+**Total deviations:** 1 auto-fixed (1 bug).
+**Impact on plan:** The fix keeps the plan's intended branch-protection enforcement exact and does not change scope.
 
 ## Issues Encountered
 
-None.
+The branch-protection CLI example needed one verification correction so nested GitHub API settings are sent as a JSON body.
 
 ## User Setup Required
 
