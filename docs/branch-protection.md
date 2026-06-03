@@ -21,10 +21,19 @@ gh api \
   --method PUT \
   -H "Accept: application/vnd.github+json" \
   "/repos/${OWNER_REPO}/branches/main/protection" \
-  -f required_pull_request_reviews='{"required_approving_review_count":1}' \
-  -f required_status_checks='{"strict":true,"contexts":["release_gate"]}' \
-  -f enforce_admins=true \
-  -f restrictions=null
+  --input - <<'JSON'
+{
+  "required_pull_request_reviews": {
+    "required_approving_review_count": 1
+  },
+  "required_status_checks": {
+    "strict": true,
+    "contexts": ["release_gate"]
+  },
+  "enforce_admins": true,
+  "restrictions": null
+}
+JSON
 ```
 
 After applying the rule, confirm that `release_gate` appears in the branch protection settings for `main`.
