@@ -1,7 +1,7 @@
 ## Milestone v1.2 Requirements
 
 ### Authoring DX
-- [ ] **DX-01**: `mix parapet.gen.slo` task is rebuilt as a flag-based Igniter task.
+- [x] **DX-01**: `mix parapet.gen.slo` task is rebuilt as a flag-based Igniter task.
 - [ ] **DX-02**: `Parapet.SLO` registry state is moved off the `Application` env to fix test isolation issues.
 - [ ] **DX-03**: v0.x -> v1.0 migration guide is added to `docs/`.
 - [ ] **DX-04**: Deployment guide is added to `docs/`.

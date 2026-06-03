@@ -15,10 +15,10 @@
 1. `mix parapet.gen.slo` executes via Igniter.
 2. Supports passing flags for metric names and thresholds.
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
-- [ ] 31-01-PLAN.md — Provide a seamless, flag-based generator for SLOs by creating an Igniter Mix task `mix parapet.gen.slo`.
+- [x] 31-01-PLAN.md — Provide a seamless, flag-based generator for SLOs by creating an Igniter Mix task `mix parapet.gen.slo`.
 
 ## Phase 32: CI & Supply Chain Hardening
 **Goal:** Lock down CI dependencies and enforce branch protection.
