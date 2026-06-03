@@ -19,7 +19,9 @@ defmodule Parapet.SLO.Registry do
 
   def all do
     case :ets.info(__MODULE__) do
-      :undefined -> []
+      :undefined ->
+        []
+
       _ ->
         pid = find_checkout_pid()
         pattern = if pid, do: {{:test, pid, :slo, :_}, :"$1"}, else: {{:global, :slo, :_}, :"$1"}
@@ -42,10 +44,13 @@ defmodule Parapet.SLO.Registry do
 
   def providers do
     case :ets.info(__MODULE__) do
-      :undefined -> Application.get_env(:parapet, :providers, [])
+      :undefined ->
+        Application.get_env(:parapet, :providers, [])
+
       _ ->
         pid = find_checkout_pid()
         key = if pid, do: {:test, pid, :providers}, else: {:global, :providers}
+
         case :ets.lookup(__MODULE__, key) do
           [{^key, providers}] -> providers
           _ -> Application.get_env(:parapet, :providers, [])
@@ -72,6 +77,7 @@ defmodule Parapet.SLO.Registry do
 
   defp find_checkout_pid do
     pids = [self() | Process.get(:"$callers", [])]
+
     Enum.find(pids, fn pid ->
       case :ets.lookup(__MODULE__, {:checkout, pid}) do
         [{_, true}] -> true

@@ -39,6 +39,7 @@ defmodule Parapet.SLO.GeneratorTest do
 
   test "provider artifacts use active providers only" do
     Parapet.SLO.Registry.checkout()
+
     Parapet.SLO.Registry.store(%SLO{
       name: :legacy_only,
       objective: 99.0,

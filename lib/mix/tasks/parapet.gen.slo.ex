@@ -45,8 +45,16 @@ defmodule Mix.Tasks.Parapet.Gen.Slo do
         "threshold: #{options[:threshold]},"
       end
 
-    good_metric = if options[:good_metric], do: "good_source_metric: #{inspect(options[:good_metric])},\n", else: ""
-    total_metric = if options[:total_metric], do: "total_source_metric: #{inspect(options[:total_metric])},\n", else: ""
+    good_metric =
+      if options[:good_metric],
+        do: "good_source_metric: #{inspect(options[:good_metric])},\n",
+        else: ""
+
+    total_metric =
+      if options[:total_metric],
+        do: "total_source_metric: #{inspect(options[:total_metric])},\n",
+        else: ""
+
     alert_class_str = options[:alert_class] || "page"
     runbook_str = options[:runbook] || "https://example.com"
 
@@ -69,7 +77,7 @@ defmodule Mix.Tasks.Parapet.Gen.Slo do
       end
     end
     """
-    
+
     # Clean up any potential double newlines introduced by empty metrics
     content = String.replace(content, ~r/\n\s*\n\s*alert_class:/, "\n        alert_class:")
 

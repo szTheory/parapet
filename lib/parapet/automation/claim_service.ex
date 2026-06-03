@@ -23,7 +23,9 @@ defmodule Parapet.Automation.ClaimService do
     action_key = opts |> Keyword.fetch!(:action_key) |> to_string()
     idempotency_key = Keyword.fetch!(opts, :idempotency_key)
     now = Keyword.get(opts, :now, DateTime.utc_now() |> DateTime.truncate(:microsecond))
-    lease_until = DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
+
+    lease_until =
+      DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
 
     attrs = %{
       incident_id: incident_id,
@@ -137,7 +139,9 @@ defmodule Parapet.Automation.ClaimService do
 
   defp steal_expired_claim(repo, attrs) do
     now = attrs.claimed_at
-    new_lease_until = DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
+
+    new_lease_until =
+      DateTime.add(now, @default_lease_ms, :millisecond) |> DateTime.truncate(:microsecond)
 
     # Re-grant the row when the prior holder's lease expired (crashed node) OR
     # when a previous attempt was released as retryable. Resetting status to

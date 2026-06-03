@@ -20,15 +20,15 @@ end
 # Fixture runbook that references an unregistered capability atom:
 defmodule Mix.Tasks.Parapet.DoctorTest.RunbookWithUnregisteredCap do
   use Parapet.Runbook
-  title "Runbook with Unregistered Cap"
-  step :check, label: "Check", capability: :disable_metric_label
+  title("Runbook with Unregistered Cap")
+  step(:check, label: "Check", capability: :disable_metric_label)
 end
 
 # Fixture runbook whose step has NO capability (guidance-only):
 defmodule Mix.Tasks.Parapet.DoctorTest.RunbookGuidanceOnly do
   use Parapet.Runbook
-  title "Guidance Only Runbook"
-  step :guide, label: "Guide"
+  title("Guidance Only Runbook")
+  step(:guide, label: "Guide")
 end
 
 defmodule Mix.Tasks.Parapet.DoctorTest do

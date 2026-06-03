@@ -105,9 +105,13 @@ defmodule Parapet.Evidence.RetrospectiveTest do
     refute markdown =~ "[\"job-"
 
     # Both entries appear inline in the chronological entry list (not a separate section)
-    confirmed_pos = :binary.match(markdown, "retry_async_item confirmed by ops@example.com") |> elem(0)
+    confirmed_pos =
+      :binary.match(markdown, "retry_async_item confirmed by ops@example.com") |> elem(0)
+
     failed_pos = :binary.match(markdown, "Recovery failed:") |> elem(0)
-    assert confirmed_pos < failed_pos, "recovery_confirmed should appear before recovery_failed in chronological order"
+
+    assert confirmed_pos < failed_pos,
+           "recovery_confirmed should appear before recovery_failed in chronological order"
   end
 
   test "recovery_failed without a reason key still renders human-readable copy" do

@@ -13,7 +13,15 @@ defmodule Mix.Tasks.Parapet.Gen.SloTest do
       igniter =
         test_project(app_name: :test)
         |> Igniter.Project.Config.configure("config.exs", :parapet, [:providers], [])
-        |> run_slo(["TestJourney", "--objective", "99.9", "--good-metric", "http_requests_total", "--alert-class", "ticket"])
+        |> run_slo([
+          "TestJourney",
+          "--objective",
+          "99.9",
+          "--good-metric",
+          "http_requests_total",
+          "--alert-class",
+          "ticket"
+        ])
 
       files = Rewrite.sources(igniter.rewrite) |> Enum.map(&Rewrite.Source.get(&1, :path))
 

@@ -46,6 +46,7 @@ defmodule Parapet.Capabilities do
 
   defp find_checkout_pid do
     pids = [self() | Process.get(:"$callers", [])]
+
     Enum.find(pids, fn pid ->
       case :ets.lookup(__MODULE__, {:checkout, pid}) do
         [{_, true}] -> true
@@ -84,10 +85,17 @@ defmodule Parapet.Capabilities do
   """
   def capabilities(:recovery) do
     case :ets.info(__MODULE__) do
-      :undefined -> []
+      :undefined ->
+        []
+
       _ ->
         pid = find_checkout_pid()
-        pattern = if pid, do: {{:test, pid, :recovery, :_}, :"$1"}, else: {{:global, :recovery, :_}, :"$1"}
+
+        pattern =
+          if pid,
+            do: {{:test, pid, :recovery, :_}, :"$1"},
+            else: {{:global, :recovery, :_}, :"$1"}
+
         :ets.match(__MODULE__, pattern) |> Enum.map(fn [cap] -> cap end)
     end
   end
@@ -98,10 +106,13 @@ defmodule Parapet.Capabilities do
   """
   def get_recovery(id) do
     case :ets.info(__MODULE__) do
-      :undefined -> nil
+      :undefined ->
+        nil
+
       _ ->
         pid = find_checkout_pid()
         key = if pid, do: {:test, pid, :recovery, id}, else: {:global, :recovery, id}
+
         case :ets.lookup(__MODULE__, key) do
           [{^key, capability}] -> capability
           _ -> nil

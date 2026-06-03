@@ -197,7 +197,9 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
       recovery_entries =
         ConcurrencyRepo.all(
           from(t in TimelineEntry,
-            where: t.incident_id == ^incident.id and t.type in ["recovery_confirmed", "recovery_failed"]
+            where:
+              t.incident_id == ^incident.id and
+                t.type in ["recovery_confirmed", "recovery_failed"]
           )
         )
 

@@ -355,13 +355,23 @@ defmodule Mix.Tasks.Parapet.Doctor do
     # Guard: Capabilities Agent may not be running when Mix tasks load the app without starting OTP.
     # In that case, skip the check gracefully (mirrors the :skip contract for unavailable checks).
     if Process.whereis(Parapet.Capabilities) == nil do
-      %{status: :skip, messages: ["Recovery capabilities agent is not running; start the OTP app to enable this check."]}
+      %{
+        status: :skip,
+        messages: [
+          "Recovery capabilities agent is not running; start the OTP app to enable this check."
+        ]
+      }
     else
       caps = Parapet.Capabilities.capabilities(:recovery)
 
       # Signal 1: COUNT — zero capabilities is :skip (A1 resolution; mirrors check_runbooks no-SLOs)
       if caps == [] do
-        %{status: :skip, messages: ["No recovery capabilities attached, so recovery adoption checks were skipped."]}
+        %{
+          status: :skip,
+          messages: [
+            "No recovery capabilities attached, so recovery adoption checks were skipped."
+          ]
+        }
       else
         warnings = []
 
@@ -380,7 +390,10 @@ defmodule Mix.Tasks.Parapet.Doctor do
                 cap_atom = Map.get(step, :capability)
 
                 if cap_atom && Parapet.Capabilities.get_recovery(cap_atom) == nil do
-                  ["Runbook #{inspect(module)} step references unregistered capability: #{inspect(cap_atom)}" | step_acc]
+                  [
+                    "Runbook #{inspect(module)} step references unregistered capability: #{inspect(cap_atom)}"
+                    | step_acc
+                  ]
                 else
                   step_acc
                 end
@@ -401,7 +414,10 @@ defmodule Mix.Tasks.Parapet.Doctor do
 
               mod ->
                 if not Code.ensure_loaded?(mod) do
-                  ["Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is not loadable" | acc]
+                  [
+                    "Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is not loadable"
+                    | acc
+                  ]
                 else
                   missing_callbacks =
                     Enum.reject(recovery_callbacks, fn {fun, arity} ->
@@ -411,8 +427,13 @@ defmodule Mix.Tasks.Parapet.Doctor do
                   if missing_callbacks == [] do
                     acc
                   else
-                    missing_names = Enum.map(missing_callbacks, fn {fun, arity} -> "#{fun}/#{arity}" end)
-                    ["Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is missing callbacks: #{Enum.join(missing_names, ", ")}" | acc]
+                    missing_names =
+                      Enum.map(missing_callbacks, fn {fun, arity} -> "#{fun}/#{arity}" end)
+
+                    [
+                      "Recovery capability #{inspect(cap.id)} host module #{inspect(mod)} is missing callbacks: #{Enum.join(missing_names, ", ")}"
+                      | acc
+                    ]
                   end
                 end
             end

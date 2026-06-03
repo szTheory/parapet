@@ -74,7 +74,13 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
   test "exposes the executed span family" do
     assert [:parapet, :operator, :recovery_action, :executed] in RecoveryAction.span_families()
 
-    assert RecoveryAction.allowed_public_keys([:parapet, :operator, :recovery_action, :executed, :stop]) ==
+    assert RecoveryAction.allowed_public_keys([
+             :parapet,
+             :operator,
+             :recovery_action,
+             :executed,
+             :stop
+           ]) ==
              RecoveryAction.allowed_public_keys(:executed)
   end
 

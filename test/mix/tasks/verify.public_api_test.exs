@@ -75,7 +75,9 @@ defmodule Mix.Tasks.Verify.PublicApiTest do
     test "detect_tier_from_text/1 returns :experimental for the old Recovery admonition string" do
       # Confirms the regression guard is real: the old Experimental string would have
       # returned :experimental, not :stable. Reversing the flip would break the test above.
-      old_admonition = "> #### Experimental {: .warning}\n>\n> This module is experimental in v1.x."
+      old_admonition =
+        "> #### Experimental {: .warning}\n>\n> This module is experimental in v1.x."
+
       assert PublicApi.detect_tier_from_text(old_admonition) == :experimental
     end
   end

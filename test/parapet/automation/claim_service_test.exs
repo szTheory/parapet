@@ -145,7 +145,8 @@ defmodule Parapet.Automation.ClaimServiceTest do
         |> Incident.changeset(%{title: "Crashed node remnant"})
         |> ConcurrencyRepo.insert()
 
-      past = DateTime.add(DateTime.utc_now(), -10 * 60, :second) |> DateTime.truncate(:microsecond)
+      past =
+        DateTime.add(DateTime.utc_now(), -10 * 60, :second) |> DateTime.truncate(:microsecond)
 
       {:ok, original} =
         ConcurrencyRepo.insert(%ActionClaim{
