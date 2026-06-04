@@ -15,9 +15,9 @@
 
 ## Generated UI Host Compatibility
 
-- [ ] **UIROUTE-01**: Generated Operator UI route helpers, links, redirects, forms, and LiveView patches respect a host-owned base path when mounted under a non-default scope such as `/ops/parapet`.
-- [ ] **UIROUTE-02**: The generated template and demo app copy stay synchronized and test-pinned for both default `/parapet` and scoped route mounting.
-- [ ] **UIROUTE-03**: Scoped-route support does not change Parapet's auth ownership, router ownership, public API stability tier, or dependency surface.
+- [x] **UIROUTE-01**: Generated Operator UI route helpers, links, redirects, forms, and LiveView patches respect a host-owned base path when mounted under a non-default scope such as `/ops/parapet`.
+- [x] **UIROUTE-02**: The generated template and demo app copy stay synchronized and test-pinned for both default `/parapet` and scoped route mounting.
+- [x] **UIROUTE-03**: Scoped-route support does not change Parapet's auth ownership, router ownership, public API stability tier, or dependency surface.
 
 ## Adoption And Supportability
 

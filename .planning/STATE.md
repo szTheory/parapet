@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Trust Hardening & Host-App Compatibility
 status: executing
-last_updated: "2026-06-04T19:34:26.824Z"
-last_activity: 2026-06-04 -- Phase 38 planning complete
+last_updated: "2026-06-04T19:45:05.577Z"
+last_activity: 2026-06-04 -- Completed Phase 38 Plan 01
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 4
   percent: 33
 ---
 
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 38 — scoped ui routes
+**Current focus:** Phase 38 — Scoped UI Routes
 
 ## Current Position
 
-Phase: 38
-Plan: Not started
+Phase: 38 (Scoped UI Routes) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-04 -- Phase 38 planning complete
+Last activity: 2026-06-04 -- Completed Phase 38 Plan 01
 
 ## Performance Metrics
 
@@ -80,6 +80,7 @@ Last activity: 2026-06-04 -- Phase 38 planning complete
 | Phase 37 P01 | 20 min | 4 tasks | 2 files |
 | Phase 37 P02 | 8 min | 2 tasks | 3 files |
 | Phase 37 P03 | 7 min | 2 tasks | 2 files |
+| Phase 38 P01 | 8min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Incident 4 added as always-insert alongside existing 3; replayability via mix demo.reset per D-10/D-11
 - [Phase 32]: Keep `release_gate` as the stable required status check while CI expands into an Elixir/OTP matrix.
 - [Phase 36]: Browser screenshot proof uses local Chromium automation against the demo app and writes durable PNG evidence under the Phase 36 planning directory without adding repo dependencies.
+- [Phase 38]: Keep scoped route ownership in generated host-owned LiveView/component code rather than adding a Parapet router abstraction. — Preserves host auth/router ownership and Parapet core compile-out boundary.
+- [Phase 38]: Derive the active Operator UI base path from the current LiveView URI path only. — Avoids using scheme, host, query, or user params as redirect targets while supporting nested host scopes.
+- [Phase 38]: No generated route-bearing form surfaces were found, so no form route handling was added. — The form audit returned no matches; adding form route behavior would invent unsupported semantics.
 
 ### Pending Todos
 
@@ -127,11 +131,11 @@ None. v1.3 closed with 13/13 requirements satisfied, milestone audit passed, and
 
 ## Session Continuity
 
-Last session: 2026-06-04T19:10:33.612Z
-Stopped at: Phase 38 UI-SPEC approved
-Resume file: .planning/phases/38-scoped-ui-routes/38-UI-SPEC.md
-Next step: /gsd-execute-phase 37
+Last session: 2026-06-04T19:45:05.573Z
+Stopped at: Completed 38-01-PLAN.md
+Resume file: None
+Next step: Execute Phase 38 Plan 02
 
 ## Operator Next Steps
 
-- Execute Phase 37 Archive Durability with /gsd-execute-phase 37
+- Execute Phase 38 Plan 02.
