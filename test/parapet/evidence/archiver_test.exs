@@ -128,6 +128,18 @@ defmodule Parapet.Evidence.ArchiverTest do
       Agent.update(__MODULE__, &%{&1 | delete_result: result})
     end
 
+    def set_runbook_data(incident_id, runbook_data) do
+      Agent.update(__MODULE__, fn state ->
+        incidents =
+          Enum.map(state.incidents, fn
+            %Incident{id: ^incident_id} = incident -> %{incident | runbook_data: runbook_data}
+            incident -> incident
+          end)
+
+        %{state | incidents: incidents}
+      end)
+    end
+
     defp matching_ids_from_query(query) do
       cutoff = Enum.at(query.wheres, 1).params |> Enum.at(0) |> elem(0)
 
@@ -143,6 +155,38 @@ defmodule Parapet.Evidence.ArchiverTest do
     defp ids_from_query(query) do
       [{ids, _type}] = Enum.at(query.wheres, 0).params
       ids
+    end
+  end
+
+  defmodule TamperReadFile do
+    def write(path, data, opts), do: File.write(path, data, opts)
+    def rename(source, destination), do: File.rename(source, destination)
+
+    def read(path) do
+      if String.ends_with?(path, ".tmp") do
+        {:ok,
+         Jason.encode!(%{
+           id: "tampered",
+           timeline_entries: [],
+           action_items: [],
+           action_claims: []
+         }) <> "\n"}
+      else
+        File.read(path)
+      end
+    end
+  end
+
+  defmodule ManifestFailFile do
+    def rename(source, destination), do: File.rename(source, destination)
+    def read(path), do: File.read(path)
+
+    def write(path, data, opts) do
+      if String.ends_with?(path, ".manifest.json") do
+        {:error, :eacces}
+      else
+        File.write(path, data, opts)
+      end
     end
   end
 
@@ -241,6 +285,7 @@ defmodule Parapet.Evidence.ArchiverTest do
       Application.delete_env(:parapet, :archive_chunk_size)
       Application.delete_env(:parapet, :archive_now)
       Application.delete_env(:parapet, :archive_run_id)
+      Application.delete_env(:parapet, :archive_file_module)
       File.rm(path)
       File.rm("#{path}.#{@run_id}.tmp")
       File.rm("#{path}.#{@run_id}.manifest.json")
@@ -359,6 +404,71 @@ defmodule Parapet.Evidence.ArchiverTest do
     assert failure.partial_summary.deleted_count == 0
     assert File.exists?(archive_path)
     assert File.exists?(failure.partial_summary.manifest_path)
+  end
+
+  test "encode failure returns Failure without deleting selected records", %{
+    archive_path: archive_path,
+    archived_id: archived_id
+  } do
+    FakeRepo.set_runbook_data(archived_id, %{"not_json" => self()})
+
+    assert {:error, %Failure{} = failure} = Archiver.archive(FakeRepo, archive_path, 30)
+
+    assert failure.stage == :write_archive
+    assert failure.partial_summary.selected_count == 1
+    assert FakeRepo.snapshot().delete_calls == []
+    refute File.exists?(archive_path)
+  end
+
+  test "verification mismatch returns Failure without deleting selected records", %{
+    archive_path: archive_path
+  } do
+    Application.put_env(:parapet, :archive_file_module, TamperReadFile)
+
+    assert {:error, %Failure{} = failure} = Archiver.archive(FakeRepo, archive_path, 30)
+
+    assert failure.stage == :verify_archive
+    assert {:child_count_mismatch, _details} = failure.reason
+    assert failure.partial_summary.selected_count == 1
+    assert failure.partial_summary.archived_count == 1
+    assert FakeRepo.snapshot().delete_calls == []
+    refute File.exists?(archive_path)
+  end
+
+  test "manifest write failure returns Failure without deleting selected records", %{
+    archive_path: archive_path
+  } do
+    Application.put_env(:parapet, :archive_file_module, ManifestFailFile)
+
+    assert {:error, %Failure{} = failure} = Archiver.archive(FakeRepo, archive_path, 30)
+
+    assert failure.stage == :write_manifest
+    assert failure.reason == :eacces
+    assert failure.partial_summary.selected_count == 1
+    assert failure.partial_summary.archived_count == 1
+    assert FakeRepo.snapshot().delete_calls == []
+    assert File.exists?(archive_path)
+  end
+
+  test "delete-stage failure can be rerun safely for the same selected id", %{
+    archive_path: archive_path,
+    archived_id: archived_id
+  } do
+    FakeRepo.set_delete_result({0, nil})
+
+    assert {:error, %Failure{stage: :delete_records}} =
+             Archiver.archive(FakeRepo, archive_path, 30)
+
+    assert FakeRepo.snapshot().delete_calls == [[archived_id]]
+
+    FakeRepo.set_delete_result(nil)
+
+    assert {:ok, %Summary{} = summary} = Archiver.archive(FakeRepo, archive_path, 30)
+
+    assert summary.selected_ids == [archived_id]
+    assert summary.deleted_count == 1
+    assert FakeRepo.snapshot().delete_calls == [[archived_id], [archived_id]]
+    assert File.exists?(archive_path)
   end
 
   defp incident(id, title, state, inserted_at) do
