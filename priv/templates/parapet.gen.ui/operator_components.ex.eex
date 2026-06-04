@@ -307,6 +307,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <.link
           patch={queue_item_path(@queue_params, incident)}
           aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
+          data-incident-id={incident.id}
           class={[
             "block border-l-4 px-4 py-3 transition-colors",
             queue_row_class(@selected, incident)
