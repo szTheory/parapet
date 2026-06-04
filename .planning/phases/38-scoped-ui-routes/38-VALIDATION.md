@@ -3,7 +3,7 @@ phase: 38
 slug: scoped-ui-routes
 status: draft
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-06-04
 ---
 
@@ -32,15 +32,15 @@ created: 2026-06-04
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 38-01-01 | 01 | 1 | UIROUTE-01 | T-38-01 | Generated links, patches, redirects, and route helpers keep local navigation under the active host scope. | unit/render contract | `mix test test/parapet/generated_operator_live_paging_test.exs test/mix/tasks/parapet.gen.ui_test.exs` | yes; scoped assertions needed | pending |
-| 38-01-02 | 01 | 1 | UIROUTE-02 | T-38-02 | Generated templates and checked-in demo copies render matching default and scoped route behavior. | contract | `mix test test/parapet/operator_ui_demo_contract_test.exs test/parapet/operator_ui_integration_test.exs` | yes; scoped assertions needed | pending |
-| 38-01-03 | 01 | 1 | UIROUTE-03 | T-38-03 | Scoped route support does not add auth/router ownership, stable public APIs, or direct Phoenix/LiveView core dependencies. | regression/static | `mix test test/parapet/operator_ui_compile_out_test.exs test/parapet/operator_ui_integration_test.exs` | yes; may need stronger assertions | pending |
+| 38-01-01 | 01 | 1 | UIROUTE-01 | T-38-01 | Generated links, patches, redirects, and route helpers keep local navigation under the active host scope. | unit/render contract | `mix test test/parapet/generated_operator_live_paging_test.exs test/mix/tasks/parapet.gen.ui_test.exs` | yes | green |
+| 38-01-02 | 01 | 1 | UIROUTE-02 | T-38-02 | Generated templates and checked-in demo copies render matching default and scoped route behavior. | contract | `mix test test/parapet/operator_ui_demo_contract_test.exs test/parapet/operator_ui_integration_test.exs` | yes | green |
+| 38-01-03 | 01 | 1 | UIROUTE-03 | T-38-03 | Scoped route support does not add auth/router ownership, stable public APIs, or direct Phoenix/LiveView core dependencies. | regression/static | `mix test test/parapet/operator_ui_compile_out_test.exs test/parapet/operator_ui_integration_test.exs` | yes | green |
 
 ## Wave 0 Requirements
 
-- [ ] Add scoped route assertions to `test/parapet/generated_operator_live_paging_test.exs` for `/ops/parapet`, including history detail links and queue patches.
-- [ ] Add generator output assertions in `test/mix/tasks/parapet.gen.ui_test.exs` for the generated base-path seam and absence of raw local `/parapet` literals outside helper/default definitions.
-- [ ] Add demo-copy scoped assertions in `test/parapet/operator_ui_demo_contract_test.exs` or `test/parapet/operator_ui_integration_test.exs`.
+- [x] Add scoped route assertions to `test/parapet/generated_operator_live_paging_test.exs` for `/ops/parapet`, including history detail links and queue patches.
+- [x] Add generator output assertions in `test/mix/tasks/parapet.gen.ui_test.exs` for the generated base-path seam and absence of raw local `/parapet` literals outside helper/default definitions.
+- [x] Add demo-copy scoped assertions in `test/parapet/operator_ui_demo_contract_test.exs` or `test/parapet/operator_ui_integration_test.exs`.
 
 ## Manual-Only Verifications
 

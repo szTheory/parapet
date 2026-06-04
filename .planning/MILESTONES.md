@@ -1,5 +1,26 @@
 # Milestones
 
+## v1.4 Trust Hardening & Host-App Compatibility (Shipped: 2026-06-04)
+
+**Phases completed:** 3 phases, 8 plans, 21 tasks
+
+**Key accomplishments:**
+
+- Verified JSONL archive export with structured run summaries, complete Parapet-owned incident bundles, and exact-id prune semantics
+- Archive CLI and optional Oban worker now preserve structured archive success and failure truth
+- Archive result contract documentation, Experimental changelog note, and full repository verification for archive durability
+- Generated Operator UI routes now derive and thread a host-owned base path so `/parapet` and nested mounts like `/ops/parapet` render local navigation correctly.
+- Checked-in demo Operator UI copies now mirror the generated scoped-route helpers, and the runnable demo proves both `/parapet` and `/ops/parapet` host mounts.
+- Generated Operator UI guidance now documents default and nested host mounts, with tests proving scoped route support did not widen Parapet router, auth, API, or dependency ownership.
+- Archive maintenance and scoped Operator UI mounting are now copy-pasteable from first-contact docs and guarded by focused ExUnit documentation tests.
+- ADOPT-03 now has a dated, test-guarded quality-evaluation closeout that links v1.4 risk closures to Phase 37, Phase 38, and Phase 39 evidence without erasing still-open audit findings.
+
+**Audit:** Passed 2026-06-04: 10/10 requirements, 3/3 phases, 7/7 integration checks, 6/6 E2E flows. See [`milestones/v1.4-MILESTONE-AUDIT.md`](milestones/v1.4-MILESTONE-AUDIT.md).
+
+**Known deferred items at close:** 0.
+
+---
+
 ## v1.3 Operator UI Polish & Design System (Shipped: 2026-06-04)
 
 **Phases completed:** 3 phases, 4 plans, 11 tasks

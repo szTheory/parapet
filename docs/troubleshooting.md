@@ -1,8 +1,8 @@
 # Parapet Troubleshooting
 
-This guide answers common obstacles you may hit after following [Parapet Getting Started](docs/getting-started.md). Each section names the exact surface involved so you can confirm the fix against your specific setup.
+This guide answers common obstacles you may hit after following [Parapet Getting Started](getting-started.md). Each section names the exact surface involved so you can confirm the fix against your specific setup.
 
-For UI-specific doctor checks, see [Parapet Operator UI Guide](docs/operator-ui.md).
+For UI-specific doctor checks, see [Parapet Operator UI Guide](operator-ui.md).
 
 ## When to run archive maintenance
 

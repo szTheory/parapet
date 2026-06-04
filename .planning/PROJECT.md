@@ -10,10 +10,12 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.3 Operator UI Polish & Design System (2026-06-04) — Completed the generated Operator UI polish pass: reframed `/parapet` around active response, explicit response/actions/history lanes, and preferred incident detail navigation; consolidated generated Tailwind component helpers and audit-safe action copy; expanded demo state coverage; and captured browser screenshot proof across desktop and mobile routes.
+**Shipped:** v1.4 Trust Hardening & Host-App Compatibility (2026-06-04) — Closed the repo-evidenced adoption-trust gaps most likely to hurt real host-app use: archive/export/prune now preserves complete Parapet-owned evidence bundles or fails loudly with structured run context; generated Operator UI links and patches respect default and nested host scopes such as `/ops/parapet`; and first-contact docs explain archive maintenance, scoped mounting, and the v1.4 quality-evaluation closeout.
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.3 Operator UI Polish & Design System (2026-06-04) — Completed the generated Operator UI polish pass: reframed `/parapet` around active response, explicit response/actions/history lanes, and preferred incident detail navigation; consolidated generated Tailwind component helpers and audit-safe action copy; expanded demo state coverage; and captured browser screenshot proof across desktop and mobile routes.
 
 **Previously shipped:** v1.2 Authoring DX & Maturity (2026-06-03) — Completed the stable-line maturity pass: moved SLO and capability dynamic state to ETS-backed checkout isolation, shipped the flag-based `mix parapet.gen.slo` Igniter task, hardened CI with an Elixir/OTP matrix and SHA-pinned actions, added Dependabot and branch-protection guidance, published migration/deployment docs with HexDocs branding, and documented maintainer/contributor/demo Compose workflows.
 
@@ -25,18 +27,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Current milestone:** v1.4 Trust Hardening & Host-App Compatibility — Closing the quality-evaluation risks most likely to damage adoption trust: archive evidence durability is complete as of Phase 37, and generated Operator UI behavior inside real host-app route scopes remains the next host-app compatibility boundary.
+**Current milestone:** None. v1.4 is archived; the next milestone should be defined from the remaining quality-evaluation findings and strategic follow-up candidates.
 
-## Last Milestone: v1.3 Operator UI Polish & Design System
+## Last Milestone: v1.4 Trust Hardening & Host-App Compatibility
 
-**Goal:** Make Parapet's generated Operator UI a deliberate, high-polish active-response workbench that clearly orients operators from health state to evidence to safe action.
+**Goal:** Close the repo-evidenced quality gaps most likely to make adopters lose trust without broadening Parapet's public product surface.
 
 **Delivered:**
-- Active-response-first `/parapet` orientation with explicit navigation lanes for response, actions, and history.
-- Preferred `/parapet/incidents/:id` detail route while preserving `/parapet/:id` compatibility.
-- Generated Tailwind design-system helper families for surfaces, controls, chips, selected/focus states, restrained motion, and audit-safe action copy.
-- Rich demo seed coverage for active, investigating, resolved, recovery, escalation, action-item, retrospective, and external-evidence states.
-- Browser-backed responsive UI verification for desktop and mobile response/actions/history/detail paths.
+- Archive/export/prune durability for complete Parapet-owned incident evidence bundles, including incidents, timeline entries, tool audits, action items, and action claims.
+- Structured archive Summary/Failure result contracts surfaced through the library, Mix task, and optional Oban worker.
+- Scoped generated Operator UI route helpers for default `/parapet` and nested host scopes such as `/ops/parapet`, mirrored into the demo app and smoke-tested.
+- Default and scoped Phoenix router examples plus troubleshooting notes for archive maintenance and generated UI mounting.
+- Dated quality-evaluation closeout that identifies the v1.4 risks closed without erasing unrelated future quality candidates.
 
 ## Previous Posture: Released Maintenance
 
@@ -59,16 +61,9 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 **Key context:** The public surface is already frozen under `docs/stability.md`; future work should assume that contract. Research backing the additive follow-up still lives in `.planning/research/V1-*.md`. The 2026-05-27 strategic assessment lives at `.planning/NEXT-STEP-ASSESSMENT.md` and expires when v1.1 ships.
 
-## Current Milestone: v1.4 Trust Hardening & Host-App Compatibility
+## Next Milestone Goals
 
-**Goal:** Close the repo-evidenced quality gaps most likely to make adopters lose trust without broadening Parapet's public product surface.
-
-**Target features:**
-- Archive/export/prune behavior preserves complete durable evidence or fails loudly with actionable results.
-- Generated Operator UI route helpers, links, and forms work correctly when mounted under a non-default host-app scope.
-- Adoption and troubleshooting docs tell users how to run archive maintenance and mount generated UI in realistic Phoenix apps.
-
-**Key context:** `.planning/QUALITY-EVALUATION.md` is the source artifact for this milestone. The top risks are not generic polish: archive durability is a trust boundary, and scoped-route compatibility is a host-app respect boundary. Keep the public API, dependency surface, auth ownership, and runtime behavior stable unless a phase explicitly proves the change is additive and necessary.
+Define the next milestone with `$gsd-new-milestone`. Candidate inputs include the still-open quality-evaluation findings, long-tail cross-boundary journey correlation, MCP/recovery extensions after MCP stability improves, and any concrete release-readiness gaps found after v1.4 adoption hardening.
 
 ## Requirements
 
@@ -101,6 +96,9 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 - ✓ Conventional Commit taxonomy in `CONTRIBUTING.md` — v1.2 (MAT-06)
 - ✓ HexDocs logo and favicon — v1.2 (MAT-07)
 - ✓ Demo app Docker Compose path — v1.2 (MAT-08)
+- ✓ Archive durability hardening — resolved evidence archive/export/prune preserves complete durable evidence, fails loudly on partial failure, and exposes actionable run summaries — v1.4 (ARCH-01 to ARCH-04)
+- ✓ Generated UI scoped-route compatibility — generated Operator UI works under default `/parapet` and nested host-owned scopes such as `/ops/parapet` without taking auth/router ownership — v1.4 (UIROUTE-01 to UIROUTE-03)
+- ✓ Adoption proof and docs — archive maintenance and scoped UI mounting are documented, tested, and reflected in the quality-evaluation follow-up trail — v1.4 (ADOPT-01 to ADOPT-03)
 - ✓ HTTP/API request health SLI/SLO slice — error rate, latency, availability per route group — v0.1
 - ✓ Oban/job health SLI/SLO slice — failure rate, throughput, latency per queue and worker — v0.1
 - ✓ Login journey as the first business-critical SLO — auth success rate via `sigra` integration — v0.1
@@ -178,13 +176,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- v1.4 opened from .planning/QUALITY-EVALUATION.md after v1.3 archive. -->
-
-v1.4 is active. It is a trust-hardening milestone, not a product-scope expansion.
-
-- [x] Archive durability hardening — resolved evidence archive/export/prune preserves complete durable evidence, fails loudly on partial failure, and exposes actionable run summaries. Validated in Phase 37.
-- [ ] Generated UI scoped-route compatibility — generated Operator UI must work when mounted below a host-owned route scope such as `/ops/parapet`, without taking ownership of auth/router decisions.
-- [ ] Adoption proof and docs — archive maintenance and scoped UI mounting must be documented, tested, and reflected in the quality-evaluation follow-up trail.
+No active requirements. A fresh `.planning/REQUIREMENTS.md` will be created by the next `$gsd-new-milestone` run.
 
 Dropped:
 
@@ -217,6 +209,8 @@ Shipped v0.10 adding Adopter Success: a credibility-gate release (no new runtime
 
 Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution flow via Guidance → Preview → Confirm. Added the `Parapet.Recovery` behaviour, six prebuilt playbooks, and audit propagation. Demo seeded with a complete end-to-end confirm loop.
 Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/capability registries, a flag-based SLO Igniter task, CI matrix and supply-chain hardening, migration/deployment guides, release-maintenance docs, HexDocs branding, and a validated demo Compose path.
+Shipped v1.3 Operator UI Polish & Design System adding active-response-first generated UI navigation, private Tailwind helper families, richer demo state coverage, and browser screenshot proof without adding repo dependencies.
+Shipped v1.4 Trust Hardening & Host-App Compatibility adding durable archive evidence bundles and structured failure context, scoped generated Operator UI routes for host-owned mount paths, and copy-pasteable adoption docs backed by focused guard tests.
 
 ## Constraints
 
@@ -282,6 +276,10 @@ Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/c
 | Preferred detail route plus compatibility route | `/parapet/incidents/:id` improves generated navigation clarity while `/parapet/:id` remains documented and test-pinned for adopters | ✓ Good |
 | Generated component helpers stay private to copied LiveViews | Consolidates Tailwind surfaces and controls without creating a new public design-system module or dependency | ✓ Good |
 | Browser screenshot proof without repo dependencies | Local Chromium script verifies desktop/mobile generated UI paths while avoiding a new browser-test dependency surface | ✓ Good |
+| Complete archive evidence bundle before prune | Archive maintenance serializes incident, timeline, tool audit, action item, and action claim records before exact-id deletion | ✓ Good |
+| Structured archive failures over silent success | Summary/Failure tuples and CLI failure context make partial archive persistence/export/delete failures actionable | ✓ Good |
+| Scoped route ownership stays in generated host-owned code | Supports `/parapet` and nested scopes like `/ops/parapet` without adding Parapet router/auth ownership or generator flags | ✓ Good |
+| Quality closeout as dated addendum | Preserves the original quality evaluation as historical input while documenting exactly which v1.4 risks closed | ✓ Good |
 
 ## Evolution
 
@@ -301,4 +299,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility*
+*Last updated: 2026-06-04 after v1.4 Trust Hardening & Host-App Compatibility milestone*

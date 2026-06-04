@@ -251,4 +251,4 @@ Recovery actions are backed by named host capabilities. These capabilities are r
 
 By naming and bounding these capabilities, the host application maintains control over what the operator can do, ensuring the workbench remains a safe environment for high-stakes incident response.
 
-See the [Recovery Actions Guide](recovery-actions.html) for step-by-step authoring instructions, worked examples, and the error semantics for each capability outcome.
+See the [Recovery Actions Guide](recovery-actions.md) for step-by-step authoring instructions, worked examples, and the error semantics for each capability outcome.

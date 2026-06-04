@@ -159,7 +159,7 @@ Instead of manually keeping your Prometheus configuration in sync with your code
 mix parapet.gen.prometheus
 ```
 
-This generates a `.yml` file that you can deploy to your Prometheus instance or import into your infrastructure-as-code repository.
+This generates Prometheus rule files under `priv/parapet/prometheus/` that you can deploy to your Prometheus instance or import into your infrastructure-as-code repository.
 
 ### 4. Generate Grafana Dashboards
 

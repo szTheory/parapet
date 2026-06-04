@@ -90,6 +90,37 @@
 - Every final verification phase should write `VALIDATION.md` alongside `SUMMARY.md` and `VERIFICATION.md` before milestone audit.
 - UI polish milestones need both source-contract assertions and rendered-browser evidence; either alone misses important failure modes.
 
+## Milestone: v1.4 — Trust Hardening & Host-App Compatibility
+
+**Shipped:** 2026-06-04
+**Phases:** 3 | **Plans:** 8
+
+### What Was Built
+- Durable archive/export/prune behavior that writes a complete Parapet-owned incident evidence bundle before exact-id pruning.
+- Structured archive Summary/Failure result contracts surfaced through the library, Mix task, and optional Oban worker.
+- Generated Operator UI route helpers that preserve host-owned scopes such as `/ops/parapet`, mirrored into the demo app with scoped smoke coverage.
+- First-contact archive maintenance and scoped UI mounting docs, plus a dated quality-evaluation closeout for the named v1.4 top risks.
+
+### What Worked
+- Treating archive durability as a trust boundary kept the implementation focused on evidence completeness and actionable failure context.
+- Keeping scoped-route behavior inside generated host-owned files preserved auth/router ownership and avoided a generator flag or public API expansion.
+- Focused docs guards caught adoption-copy drift cheaply and made the quality closeout verifiable.
+
+### What Was Inefficient
+- The milestone audit was missing at close, so it had to be generated inline before archival.
+- A few planning truth surfaces were stale even though phase verification had passed, including Phase 38 Wave 0 metadata and requirements traceability statuses.
+- Phase directories remain in `.planning/phases/`; archive cleanup can be handled later by `$gsd-cleanup`.
+
+### Patterns Established
+- Archive maintenance should fail with structured operator context instead of ambiguous success/failure text.
+- Generated route helpers should derive local host scope from current LiveView path and leave external links untouched.
+- Quality-evaluation closeouts should be additive and dated, preserving the original audit snapshot while naming what actually closed.
+
+### Key Lessons
+- Run `$gsd-audit-milestone` before invoking closeout; otherwise completion has to pause for evidence aggregation.
+- Keep validation metadata synchronized with verification reports, or milestone closeout will rediscover already-solved Wave 0 work.
+- Adoption docs benefit from link-target and output-shape assertions, not just broad phrase checks.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -104,6 +135,7 @@
 | v0.10 | 4 / 12 | 2 | ~21038 | 12 plans / 2 days (docs-heavy) |
 | v1.2 | 4 / 6 | 1 | - | 6 plans / 1 day (maturity/docs-heavy) |
 | v1.3 | 3 / 4 | 1 | ~29632 | 4 plans / 1 day (UI polish/browser proof) |
+| v1.4 | 3 / 8 | 1 | - | 8 plans / 1 day (trust hardening/docs proof) |
 
 ## Milestone: v0.10 — Adopter Success
 
