@@ -213,3 +213,14 @@ Top UI fixes:
 | 9 | Supply-chain audit | CI/CD | Retired packages should fail CI | Medium | Low | Medium | soon | `mix hex.audit` runs in CI |
 | 10 | UI action pending/confirm | Operator UX | Operators need safe action feedback | Medium | Medium | Medium | before broad adoption | High-impact actions have confirm/pending behavior |
 
+## 10. v1.4 Top-Risk Closeout (2026-06-04)
+
+This dated addendum preserves the original audit narrative above. It records the v1.4 risk slices closed by the Trust Hardening & Host-App Compatibility milestone and keeps unrelated findings governed by the original quality evaluation and future milestone planning.
+
+| v1.4 risk slice | Closeout status | Evidence |
+|---|---|---|
+| archive durability | Closed for the Phase 37 archive durability scope: staged export/prune behavior, manifest and failure semantics, retention-boundary docs, and full verification evidence landed without taking host backup/restore ownership. | Phase 37 archive durability evidence: `.planning/phases/37-archive-durability/37-03-SUMMARY.md` |
+| scoped route compatibility | Closed for the Phase 38 scoped route compatibility scope: generated Operator UI local links and redirects derive from `operator_base_path`, default `/parapet` and scoped `/ops/parapet` host-owned route examples are documented and guarded, and Parapet did not add router/auth/dependency ownership. | Phase 38 scoped route evidence: `.planning/phases/38-scoped-ui-routes/38-03-SUMMARY.md` |
+| adoption supportability docs | Closed for the Phase 39 adoption supportability docs scope: README, operator UI docs, troubleshooting docs, and focused docs guards explain archive maintenance, scoped mounting, and first-error recovery paths for adopters. | Phase 39 adoption docs evidence: `.planning/phases/39-adoption-proof/39-01-SUMMARY.md`; current closeout plan evidence: `.planning/phases/39-adoption-proof/39-02-SUMMARY.md` |
+
+Closeout boundary: this addendum covers only the named v1.4 top-risk slices and does not claim every quality-evaluation item is closed. The original ranked findings above remain the historical source for unrelated or still-open risks such as stable API enforcement, migration timestamp hygiene, UI action pending/confirm behavior, accessibility focus/live-region work, supply-chain audit automation, and other future milestone candidates.
