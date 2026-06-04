@@ -80,6 +80,12 @@ defmodule Parapet.OperatorUIIntegrationTest do
 
       assert task_content =~ ~S|live "/parapet/incidents/:id"|
       assert task_content =~ ~S|live "/parapet/:id"|
+      assert router_content =~ "Default mount: /parapet"
+      assert router_content =~ "Scoped mount: /ops/parapet"
+      assert router_content =~ ~S|scope "/ops"|
+      assert task_content =~ "Default mount: /parapet"
+      assert task_content =~ "Scoped mount: /ops/parapet"
+      assert task_content =~ ~S|scope "/ops"|
       assert components_content =~ "Respond"
       assert components_content =~ "Actions"
       assert components_content =~ "History"
@@ -338,6 +344,11 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "/parapet/incidents/:id is the preferred incident detail route"
       assert content =~ "/parapet/:id remains available for compatibility"
       assert content =~ "Parapet does **not** provide its own authentication system"
+      assert content =~ "Default mount: `/parapet`"
+      assert content =~ "Scoped mount: `/ops/parapet`"
+      assert content =~ ~S|scope "/ops", MyAppWeb do|
+      assert content =~ "generated `operator_base_path` helper"
+      assert content =~ "Host app scopes, pipelines, authentication, and authorization remain owner-controlled"
     end
 
     test "generated queue rows render bounded triage fields instead of raw ids only" do

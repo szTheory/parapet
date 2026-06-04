@@ -192,6 +192,12 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/history\""))
       assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/incidents/:id\""))
       assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/:id\""))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "Default mount: /parapet"))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "Scoped mount: /ops/parapet"))
+      assert Enum.any?(igniter.notices, &String.contains?(&1, "scope \"/ops\""))
+
+      refute Enum.any?(igniter.notices, &String.contains?(&1, "route_base"))
+      refute Enum.any?(igniter.notices, &String.contains?(&1, "--operator-base-path"))
     end
 
     test "generated route surfaces flow through operator_base_path helpers" do

@@ -48,12 +48,34 @@ This will scaffold three files into your `lib/my_app_web/live/parapet/` director
 
 The generated files belong to your application. The UI is only relevant when Phoenix LiveView is present, and Parapet does **not** provide its own authentication system. You must mount the operator routes inside your application's authenticated scope to ensure the UI is secured according to your app's existing authorization policies.
 
-Update your `router.ex` to include the Parapet routes within a protected area:
+Update your `router.ex` to include the Parapet routes within a protected area.
+
+Default mount: `/parapet`
 
 ```elixir
 # lib/my_app_web/router.ex
 
-scope "/admin", MyAppWeb do
+scope "/", MyAppWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  live_session :parapet_operator,
+    on_mount: [{MyAppWeb.UserAuth, :ensure_authenticated}] do
+
+    live "/parapet", MyAppWeb.Parapet.OperatorLive, :index
+    live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions
+    live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history
+    live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+    live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+  end
+end
+```
+
+Scoped mount: `/ops/parapet`
+
+```elixir
+# lib/my_app_web/router.ex
+
+scope "/ops", MyAppWeb do
   pipe_through [:browser, :require_authenticated_user]
 
   live_session :parapet_operator,
@@ -69,6 +91,8 @@ end
 ```
 
 The route map keeps `/parapet` as the active-response overview, `/parapet/actions` as pending recovery work, and `/parapet/history` as resolved incident review. /parapet/incidents/:id is the preferred incident detail route, while /parapet/:id remains available for compatibility with existing deep links.
+
+Generated local links derive from the current LiveView URI through the generated `operator_base_path` helper, so the same editable host-owned files render links for `/parapet` or nested mounts such as `/ops/parapet`. Host app scopes, pipelines, authentication, and authorization remain owner-controlled.
 
 ## Security and Verification
 

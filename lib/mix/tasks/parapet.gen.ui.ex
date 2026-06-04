@@ -87,8 +87,25 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
         # or define a new pipeline with your app's standard authentication plugs.
         # Parapet does not provide its own auth.
         #
-        # Example:
-        # scope "/admin", #{inspect(assigns[:web_module])} do
+        # Default mount: /parapet
+        #
+        # scope "/", #{inspect(assigns[:web_module])} do
+        #   pipe_through [:browser, :require_authenticated_user]
+        #
+        #   live_session :parapet_operator,
+        #     on_mount: [{#{inspect(assigns[:web_module])}.UserAuth, :ensure_authenticated}] do
+        #
+        #     live "/parapet", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :index
+        #     live "/parapet/actions", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :actions
+        #     live "/parapet/history", #{inspect(assigns[:web_module])}.Parapet.OperatorLive, :history
+        #     live "/parapet/incidents/:id", #{inspect(assigns[:web_module])}.Parapet.OperatorDetailLive, :show
+        #     live "/parapet/:id", #{inspect(assigns[:web_module])}.Parapet.OperatorDetailLive, :show
+        #   end
+        # end
+        #
+        # Scoped mount: /ops/parapet
+        #
+        # scope "/ops", #{inspect(assigns[:web_module])} do
         #   pipe_through [:browser, :require_authenticated_user]
         #
         #   live_session :parapet_operator,

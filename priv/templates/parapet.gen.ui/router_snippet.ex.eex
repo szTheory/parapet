@@ -2,8 +2,25 @@
   # or define a new pipeline with your app's standard authentication plugs.
   # Parapet does not provide its own auth.
   #
-  # Example:
-  # scope "/admin", <%= inspect(@web_module) %> do
+  # Default mount: /parapet
+  #
+  # scope "/", <%= inspect(@web_module) %> do
+  #   pipe_through [:browser, :require_authenticated_user]
+  #
+  #   live_session :parapet_operator,
+  #     on_mount: [{<%= inspect(@web_module) %>.UserAuth, :ensure_authenticated}] do
+  #
+  #     live "/parapet", <%= inspect(@web_module) %>.Parapet.OperatorLive, :index
+  #     live "/parapet/actions", <%= inspect(@web_module) %>.Parapet.OperatorLive, :actions
+  #     live "/parapet/history", <%= inspect(@web_module) %>.Parapet.OperatorLive, :history
+  #     live "/parapet/incidents/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
+  #     live "/parapet/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
+  #   end
+  # end
+  #
+  # Scoped mount: /ops/parapet
+  #
+  # scope "/ops", <%= inspect(@web_module) %> do
   #   pipe_through [:browser, :require_authenticated_user]
   #
   #   live_session :parapet_operator,
