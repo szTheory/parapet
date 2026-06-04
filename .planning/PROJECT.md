@@ -10,10 +10,12 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.2 Authoring DX & Maturity (2026-06-03) — Completed the stable-line maturity pass: moved SLO and capability dynamic state to ETS-backed checkout isolation, shipped the flag-based `mix parapet.gen.slo` Igniter task, hardened CI with an Elixir/OTP matrix and SHA-pinned actions, added Dependabot and branch-protection guidance, published migration/deployment docs with HexDocs branding, and documented maintainer/contributor/demo Compose workflows.
+**Shipped:** v1.3 Operator UI Polish & Design System (2026-06-04) — Completed the generated Operator UI polish pass: reframed `/parapet` around active response, explicit response/actions/history lanes, and preferred incident detail navigation; consolidated generated Tailwind component helpers and audit-safe action copy; expanded demo state coverage; and captured browser screenshot proof across desktop and mobile routes.
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.2 Authoring DX & Maturity (2026-06-03) — Completed the stable-line maturity pass: moved SLO and capability dynamic state to ETS-backed checkout isolation, shipped the flag-based `mix parapet.gen.slo` Igniter task, hardened CI with an Elixir/OTP matrix and SHA-pinned actions, added Dependabot and branch-protection guidance, published migration/deployment docs with HexDocs branding, and documented maintainer/contributor/demo Compose workflows.
 
 **Previously shipped:** v1.1 Actionable Recovery (2026-06-03) — Closed the action loop in the operator UI. Turned runbook steps into executable, audited, host-app-registered recovery actions with a safe Preview → Confirm flow. Shipped the capability-registration behaviour (`Parapet.Recovery`), 6 prebuilt recovery playbooks, audit propagation (TimelineEntry and ToolAudit), and a demo seed that proves the loop. `Parapet.Recovery` graduated to Stable.
 
@@ -23,27 +25,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Next:** Active milestone v1.3 Operator UI Polish & Design System — a systematic generated Operator UI refresh focused on active-response information architecture, reusable Tailwind design-system primitives, richer demo seed states, and browser-backed responsive polish.
+**Next:** No active milestone. Start the next requirements/roadmap cycle with `$gsd-new-milestone` when there is a concrete PR-shaped slice worth opening.
 
-## Current Milestone: v1.3 Operator UI Polish & Design System
+## Last Milestone: v1.3 Operator UI Polish & Design System
 
 **Goal:** Make Parapet's generated Operator UI a deliberate, high-polish active-response workbench that clearly orients operators from health state to evidence to safe action.
 
-**Target features:**
-- Active-response-first `/parapet` orientation with explicit navigation lanes for response, actions, and history.
-- Generated Tailwind design-system consolidation for operator surfaces, states, action affordances, focus/motion, and audit-safe controls.
-- Rich demo seed coverage that expresses active, investigating, resolved, recovery, escalation, action-item, retrospective, and external-evidence states.
-- Browser-backed responsive UI verification for desktop and mobile touchpoints.
-
-## Last Milestone: v1.2 Authoring DX & Maturity
-
-**Goal:** Land additive DX and maturity work, fix technical debt in the SLO registry, and harden the CI pipeline to mark the library as functionally complete for Solo SaaS Operators without reopening the 1.0 stability freeze.
-
 **Delivered:**
-- SLO-W1 flag-based `mix parapet.gen.slo` Igniter task.
-- `Parapet.SLO` and `Parapet.Capabilities` dynamic state moved to ETS-backed checkout isolation.
-- Multi-version Elixir/OTP CI matrix and supply-chain hardening (Dependabot, SHA-pinned actions, branch-protection documentation).
-- v0.x -> v1.0 migration guide, deployment guide, HexDocs logo/favicon, maintainer/contributor docs, and demo Compose validation.
+- Active-response-first `/parapet` orientation with explicit navigation lanes for response, actions, and history.
+- Preferred `/parapet/incidents/:id` detail route while preserving `/parapet/:id` compatibility.
+- Generated Tailwind design-system helper families for surfaces, controls, chips, selected/focus states, restrained motion, and audit-safe action copy.
+- Rich demo seed coverage for active, investigating, resolved, recovery, escalation, action-item, retrospective, and external-evidence states.
+- Browser-backed responsive UI verification for desktop and mobile response/actions/history/detail paths.
 
 ## Previous Posture: Released Maintenance
 
@@ -176,7 +169,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 <!-- v1.0 Stable Release shipped 2026-05-26. Quiet stable-line mode is the default until a new PR-shaped slice is explicitly opened. -->
 
-No active feature milestone by default. v1.2 requirements are archived in `.planning/milestones/v1.2-REQUIREMENTS.md`; fresh active requirements should be created by `$gsd-new-milestone`.
+No active feature milestone by default. v1.3 requirements are archived in `.planning/milestones/v1.3-REQUIREMENTS.md`; fresh active requirements should be created by `$gsd-new-milestone`.
 
 Dropped:
 
@@ -270,6 +263,10 @@ Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/c
 | Code surfaces land before the docs that name them | Phase 16/17 code shipped before Phase 18 docs, so guides never reference uncompilable code | ✓ Good |
 | ETS checkout isolation for dynamic library state | Avoids test bleed and keeps host-owned runtime behavior compatible with the stable API | ✓ Good |
 | `release_gate` remains the stable aggregate CI check | Lets branch protection stay stable while underlying jobs expand into an Elixir/OTP matrix | ✓ Good |
+| Generated Operator UI remains host-owned | v1.3 polish improves templates and demo mirrors without adding Parapet-owned auth, router, runtime UI dependency, or stable API changes | ✓ Good |
+| Preferred detail route plus compatibility route | `/parapet/incidents/:id` improves generated navigation clarity while `/parapet/:id` remains documented and test-pinned for adopters | ✓ Good |
+| Generated component helpers stay private to copied LiveViews | Consolidates Tailwind surfaces and controls without creating a new public design-system module or dependency | ✓ Good |
+| Browser screenshot proof without repo dependencies | Local Chromium script verifies desktop/mobile generated UI paths while avoiding a new browser-test dependency surface | ✓ Good |
 
 ## Evolution
 
@@ -289,4 +286,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-03 — v1.2 Authoring DX & Maturity milestone complete*
+*Last updated: 2026-06-04 after v1.3 Operator UI Polish & Design System milestone*
