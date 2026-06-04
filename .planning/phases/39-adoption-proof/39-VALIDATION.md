@@ -40,7 +40,8 @@ created: 2026-06-04
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
 | 39-01-01 | 01 | 1 | ADOPT-01 | T-39-01 | Archive docs do not imply backup/restore ownership and name stage-aware failure fields. | docs guard / manual review | `mix test test/mix/tasks/parapet.archive_test.exs` plus any new focused docs assertion | Partial | pending |
 | 39-01-02 | 01 | 1 | ADOPT-02 | T-39-02 | Scoped UI docs keep Operator UI inside host-owned authenticated scope examples. | docs guard | `mix test test/parapet/operator_ui_integration_test.exs test/parapet/operator_ui_compile_out_test.exs` | yes | pending |
-| 39-01-03 | 01 | 1 | ADOPT-03 | T-39-03 | Quality closeout records only named v1.4 top-risk closures and preserves unrelated future risks. | artifact review / optional text guard | Manual review; optional focused assertion if planner adds one | Partial | pending |
+| 39-02-01 | 02 | 2 | ADOPT-03 | T-39-03 | Quality closeout records only named v1.4 top-risk closures and preserves unrelated future risks. | artifact review / optional text guard | `mix test test/parapet/adoption_docs_test.exs` | Partial | pending |
+| 39-02-02 | 02 | 2 | ADOPT-03 | T-39-03 | Final verification proves closeout and docs proof without runtime, API, dependency, auth, router, migration, object-store, generator flag, or visual redesign expansion. | focused + full suite | `mix test test/mix/tasks/parapet.archive_test.exs test/parapet/adoption_docs_test.exs test/parapet/operator_ui_integration_test.exs test/parapet/operator_ui_compile_out_test.exs && mix format --check-formatted && mix compile --warnings-as-errors && mix test` | Partial | pending |
 
 *Status: pending / green / red / flaky*
 

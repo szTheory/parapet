@@ -308,12 +308,11 @@ Use the full scoped example from `docs/operator-ui.md` / `router_snippet.ex.eex`
 | A2 | Humans naturally read retention as time since resolution. | Common Pitfalls | Medium; reinforces need for precise retention wording. |
 | A3 | Broad closeout language is a likely maintainer pitfall. | Common Pitfalls | Low; planner can avoid it with exact evidence links. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Quality closeout location**
+1. **Quality closeout location — RESOLVED**
    - What we know: CONTEXT permits either a `.planning/QUALITY-EVALUATION.md` addendum or a linked milestone close artifact. [VERIFIED: 39-CONTEXT.md]
-   - What's unclear: Which location the planner will prefer for artifact hygiene. [VERIFIED: 39-CONTEXT.md]
-   - Recommendation: Append a dated closeout section to `.planning/QUALITY-EVALUATION.md` because it is the original risk source and avoids forcing readers to chase a second artifact. [VERIFIED: codebase grep]
+   - Resolution: Plan-phase chose a dated closeout section appended to `.planning/QUALITY-EVALUATION.md` because it is the original risk source and avoids forcing readers to chase a second artifact. [VERIFIED: codebase grep]
 
 ## Environment Availability
 
