@@ -194,6 +194,40 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert Enum.any?(igniter.notices, &String.contains?(&1, "live \"/parapet/:id\""))
     end
 
+    test "generated route surfaces flow through operator_base_path helpers" do
+      sources = generated_operator_sources()
+
+      route_surface_expectations = [
+        {"push_patch", sources.operator_live, "queue_path(socket,"},
+        {"push_navigate", sources.operator_detail, "incident_detail_path(socket.assigns.operator_base_path, id)"},
+        {"navigate", sources.operator_components, "operator_path(@operator_base_path"},
+        {"patch", sources.operator_components, "queue_item_path(@operator_base_path"},
+        {"href", sources.operator_components, "operator_path(@operator_base_path, :history)"},
+        {"queue_page_path", sources.operator_live, "queue_page_path(@operator_base_path"},
+        {"queue_item_path", sources.operator_components, "queue_item_path(@operator_base_path"},
+        {"history_path", sources.operator_live, "history_path(@operator_base_path)"},
+        {"incident_detail_path", sources.operator_components, "incident_detail_path(@operator_base_path, incident)"},
+        {"detail_back_path", sources.operator_detail, "detail_back_path(@operator_base_path, @incident)"}
+      ]
+
+      for {surface, source, scoped_pattern} <- route_surface_expectations do
+        assert source =~ surface
+        assert source =~ scoped_pattern
+      end
+
+      for {path, source} <- Map.to_list(sources) do
+        assert_no_direct_local_parapet_routes!(path, source)
+      end
+    end
+
+    test "generated templates do not include route-bearing form surfaces" do
+      sources = generated_operator_sources()
+
+      for {_path, source} <- Map.to_list(sources) do
+        refute source =~ ~r/<form|form_for|phx-submit|action=/
+      end
+    end
+
     test "is idempotent and does not duplicate files" do
       # Run generator once
       igniter1 =
@@ -215,6 +249,41 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
                  "Ensure you place these routes inside an existing authenticated scope"
                )
              )
+    end
+  end
+
+  defp generated_operator_sources do
+    igniter =
+      test_project(app_name: :test)
+      |> Ui.igniter()
+
+    %{
+      operator_live:
+        generated_source(igniter, "lib/test_web/live/parapet/operator_live.ex"),
+      operator_detail:
+        generated_source(igniter, "lib/test_web/live/parapet/operator_detail_live.ex"),
+      operator_components:
+        generated_source(igniter, "lib/test_web/live/parapet/operator_components.ex")
+    }
+  end
+
+  defp generated_source(igniter, path) do
+    igniter.rewrite
+    |> Rewrite.source!(path)
+    |> Rewrite.Source.get(:content)
+  end
+
+  defp assert_no_direct_local_parapet_routes!(path, source) do
+    forbidden_patterns = [
+      ~r/(navigate|patch|href)="\/parapet/,
+      ~r/(navigate|patch|href)=\{"\/parapet/,
+      ~r/push_(patch|navigate).*"\/parapet/s,
+      ~r/defp\s+(queue_base_path|queue_page_path|queue_item_path|history_path|incident_detail_path|detail_back_path).*"\/parapet/s
+    ]
+
+    for pattern <- forbidden_patterns do
+      refute source =~ pattern,
+             "expected #{path} not to contain direct local /parapet route matching #{inspect(pattern)}"
     end
   end
 end
