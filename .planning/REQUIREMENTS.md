@@ -8,10 +8,10 @@
 
 ## Archive Durability
 
-- [ ] **ARCH-01**: Operators can run archive/export/prune maintenance knowing resolved evidence is preserved as a complete incident bundle, including incident, timeline, tool audit, and related evidence records that Parapet owns.
-- [ ] **ARCH-02**: Archive maintenance fails loudly and actionably on partial persistence/export/delete failure instead of silently returning success or leaving ambiguous state.
-- [ ] **ARCH-03**: Archive maintenance keeps the resolved-only retention contract explicit and test-pinned: active or investigating incidents are never pruned, and boundary retention dates are handled deterministically.
-- [ ] **ARCH-04**: Archive maintenance returns or logs a structured run summary with counts, skipped records, failures, and enough context for a host app or maintainer to debug the run.
+- [x] **ARCH-01**: Operators can run archive/export/prune maintenance knowing resolved evidence is preserved as a complete incident bundle, including incident, timeline, tool audit, and related evidence records that Parapet owns.
+- [x] **ARCH-02**: Archive maintenance fails loudly and actionably on partial persistence/export/delete failure instead of silently returning success or leaving ambiguous state.
+- [x] **ARCH-03**: Archive maintenance keeps the resolved-only retention contract explicit and test-pinned: active or investigating incidents are never pruned, and boundary retention dates are handled deterministically.
+- [x] **ARCH-04**: Archive maintenance returns or logs a structured run summary with counts, skipped records, failures, and enough context for a host app or maintainer to debug the run.
 
 ## Generated UI Host Compatibility
 
