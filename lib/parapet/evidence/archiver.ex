@@ -2,6 +2,20 @@ defmodule Parapet.Evidence.Archiver do
   @moduledoc """
   Archives old, resolved incidents to a verified JSONL artifact and deletes them from the primary database.
 
+  `archive/3` returns `{:ok, %Parapet.Evidence.Archiver.Summary{}}` when the
+  archive artifact, manifest, and exact-id prune complete. It returns
+  `{:error, %Parapet.Evidence.Archiver.Failure{}}` when a stage fails, including
+  the run paths and partial summary known at the failure point.
+
+  This is an operational export/prune path for Parapet-owned incident evidence,
+  not a host backup or restore system. It intentionally does not archive host
+  domain rows, external provider records, telemetry samples, Prometheus state,
+  Grafana state, or object-store contents.
+
+  Retention currently means resolved incidents created before the cutoff
+  (`inserted_at < cutoff`), not incidents resolved before the cutoff. The spine
+  schema does not currently store `resolved_at`.
+
   > #### Experimental {: .warning}
   >
   > This module is **experimental** in v1.x. Its API may change in a minor release with a

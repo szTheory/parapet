@@ -11,6 +11,12 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## Unreleased
+
+### Changed
+
+* **archive:** changed the Experimental `Parapet.Evidence.Archiver.archive/3` return shape from `{:ok, :ok}` to structured `{:ok, %Parapet.Evidence.Archiver.Summary{}}` and `{:error, %Parapet.Evidence.Archiver.Failure{}}` tuples; `mix parapet.archive` now prints machine-readable summary JSON on success and raises on archive failure instead of emitting static success JSON.
+
 ## [1.0.3](https://github.com/szTheory/parapet/compare/v1.0.2...v1.0.3) (2026-05-27)
 
 
