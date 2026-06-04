@@ -11,7 +11,7 @@
 
 | Phase | Name | Goal | Requirements |
 |---:|---|---|---|
-| 37 | 2/3 | In Progress|  |
+| 37 | 3/3 | Complete   | 2026-06-04 |
 | 38 | Scoped UI Routes | Make generated Operator UI links, forms, redirects, and patches respect host-owned route scopes. | UIROUTE-01, UIROUTE-02, UIROUTE-03 |
 | 39 | Adoption Proof | Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers. | ADOPT-01, ADOPT-02, ADOPT-03 |
 
