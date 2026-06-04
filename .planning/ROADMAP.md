@@ -31,6 +31,13 @@
 
 **Goal:** Make generated Operator UI links, forms, redirects, and patches respect host-owned route scopes.
 
+**Plans:** 3 plans
+
+Plans:
+- [ ] 38-01-PLAN.md — Generated route base path and scoped template tests
+- [ ] 38-02-PLAN.md — Demo scoped-route synchronization and runnable proof
+- [ ] 38-03-PLAN.md — Router guidance, focused docs, and stability/security guards
+
 **Success criteria:**
 1. Generated templates support default `/parapet` mounting and at least one nested host scope such as `/ops/parapet`.
 2. Demo app generated-copy tests prove template/demo synchronization.
