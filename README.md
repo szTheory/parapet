@@ -10,6 +10,10 @@ It provides an immediate, evidence-based understanding of whether your critical 
 
 Parapet's philosophy: A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
+Want to see it before installing it? The [runnable demo app](examples/demo_app/README.md)
+starts a seeded Operator UI, Prometheus, and Grafana with Docker and prints the
+exact URLs and local Grafana credentials to open.
+
 ## Compatibility
 
 | Component | Supported |
@@ -213,6 +217,7 @@ For the full contract, safe metadata rules, and event-family semantics, see [doc
 ## Learn The Flows
 
 - [Parapet Adopter Flows](docs/adopter-flows.md)
+- [Runnable Demo App](examples/demo_app/README.md)
 - [Operator UI Guide](docs/operator-ui.md)
 - [SLO Reference](docs/slo-reference.md)
 - [Telemetry Contract](docs/telemetry.md)

@@ -8,7 +8,7 @@ This guide takes you from a fresh install to your first generated Prometheus ale
 
 - An existing Phoenix application with `mix` available
 - Prometheus set up to scrape your app (or planned)
-- Parapet `~> 0.10` available on [hex.pm](https://hex.pm/packages/parapet)
+- Parapet `~> 1.0` available on [hex.pm](https://hex.pm/packages/parapet)
 
 ## Step 1: Add the dependency
 
@@ -17,7 +17,7 @@ Add `:parapet` to your `mix.exs` deps:
 ```elixir
 def deps do
   [
-    {:parapet, "~> 0.10"}
+    {:parapet, "~> 1.0"}
   ]
 end
 ```
@@ -96,5 +96,5 @@ With `--ci`, the doctor exits `1` for any `:warn` or `:error` finding — a stri
 - [Parapet Adopter Flows](docs/adopter-flows.md) — understand the reliability operating loop and when each surface matters
 - [SLO Authoring Guide](docs/slo-authoring-guide.md) — learn to author custom SLO slices for your specific journeys
 - [Parapet Sigra Integration](docs/integrations/sigra.md) — wire the login journey slice with real authentication event data
-- [Runnable Demo App](https://github.com/szTheory/parapet/tree/main/examples/demo_app) — explore a live, seeded Parapet setup end-to-end: incidents, timeline entries, runbook steps, and the Operator UI populated and ready to browse
+- [Runnable Demo App](https://github.com/szTheory/parapet/tree/main/examples/demo_app) — start a seeded Operator UI with local Prometheus and Grafana, use the printed URLs and Grafana credentials, and browse focused response, recovery, escalation, and history scenarios before installing Parapet in your own app
 - [Recovery Actions Guide](docs/recovery-actions.md) — author host recovery capabilities and wire them to runbook steps

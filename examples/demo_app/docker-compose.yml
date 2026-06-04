@@ -1,4 +1,4 @@
-version: '3.8'
+name: ${COMPOSE_PROJECT_NAME:-parapet_demo}
 
 services:
   db:
@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: demo_app_dev
-    ports:
-      - "${DB_PORT:-5432}:5432"
+    expose:
+      - "5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -22,27 +22,59 @@ services:
       context: ../../
       dockerfile: examples/demo_app/Dockerfile.dev
     ports:
-      - "${WEB_PORT:-4000}:4000"
+      - "127.0.0.1:${WEB_PORT:-4000}:4000"
     environment:
       - PGHOST=db
       - PGUSER=postgres
       - PGPASSWORD=postgres
+      - PGDATABASE=demo_app_dev
       - MIX_ENV=dev
+      - GRAFANA_PORT=${GRAFANA_PORT:-3000}
+      - PARAPET_DEMO_GRAFANA_URL=${PARAPET_DEMO_GRAFANA_URL:-http://127.0.0.1:${GRAFANA_PORT:-3000}}
+      - PARAPET_DEMO_SCENARIO=${PARAPET_DEMO_SCENARIO:-all}
     depends_on:
       db:
         condition: service_healthy
     # We mount the source code so UI tweaks trigger Phoenix LiveReload instantly
     # without needing to rebuild the Docker image.
     volumes:
-      - ../../lib:/app/lib:ro
-      - ../../priv:/app/priv:ro
-      - .:/app/examples/demo_app
+      - ../..:/app
       # Named volumes for deps and _build to prevent cross-OS NIF compilation issues
       # between the host (macOS) and the container (Linux).
       - mix_deps:/app/deps
       - mix_build:/app/_build
       - demo_mix_deps:/app/examples/demo_app/deps
       - demo_mix_build:/app/examples/demo_app/_build
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--web.enable-lifecycle"
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      - web
+    volumes:
+      - ./priv/observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../../priv/parapet/prometheus/rules.yml:/etc/prometheus/rules/parapet.yml:ro
+
+  grafana:
+    image: grafana/grafana:11.5.2
+    ports:
+      - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-parapet}
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - GF_USERS_DEFAULT_THEME=dark
+    depends_on:
+      - prometheus
+    volumes:
+      - ./priv/observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./priv/observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./priv/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
 
 volumes:
   pgdata:

@@ -1,6 +1,8 @@
 /_build/
 /deps/
 /cover/
+.docker/
+.env
 erl_crash.dump
 *.ez
 demo_app-*.tar
