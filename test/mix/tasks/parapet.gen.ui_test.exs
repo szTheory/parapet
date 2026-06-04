@@ -71,9 +71,25 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
         |> Rewrite.Source.get(:content)
 
       assert operator_components_source =~ "data-incident-id"
-      assert operator_components_source =~ "navigate={incident_detail_path(incident)}"
+      assert operator_components_source =~ "attr(:operator_base_path, :string, default: \"/parapet\")"
+      assert operator_components_source =~ "navigate={incident_detail_path(@operator_base_path, incident)}"
 
       assert operator_components_source =~
+               "patch={queue_item_path(@operator_base_path, @queue_params, incident)}"
+
+      assert operator_components_source =~
+               "defp operator_path(operator_base_path), do: operator_base_path"
+
+      assert operator_components_source =~ "defp operator_path(operator_base_path, :actions)"
+      assert operator_components_source =~ "defp operator_path(operator_base_path, :history)"
+
+      assert operator_components_source =~
+               "defp queue_item_path(operator_base_path, queue_params, incident)"
+
+      assert operator_components_source =~
+               ~S|defp incident_detail_path(operator_base_path, incident)|
+
+      refute operator_components_source =~
                ~S|defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"|
 
       assert operator_components_source =~ "Active response summary"
@@ -115,6 +131,8 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_components_source =~
                "Execute bounded recovery. Writes a durable audit record"
 
+      assert operator_components_source =~ "href={external_link_url(link)}"
+      assert operator_components_source =~ "href={external_link_url(entry.payload)}"
       refute operator_components_source =~ "transition-all"
 
       operator_detail_source =
