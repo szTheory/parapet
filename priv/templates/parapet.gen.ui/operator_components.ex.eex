@@ -2,6 +2,171 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   @moduledoc false
   use <%= inspect(@web_module) %>, :html
 
+  def operator_theme_bootstrap(assigns) do
+    ~H"""
+    <style>
+      .parapet-ui {
+        color-scheme: light;
+        --parapet-bg: #f5f5f4;
+        --parapet-panel: #ffffff;
+        --parapet-panel-muted: #fafaf9;
+        --parapet-text: #1c1917;
+        --parapet-text-muted: #57534e;
+        --parapet-border: #e7e5e4;
+        --parapet-border-strong: rgba(28, 25, 23, 0.14);
+        --parapet-shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 0 0 1px rgba(28, 25, 23, 0.04);
+        --parapet-accent: #0f766e;
+        --parapet-accent-strong: #0f5f59;
+        --parapet-accent-soft: #ccfbf1;
+        --parapet-accent-text: #115e59;
+        --parapet-warning-bg: #fffbeb;
+        --parapet-warning-text: #78350f;
+        --parapet-info-bg: #f5f3ff;
+        --parapet-info-text: #4c1d95;
+      }
+
+      html[data-parapet-theme="dark"] .parapet-ui,
+      html[data-parapet-theme="system"] .parapet-ui:is(.force-system-dark) {
+        color-scheme: dark;
+        --parapet-bg: #12100d;
+        --parapet-panel: #1c1917;
+        --parapet-panel-muted: #292524;
+        --parapet-text: #fafaf9;
+        --parapet-text-muted: #d6d3d1;
+        --parapet-border: #44403c;
+        --parapet-border-strong: rgba(250, 250, 249, 0.16);
+        --parapet-shadow: 0 1px 2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(250, 250, 249, 0.08);
+        --parapet-accent: #2dd4bf;
+        --parapet-accent-strong: #5eead4;
+        --parapet-accent-soft: rgba(45, 212, 191, 0.16);
+        --parapet-accent-text: #99f6e4;
+        --parapet-warning-bg: rgba(146, 64, 14, 0.24);
+        --parapet-warning-text: #fde68a;
+        --parapet-info-bg: rgba(76, 29, 149, 0.24);
+        --parapet-info-text: #ddd6fe;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        html:not([data-parapet-theme]),
+        html[data-parapet-theme="system"] {
+          color-scheme: dark;
+        }
+
+        html:not([data-parapet-theme]) .parapet-ui,
+        html[data-parapet-theme="system"] .parapet-ui {
+          color-scheme: dark;
+          --parapet-bg: #12100d;
+          --parapet-panel: #1c1917;
+          --parapet-panel-muted: #292524;
+          --parapet-text: #fafaf9;
+          --parapet-text-muted: #d6d3d1;
+          --parapet-border: #44403c;
+          --parapet-border-strong: rgba(250, 250, 249, 0.16);
+          --parapet-shadow: 0 1px 2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(250, 250, 249, 0.08);
+          --parapet-accent: #2dd4bf;
+          --parapet-accent-strong: #5eead4;
+          --parapet-accent-soft: rgba(45, 212, 191, 0.16);
+          --parapet-accent-text: #99f6e4;
+          --parapet-warning-bg: rgba(146, 64, 14, 0.24);
+          --parapet-warning-text: #fde68a;
+          --parapet-info-bg: rgba(76, 29, 149, 0.24);
+          --parapet-info-text: #ddd6fe;
+        }
+      }
+
+      .parapet-ui.bg-stone-100,
+      .parapet-ui .bg-stone-50,
+      .parapet-ui .bg-stone-50\/40,
+      .parapet-ui .bg-stone-100 { background-color: var(--parapet-bg); }
+      .parapet-ui .bg-white,
+      .parapet-ui .bg-white\/70 { background-color: var(--parapet-panel); }
+      .parapet-ui .text-stone-950,
+      .parapet-ui .text-stone-900,
+      .parapet-ui .text-stone-800,
+      .parapet-ui .text-stone-700 { color: var(--parapet-text); }
+      .parapet-ui .text-stone-600,
+      .parapet-ui .text-stone-500,
+      .parapet-ui .text-stone-400 { color: var(--parapet-text-muted); }
+      .parapet-ui .border-stone-200,
+      .parapet-ui .border-stone-300 { border-color: var(--parapet-border); }
+      .parapet-ui .divide-stone-200 > :not([hidden]) ~ :not([hidden]) { border-color: var(--parapet-border); }
+      .parapet-ui .ring-stone-900\/5,
+      .parapet-ui .ring-stone-300,
+      .parapet-ui .ring-stone-200 { --tw-ring-color: var(--parapet-border-strong); }
+      .parapet-ui .shadow-sm { box-shadow: var(--parapet-shadow); }
+      .parapet-ui .bg-teal-50,
+      .parapet-ui .bg-teal-50\/80 { background-color: var(--parapet-accent-soft); }
+      .parapet-ui .text-teal-700,
+      .parapet-ui .text-teal-800,
+      .parapet-ui .text-teal-950 { color: var(--parapet-accent-text); }
+      .parapet-ui .bg-indigo-50,
+      .parapet-ui .bg-violet-50\/50 { background-color: var(--parapet-info-bg); }
+      .parapet-ui .text-indigo-700,
+      .parapet-ui .text-indigo-800,
+      .parapet-ui .text-indigo-900,
+      .parapet-ui .text-violet-800,
+      .parapet-ui .text-violet-900 { color: var(--parapet-info-text); }
+      .parapet-ui .bg-amber-50,
+      .parapet-ui .bg-amber-50\/60 { background-color: var(--parapet-warning-bg); }
+      .parapet-ui .text-amber-700,
+      .parapet-ui .text-amber-800,
+      .parapet-ui .text-amber-900,
+      .parapet-ui .text-amber-950 { color: var(--parapet-warning-text); }
+
+      .parapet-theme-option[aria-pressed="true"] {
+        background: var(--parapet-accent);
+        color: #042f2e;
+      }
+
+      html[data-parapet-theme="light"] .parapet-theme-option[data-parapet-theme-value="light"],
+      html[data-parapet-theme="dark"] .parapet-theme-option[data-parapet-theme-value="dark"],
+      html[data-parapet-theme="system"] .parapet-theme-option[data-parapet-theme-value="system"] {
+        background: var(--parapet-accent);
+        color: #042f2e;
+      }
+
+      html[data-parapet-theme="dark"] .parapet-theme-option[aria-pressed="true"] {
+        color: #042f2e;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .parapet-ui * {
+          animation-duration: 0.01ms;
+          animation-iteration-count: 1;
+          scroll-behavior: auto;
+          transition-duration: 0.01ms;
+        }
+      }
+    </style>
+    <script>
+      (() => {
+        const key = "parapet.operator.theme";
+        const root = document.documentElement;
+        const requested = new URLSearchParams(window.location.search).get("parapet_theme");
+        const syncButtons = (value) => {
+          document.querySelectorAll("[data-parapet-theme-value]").forEach((button) => {
+            button.setAttribute("aria-pressed", button.dataset.parapetThemeValue === value ? "true" : "false");
+          });
+        };
+        const apply = (theme) => {
+          const value = ["light", "dark", "system"].includes(theme) ? theme : "system";
+          root.dataset.parapetTheme = value;
+          syncButtons(value);
+          window.requestAnimationFrame(() => syncButtons(value));
+        };
+        if (["light", "dark", "system"].includes(requested)) {
+          localStorage.setItem(key, requested);
+        }
+        apply(requested || localStorage.getItem(key) || "system");
+        window.parapetSetTheme = (theme) => {
+          localStorage.setItem(key, theme);
+          apply(theme);
+        };
+      })();
+    </script>
+    """
+  end
+
   attr :active, :atom, required: true
 
   def operator_nav(assigns) do
@@ -17,8 +182,25 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           <.nav_item href="/parapet/actions" active={@active == :actions}>Actions</.nav_item>
           <.nav_item href="/parapet/history" active={@active == :history}>History</.nav_item>
         </nav>
+        <.theme_control />
       </div>
     </header>
+    """
+  end
+
+  def theme_control(assigns) do
+    ~H"""
+    <div class="flex min-h-[40px] items-center gap-1 rounded-lg bg-stone-900 px-1 py-1 ring-1 ring-stone-700" aria-label="Operator color theme">
+      <button type="button" data-parapet-theme-value="light" onclick="window.parapetSetTheme && window.parapetSetTheme('light')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+        Light
+      </button>
+      <button type="button" data-parapet-theme-value="dark" onclick="window.parapetSetTheme && window.parapetSetTheme('dark')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+        Dark
+      </button>
+      <button type="button" data-parapet-theme-value="system" onclick="window.parapetSetTheme && window.parapetSetTheme('system')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+        System
+      </button>
+    </div>
     """
   end
 
@@ -125,6 +307,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <.link
           patch={queue_item_path(@queue_params, incident)}
           aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
+          data-incident-id={incident.id}
           class={[
             "block border-l-4 px-4 py-3 transition-colors",
             queue_row_class(@selected, incident)

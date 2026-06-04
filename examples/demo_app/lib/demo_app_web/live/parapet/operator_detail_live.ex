@@ -193,7 +193,8 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
 
   def render(assigns) do
     ~H"""
-    <div class="antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
+    <.operator_theme_bootstrap />
+    <div class="parapet-ui antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
       <.operator_nav active={:response} />
 
       <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">

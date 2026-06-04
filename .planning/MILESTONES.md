@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.3 Operator UI Polish & Design System (Shipped: 2026-06-04)
+
+**Phases completed:** 3 phases, 4 plans, 11 tasks
+
+**Key accomplishments:**
+
+- Reframed generated `/parapet` around active response, explicit response/actions/history lanes, preferred `/parapet/incidents/:id` detail navigation, and compatibility `/parapet/:id` guidance.
+- Consolidated generated Tailwind component helpers for surfaces, controls, chips, selected/focus states, restrained motion, and audit/risk copy before mutating actions.
+- Kept stable API, dependency, router, and auth ownership unchanged; all UI work remains host-owned generated LiveView code.
+- Expanded demo seeds and smoke routes to cover active, investigating, resolved, recovery, warning, action-item, escalation, audit, external-link, and retrospective states.
+- Added browser screenshot proof for response, actions, history, and detail routes across desktop and mobile.
+
+**Audit:** Passed 2026-06-04: 13/13 requirements, 3/3 phases, 4/4 integration checks, 4/4 E2E flows. See [`milestones/v1.3-MILESTONE-AUDIT.md`](milestones/v1.3-MILESTONE-AUDIT.md).
+
+**Known deferred items at close:** 0.
+
+---
+
 ## v1.2 Authoring DX & Maturity (Shipped: 2026-06-03)
 
 **Phases completed:** 4 phases, 6 plans, 10 tasks

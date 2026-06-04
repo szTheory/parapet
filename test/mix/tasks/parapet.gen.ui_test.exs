@@ -45,6 +45,11 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "Load latest changes"
       assert operator_live_source =~ "Back to active response"
       refute operator_live_source =~ "Back to Queue"
+      assert operator_live_source =~ "selection_source: :none"
+      assert operator_live_source =~ "selected_incident(params, page_mode, visible_incidents)"
+      assert operator_live_source =~ "defp selected_incident(_params, :response"
+      assert operator_live_source =~ "defp detail_pane_visibility"
+      assert operator_live_source =~ "No incident selected"
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
       assert operator_live_source =~ "Parapet.Operator.resolve_incident(incident, payload)"
@@ -63,6 +68,17 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_components_source =~ "surface_class(:action_card)"
       assert operator_components_source =~ "control_class(:recovery"
       assert operator_components_source =~ "chip_class(:state"
+      assert operator_components_source =~ "operator_theme_bootstrap"
+      assert operator_components_source =~ "parapet-ui"
+      assert operator_components_source =~ "parapet.operator.theme"
+      assert operator_components_source =~ "parapet_theme"
+      assert operator_components_source =~ "data-parapet-theme-value=\"light\""
+      assert operator_components_source =~ "data-parapet-theme-value=\"dark\""
+      assert operator_components_source =~ "data-parapet-theme-value=\"system\""
+      assert operator_components_source =~ "--parapet-bg"
+      assert operator_components_source =~ "--parapet-accent"
+      assert operator_components_source =~ "prefers-color-scheme: dark"
+      assert operator_components_source =~ "prefers-reduced-motion: reduce"
 
       assert operator_components_source =~
                "Preview scoped changes before execution. No recovery action runs until confirm."
@@ -81,6 +97,8 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_detail_source =~ "Parapet.Operator.acknowledge_incident"
       assert operator_detail_source =~ "Parapet.Operator.resolve_incident"
       assert operator_detail_source =~ "Parapet.Operator.incident_detail(id)"
+      assert operator_detail_source =~ "operator_theme_bootstrap"
+      assert operator_detail_source =~ "parapet-ui"
     end
 
     test "emits authenticated-scope router guidance" do

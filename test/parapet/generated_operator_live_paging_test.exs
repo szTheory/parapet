@@ -88,6 +88,7 @@ defmodule Test.Repo do
         changeset
         |> Ecto.Changeset.apply_changes()
         |> ensure_id()
+        |> ensure_timestamps()
 
       persist_insert(struct)
       {:ok, struct}
@@ -238,6 +239,22 @@ defmodule Test.Repo do
   defp ensure_id(%{id: nil} = struct), do: %{struct | id: Ecto.UUID.generate()}
   defp ensure_id(struct), do: struct
 
+  defp ensure_timestamps(struct) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    struct
+    |> put_timestamp_if_missing(:inserted_at, now)
+    |> put_timestamp_if_missing(:updated_at, now)
+  end
+
+  defp put_timestamp_if_missing(struct, field, timestamp) do
+    if Map.has_key?(struct, field) && is_nil(Map.get(struct, field)) do
+      Map.put(struct, field, timestamp)
+    else
+      struct
+    end
+  end
+
   defp persist_insert(%TimelineEntry{} = entry) do
     Agent.update(__MODULE__, fn state ->
       updated_entries = Map.update(state.entries, entry.incident_id, [entry], &[entry | &1])
@@ -320,7 +337,7 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
     refute html =~ "Active incident 31"
     refute html =~ "Resolved incident 61"
 
-    assert count_visible_titles(html) == 30
+    assert count_queue_titles(html) == 30
 
     next_cursor =
       Base.url_encode64("2026-05-10T11:30:00Z|inc-030", padding: false)
@@ -338,7 +355,7 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
     assert html =~ "Active incident 60"
     refute html =~ "Active incident 1"
     refute html =~ "Resolved incident 61"
-    assert count_visible_titles(html) == 30
+    assert count_queue_titles(html) == 30
   end
 
   test "generated operator live resolves an active incident into resolved history",
@@ -430,8 +447,8 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
     end)
   end
 
-  defp count_visible_titles(html) do
-    Regex.scan(~r/Active incident \d+/, html) |> Enum.count()
+  defp count_queue_titles(html) do
+    Regex.scan(~r/data-incident-id="inc-\d{3}"/, html) |> Enum.count()
   end
 
   defp configured_socket(view, host_uri) do

@@ -60,6 +60,36 @@
 - Closeout is smoother when every phase has `SUMMARY`, `VERIFICATION`, and `VALIDATION` artifacts before milestone audit.
 - Runtime-compatible internal refactors still need explicit planning evidence when they satisfy public requirements.
 
+## Milestone: v1.3 — Operator UI Polish & Design System
+
+**Shipped:** 2026-06-04
+**Phases:** 3 | **Plans:** 4
+
+### What Was Built
+- Active-response-first generated Operator UI route/copy contract for `/parapet`, `/parapet/actions`, `/parapet/history`, `/parapet/incidents/:id`, and compatibility `/parapet/:id`.
+- Generated Tailwind helper families for operator surfaces, controls, chips, selected/focus states, restrained motion, and audit-safe mutating action copy.
+- Demo seed matrix and route smoke coverage for active, investigating, resolved, recovery-previewable, guidance-only, warning, action-item, escalation, audit, external-link, and retrospective states.
+- Browser screenshot capture for response, actions, history, and detail paths across desktop and mobile.
+
+### What Worked
+- Source-contract tests were the right first proof for generated host-owned LiveView code.
+- Mirroring generated component changes into the demo copy in the same slice prevented generated/demo drift.
+- Deferring browser proof to the final phase kept earlier IA/design-system work focused while still closing the visual verification loop.
+
+### What Was Inefficient
+- The phase directory still contained older v1.1/v1.2 phase directories, so the milestone archive CLI over-counted stats and required manual correction.
+- Phase 36 verification evidence existed, but the validation artifact had to be backfilled during milestone close.
+
+### Patterns Established
+- Generated UI polish should stay template-first and dependency-neutral unless a public component API is explicitly warranted.
+- Browser proof can live as a local Chromium script with durable screenshots, avoiding a new test dependency surface.
+- Active-response language is now the preferred Operator UI vocabulary: impact, evidence, next safe action, audit, and recovery.
+
+### Key Lessons
+- Keep `.planning/phases/` scoped or archive old phase directories before relying on automated closeout stats.
+- Every final verification phase should write `VALIDATION.md` alongside `SUMMARY.md` and `VERIFICATION.md` before milestone audit.
+- UI polish milestones need both source-contract assertions and rendered-browser evidence; either alone misses important failure modes.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -73,6 +103,7 @@
 | v0.9 | 14 / 36 | 5 | ~20274 | 36 plans / 5 days |
 | v0.10 | 4 / 12 | 2 | ~21038 | 12 plans / 2 days (docs-heavy) |
 | v1.2 | 4 / 6 | 1 | - | 6 plans / 1 day (maturity/docs-heavy) |
+| v1.3 | 3 / 4 | 1 | ~29632 | 4 plans / 1 day (UI polish/browser proof) |
 
 ## Milestone: v0.10 — Adopter Success
 
