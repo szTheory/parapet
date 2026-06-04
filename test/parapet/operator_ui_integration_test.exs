@@ -36,10 +36,14 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert doctor_code =~ "has_auth_plug?"
     end
 
-    test "generated workbench uses active-response selected-detail copy" do
+    test "generated workbench uses calm active-response cockpit copy" do
       content = File.read!("priv/templates/parapet.gen.ui/operator_live.ex.eex")
+      components = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
 
-      assert content =~ "Back to active response"
+      assert content =~ "response_cockpit"
+      assert content =~ "Next Safe Actions"
+      assert components =~ "Active response summary"
+      assert components =~ "Next Safe Action"
       refute content =~ "Back to Queue"
     end
 
@@ -76,18 +80,17 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert components_content =~ ~S|aria-current={if @active, do: "page", else: nil}|
     end
 
-    test "generated UI templates enforce responsive layout contracts" do
+    test "generated UI templates enforce calm responsive layout contracts" do
       template_path = "priv/templates/parapet.gen.ui/operator_live.ex.eex"
       content = File.read!(template_path)
 
-      # Assert structural elements of the layout to ensure it meets the 3-pane responsive contract
-      # without needing a full e2e browser test suite.
-      assert content =~ "md:flex-row", "Outer container should shift to row on desktop"
-      assert content =~ "md:w-80", "Panes 1 and 3 should have fixed desktop widths"
-      assert content =~ "hidden md:flex", "Panes should collapse/hide on mobile conditionally"
-
-      assert content =~ "md:hidden",
-             "Mobile specific elements (like back button) should hide on desktop"
+      assert content =~ "min-h-screen"
+      assert content =~ "max-w-7xl"
+      assert content =~ "response_cockpit"
+      assert content =~ "lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]"
+      refute content =~ "md:w-80"
+      refute content =~ "hidden md:flex"
+      refute content =~ "h-screen flex-col overflow-hidden"
     end
 
     test "generated queue exposes explicit refresh, paging, and history affordances" do
@@ -96,16 +99,25 @@ defmodule Parapet.OperatorUIIntegrationTest do
       content = live_content <> "\n" <> components_content
 
       assert content =~ "New incidents or queue changes are available."
-      assert content =~ "Load latest changes"
+      assert content =~ "Load Latest Changes"
       assert content =~ "History"
       assert content =~ "Respond"
       assert content =~ "Actions"
-      assert content =~ "Active response workbench"
+      assert content =~ "Active response"
       assert content =~ "Previous"
       assert content =~ "Next"
+      assert content =~ "Newer"
+      assert content =~ "Older"
+      assert content =~ "Resolved archive"
       assert content =~ "selected_incident(params, page_mode, visible_incidents)"
       assert content =~ "selection_source"
       assert content =~ "No incident selected"
+      assert components_content =~ "navigate={incident_detail_path(incident)}"
+
+      assert components_content =~
+               ~S|defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"|
+
+      assert live_content =~ "page_mode={@page_mode}"
     end
 
     test "generated UI exposes polished IA and audit-safe action copy" do
@@ -120,7 +132,16 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "Resolved history"
       assert content =~ "Writes a durable audit record"
       assert content =~ "Every request is audited"
-      assert content =~ "Back to active response"
+      assert content =~ "Next Safe Action"
+      assert content =~ "Latest Evidence"
+      assert content =~ "Back to history"
+      assert content =~ "Resolved incident review"
+      assert content =~ "detail_nav_active(@incident)"
+      assert content =~ "retrospective_card"
+      assert content =~ "Incident retrospective"
+      assert content =~ "Copy retrospective"
+      assert content =~ "readable_datetime"
+      assert content =~ "exact_datetime"
       assert content =~ "surface_class(:action_card)"
       assert content =~ "control_class(:recovery"
       assert content =~ "chip_class(:state"
@@ -132,6 +153,11 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "--parapet-bg"
       assert content =~ "--parapet-panel"
       assert content =~ "--parapet-accent"
+      assert content =~ "--po-link"
+      assert content =~ "--po-chip-warning-bg"
+      assert content =~ "po-button-warning"
+      assert content =~ "po-chip-warning"
+      assert content =~ "aria-label=\"Close Recovery Preview\""
       assert content =~ "prefers-color-scheme: dark"
       assert content =~ "prefers-reduced-motion: reduce"
 
@@ -150,6 +176,10 @@ defmodule Parapet.OperatorUIIntegrationTest do
       refute content =~ "transition-all"
       refute components_content =~ "bg-white shadow-sm ring-1 ring-stone-900/5 bg-white"
       refute detail_content =~ "md:hidden"
+      refute detail_content =~ "md:overflow-y-auto"
+      refute content =~ "Automated Retrospective"
+      refute content =~ "Copy to Clipboard"
+      refute content =~ "alert("
     end
 
     test "demo copied LiveViews stay aligned with generated IA contract" do
@@ -162,7 +192,8 @@ defmodule Parapet.OperatorUIIntegrationTest do
       components_content =
         File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex")
 
-      assert live_content =~ "Back to active response"
+      assert live_content =~ "response_cockpit"
+      assert live_content =~ "Next Safe Actions"
       refute live_content =~ "Back to Queue"
       assert detail_content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
       assert detail_content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
@@ -172,6 +203,18 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert components_content =~ "operator_theme_bootstrap"
       assert components_content =~ "parapet.operator.theme"
       assert live_content =~ "selection_source"
+      assert live_content =~ "response_cockpit"
+      assert live_content =~ "Next Safe Actions"
+      assert components_content =~ "po-chip-warning"
+      assert components_content =~ "po-link"
+      assert components_content =~ "navigate={incident_detail_path(incident)}"
+      assert live_content =~ "Resolved archive"
+      assert detail_content =~ "Back to history"
+      assert detail_content =~ "Resolved incident review"
+      assert detail_content =~ "retrospective_card"
+      assert components_content =~ "Copy retrospective"
+      assert components_content =~ "readable_datetime"
+      refute detail_content =~ "md:overflow-y-auto"
 
       assert components_content =~
                "Preview scoped changes before execution. No recovery action runs until confirm."
@@ -240,6 +283,10 @@ defmodule Parapet.OperatorUIIntegrationTest do
 
       assert content =~ "timeline_entry_title"
       assert content =~ "timeline_entry_body"
+      assert content =~ "external_link_entry?"
+      assert content =~ ~S|href={external_link_url(entry.payload)}|
+      assert content =~ "title={exact_datetime(entry.inserted_at)}"
+      assert content =~ "readable_datetime(entry.inserted_at)"
       assert content =~ "presentation.actor_class"
       refute content =~ "inspect(entry.payload)"
     end
