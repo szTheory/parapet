@@ -360,6 +360,35 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "incident.severity"
     end
 
+    test "generated and demo route emitters do not bypass scoped route helpers" do
+      for path <- generated_and_demo_operator_sources() do
+        content = File.read!(path)
+
+        assert_no_direct_local_route_emitters!(path, content)
+      end
+    end
+
+    test "external link surfaces stay external and do not use operator_base_path" do
+      for path <- [
+            "priv/templates/parapet.gen.ui/operator_components.ex.eex",
+            "examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex"
+          ] do
+        content = File.read!(path)
+
+        assert content =~ "external_link_url"
+        assert content =~ ~S|target="_blank"|
+        assert content =~ ~S|rel="noopener noreferrer"|
+
+        for external_surface <-
+              Regex.scan(~r/<a [^>]*(external_link_url|href=\{@url\})[^>]*>/, content)
+              |> Enum.map(fn [surface | _captures] -> surface end) do
+          assert external_surface =~ ~S|target="_blank"|
+          assert external_surface =~ ~S|rel="noopener noreferrer"|
+          refute external_surface =~ "operator_base_path"
+        end
+      end
+    end
+
     test "UI stays generator-first and host-owned" do
       # Parapet must not define its own Plug.Router or Phoenix.Router for the UI.
       # Let's verify no router modules exist in Parapet core.
@@ -415,6 +444,32 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert index_of(components_content, "def incident_timeline") <
                index_of(components_content, "Trigger Next Escalation"),
              "Escalation controls should stay below the canonical timeline"
+    end
+  end
+
+  defp generated_and_demo_operator_sources do
+    [
+      "priv/templates/parapet.gen.ui/operator_live.ex.eex",
+      "priv/templates/parapet.gen.ui/operator_detail_live.ex.eex",
+      "priv/templates/parapet.gen.ui/operator_components.ex.eex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex"
+    ]
+  end
+
+  defp assert_no_direct_local_route_emitters!(path, content) do
+    forbidden_patterns = [
+      ~r/(navigate|patch|href)="\/parapet/,
+      ~r/(navigate|patch|href)=\{"\/parapet/,
+      ~r/push_(patch|navigate)\([^)]*"\/parapet/s,
+      ~r/push_(patch|navigate)\([^)]*to:\s*"\/parapet/s,
+      ~r/(navigate|patch|href)=\{[^}]*operator_base_path[^}]*<>/s
+    ]
+
+    for pattern <- forbidden_patterns do
+      refute content =~ pattern,
+             "expected #{path} not to contain a direct local route emitter matching #{inspect(pattern)}"
     end
   end
 end
