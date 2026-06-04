@@ -4,6 +4,7 @@ defmodule Parapet.AdoptionDocsTest do
   @readme Path.expand("../../README.md", __DIR__)
   @operator_ui Path.expand("../../docs/operator-ui.md", __DIR__)
   @troubleshooting Path.expand("../../docs/troubleshooting.md", __DIR__)
+  @quality_evaluation Path.expand("../../.planning/QUALITY-EVALUATION.md", __DIR__)
 
   test "archive maintenance docs expose the CLI contract boundary and cadence" do
     readme = File.read!(@readme)
@@ -113,6 +114,27 @@ defmodule Parapet.AdoptionDocsTest do
           "keep routes inside the host app's authenticated pipeline and `live_session`"
         ] do
       assert operator_ui <> "\n" <> troubleshooting =~ phrase
+    end
+  end
+
+  test "quality evaluation records v1.4 top risk closeout without overclaiming" do
+    quality_evaluation = File.read!(@quality_evaluation)
+
+    for phrase <- [
+          "v1.4 Top-Risk Closeout",
+          "2026-06-04",
+          "Phase 37",
+          "Phase 38",
+          "Phase 39",
+          "37-03-SUMMARY.md",
+          "38-03-SUMMARY.md",
+          "39-01-SUMMARY.md",
+          "archive durability",
+          "scoped route compatibility",
+          "adoption supportability docs",
+          "does not claim every quality-evaluation item is closed"
+        ] do
+      assert quality_evaluation =~ phrase
     end
   end
 
