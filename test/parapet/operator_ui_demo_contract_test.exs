@@ -66,11 +66,36 @@ defmodule Parapet.OperatorUIDemoContractTest do
       assert router =~ route
     end
 
+    assert router =~ ~S|scope "/ops" do|
+    assert router =~ "live_session :parapet_operator_scoped"
+
+    assert :binary.match(router, ~S|scope "/" do|) <
+             :binary.match(router, ~S|scope "/ops" do|)
+
+    assert router =~
+             ~S|live_session :parapet_operator_scoped do|
+
+    for route <- [
+          ~S|live("/parapet", DemoAppWeb.Parapet.OperatorLive, :index)|,
+          ~S|live("/parapet/actions", DemoAppWeb.Parapet.OperatorLive, :actions)|,
+          ~S|live("/parapet/history", DemoAppWeb.Parapet.OperatorLive, :history)|,
+          ~S|live("/parapet/incidents/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)|,
+          ~S|live("/parapet/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)|
+        ] do
+      assert router =~ route
+    end
+
     for smoke_path <- [
           ~S|GET /parapet returns 200|,
           ~S|GET /parapet/actions returns 200|,
           ~S|GET /parapet/history returns 200|,
-          ~S|preferred and compatibility incident detail routes render|
+          ~S|preferred and compatibility incident detail routes render|,
+          ~S|GET /ops/parapet returns 200|,
+          ~S|GET /ops/parapet/actions returns 200|,
+          ~S|GET /ops/parapet/history returns 200|,
+          ~S|scoped preferred and compatibility incident detail routes render|,
+          ~S|/ops/parapet/incidents/#{incident.id}|,
+          ~S|/ops/parapet/#{incident.id}|
         ] do
       assert smoke =~ smoke_path
     end

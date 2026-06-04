@@ -13,6 +13,16 @@ defmodule DemoApp.OperatorSmokeTest do
     assert conn.status == 200
   end
 
+  test "GET /ops/parapet returns 200", %{conn: conn} do
+    conn = get(conn, "/ops/parapet")
+    assert conn.status == 200
+  end
+
+  test "GET /ops/parapet/actions returns 200", %{conn: conn} do
+    conn = get(conn, "/ops/parapet/actions")
+    assert conn.status == 200
+  end
+
   test "GET /parapet/history returns 200", %{conn: conn} do
     {:ok, _incident} =
       Parapet.Evidence.create_incident(%{
@@ -23,6 +33,18 @@ defmodule DemoApp.OperatorSmokeTest do
     conn = get(conn, "/parapet/history")
     assert conn.status == 200
     assert conn.resp_body =~ "resolved history smoke incident"
+  end
+
+  test "GET /ops/parapet/history returns 200", %{conn: conn} do
+    {:ok, _incident} =
+      Parapet.Evidence.create_incident(%{
+        title: "scoped resolved history smoke incident",
+        state: "resolved"
+      })
+
+    conn = get(conn, "/ops/parapet/history")
+    assert conn.status == 200
+    assert conn.resp_body =~ "scoped resolved history smoke incident"
   end
 
   test "at least one seeded incident exists" do
@@ -52,6 +74,22 @@ defmodule DemoApp.OperatorSmokeTest do
     compatibility = get(recycle(conn), "/parapet/#{incident.id}")
     assert compatibility.status == 200
     assert compatibility.resp_body =~ "detail route smoke incident"
+  end
+
+  test "scoped preferred and compatibility incident detail routes render", %{conn: conn} do
+    {:ok, incident} =
+      Parapet.Evidence.create_incident(%{
+        title: "scoped detail route smoke incident",
+        state: "open"
+      })
+
+    preferred = get(conn, "/ops/parapet/incidents/#{incident.id}")
+    assert preferred.status == 200
+    assert preferred.resp_body =~ "scoped detail route smoke incident"
+
+    compatibility = get(recycle(conn), "/ops/parapet/#{incident.id}")
+    assert compatibility.status == 200
+    assert compatibility.resp_body =~ "scoped detail route smoke incident"
   end
 
   test "resolved incident detail is read-only and retrospective friendly", %{conn: conn} do
