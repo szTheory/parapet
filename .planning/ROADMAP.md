@@ -57,6 +57,17 @@ Plans:
 
 **Goal:** Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers.
 
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 39-01-PLAN.md — Archive and scoped UI adoption docs with focused guard tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 39-02-PLAN.md — Quality-evaluation closeout and final Phase 39 verification
+
 **Success criteria:**
 
 1. README and docs include copy-pasteable archive maintenance guidance.
