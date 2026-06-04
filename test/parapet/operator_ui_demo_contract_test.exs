@@ -77,6 +77,10 @@ defmodule Parapet.OperatorUIDemoContractTest do
     assert script =~ "390,844"
     assert script =~ "operator-response-desktop"
     assert script =~ "operator-detail-mobile"
+    assert script =~ "operator-response-dark-desktop"
+    assert script =~ "operator-detail-dark-desktop"
+    assert script =~ "operator-response-dark-mobile"
+    assert script =~ "parapet_theme"
     assert script =~ "chromium"
   end
 end

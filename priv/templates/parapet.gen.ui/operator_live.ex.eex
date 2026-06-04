@@ -26,6 +26,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
        visible_incidents: [],
        queue_page: empty_queue_page(),
        queue_params: %{"status" => "active"},
+       selection_source: :none,
        queue_refresh_available?: false
      )
      |> stream_configure(:incidents, dom_id: &incident_dom_id/1)
@@ -37,19 +38,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
     queue_params = queue_params(params, page_mode)
     queue_page = load_queue_page(queue_params)
 
-    selected =
-      if id = params["id"] do
-        Parapet.Operator.incident_detail(id)
-      else
-        nil
-      end
-
     visible_incidents = Enum.map(queue_page.items, &queue_stream_item/1)
+    {selected, selection_source} = selected_incident(params, page_mode, visible_incidents)
 
     {:noreply,
      socket
      |> assign(
        selected_incident: selected,
+       selection_source: selection_source,
        visible_incidents: visible_incidents,
        queue_page: queue_page,
        queue_params: visible_queue_params(queue_params, queue_page),
@@ -117,7 +113,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
 
   def render(assigns) do
     ~H"""
-    <div class="antialiased text-stone-900 flex h-screen flex-col overflow-hidden bg-stone-100">
+    <.operator_theme_bootstrap />
+    <div class="parapet-ui antialiased text-stone-900 flex h-screen flex-col overflow-hidden bg-stone-100">
       <.operator_nav active={@page_mode} />
 
       <div class="border-b border-stone-200 bg-stone-50 px-4 py-3 md:px-6">
@@ -138,7 +135,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
         </main>
       <%% else %>
         <div class="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
-      <div class={"w-full md:w-80 border-r border-stone-200 bg-white flex flex-col flex-shrink-0 #{if @selected_incident, do: "hidden md:flex", else: "flex"}"}>
+      <div class={"w-full md:w-80 border-r border-stone-200 bg-white flex flex-col flex-shrink-0 #{queue_pane_visibility(@selection_source)}"}>
         <div class="p-4 border-b border-stone-200 bg-stone-50">
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -205,8 +202,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
         </div>
       </div>
 
-      <div class={"flex-1 flex flex-col md:flex-row min-w-0 bg-stone-50 #{if @selected_incident, do: "flex", else: "hidden md:flex"}"}>
-        <div class="md:hidden p-4 border-b border-stone-200 bg-white">
+      <div class={"flex-1 flex-col md:flex-row min-w-0 bg-stone-50 #{detail_pane_visibility(@selected_incident, @selection_source)}"}>
+        <div class={["md:hidden p-4 border-b border-stone-200 bg-white", if(@selection_source == :explicit, do: "block", else: "hidden")]}>
           <.link patch={queue_path(@queue_params, %{})} class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium">
             &larr; Back to active response
           </.link>
@@ -221,8 +218,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
               <.incident_timeline detail={@selected_incident} />
             </div>
           <%% else %>
-            <div class="flex-1 flex items-center justify-center text-stone-500">
-              Select an incident to review details
+            <div class="flex-1 flex items-center justify-center p-8 text-stone-500">
+              <div class="max-w-md rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+                <p class="text-sm font-semibold text-stone-800">No incident selected</p>
+                <p class="mt-2 text-sm text-stone-500">
+                  Active incidents appear in the queue. Select one to review impact, evidence, and the next safe action.
+                </p>
+              </div>
             </div>
           <%% end %>
         </div>
@@ -249,6 +251,24 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
   defp selected_queue_incident(%{incident: incident}) do
     %{id: incident.id}
   end
+
+  defp selected_incident(%{"id" => id}, _page_mode, _visible_incidents) when is_binary(id) and id != "" do
+    {Parapet.Operator.incident_detail(id), :explicit}
+  end
+
+  defp selected_incident(_params, :response, [%{id: id} | _visible_incidents]) do
+    {Parapet.Operator.incident_detail(id), :auto}
+  end
+
+  defp selected_incident(_params, _page_mode, _visible_incidents), do: {nil, :none}
+
+  defp queue_pane_visibility(:explicit), do: "hidden md:flex"
+  defp queue_pane_visibility(_selection_source), do: "flex"
+
+  defp detail_pane_visibility(nil, _selection_source), do: "hidden md:flex"
+  defp detail_pane_visibility(_selected_incident, :explicit), do: "flex"
+  defp detail_pane_visibility(_selected_incident, :auto), do: "hidden md:flex"
+  defp detail_pane_visibility(_selected_incident, _selection_source), do: "hidden md:flex"
 
   defp queue_stream_item(item) do
     item

@@ -48,6 +48,13 @@ capture() {
   local name="$1"
   local size="$2"
   local path="$3"
+  local theme="${4:-system}"
+  local themed_path="$path"
+  if [[ "$path" == *"?"* ]]; then
+    themed_path="${path}&parapet_theme=${theme}"
+  else
+    themed_path="${path}?parapet_theme=${theme}"
+  fi
   "$CHROME_BIN" \
     --headless=new \
     --disable-gpu \
@@ -56,17 +63,20 @@ capture() {
     --hide-scrollbars \
     --window-size="$size" \
     --screenshot="$OUTPUT_DIR/$name.png" \
-    "$BASE_URL$path" >/dev/null
+    "$BASE_URL$themed_path" >/dev/null
 }
 
-capture "operator-response-desktop" "1440,1100" "/parapet"
-capture "operator-actions-desktop" "1440,1100" "/parapet/actions"
-capture "operator-history-desktop" "1440,1100" "/parapet/history"
-capture "operator-detail-desktop" "1440,1100" "/parapet/incidents/$DETAIL_ID"
+capture "operator-response-desktop" "1440,1100" "/parapet" "light"
+capture "operator-actions-desktop" "1440,1100" "/parapet/actions" "light"
+capture "operator-history-desktop" "1440,1100" "/parapet/history" "light"
+capture "operator-detail-desktop" "1440,1100" "/parapet/incidents/$DETAIL_ID" "light"
+capture "operator-response-dark-desktop" "1440,1100" "/parapet" "dark"
+capture "operator-detail-dark-desktop" "1440,1100" "/parapet/incidents/$DETAIL_ID" "dark"
 
-capture "operator-response-mobile" "390,844" "/parapet"
-capture "operator-actions-mobile" "390,844" "/parapet/actions"
-capture "operator-history-mobile" "390,844" "/parapet/history"
-capture "operator-detail-mobile" "390,844" "/parapet/incidents/$DETAIL_ID"
+capture "operator-response-mobile" "390,844" "/parapet" "light"
+capture "operator-actions-mobile" "390,844" "/parapet/actions" "light"
+capture "operator-history-mobile" "390,844" "/parapet/history" "light"
+capture "operator-detail-mobile" "390,844" "/parapet/incidents/$DETAIL_ID" "light"
+capture "operator-response-dark-mobile" "390,844" "/parapet" "dark"
 
 ls -1 "$OUTPUT_DIR"/*.png

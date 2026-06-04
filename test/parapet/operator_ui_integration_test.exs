@@ -103,6 +103,9 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "Active response workbench"
       assert content =~ "Previous"
       assert content =~ "Next"
+      assert content =~ "selected_incident(params, page_mode, visible_incidents)"
+      assert content =~ "selection_source"
+      assert content =~ "No incident selected"
     end
 
     test "generated UI exposes polished IA and audit-safe action copy" do
@@ -122,6 +125,15 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "control_class(:recovery"
       assert content =~ "chip_class(:state"
       assert content =~ "focus:outline-none focus:ring-2"
+      assert content =~ "operator_theme_bootstrap"
+      assert content =~ "theme_control"
+      assert content =~ "parapet.operator.theme"
+      assert content =~ "parapet_theme"
+      assert content =~ "--parapet-bg"
+      assert content =~ "--parapet-panel"
+      assert content =~ "--parapet-accent"
+      assert content =~ "prefers-color-scheme: dark"
+      assert content =~ "prefers-reduced-motion: reduce"
 
       assert content =~
                "Preview scoped changes before execution. No recovery action runs until confirm."
@@ -157,6 +169,9 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert components_content =~ "surface_class(:action_card)"
       assert components_content =~ "control_class(:recovery"
       assert components_content =~ "chip_class(:state"
+      assert components_content =~ "operator_theme_bootstrap"
+      assert components_content =~ "parapet.operator.theme"
+      assert live_content =~ "selection_source"
 
       assert components_content =~
                "Preview scoped changes before execution. No recovery action runs until confirm."
