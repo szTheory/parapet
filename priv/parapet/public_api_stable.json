@@ -1,0 +1,223 @@
+[
+  {
+    "functions": [
+      "attach/1"
+    ],
+    "module": "Parapet",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "mark/0",
+      "mark/1"
+    ],
+    "module": "Parapet.Deploy",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [],
+    "module": "Parapet.Escalation.Policy",
+    "callbacks": [
+      "escalate/2"
+    ],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "append_timeline/1",
+      "append_timeline/2",
+      "create_action_item/0",
+      "create_action_item/1",
+      "create_incident/0",
+      "create_incident/1",
+      "log_tool_audit/0",
+      "log_tool_audit/1",
+      "repo/0",
+      "resolve_action_item/1",
+      "run_operator_command/1"
+    ],
+    "module": "Parapet.Evidence",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [],
+    "module": "Parapet.Integration",
+    "callbacks": [
+      "setup/0"
+    ],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "broadcast/1",
+      "deliver_and_audit/3",
+      "dispatch/3"
+    ],
+    "module": "Parapet.Notifier",
+    "callbacks": [
+      "deliver/2"
+    ],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "acknowledge_incident/2",
+      "action_items_query/0",
+      "attach_change_marker/3",
+      "capabilities/1",
+      "confirm_runbook_step/4",
+      "execute_runbook_step/3",
+      "incident_detail/1",
+      "list_incident_queue/0",
+      "list_incident_queue/1",
+      "mark_investigating/2",
+      "preview_runbook_step/3",
+      "queue_query/0",
+      "record_note/3",
+      "request_approval/3",
+      "resolve_incident/2",
+      "short_circuit_reasons/0",
+      "suppress_pending_escalation/3",
+      "trigger_next_escalation/2"
+    ],
+    "module": "Parapet.Operator",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "attach/1"
+    ],
+    "module": "Parapet.Recovery",
+    "callbacks": [
+      "execute/2",
+      "id/0",
+      "label/0",
+      "preview/2"
+    ],
+    "macros": [
+      "__using__/1"
+    ],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [],
+    "module": "Parapet.Runbook",
+    "callbacks": [],
+    "macros": [
+      "__before_compile__/1",
+      "__using__/1",
+      "description/1",
+      "step/2",
+      "title/1"
+    ],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [],
+    "module": "Parapet.SLO.Provider",
+    "callbacks": [
+      "slos/0"
+    ],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "__struct__/0",
+      "__struct__/1",
+      "default_for/1",
+      "default_keep_firing_for/1",
+      "diagnostic?/1",
+      "new/1",
+      "severity/1",
+      "threshold/1",
+      "value_matchers/1",
+      "value_metric/1"
+    ],
+    "module": "Parapet.SLO.SliceSpec",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [
+      "alert_class",
+      "bad_matchers",
+      "bad_source_metric",
+      "for",
+      "good_matchers",
+      "good_source_metric",
+      "group_labels",
+      "integration",
+      "keep_firing_for",
+      "kind",
+      "labels",
+      "min_total_rate",
+      "name",
+      "objective",
+      "runbook",
+      "summary",
+      "threshold",
+      "total_matchers",
+      "total_source_metric"
+    ],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "delivery_slices/2",
+      "slos/0"
+    ],
+    "module": "Parapet.SLO.StarterPack.DeliverySaaS",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "slos/0"
+    ],
+    "module": "Parapet.SLO.StarterPack.WebSaaS",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  },
+  {
+    "functions": [
+      "allowed_public_keys/1",
+      "delay_bucket/1",
+      "event_families/0",
+      "event_name/1",
+      "normalize_async_outcome/1",
+      "normalize_delivery_outcome/1",
+      "normalize_fault_plane/1",
+      "normalize_retry_state/1",
+      "shape_metadata/2"
+    ],
+    "module": "Parapet.Telemetry.AsyncDelivery",
+    "callbacks": [],
+    "macros": [],
+    "struct_keys": [],
+    "tier": "stable"
+  }
+]

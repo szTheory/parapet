@@ -66,6 +66,7 @@ if Code.ensure_loaded?(Oban.Worker) do
           :ok
 
         {:error, reason} ->
+          claim_service().mark_failed(claim, reason)
           {:error, reason}
       end
     end

@@ -224,9 +224,13 @@ defmodule MyApp.MySLOProvider do
     ]
   end
 end
+```
 
-# In your application start or Parapet.attach/1 call:
-Parapet.attach(slo_providers: [MyApp.MySLOProvider])
+Register the provider in config:
+
+```elixir
+config :parapet,
+  providers: [MyApp.MySLOProvider]
 ```
 
 `Parapet.SLO.define/2` will be removed at the next major version bump.

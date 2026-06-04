@@ -77,6 +77,34 @@ defmodule Parapet.Automation.ExecutorTest do
       send(self(), {:mark_executed, claim})
       %{claim | status: "executed"}
     end
+
+    def mark_failed(claim, reason, _opts \\ []) do
+      send(self(), {:mark_failed, claim, reason})
+      %{claim | status: "failed_retryable"}
+    end
+  end
+
+  defmodule FailingClaimService do
+    def claim_action(opts) do
+      send(self(), {:claim_action, opts})
+
+      {:won,
+       %ActionClaim{
+         id: "claim-1",
+         incident_id: opts[:incident_id],
+         action_kind: opts[:action_kind],
+         action_key: opts[:action_key],
+         status: "claimed",
+         idempotency_key: opts[:idempotency_key]
+       }}
+    end
+
+    def mark_executed(_claim, _opts \\ []), do: raise("should not mark executed")
+
+    def mark_failed(claim, reason, _opts \\ []) do
+      send(self(), {:mark_failed, claim, reason})
+      %{claim | status: "failed_retryable"}
+    end
   end
 
   defmodule ShortCircuitClaimService do
@@ -110,6 +138,11 @@ defmodule Parapet.Automation.ExecutorTest do
     def execute_mitigation(:auto_step, _incident) do
       send(self(), :mitigated)
       {:ok, :mitigated}
+    end
+
+    def execute_mitigation(:failing_step, _incident) do
+      send(self(), :mitigation_failed)
+      {:error, :provider_unavailable}
     end
   end
 
@@ -189,6 +222,23 @@ defmodule Parapet.Automation.ExecutorTest do
     assert Ecto.Changeset.get_field(changeset, :type) == "automation_claim_conflicted"
     assert Ecto.Changeset.get_field(changeset, :payload) == %{"step_id" => "auto_step"}
     refute_received :mitigated
+  end
+
+  test "perform/1 releases the claim when execution fails so Oban can retry immediately" do
+    Application.put_env(:parapet, :automation_claim_service, FailingClaimService)
+
+    job = %Oban.Job{args: %{"incident_id" => "inc-1", "step_id" => "failing_step"}}
+
+    assert {:error, :provider_unavailable} = Executor.perform(job)
+
+    assert_received {:claim_action, claim_opts}
+    assert claim_opts[:idempotency_key] == "auto_exec_inc-1_failing_step"
+    assert_received :mitigation_failed
+
+    assert_received {:mark_failed, %ActionClaim{idempotency_key: "auto_exec_inc-1_failing_step"},
+                     :provider_unavailable}
+
+    refute_received {:mark_executed, _}
   end
 
   test "perform/1 returns error when incident is not found" do

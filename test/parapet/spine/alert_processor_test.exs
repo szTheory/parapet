@@ -32,6 +32,14 @@ defmodule Parapet.Spine.AlertProcessorTest do
     end
 
     def transaction(multi) do
+      if Process.get(:mock_transaction_error) do
+        {:error, :incident, Process.get(:mock_transaction_error), %{}}
+      else
+        run_transaction(multi)
+      end
+    end
+
+    defp run_transaction(multi) do
       ops = Ecto.Multi.to_list(multi)
       send(self(), {:transaction, ops})
 
@@ -338,6 +346,30 @@ defmodule Parapet.Spine.AlertProcessorTest do
       assert {:error, :invalid_payload} = AlertProcessor.process_batch("invalid")
 
       refute_received {:transaction, _}
+    end
+
+    test "returns per-alert failures instead of reporting batch success" do
+      Process.put(:mock_transaction_error, :unique_conflict)
+
+      payload = %{
+        "alerts" => [
+          %{
+            "status" => "firing",
+            "fingerprint" => "duplicate-open",
+            "labels" => %{"alertname" => "HighCPU"}
+          }
+        ]
+      }
+
+      assert {:error,
+              [
+                %{
+                  status: "firing",
+                  alertname: "HighCPU",
+                  fingerprint: "duplicate-open",
+                  result: {:error, :incident, :unique_conflict, %{}}
+                }
+              ]} = AlertProcessor.process_batch(payload)
     end
 
     test "resolved alerts close matching incidents and append auto_resolved chronology" do

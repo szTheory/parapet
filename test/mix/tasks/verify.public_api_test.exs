@@ -97,4 +97,44 @@ defmodule Mix.Tasks.Verify.PublicApiTest do
       assert PublicApi.detect_tier_from_text(plain_text) == :unclassified
     end
   end
+
+  describe "stable API surface fields" do
+    defmodule BehaviourSample do
+      @callback run(term()) :: {:ok, term()}
+      defmacro sample_macro(arg), do: arg
+      def public_fun(arg), do: {:ok, arg}
+    end
+
+    defmodule StructSample do
+      defstruct [:id, :name]
+    end
+
+    test "exported_functions/1 records public functions and omits compiler builtins" do
+      assert "public_fun/1" in PublicApi.exported_functions(BehaviourSample)
+
+      refute Enum.any?(
+               PublicApi.exported_functions(BehaviourSample),
+               &String.starts_with?(&1, "__info__/")
+             )
+
+      refute Enum.any?(
+               PublicApi.exported_functions(BehaviourSample),
+               &String.starts_with?(&1, "module_info/")
+             )
+    end
+
+    test "exported_macros/1 records public macros" do
+      assert "sample_macro/1" in PublicApi.exported_macros(BehaviourSample)
+    end
+
+    test "callbacks/1 records behaviour callbacks" do
+      assert "id/0" in PublicApi.callbacks(Parapet.Recovery)
+      assert PublicApi.callbacks(Parapet.SLO.Provider) == ["slos/0"]
+    end
+
+    test "struct_keys/1 records stable struct fields" do
+      assert PublicApi.struct_keys(StructSample) == ["id", "name"]
+      assert PublicApi.struct_keys(BehaviourSample) == []
+    end
+  end
 end
