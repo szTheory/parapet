@@ -16,10 +16,8 @@ defmodule Parapet.Integrations.RindleTest do
       :telemetry.attach(
         handler_id,
         event_name,
-        fn name, measurements, metadata, _config ->
-          send(test_pid, {:telemetry_event, name, measurements, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_event/4,
+        %{pid: test_pid}
       )
     end)
 

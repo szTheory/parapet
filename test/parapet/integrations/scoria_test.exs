@@ -6,6 +6,7 @@ end
 
 defmodule Parapet.Integrations.ScoriaTest do
   use ExUnit.Case, async: false
+  import ExUnit.CaptureLog
 
   defmodule DummyRepo do
     def insert(changeset) do
@@ -79,10 +80,8 @@ defmodule Parapet.Integrations.ScoriaTest do
     :telemetry.attach(
       handler_id,
       [:parapet, :scoria, :metrics],
-      fn name, measurements, metadata, _config ->
-        send(test_pid, {:telemetry_event, name, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_event/4,
+      %{pid: test_pid}
     )
 
     :telemetry.attach_many(
@@ -92,10 +91,8 @@ defmodule Parapet.Integrations.ScoriaTest do
         [:parapet, :scoria, :metrics, :expired],
         [:parapet, :scoria, :metrics, :resumed]
       ],
-      fn name, measurements, metadata, _config ->
-        send(test_pid, {:telemetry_event, name, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_event/4,
+      %{pid: test_pid}
     )
 
     on_exit(fn ->
@@ -188,13 +185,17 @@ defmodule Parapet.Integrations.ScoriaTest do
     # In Elixir, Map.take on a non-map raises, for example. We can call handle_event directly
     # with a non-map metadata to force an exception.
 
-    # Should not raise
-    assert Parapet.Integrations.Scoria.handle_event(
-             [:scoria, :sre, :telemetry],
-             %{duration: 100},
-             :not_a_map,
-             nil
-           ) == :ok
+    log =
+      capture_log(fn ->
+        assert Parapet.Integrations.Scoria.handle_event(
+                 [:scoria, :sre, :telemetry],
+                 %{duration: 100},
+                 :not_a_map,
+                 nil
+               ) == :ok
+      end)
+
+    assert log =~ "expected a map"
   end
 
   describe "[:scoria, :config, :deployed] telemetry" do
@@ -228,10 +229,8 @@ defmodule Parapet.Integrations.ScoriaTest do
       :telemetry.attach(
         handler_id,
         [:parapet, :scoria, :mcp, :error],
-        fn name, measurements, metadata, _config ->
-          send(test_pid, {:telemetry_event, name, measurements, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_event/4,
+        %{pid: test_pid}
       )
 
       on_exit(fn ->

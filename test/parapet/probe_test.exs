@@ -14,7 +14,9 @@ defmodule Parapet.ProbeTest do
     use Parapet.Probe
 
     @impl true
-    def run, do: {:error, :timeout}
+    def run do
+      if Process.get(:force_success), do: :ok, else: {:error, :timeout}
+    end
   end
 
   test "execute/0 wraps run/0 in a telemetry span for success" do
@@ -24,15 +26,15 @@ defmodule Parapet.ProbeTest do
     :telemetry.attach(
       "probe-success-test",
       [:parapet, :probe, :run, :stop],
-      fn event, measurements, metadata, _config ->
-        send(parent, {ref, event, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+      %{pid: parent, ref: ref}
     )
 
     assert :ok = SuccessProbe.execute()
 
-    assert_receive {^ref, [:parapet, :probe, :run, :stop], %{duration: _}, metadata}
+    assert_receive {^ref, [:parapet, :probe, :run, :stop], %{duration: _},
+                    %{probe: "Parapet.ProbeTest.SuccessProbe"} = metadata}
+
     assert metadata.probe == "Parapet.ProbeTest.SuccessProbe"
     assert metadata.status == "success"
 
@@ -46,15 +48,15 @@ defmodule Parapet.ProbeTest do
     :telemetry.attach(
       "probe-error-test",
       [:parapet, :probe, :run, :stop],
-      fn event, measurements, metadata, _config ->
-        send(parent, {ref, event, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+      %{pid: parent, ref: ref}
     )
 
     assert {:error, :timeout} = ErrorProbe.execute()
 
-    assert_receive {^ref, [:parapet, :probe, :run, :stop], %{duration: _}, metadata}
+    assert_receive {^ref, [:parapet, :probe, :run, :stop], %{duration: _},
+                    %{probe: "Parapet.ProbeTest.ErrorProbe"} = metadata}
+
     assert metadata.probe == "Parapet.ProbeTest.ErrorProbe"
     assert metadata.status == "error"
 

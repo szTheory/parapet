@@ -19,10 +19,8 @@ defmodule Parapet.Metrics.ScoriaTest do
     :telemetry.attach(
       "test-scoria-downstream",
       [:parapet, :scoria, :eval, :completed],
-      fn _name, measurements, metadata, _config ->
-        send(parent, {:downstream_event, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_named_payload/4,
+      %{pid: parent, name: :downstream_event}
     )
 
     on_exit(fn ->

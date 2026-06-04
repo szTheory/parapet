@@ -94,11 +94,17 @@ if Code.ensure_loaded?(Oban.Worker) do
     end
 
     defp maybe_enqueue_escalation(incident_id) do
-      if Code.ensure_loaded?(Oban) and Application.get_env(:parapet, :escalation_policy) do
-        %{incident_id: incident_id}
-        |> Parapet.Escalation.Worker.new()
-        |> Evidence.repo().insert!()
+      worker = Parapet.Escalation.Worker
+
+      if escalation_worker_available?(worker) and
+           Application.get_env(:parapet, :escalation_policy) do
+        job = apply(worker, :new, [%{incident_id: incident_id}])
+        Evidence.repo().insert!(job)
       end
+    end
+
+    defp escalation_worker_available?(worker) do
+      Code.ensure_loaded?(worker) and function_exported?(worker, :new, 1)
     end
 
     defp claim_service do

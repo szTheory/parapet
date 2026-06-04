@@ -91,10 +91,8 @@ defmodule Parapet.Integrations.RulesteadTest do
       :telemetry.attach(
         handler_id,
         [:parapet, :rulestead, :flag_change],
-        fn _event, measurements, metadata, _config ->
-          send(test_pid, {:telemetry_executed, measurements, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_executed/4,
+        %{pid: test_pid}
       )
 
       metadata = %{

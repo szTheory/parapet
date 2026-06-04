@@ -10,7 +10,6 @@ end
 
 # Broken module — missing the execute/2 callback:
 defmodule Mix.Tasks.Parapet.DoctorTest.BrokenCallbackRecovery do
-  use Parapet.Recovery
   def id, do: :requeue_dead_letter
   def label, do: "Broken (Fixture)"
   def preview(_incident, _step), do: {:ok, %{}}
@@ -175,7 +174,7 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
 
   describe "cardinality security checks" do
     test "passes when SLO queries use safe labels" do
-      Parapet.SLO.define(:safe_slo,
+      define_slo(:safe_slo,
         objective: 99.9,
         good_events: "rate(http_requests_total{status=~\"2..\"}[5m])",
         total_events: "sum by (route) (rate(http_requests_total[5m]))",
@@ -186,7 +185,7 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
     end
 
     test "fails when SLO uses a high-cardinality label in by() clause" do
-      Parapet.SLO.define(:bad_by_slo,
+      define_slo(:bad_by_slo,
         objective: 99.9,
         good_events: "rate(events[5m])",
         total_events: "sum by (user_id) (rate(events[5m]))",
@@ -351,5 +350,9 @@ defmodule Mix.Tasks.Parapet.DoctorTest do
       assert String.contains?(messages, "==> recovery: warn")
       assert String.contains?(messages, "execute")
     end
+  end
+
+  defp define_slo(name, opts) do
+    apply(Parapet.SLO, :define, [name, opts])
   end
 end

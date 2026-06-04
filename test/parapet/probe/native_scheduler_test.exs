@@ -20,6 +20,7 @@ defmodule Parapet.Probe.NativeSchedulerTest do
     probes = [{TestProbe, 10}]
 
     {:ok, pid} = start_supervised({NativeScheduler, probes})
+    assert is_pid(pid)
 
     # Wait for the probe to execute
     assert_receive :probe_executed, 100

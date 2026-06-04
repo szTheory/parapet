@@ -1,5 +1,6 @@
 defmodule Parapet.Integrations.ThreadlineTest do
   use ExUnit.Case, async: false
+  import ExUnit.CaptureLog
 
   defmodule DummyRepo do
     def insert(changeset) do
@@ -58,9 +59,13 @@ defmodule Parapet.Integrations.ThreadlineTest do
 
   test "safely rescues exceptions to prevent Ecto crash propagation" do
     # Emit an event with action: "crash" to trigger the DummyRepo's raise
-    :telemetry.execute([:threadline, :audit, :event], %{duration_ms: 10}, %{action: "crash"})
+    log =
+      capture_log(fn ->
+        :telemetry.execute([:threadline, :audit, :event], %{duration_ms: 10}, %{action: "crash"})
+      end)
 
     # We shouldn't crash the test process
+    assert log =~ "db connection failed"
     assert true
   end
 
