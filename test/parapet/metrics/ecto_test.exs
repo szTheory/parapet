@@ -19,10 +19,8 @@ defmodule Parapet.Metrics.EctoTest do
     :telemetry.attach(
       "test-ecto-emitted",
       [:parapet, :ecto, :query],
-      fn _event, measurements, _metadata, _config ->
-        send(test_pid, {:telemetry_measurements, measurements})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_measurements/4,
+      %{pid: test_pid, name: :telemetry_measurements}
     )
 
     query_time_native = System.convert_time_unit(10, :millisecond, :native)
@@ -49,10 +47,8 @@ defmodule Parapet.Metrics.EctoTest do
     :telemetry.attach(
       "test-ecto-emitted-source",
       [:parapet, :ecto, :query],
-      fn _event, _measurements, metadata, _config ->
-        send(test_pid, {:telemetry_metadata, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_metadata/4,
+      %{pid: test_pid, name: :telemetry_metadata}
     )
 
     :telemetry.execute(

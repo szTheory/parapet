@@ -388,6 +388,26 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
     assert Test.Repo.get!(Incident, "inc-001").state == "resolved"
   end
 
+  test "generated history rows navigate to canonical incident detail instead of response queue",
+       %{live_module: live_module} do
+    socket = configured_socket(live_module, URI.parse("http://example.com/parapet/history"))
+
+    {:ok, socket} = live_module.mount(%{}, %{}, socket)
+    socket = Phoenix.Component.assign(socket, :live_action, :history)
+
+    {:noreply, socket} =
+      live_module.handle_params(%{}, "http://example.com/parapet/history", socket)
+
+    html = render_live(live_module, socket)
+
+    assert html =~ ~r/href="\/parapet\/incidents\/inc-\d{3}"/
+    assert html =~ "Resolved archive"
+    assert html =~ ~r/>\s*Older\s*</
+    assert html =~ ~r/>\s*Newer\s*</
+    refute html =~ ~r/href="\/parapet\?[^"]*id=inc-\d{3}/
+    refute html =~ ~r/status=resolved[^"]*id=inc-\d{3}/
+  end
+
   defp seeded_incidents do
     active_incidents =
       for index <- 1..60 do

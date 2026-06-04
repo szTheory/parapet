@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :external_id, :string, null: false
             add :state, :string, default: "open", null: false
 
-            timestamps()
+            timestamps(type: :utc_datetime_usec)
           end
 
           create table(:parapet_incidents, primary_key: false) do
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :description, :text
             add :correlation_key, :string
 
-            timestamps()
+            timestamps(type: :utc_datetime_usec)
           end
 
           create unique_index(:parapet_incidents, [:correlation_key], where: "state = 'open'")
@@ -54,7 +54,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :payload, :map, default: %{}
             add :incident_id, references(:parapet_incidents, type: :binary_id, on_delete: :delete_all), null: false
 
-            timestamps()
+            timestamps(type: :utc_datetime_usec)
           end
 
           create index(:parapet_timeline_entries, [:incident_id])
@@ -69,7 +69,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :duration_ms, :integer
             add :timeline_entry_id, references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)
 
-            timestamps()
+            timestamps(type: :utc_datetime_usec)
           end
 
           create index(:parapet_tool_audits, [:timeline_entry_id])
@@ -80,7 +80,7 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
             add :type, :string, null: false
             add :payload, :map, default: %{}
 
-            timestamps()
+            timestamps(type: :utc_datetime_usec)
           end
 
           create index(:parapet_system_events, [:inserted_at])

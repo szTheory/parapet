@@ -12,10 +12,8 @@ defmodule Parapet.Plug.MetricsTest do
     :telemetry.attach(
       "test-http-metrics-1",
       [:parapet, :http, :request],
-      fn name, measurements, metadata, _config ->
-        send(parent, {ref, name, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+      %{pid: parent, ref: ref}
     )
 
     _conn =
@@ -39,10 +37,8 @@ defmodule Parapet.Plug.MetricsTest do
     :telemetry.attach(
       "test-http-metrics-2",
       [:parapet, :http, :request],
-      fn name, measurements, metadata, _config ->
-        send(parent, {ref, name, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+      %{pid: parent, ref: ref}
     )
 
     _conn =
@@ -64,10 +60,8 @@ defmodule Parapet.Plug.MetricsTest do
     :telemetry.attach(
       "test-http-metrics-3",
       [:parapet, :http, :request],
-      fn name, measurements, metadata, _config ->
-        send(parent, {ref, name, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+      %{pid: parent, ref: ref}
     )
 
     require OpenTelemetry.Tracer

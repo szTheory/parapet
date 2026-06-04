@@ -10,6 +10,10 @@ It provides an immediate, evidence-based understanding of whether your critical 
 
 Parapet's philosophy: A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
+Want to see it before installing it? The [runnable demo app](examples/demo_app/README.md)
+starts a seeded Operator UI, Prometheus, and Grafana with Docker and prints the
+exact URLs and local Grafana credentials to open.
+
 ## Compatibility
 
 | Component | Supported |
@@ -18,7 +22,7 @@ Parapet's philosophy: A Phoenix SaaS team can install Parapet and immediately kn
 | OTP       | 26–28     |
 | Postgres  | 14+       |
 
-CI validates on Elixir 1.19 / OTP 27 / PG 14.
+CI validates on Elixir 1.19 across OTP 26, 27, and 28.
 
 ## Stability & Versioning
 
@@ -74,24 +78,49 @@ If you want the shortest explanation of what Parapet is trying to help an adopte
 
 ## The Operator Loop: Zero to First Alert
 
-### 1. Define your SLOs
+### 1. Activate the WebSaaS starter pack
 
-After installation, Parapet creates an SLO definitions file (usually in your application's `lib` directory, e.g., `lib/my_app/slos.ex`). 
-
-You define SLOs using standard PromQL for `good_events` and `total_events`.
+After installation, activate the built-in WebSaaS provider in `config/config.exs`:
 
 ```elixir
-defmodule MyApp.SLOs do
-  require Parapet.SLO
+config :parapet,
+  providers: [Parapet.SLO.StarterPack.WebSaaS]
+```
 
-  Parapet.SLO.define(:checkout_success_rate,
-    objective: 99.9,
-    good_events: ~s{sum(rate(phoenix_endpoint_http_requests_total{route="/checkout", status=~"2.."}[5m]))},
-    total_events: ~s{sum(rate(phoenix_endpoint_http_requests_total{route="/checkout"}[5m]))},
-    runbook: "https://notion.so/my-org/checkout-runbook"
-  )
+That one line registers the default HTTP availability, login journey, and Oban
+job-success SLO slices. You write zero raw PromQL for the Day-1 path; Parapet's
+generator renders the recording rules, alert rules, and denominator guards from
+the slice definitions.
+
+For custom user journeys, implement `Parapet.SLO.Provider` and register your
+provider the same way:
+
+```elixir
+defmodule MyApp.Parapet.SLOs do
+  @behaviour Parapet.SLO.Provider
+
+  @impl true
+  def slos do
+    [
+      Parapet.SLO.SliceSpec.new(
+        name: :checkout_availability,
+        integration: :my_app,
+        kind: :ratio,
+        objective: 99.9,
+        alert_class: :page,
+        good_source_metric: "my_app_checkout_success_total",
+        total_source_metric: "my_app_checkout_total",
+        good_matchers: [outcome: "success"],
+        total_matchers: [journey: "checkout"],
+        runbook: "https://notion.so/my-org/checkout-runbook"
+      )
+    ]
+  end
 end
 ```
+
+The older `Parapet.SLO.define/2` API remains available during the 1.x
+deprecation window for compatibility, but new installations should use providers.
 
 ### 2. Validate your configuration
 
@@ -213,6 +242,7 @@ For the full contract, safe metadata rules, and event-family semantics, see [doc
 ## Learn The Flows
 
 - [Parapet Adopter Flows](docs/adopter-flows.md)
+- [Runnable Demo App](examples/demo_app/README.md)
 - [Operator UI Guide](docs/operator-ui.md)
 - [SLO Reference](docs/slo-reference.md)
 - [Telemetry Contract](docs/telemetry.md)

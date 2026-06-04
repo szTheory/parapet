@@ -53,4 +53,33 @@ defmodule DemoApp.OperatorSmokeTest do
     assert compatibility.status == 200
     assert compatibility.resp_body =~ "detail route smoke incident"
   end
+
+  test "resolved incident detail is read-only and retrospective friendly", %{conn: conn} do
+    {:ok, incident} =
+      Parapet.Evidence.create_incident(%{
+        title: "resolved detail review incident",
+        state: "resolved",
+        runbook_data: %{
+          "retrospective" => """
+          # Resolved detail review incident
+
+          Impact stopped after the provider recovered. Follow-up: keep the SLO threshold unchanged.
+          """
+        }
+      })
+
+    conn = get(conn, "/parapet/incidents/#{incident.id}")
+
+    assert conn.status == 200
+    assert conn.resp_body =~ "Resolved incident review"
+    assert conn.resp_body =~ "Incident retrospective"
+    assert conn.resp_body =~ "Copy retrospective"
+    assert conn.resp_body =~ "Resolved incident"
+    refute conn.resp_body =~ "Resolve Incident"
+    refute conn.resp_body =~ "Trigger Next Escalation"
+    refute conn.resp_body =~ "Suppress Pending Escalation"
+    refute conn.resp_body =~ "Automated Retrospective"
+    refute conn.resp_body =~ "Copy to Clipboard"
+    refute conn.resp_body =~ "alert("
+  end
 end

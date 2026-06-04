@@ -42,13 +42,15 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "page_mode(:history)"
       assert operator_live_source =~ "Previous"
       assert operator_live_source =~ "Next"
-      assert operator_live_source =~ "Load latest changes"
-      assert operator_live_source =~ "Back to active response"
+      assert operator_live_source =~ "Newer"
+      assert operator_live_source =~ "Older"
+      assert operator_live_source =~ "Resolved archive"
+      assert operator_live_source =~ "Load Latest Changes"
       refute operator_live_source =~ "Back to Queue"
       assert operator_live_source =~ "selection_source: :none"
       assert operator_live_source =~ "selected_incident(params, page_mode, visible_incidents)"
       assert operator_live_source =~ "defp selected_incident(_params, :response"
-      assert operator_live_source =~ "defp detail_pane_visibility"
+      assert operator_live_source =~ "response_cockpit"
       assert operator_live_source =~ "No incident selected"
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
@@ -61,6 +63,13 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
         Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_components.ex")
         |> Rewrite.Source.get(:content)
 
+      assert operator_components_source =~ "data-incident-id"
+      assert operator_components_source =~ "navigate={incident_detail_path(incident)}"
+
+      assert operator_components_source =~
+               ~S|defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"|
+
+      assert operator_components_source =~ "Active response summary"
       assert operator_components_source =~ "incident.secondary_line"
       assert operator_components_source =~ "incident.updated_at_label"
       assert operator_components_source =~ "incident.attention_chip"
@@ -77,8 +86,21 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_components_source =~ "data-parapet-theme-value=\"system\""
       assert operator_components_source =~ "--parapet-bg"
       assert operator_components_source =~ "--parapet-accent"
+      assert operator_components_source =~ "--po-header-bg"
+      assert operator_components_source =~ "--po-theme-control-bg"
+      assert operator_components_source =~ "po-operator-header"
+      assert operator_components_source =~ "po-operator-brand"
+      assert operator_components_source =~ "po-theme-control"
+      assert operator_components_source =~ "po-theme-option"
       assert operator_components_source =~ "prefers-color-scheme: dark"
       assert operator_components_source =~ "prefers-reduced-motion: reduce"
+      assert operator_components_source =~ "Incident retrospective"
+      assert operator_components_source =~ "Copy retrospective"
+      assert operator_components_source =~ "readable_datetime"
+      assert operator_components_source =~ "exact_datetime"
+      refute operator_components_source =~ "Automated Retrospective"
+      refute operator_components_source =~ "Copy to Clipboard"
+      refute operator_components_source =~ "alert("
 
       assert operator_components_source =~
                "Preview scoped changes before execution. No recovery action runs until confirm."
@@ -97,6 +119,12 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_detail_source =~ "Parapet.Operator.acknowledge_incident"
       assert operator_detail_source =~ "Parapet.Operator.resolve_incident"
       assert operator_detail_source =~ "Parapet.Operator.incident_detail(id)"
+      assert operator_detail_source =~ "detail_nav_active(@incident)"
+      assert operator_detail_source =~ "Back to history"
+      assert operator_detail_source =~ "Resolved incident review"
+      assert operator_detail_source =~ "retrospective_card"
+      assert operator_detail_source =~ "max-w-7xl"
+      refute operator_detail_source =~ "md:overflow-y-auto"
       assert operator_detail_source =~ "operator_theme_bootstrap"
       assert operator_detail_source =~ "parapet-ui"
     end

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Verify.PublicApi do
   @moduledoc """
   Verifies that all public API modules have documentation and a stability-tier
-  declaration, and generates a manifest.
+  declaration, and checks the committed Stable API manifest.
 
   Each public Parapet module must include an ExDoc admonition callout in its
   `@moduledoc` to declare its stability tier:
@@ -18,8 +18,12 @@ defmodule Mix.Tasks.Verify.PublicApi do
 
   @shortdoc "Verifies public API module documentation and stability-tier declarations"
 
+  @stable_manifest_path "priv/parapet/public_api_stable.json"
+
   @impl Mix.Task
-  def run(_args) do
+  def run(args) do
+    write_manifest? = "--write" in args
+
     # Ensure application is compiled and loaded
     Mix.Task.run("compile")
     Application.load(:parapet)
@@ -77,6 +81,45 @@ defmodule Mix.Tasks.Verify.PublicApi do
       IO.puts(:stderr, Enum.map_join(unclassified, "\n", &"  - #{&1.module}"))
       System.halt(1)
     end
+
+    stable_manifest =
+      manifest
+      |> Enum.filter(&(&1.tier == :stable))
+      |> Enum.map(&Map.delete(&1, :has_docs))
+      |> Enum.sort_by(& &1.module)
+
+    stable_output = Jason.encode!(stable_manifest, pretty: true)
+
+    if write_manifest? do
+      File.mkdir_p!(Path.dirname(@stable_manifest_path))
+      File.write!(@stable_manifest_path, stable_output <> "\n")
+    else
+      verify_stable_manifest!(stable_output)
+    end
+  end
+
+  defp verify_stable_manifest!(stable_output) do
+    case File.read(@stable_manifest_path) do
+      {:ok, expected} ->
+        if String.trim(expected) != String.trim(stable_output) do
+          IO.puts(
+            :stderr,
+            "Error: Stable public API manifest drifted. " <>
+              "Run `mix verify.public_api --write` only for intentional, reviewed API changes."
+          )
+
+          System.halt(1)
+        end
+
+      {:error, reason} ->
+        IO.puts(
+          :stderr,
+          "Error: Stable public API manifest missing at #{@stable_manifest_path}: #{inspect(reason)}. " <>
+            "Run `mix verify.public_api --write` to create it."
+        )
+
+        System.halt(1)
+    end
   end
 
   defp public_api_module?(module) do
@@ -97,7 +140,15 @@ defmodule Mix.Tasks.Verify.PublicApi do
         {:error, _} -> {false, :unclassified}
       end
 
-    %{module: inspect(module), has_docs: has_docs, tier: tier}
+    %{
+      module: inspect(module),
+      has_docs: has_docs,
+      tier: tier,
+      callbacks: callbacks(module),
+      functions: exported_functions(module),
+      macros: exported_macros(module),
+      struct_keys: struct_keys(module)
+    }
   end
 
   @doc false
@@ -112,4 +163,71 @@ defmodule Mix.Tasks.Verify.PublicApi do
       true -> :unclassified
     end
   end
+
+  @doc false
+  def exported_functions(module) do
+    module
+    |> function_exports()
+    |> reject_builtin_exports()
+    |> Enum.map(&format_export/1)
+    |> Enum.sort()
+  end
+
+  @doc false
+  def exported_macros(module) do
+    module
+    |> macro_exports()
+    |> reject_builtin_exports()
+    |> Enum.map(&format_export/1)
+    |> Enum.sort()
+  end
+
+  @doc false
+  def callbacks(module) do
+    module
+    |> docs_callbacks()
+    |> Enum.map(&format_export/1)
+    |> Enum.sort()
+  end
+
+  @doc false
+  def struct_keys(module) do
+    if function_exported?(module, :__struct__, 0) do
+      module
+      |> apply(:__struct__, [])
+      |> Map.keys()
+      |> Enum.reject(&(&1 == :__struct__))
+      |> Enum.map(&to_string/1)
+      |> Enum.sort()
+    else
+      []
+    end
+  end
+
+  defp function_exports(module), do: module.__info__(:functions)
+  defp macro_exports(module), do: module.__info__(:macros)
+
+  defp docs_callbacks(module) do
+    case Code.fetch_docs(module) do
+      {:docs_v1, _, _, _, _, _, docs} ->
+        Enum.flat_map(docs, fn
+          {{kind, name, arity}, _, _, _, _} when kind in [:callback, :macrocallback] ->
+            [{name, arity}]
+
+          _other ->
+            []
+        end)
+
+      _other ->
+        []
+    end
+  end
+
+  defp reject_builtin_exports(exports) do
+    Enum.reject(exports, fn {name, _arity} ->
+      name in [:__info__, :module_info]
+    end)
+  end
+
+  defp format_export({name, arity}), do: "#{name}/#{arity}"
 end

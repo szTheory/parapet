@@ -1,0 +1,12 @@
+services:
+  web:
+    ports: !override
+      - "127.0.0.1:${WEB_PORT}:4000"
+
+  prometheus:
+    ports: !override
+      - "127.0.0.1:${PROMETHEUS_PORT}:9090"
+
+  grafana:
+    ports: !override
+      - "127.0.0.1:${GRAFANA_PORT}:3000"

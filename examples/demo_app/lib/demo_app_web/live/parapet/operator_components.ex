@@ -23,6 +23,40 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --parapet-warning-text: #78350f;
         --parapet-info-bg: #f5f3ff;
         --parapet-info-text: #4c1d95;
+        --po-link: #1d4ed8;
+        --po-link-hover: #1e3a8a;
+        --po-focus: #0f766e;
+        --po-focus-offset: #ffffff;
+        --po-header-bg: #ffffff;
+        --po-header-border: #e7e5e4;
+        --po-header-title: #1c1917;
+        --po-header-muted: #0f766e;
+        --po-nav-fg: #44403c;
+        --po-nav-hover-bg: #f5f5f4;
+        --po-nav-hover-fg: #1c1917;
+        --po-nav-active-bg: #5eead4;
+        --po-nav-active-fg: #042f2e;
+        --po-theme-control-bg: #fafaf9;
+        --po-theme-control-border: #d6d3d1;
+        --po-theme-control-fg: #44403c;
+        --po-chip-neutral-bg: #f5f5f4;
+        --po-chip-neutral-fg: #292524;
+        --po-chip-neutral-border: #d6d3d1;
+        --po-chip-success-bg: #dcfce7;
+        --po-chip-success-fg: #14532d;
+        --po-chip-success-border: #86efac;
+        --po-chip-warning-bg: #fef3c7;
+        --po-chip-warning-fg: #78350f;
+        --po-chip-warning-border: #f59e0b;
+        --po-chip-danger-bg: #ffe4e6;
+        --po-chip-danger-fg: #881337;
+        --po-chip-danger-border: #fda4af;
+        --po-chip-info-bg: #e0e7ff;
+        --po-chip-info-fg: #312e81;
+        --po-chip-info-border: #a5b4fc;
+        --po-button-warning-bg: #b45309;
+        --po-button-warning-fg: #ffffff;
+        --po-button-warning-hover: #92400e;
       }
 
       html[data-parapet-theme="dark"] .parapet-ui,
@@ -44,6 +78,40 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --parapet-warning-text: #fde68a;
         --parapet-info-bg: rgba(76, 29, 149, 0.24);
         --parapet-info-text: #ddd6fe;
+        --po-link: #93c5fd;
+        --po-link-hover: #bfdbfe;
+        --po-focus: #5eead4;
+        --po-focus-offset: #0c0a09;
+        --po-header-bg: #0c0a09;
+        --po-header-border: #292524;
+        --po-header-title: #fafaf9;
+        --po-header-muted: #5eead4;
+        --po-nav-fg: #e7e5e4;
+        --po-nav-hover-bg: #292524;
+        --po-nav-hover-fg: #ffffff;
+        --po-nav-active-bg: #5eead4;
+        --po-nav-active-fg: #042f2e;
+        --po-theme-control-bg: #1c1917;
+        --po-theme-control-border: #57534e;
+        --po-theme-control-fg: #e7e5e4;
+        --po-chip-neutral-bg: #292524;
+        --po-chip-neutral-fg: #f5f5f4;
+        --po-chip-neutral-border: #57534e;
+        --po-chip-success-bg: #052e16;
+        --po-chip-success-fg: #bbf7d0;
+        --po-chip-success-border: #22c55e;
+        --po-chip-warning-bg: #451a03;
+        --po-chip-warning-fg: #fde68a;
+        --po-chip-warning-border: #d97706;
+        --po-chip-danger-bg: #4c0519;
+        --po-chip-danger-fg: #fecdd3;
+        --po-chip-danger-border: #fb7185;
+        --po-chip-info-bg: #1e1b4b;
+        --po-chip-info-fg: #c7d2fe;
+        --po-chip-info-border: #818cf8;
+        --po-button-warning-bg: #92400e;
+        --po-button-warning-fg: #fff7ed;
+        --po-button-warning-hover: #78350f;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -71,6 +139,40 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           --parapet-warning-text: #fde68a;
           --parapet-info-bg: rgba(76, 29, 149, 0.24);
           --parapet-info-text: #ddd6fe;
+          --po-link: #93c5fd;
+          --po-link-hover: #bfdbfe;
+          --po-focus: #5eead4;
+          --po-focus-offset: #0c0a09;
+          --po-header-bg: #0c0a09;
+          --po-header-border: #292524;
+          --po-header-title: #fafaf9;
+          --po-header-muted: #5eead4;
+          --po-nav-fg: #e7e5e4;
+          --po-nav-hover-bg: #292524;
+          --po-nav-hover-fg: #ffffff;
+          --po-nav-active-bg: #5eead4;
+          --po-nav-active-fg: #042f2e;
+          --po-theme-control-bg: #1c1917;
+          --po-theme-control-border: #57534e;
+          --po-theme-control-fg: #e7e5e4;
+          --po-chip-neutral-bg: #292524;
+          --po-chip-neutral-fg: #f5f5f4;
+          --po-chip-neutral-border: #57534e;
+          --po-chip-success-bg: #052e16;
+          --po-chip-success-fg: #bbf7d0;
+          --po-chip-success-border: #22c55e;
+          --po-chip-warning-bg: #451a03;
+          --po-chip-warning-fg: #fde68a;
+          --po-chip-warning-border: #d97706;
+          --po-chip-danger-bg: #4c0519;
+          --po-chip-danger-fg: #fecdd3;
+          --po-chip-danger-border: #fb7185;
+          --po-chip-info-bg: #1e1b4b;
+          --po-chip-info-fg: #c7d2fe;
+          --po-chip-info-border: #818cf8;
+          --po-button-warning-bg: #92400e;
+          --po-button-warning-fg: #fff7ed;
+          --po-button-warning-hover: #78350f;
         }
       }
 
@@ -113,16 +215,105 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       .parapet-ui .text-amber-900,
       .parapet-ui .text-amber-950 { color: var(--parapet-warning-text); }
 
+      .parapet-ui .po-link {
+        color: var(--po-link);
+      }
+
+      .parapet-ui .po-link:hover {
+        color: var(--po-link-hover);
+      }
+
+      .parapet-ui .po-focus {
+        --tw-ring-color: var(--po-focus);
+        --tw-ring-offset-color: var(--po-focus-offset);
+      }
+
+      .parapet-ui .po-operator-header {
+        border-color: var(--po-header-border);
+        background: var(--po-header-bg);
+        color: var(--po-header-title);
+      }
+
+      .parapet-ui .po-operator-brand {
+        color: var(--po-header-muted);
+      }
+
+      .parapet-ui .po-operator-title {
+        color: var(--po-header-title);
+      }
+
+      .parapet-ui .po-nav-item {
+        color: var(--po-nav-fg);
+      }
+
+      .parapet-ui .po-nav-item:hover {
+        background: var(--po-nav-hover-bg);
+        color: var(--po-nav-hover-fg);
+      }
+
+      .parapet-ui .po-nav-active {
+        background: var(--po-nav-active-bg);
+        color: var(--po-nav-active-fg);
+      }
+
+      .parapet-ui .po-theme-control {
+        background: var(--po-theme-control-bg);
+        box-shadow: inset 0 0 0 1px var(--po-theme-control-border);
+      }
+
+      .parapet-ui .po-theme-option {
+        color: var(--po-theme-control-fg);
+      }
+
+      .parapet-ui .po-chip {
+        border: 1px solid var(--po-chip-neutral-border);
+        background: var(--po-chip-neutral-bg);
+        color: var(--po-chip-neutral-fg);
+      }
+
+      .parapet-ui .po-chip-success {
+        border-color: var(--po-chip-success-border);
+        background: var(--po-chip-success-bg);
+        color: var(--po-chip-success-fg);
+      }
+
+      .parapet-ui .po-chip-warning {
+        border-color: var(--po-chip-warning-border);
+        background: var(--po-chip-warning-bg);
+        color: var(--po-chip-warning-fg);
+      }
+
+      .parapet-ui .po-chip-danger {
+        border-color: var(--po-chip-danger-border);
+        background: var(--po-chip-danger-bg);
+        color: var(--po-chip-danger-fg);
+      }
+
+      .parapet-ui .po-chip-info {
+        border-color: var(--po-chip-info-border);
+        background: var(--po-chip-info-bg);
+        color: var(--po-chip-info-fg);
+      }
+
+      .parapet-ui .po-button-warning {
+        background: var(--po-button-warning-bg);
+        color: var(--po-button-warning-fg);
+      }
+
+      .parapet-ui .po-button-warning:hover {
+        background: var(--po-button-warning-hover);
+      }
+
       .parapet-theme-option[aria-pressed="true"] {
-        background: var(--parapet-accent);
-        color: #042f2e;
+        background: var(--po-nav-active-bg);
+        color: var(--po-nav-active-fg);
       }
 
       html[data-parapet-theme="light"] .parapet-theme-option[data-parapet-theme-value="light"],
       html[data-parapet-theme="dark"] .parapet-theme-option[data-parapet-theme-value="dark"],
       html[data-parapet-theme="system"] .parapet-theme-option[data-parapet-theme-value="system"] {
-        background: var(--parapet-accent);
-        color: #042f2e;
+        background: var(--po-nav-active-bg);
+        color: var(--po-nav-active-fg);
       }
 
       html[data-parapet-theme="dark"] .parapet-theme-option[aria-pressed="true"] {
@@ -171,11 +362,11 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   def operator_nav(assigns) do
     ~H"""
-    <header class="border-b border-stone-900/10 bg-stone-950 text-stone-50">
+    <header class="po-operator-header border-b">
       <div class="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">Parapet Operator</p>
-          <h1 class="mt-1 text-lg font-semibold text-white">Active response workbench</h1>
+          <p class="po-operator-brand text-xs font-semibold uppercase tracking-[0.18em]">Parapet Operator</p>
+          <h1 class="po-operator-title mt-1 text-lg font-semibold">Active response workbench</h1>
         </div>
         <nav aria-label="Parapet operator sections" class="flex flex-wrap gap-2">
           <.nav_item href="/parapet" active={@active == :response}>Respond</.nav_item>
@@ -190,17 +381,90 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   def theme_control(assigns) do
     ~H"""
-    <div class="flex min-h-[40px] items-center gap-1 rounded-lg bg-stone-900 px-1 py-1 ring-1 ring-stone-700" aria-label="Operator color theme">
-      <button type="button" data-parapet-theme-value="light" onclick="window.parapetSetTheme && window.parapetSetTheme('light')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+    <div class="po-theme-control flex min-h-[40px] items-center gap-1 rounded-lg px-1 py-1" role="group" aria-label="Operator color theme">
+      <button type="button" data-parapet-theme-value="light" onclick="window.parapetSetTheme && window.parapetSetTheme('light')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         Light
       </button>
-      <button type="button" data-parapet-theme-value="dark" onclick="window.parapetSetTheme && window.parapetSetTheme('dark')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+      <button type="button" data-parapet-theme-value="dark" onclick="window.parapetSetTheme && window.parapetSetTheme('dark')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         Dark
       </button>
-      <button type="button" data-parapet-theme-value="system" onclick="window.parapetSetTheme && window.parapetSetTheme('system')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+      <button type="button" data-parapet-theme-value="system" onclick="window.parapetSetTheme && window.parapetSetTheme('system')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         System
       </button>
     </div>
+    """
+  end
+
+  attr(:detail, :map, default: nil)
+  attr(:visible_incidents, :list, required: true)
+  attr(:action_items, :list, required: true)
+  attr(:journeys, :list, required: true)
+
+  def response_cockpit(assigns) do
+    ~H"""
+    <section aria-label="Active response summary" class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-stone-900/5 md:p-7">
+      <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <div class="min-w-0">
+          <p class="text-sm font-semibold uppercase tracking-[0.16em] text-teal-700">Active response</p>
+          <%= if @detail do %>
+            <div class="mt-3 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div class="min-w-0">
+                <h2 class="text-3xl font-semibold text-stone-950 text-balance"><%= @detail.incident.title %></h2>
+                <p class="mt-2 max-w-3xl text-base leading-7 text-stone-600">
+                  <%= @detail.derived.impact || @detail.incident.description || "No impact summary is recorded yet." %>
+                </p>
+              </div>
+              <span class={["self-start rounded-full px-3 py-1 text-sm font-semibold", state_color(@detail.incident.state)]}>
+                <%= @detail.incident.state %>
+              </span>
+            </div>
+
+            <div class="mt-6 grid gap-4 md:grid-cols-3">
+              <div class="rounded-xl bg-stone-50 p-4 ring-1 ring-stone-900/5">
+                <p class="text-sm font-semibold text-stone-700">Latest Evidence</p>
+                <p class="mt-2 text-sm leading-6 text-stone-600"><%= latest_evidence_summary(@detail) %></p>
+              </div>
+              <div class="rounded-xl bg-stone-50 p-4 ring-1 ring-stone-900/5">
+                <p class="text-sm font-semibold text-stone-700">Next Safe Action</p>
+                <p class="mt-2 text-sm leading-6 text-stone-600"><%= next_safe_action_summary(@detail) %></p>
+              </div>
+              <div class="rounded-xl bg-stone-50 p-4 ring-1 ring-stone-900/5">
+                <p class="text-sm font-semibold text-stone-700">Pending Work</p>
+                <p class="mt-2 text-sm leading-6 text-stone-600">
+                  <%= Enum.count(@action_items) %> open recovery or review <%= if Enum.count(@action_items) == 1, do: "item", else: "items" %>.
+                </p>
+              </div>
+            </div>
+          <% else %>
+            <h2 class="mt-3 text-3xl font-semibold text-stone-950 text-balance">No active incidents need response.</h2>
+            <p class="mt-2 max-w-2xl text-base leading-7 text-stone-600">
+              The active queue is empty. Use History for resolved evidence or Actions for pending recovery work.
+            </p>
+          <% end %>
+        </div>
+
+        <div class="rounded-xl bg-stone-50 p-4 ring-1 ring-stone-900/5">
+          <p class="text-sm font-semibold text-stone-700">Critical Journeys</p>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <%= for journey <- @journeys do %>
+              <span class={chip_class(:journey, journey.status)}>
+                <%= journey.name %>: <%= journey.status %>
+              </span>
+            <% end %>
+          </div>
+          <div class="mt-5 grid grid-cols-2 gap-3 border-t border-stone-200 pt-4">
+            <div>
+              <p class="text-2xl font-semibold tabular-nums text-stone-950"><%= Enum.count(@visible_incidents) %></p>
+              <p class="text-sm text-stone-600">active incidents</p>
+            </div>
+            <div>
+              <p class="text-2xl font-semibold tabular-nums text-stone-950"><%= Enum.count(@action_items) %></p>
+              <p class="text-sm text-stone-600">pending actions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
     """
   end
 
@@ -214,8 +478,8 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       navigate={@href}
       aria-current={if @active, do: "page", else: nil}
       class={[
-        "flex min-h-[40px] items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950",
-        if(@active, do: "bg-teal-400 text-stone-950", else: "text-stone-200 hover:bg-stone-800 hover:text-white")
+        "po-focus flex min-h-[40px] items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+        if(@active, do: "po-nav-active", else: "po-nav-item")
       ]}
     >
       <%= render_slot(@inner_block) %>
@@ -298,49 +562,39 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   end
 
   attr(:incidents, :list, required: true)
-  attr(:selected, :map, default: nil)
+  attr(:selected, :any, default: nil)
   attr(:queue_params, :map, default: %{})
+  attr(:page_mode, :atom, default: :response)
 
   def incident_list(assigns) do
     ~H"""
     <div class="divide-y divide-stone-200">
       <%= for incident <- @incidents do %>
-        <.link
-          patch={queue_item_path(@queue_params, incident)}
-          aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
-          class={[
-            "block border-l-4 px-4 py-3 transition-colors",
-            queue_row_class(@selected, incident)
-          ]}
-        >
-          <div class="flex items-start justify-between gap-3">
-            <div class="min-w-0 flex-1">
-              <div class="flex flex-wrap items-center gap-2">
-                <span class={chip_class(:state, incident.state)}>
-                  <%= incident.state %>
-                </span>
-                <%= if incident.severity do %>
-                  <span class={chip_class(:severity, incident.severity)}>
-                    <%= incident.severity %>
-                  </span>
-                <% end %>
-                <%= if incident.attention_chip do %>
-                  <span class="px-2 py-1 text-xs font-semibold rounded-full border border-amber-200 bg-amber-50 text-amber-900">
-                    <%= incident.attention_chip %>
-                  </span>
-                <% end %>
-              </div>
-              <p class="mt-2 truncate text-sm font-semibold text-stone-900"><%= incident.title %></p>
-              <%= if incident.secondary_line do %>
-                <p class="mt-1 truncate text-sm text-stone-600"><%= incident.secondary_line %></p>
-              <% end %>
-            </div>
-            <div class="shrink-0 text-right">
-              <p class="text-xs font-medium uppercase tracking-wide text-stone-500">Updated</p>
-              <p class="mt-1 text-sm text-stone-700"><%= incident.updated_at_label %></p>
-            </div>
-          </div>
-        </.link>
+        <%= if @page_mode == :history do %>
+          <.link
+            navigate={incident_detail_path(incident)}
+            aria-current="false"
+            data-incident-id={incident.id}
+            class={[
+              "block border-l-4 px-4 py-3 transition-colors",
+              queue_row_class(nil, incident)
+            ]}
+          >
+            <.incident_row incident={incident} />
+          </.link>
+        <% else %>
+          <.link
+            patch={queue_item_path(@queue_params, incident)}
+            aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
+            data-incident-id={incident.id}
+            class={[
+              "block border-l-4 px-4 py-3 transition-colors",
+              queue_row_class(@selected, incident)
+            ]}
+          >
+            <.incident_row incident={incident} />
+          </.link>
+        <% end %>
       <% end %>
 
       <%= if Enum.empty?(@incidents) do %>
@@ -351,6 +605,40 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           </p>
         </div>
       <% end %>
+    </div>
+    """
+  end
+
+  attr(:incident, :map, required: true)
+
+  def incident_row(assigns) do
+    ~H"""
+    <div class="flex items-start justify-between gap-3">
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class={chip_class(:state, @incident.state)}>
+            <%= @incident.state %>
+          </span>
+          <%= if @incident.severity do %>
+            <span class={chip_class(:severity, @incident.severity)}>
+              <%= @incident.severity %>
+            </span>
+          <% end %>
+          <%= if @incident.attention_chip do %>
+            <span class="po-chip po-chip-warning rounded-full px-2.5 py-1 text-xs font-semibold">
+              <%= @incident.attention_chip %>
+            </span>
+          <% end %>
+        </div>
+        <p class="mt-2 truncate text-sm font-semibold text-stone-900"><%= @incident.title %></p>
+        <%= if @incident.secondary_line do %>
+          <p class="mt-1 truncate text-sm text-stone-600"><%= @incident.secondary_line %></p>
+        <% end %>
+      </div>
+      <div class="shrink-0 text-right">
+        <p class="text-xs font-medium uppercase tracking-wide text-stone-500">Updated</p>
+        <p class="mt-1 text-sm text-stone-700"><%= @incident.updated_at_label %></p>
+      </div>
     </div>
     """
   end
@@ -404,7 +692,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                           <p class="text-xs text-amber-800 mt-0.5">After <%= step.delay %></p>
                         <% end %>
                       </div>
-                      <span class={["self-start px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
+                      <span class={["self-start px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded-full border", escalation_chain_status_class(step.status)]}>
                         <%= escalation_chain_status_copy(step.status) %>
                       </span>
                     </li>
@@ -442,7 +730,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
           <h4 class="text-sm font-medium text-stone-700 mb-2">Top Facts</h4>
           <ul class="text-sm text-stone-600 list-disc pl-5">
-            <li>Created at <%= @detail.incident.inserted_at %></li>
+            <li>Created <%= readable_datetime(@detail.incident.inserted_at) %></li>
             <%= if @detail.derived.fault_plane do %>
               <li>Likely fault plane: <%= @detail.derived.fault_plane %></li>
             <% end %>
@@ -457,13 +745,13 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             <%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
               <% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
               <% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
-              <a href={url} class="text-sm text-indigo-700 hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
+              <a href={url} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                 <span>Trace: <span class="tabular-nums font-mono"><%= trace_id %></span></span> &nearr;
               </a>
             <% end %>
             <%= for link <- @detail.external_links do %>
-              <a href={external_link_url(link)} class="text-sm text-blue-600 hover:underline flex items-center gap-1" target="_blank" rel="noopener noreferrer">
+              <a href={external_link_url(link)} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
                 <span><%= external_link_label(link) %></span> &nearr;
               </a>
             <% end %>
@@ -500,16 +788,22 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                   <div>
                     <div class="flex items-center gap-2 flex-wrap">
                       <p class="text-sm font-medium text-stone-900"><%= timeline_entry_title(entry, presentation) %></p>
-                      <span class={["px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
+                      <span class={["px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
                         <%= timeline_actor_copy(presentation.actor_class) %>
                       </span>
                     </div>
                     <p class="text-sm text-stone-600 mt-1">
-                      <%= timeline_entry_body(entry, presentation) %>
+                      <%= if external_link_entry?(entry) do %>
+                        <a href={external_link_url(entry.payload)} class="po-link inline-flex items-center gap-1 break-all hover:underline" target="_blank" rel="noopener noreferrer">
+                          <span><%= external_link_label(entry.payload) %></span> &nearr;
+                        </a>
+                      <% else %>
+                        <%= timeline_entry_body(entry, presentation) %>
+                      <% end %>
                     </p>
                   </div>
                   <div class="whitespace-nowrap text-right text-sm text-stone-500">
-                    <time datetime={entry.inserted_at} class="tabular-nums font-mono"><%= entry.inserted_at %></time>
+                    <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="tabular-nums"><%= readable_datetime(entry.inserted_at) %></time>
                   </div>
                 </div>
               </div>
@@ -555,12 +849,59 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <span class="px-2 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-800 ring-1 ring-violet-200/50">
                   <%= inspect(scope) %>
                 </span>
-                <time datetime={entry.inserted_at} class="text-xs text-stone-500"><%= entry.inserted_at %></time>
+                <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="text-sm text-stone-500"><%= readable_datetime(entry.inserted_at) %></time>
               </div>
             </div>
           <% end %>
         </div>
       </div>
+    <% end %>
+    """
+  end
+
+  attr(:detail, :map, required: true)
+
+  def retrospective_card(assigns) do
+    retrospective =
+      if assigns.detail.incident.state == "resolved" &&
+           is_map(assigns.detail.incident.runbook_data) do
+        Map.get(assigns.detail.incident.runbook_data, "retrospective")
+      end
+
+    assigns = assign(assigns, :retrospective, retrospective)
+
+    ~H"""
+    <%= if is_binary(@retrospective) && String.trim(@retrospective) != "" do %>
+      <section class={surface_class(:compact_card)} aria-label="Incident retrospective">
+        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div class="min-w-0">
+            <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">History artifact</p>
+            <h3 class="mt-1 text-lg font-semibold text-stone-950">Incident retrospective</h3>
+            <p class="mt-2 text-sm leading-6 text-stone-600">
+              Copies the Markdown retrospective for Slack, docs, or an LLM review.
+            </p>
+          </div>
+          <button
+            type="button"
+            data-content={@retrospective}
+            onclick="navigator.clipboard && navigator.clipboard.writeText(this.dataset.content); const label = this.querySelector('[data-copy-label]'); if (label) { const previous = label.textContent; label.textContent = 'Copied'; setTimeout(() => label.textContent = previous, 1400); }"
+            class="flex min-h-[40px] shrink-0 items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+          >
+            <span data-copy-label>Copy retrospective</span>
+          </button>
+        </div>
+
+        <div class="space-y-3 rounded-lg bg-stone-50 p-4 ring-1 ring-stone-900/5">
+          <%= for block <- retrospective_blocks(@retrospective) do %>
+            <%= case block do %>
+              <% {:heading, text} -> %>
+                <h4 class="text-base font-semibold text-stone-950"><%= text %></h4>
+              <% {:paragraph, text} -> %>
+                <p class="text-sm leading-6 text-stone-700"><%= text %></p>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
     <% end %>
     """
   end
@@ -605,7 +946,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <%= if length(step.targeting_hints) > 0 do %>
                   <div class="mt-2 flex flex-wrap gap-1">
                     <%= for hint <- step.targeting_hints do %>
-                      <span class="px-1.5 py-0.5 text-[10px] font-mono rounded bg-purple-50 text-purple-700 border border-purple-100" title={hint.title}>
+                      <span class="px-1.5 py-0.5 text-xs font-mono rounded bg-purple-50 text-purple-700 border border-purple-100" title={hint.title}>
                         <%= hint.kind %>:<span class="tabular-nums font-mono"><%= String.slice(to_string(hint.external_id), 0..7) %></span>
                       </span>
                     <% end %>
@@ -613,25 +954,27 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <% end %>
               </div>
 
-              <div class="ml-4">
-                <%= case step.state do %>
-                  <% :previewable -> %>
-                    <p class="mb-2 max-w-48 text-xs text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
-                    <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
-                      Preview
-                    </button>
-                  <% :executable -> %>
-                    <p class="mb-2 max-w-48 text-xs text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
-                     <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
-                      Execute
-                    </button>
-                  <% :executed -> %>
-                    <div class="text-[10px] text-stone-400 text-right">
-                    </div>
-                  <% _ -> %>
-                  
-                <% end %>
-              </div>
+              <%= if @detail.incident.state != "resolved" do %>
+                <div class="ml-4">
+                  <%= case step.state do %>
+                    <% :previewable -> %>
+                      <p class="mb-2 max-w-48 text-sm text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
+                      <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
+                        Preview Recovery
+                      </button>
+                    <% :executable -> %>
+                      <p class="mb-2 max-w-48 text-sm text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
+                       <button phx-click="preview_mitigation" phx-value-step={step.id} phx-value-incident_id={@detail.incident.id} class={control_class(:recovery)}>
+                        Preview Recovery
+                      </button>
+                    <% :executed -> %>
+                      <div class="text-sm text-stone-400 text-right">
+                      </div>
+                    <% _ -> %>
+                    
+                  <% end %>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
@@ -649,26 +992,26 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       <div class="bg-white ring-1 ring-indigo-500 rounded-xl shadow-xl overflow-hidden">
         <div class="bg-indigo-500 px-4 py-2 flex justify-between items-center">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
-          <button phx-click="cancel_preview" class="text-white hover:text-indigo-100">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          <button type="button" phx-click="cancel_preview" aria-label="Close Recovery Preview" class="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-white hover:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-white/80">
+            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
         
         <div class="p-4">
           <div class="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p class="text-[10px] text-stone-500 uppercase font-bold">Target Kind</p>
+              <p class="text-xs text-stone-500 uppercase font-bold">Target Kind</p>
               <p class="text-sm font-medium text-stone-900"><%= preview.data["target_kind"] %></p>
             </div>
             <div>
-              <p class="text-[10px] text-stone-500 uppercase font-bold">Affected Count</p>
+              <p class="text-xs text-stone-500 uppercase font-bold">Affected Count</p>
               <p class="text-sm font-medium text-stone-900"><%= preview.data["count"] %></p>
             </div>
           </div>
 
           <%= if (preview.data["warnings"] || []) != [] do %>
             <div class="mb-4 p-2 bg-red-50 border border-red-100 rounded">
-              <p class="text-[10px] text-red-700 uppercase font-bold mb-1">Warnings</p>
+              <p class="text-xs text-red-700 uppercase font-bold mb-1">Warnings</p>
               <ul class="text-xs text-red-600 list-disc pl-4">
                 <%= for w <- preview.data["warnings"] do %>
                   <li><%= w %></li>
@@ -679,7 +1022,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
           <%= if preview.data["idempotency_caveats"] do %>
             <div class="mb-4">
-              <p class="text-[10px] text-stone-500 uppercase font-bold mb-1">Idempotency</p>
+              <p class="text-xs text-stone-500 uppercase font-bold mb-1">Idempotency</p>
               <p class="text-xs text-stone-600"><%= preview.data["idempotency_caveats"] %></p>
             </div>
           <% end %>
@@ -698,7 +1041,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
               Confirm Recovery
             </button>
           </div>
-          <p class="text-[10px] text-center text-stone-400 mt-2 italic">
+          <p class="text-xs text-center text-stone-400 mt-2 italic">
             Preview is active.
           </p>
         </div>
@@ -712,39 +1055,53 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   def action_rail(assigns) do
     ~H"""
     <div class="flex flex-col gap-4">
-      <%= if @detail.incident.state == "open" do %>
+      <%= if @detail.incident.state == "resolved" do %>
+        <section class={surface_class(:action_card)} aria-label="Resolved incident status">
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">Review mode</p>
+          <h3 class="mt-1 text-lg font-semibold text-stone-950">Resolved incident</h3>
+          <p class="mt-2 text-sm leading-6 text-stone-600">
+            This incident is closed. History keeps the final timeline, retrospective, and audit evidence together for review.
+          </p>
+          <a href="/parapet/history" class="mt-4 flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+            Back to history
+          </a>
+        </section>
+      <% else %>
+        <h3 class="text-lg font-semibold text-stone-950">Operator actions</h3>
+        <%= if @detail.incident.state == "open" do %>
+          <div class={surface_class(:action_card)}>
+            <h4 class="text-sm font-medium text-stone-900 mb-2">Acknowledge</h4>
+            <p class="text-sm text-stone-500 mb-3">Take ownership of this incident. Writes a durable audit record and timeline entry.</p>
+            <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class={control_class(:recovery, :full)}>
+              Acknowledge Incident
+            </button>
+          </div>
+        <% end %>
+
         <div class={surface_class(:action_card)}>
-          <h4 class="text-sm font-medium text-stone-900 mb-2">Acknowledge</h4>
-          <p class="text-xs text-stone-500 mb-3">Take ownership of this incident. Writes a durable audit record and timeline entry.</p>
-          <button phx-click="acknowledge" phx-value-id={@detail.incident.id} class={control_class(:recovery, :full)}>
-            Acknowledge Incident
+          <h4 class="text-sm font-medium text-stone-900 mb-2">Escalation Controls</h4>
+          <%= if escalation_controls_enabled?(@detail.incident) do %>
+            <p class="text-sm text-stone-500 mb-3">Request the next escalation only after reviewing current status and the canonical timeline. Every request is audited.</p>
+            <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class={["mb-2", control_class(:warning, :full)]}>
+              Trigger Next Escalation
+            </button>
+            <p class="text-sm text-stone-500 mb-3">Suppress pending escalation for the displayed bounded window. Every request is audited.</p>
+            <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class={control_class(:warning_secondary, :full)}>
+              Suppress Pending Escalation
+            </button>
+          <% else %>
+            <p class="text-sm text-stone-600">Escalation controls are available only while the incident is open.</p>
+          <% end %>
+        </div>
+
+        <div class={surface_class(:action_card)}>
+          <h4 class="text-sm font-medium text-stone-900 mb-2">Resolve</h4>
+          <p class="text-sm text-stone-500 mb-3">Mark incident as resolved only after user impact has stopped and evidence is complete. Writes audit record.</p>
+          <button phx-click="resolve" phx-value-id={@detail.incident.id} class={control_class(:success, :full)}>
+            Resolve Incident
           </button>
         </div>
       <% end %>
-
-      <div class={surface_class(:action_card)}>
-        <h4 class="text-sm font-medium text-stone-900 mb-2">Escalation Controls</h4>
-        <%= if escalation_controls_enabled?(@detail.incident) do %>
-          <p class="text-xs text-stone-500 mb-3">Request the next escalation only after reviewing current status and the canonical timeline. Every request is audited.</p>
-          <button phx-click="trigger_next_escalation" phx-value-id={@detail.incident.id} class={["mb-2", control_class(:warning, :full)]}>
-            Trigger Next Escalation
-          </button>
-          <p class="text-xs text-stone-500 mb-3">Suppress pending escalation for the displayed bounded window. Every request is audited.</p>
-          <button phx-click="suppress_pending_escalation" phx-value-id={@detail.incident.id} phx-value-minutes="30" class={control_class(:warning_secondary, :full)}>
-            Suppress Pending Escalation
-          </button>
-        <% else %>
-          <p class="text-sm text-stone-600">Escalation controls are available only while the incident is open.</p>
-        <% end %>
-      </div>
-
-      <div class={surface_class(:action_card)}>
-        <h4 class="text-sm font-medium text-stone-900 mb-2">Resolve</h4>
-        <p class="text-xs text-stone-500 mb-3">Mark incident as resolved only after user impact has stopped and evidence is complete. Writes audit record.</p>
-        <button phx-click="resolve" phx-value-id={@detail.incident.id} class={control_class(:success, :full)}>
-          Resolve Incident
-        </button>
-      </div>
     </div>
     """
   end
@@ -781,7 +1138,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     <div class={surface_class(:action_card)}>
       <div class="flex justify-between items-start mb-2">
         <h4 class="text-sm font-medium text-stone-900"><%= @item.title || "Action Item" %></h4>
-        <span class="px-2 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-800 ring-1 ring-amber-200/50">
+        <span class={["rounded-full px-2.5 py-1 text-xs font-semibold", state_color(@item.state)]}>
           <%= @item.state %>
         </span>
       </div>
@@ -841,7 +1198,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     do:
       control_width(width) <>
         " " <>
-        control_base() <> " bg-amber-600 text-white hover:bg-amber-700 focus:ring-amber-300"
+        control_base() <> " po-button-warning focus:ring-amber-300"
 
   defp control_class(:warning_secondary, width),
     do:
@@ -874,12 +1231,12 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   defp chip_class(:execution, :executed),
     do:
-      "rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 ring-1 ring-emerald-200/50"
+      "po-chip po-chip-success rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide"
 
-  defp journey_color(:healthy), do: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/50"
-  defp journey_color(:degraded), do: "bg-amber-100 text-amber-800 ring-1 ring-amber-200/50"
-  defp journey_color(:down), do: "bg-rose-100 text-rose-800 ring-1 ring-rose-200/50"
-  defp journey_color(_), do: "bg-stone-100 text-stone-800"
+  defp journey_color(:healthy), do: "po-chip po-chip-success"
+  defp journey_color(:degraded), do: "po-chip po-chip-warning"
+  defp journey_color(:down), do: "po-chip po-chip-danger"
+  defp journey_color(_), do: "po-chip"
 
   defp overview_mode_label(:history), do: "Resolved history"
   defp overview_mode_label(:actions), do: "Action center"
@@ -897,6 +1254,8 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     end
   end
 
+  defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"
+
   defp queue_row_class(selected, incident) do
     if selected && selected.id == incident.id do
       "border-l-teal-700 bg-teal-50/80 hover:bg-teal-50"
@@ -905,16 +1264,50 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     end
   end
 
-  defp state_color("open"), do: "bg-rose-100 text-rose-800 ring-1 ring-rose-200/50"
-  defp state_color("acknowledged"), do: "bg-amber-100 text-amber-800 ring-1 ring-amber-200/50"
-  defp state_color("resolved"), do: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/50"
-  defp state_color(_), do: "bg-stone-100 text-stone-800"
+  defp state_color("open"), do: "po-chip po-chip-danger"
+  defp state_color("acknowledged"), do: "po-chip po-chip-warning"
+  defp state_color("investigating"), do: "po-chip po-chip-info"
+  defp state_color("resolved"), do: "po-chip po-chip-success"
+  defp state_color(_), do: "po-chip"
 
-  defp severity_color("critical"), do: "border-rose-200 bg-rose-50 text-rose-900"
-  defp severity_color("high"), do: "border-orange-200 bg-orange-50 text-orange-900"
-  defp severity_color("medium"), do: "border-amber-200 bg-amber-50 text-amber-900"
-  defp severity_color("low"), do: "border-emerald-200 bg-emerald-50 text-emerald-900"
-  defp severity_color(_), do: "border-stone-200 bg-stone-100 text-stone-700"
+  defp severity_color("critical"), do: "po-chip po-chip-danger"
+  defp severity_color("high"), do: "po-chip po-chip-danger"
+  defp severity_color("medium"), do: "po-chip po-chip-warning"
+  defp severity_color("low"), do: "po-chip po-chip-success"
+  defp severity_color(_), do: "po-chip"
+
+  defp latest_evidence_summary(%{timeline_entries: entries}) when is_list(entries) do
+    case List.last(entries) do
+      %{entry: entry, presentation: presentation} -> timeline_entry_body(entry, presentation)
+      %{entry: entry} -> timeline_entry_body(entry, %{actor_class: :evidence})
+      _ -> "No timeline evidence has been recorded yet."
+    end
+  end
+
+  defp latest_evidence_summary(%{entries: entries}) when is_list(entries) do
+    case List.last(entries) do
+      nil -> "No timeline evidence has been recorded yet."
+      entry -> timeline_entry_body(entry, %{actor_class: :evidence})
+    end
+  end
+
+  defp latest_evidence_summary(_detail), do: "No timeline evidence has been recorded yet."
+
+  defp next_safe_action_summary(%{derived: %{next_safe_action: action}}) when is_binary(action),
+    do: action
+
+  defp next_safe_action_summary(%{derived: %{runbook_steps: steps}}) when is_list(steps) do
+    case Enum.find(steps, &(&1.state in [:previewable, :executable])) do
+      %{label: label} ->
+        "Review evidence, then #{String.downcase(label)} with preview/audit controls."
+
+      _ ->
+        "Continue from the latest durable evidence before taking action."
+    end
+  end
+
+  defp next_safe_action_summary(_detail),
+    do: "Continue from the latest durable evidence before taking action."
 
   defp escalation_status_copy(:suppressed),
     do: "Pending escalation is durably suppressed until the recorded window expires."
@@ -939,25 +1332,28 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp escalation_status_badge(_), do: "Idle"
 
   defp escalation_next_step_copy(%{kind: :await_suppression_expiry, at: %DateTime{} = at}),
-    do: "Wait for suppression to expire at #{at}."
+    do: "Wait for suppression to expire #{readable_datetime(at)}."
 
   defp escalation_next_step_copy(%{kind: :await_worker_execution, at: %DateTime{} = at}),
-    do: "Await worker execution for the pending escalation request recorded at #{at}."
+    do:
+      "Await worker execution for the pending escalation request recorded #{readable_datetime(at)}."
 
   defp escalation_next_step_copy(%{kind: :await_next_escalation, at: %DateTime{} = at}),
-    do: "Await the next scheduled escalation step at #{at}."
+    do: "Await the next scheduled escalation step #{readable_datetime(at)}."
 
   defp escalation_next_step_copy(%{kind: :monitor_timeline, at: %DateTime{} = at}),
-    do: "Monitor the canonical timeline. Latest escalation evidence landed at #{at}."
+    do:
+      "Monitor the canonical timeline. Latest escalation evidence landed #{readable_datetime(at)}."
 
   defp escalation_next_step_copy(_),
     do: "Monitor the canonical timeline for the next durable escalation event."
 
   defp system_action_copy(%{status: :executed, at: %DateTime{} = at, mode: mode}),
-    do: "System action executed at #{at}#{if(mode, do: " via #{mode}", else: "")}."
+    do:
+      "System action executed #{readable_datetime(at)}#{if(mode, do: " via #{mode}", else: "")}."
 
   defp system_action_copy(%{status: :short_circuited, at: %DateTime{} = at}),
-    do: "System execution was short-circuited at #{at}."
+    do: "System execution was short-circuited #{readable_datetime(at)}."
 
   defp system_action_copy(_), do: "No recent system action is recorded."
 
@@ -967,19 +1363,19 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
          actor: actor,
          reason: reason
        }) do
-    "#{actor || "Operator"} suppressed pending escalation until #{until}. #{reason || "No reason recorded."}"
+    "#{actor || "Operator"} suppressed pending escalation until #{readable_datetime(until)}. #{reason || "No reason recorded."}"
   end
 
   defp suppression_copy(_), do: "No active suppression window is recorded."
 
   defp latest_event_copy(%{type: type, at: %DateTime{} = at, actor_class: actor_class}),
-    do: "#{type} at #{at} (#{timeline_actor_copy(actor_class)})."
+    do: "#{humanize_type(type)} #{readable_datetime(at)} (#{timeline_actor_copy(actor_class)})."
 
   defp latest_event_copy(_), do: "No escalation event has been recorded yet."
 
   defp countdown_copy(%{seconds: seconds, at: %DateTime{} = at})
        when is_integer(seconds) and seconds > 0 do
-    "Approximately #{humanize_seconds(seconds)} until the next escalation checkpoint (#{at})."
+    "Approximately #{humanize_seconds(seconds)} until the next escalation checkpoint (#{readable_datetime(at)})."
   end
 
   defp countdown_copy(_), do: "No countdown is currently available from durable evidence."
@@ -1000,11 +1396,16 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp external_link_url(link) when is_binary(link), do: link
   defp external_link_url(_), do: "#"
 
-  defp timeline_entry_badge_class(%{actor_class: :system}), do: "bg-amber-600"
-  defp timeline_entry_badge_class(%{actor_class: :operator}), do: "bg-blue-600"
-  defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "bg-violet-600"
-  defp timeline_entry_badge_class(%{actor_class: :external}), do: "bg-slate-600"
-  defp timeline_entry_badge_class(_), do: "bg-stone-500"
+  defp external_link_entry?(%{type: "external_link", payload: payload}) when is_map(payload),
+    do: true
+
+  defp external_link_entry?(_entry), do: false
+
+  defp timeline_entry_badge_class(%{actor_class: :system}), do: "po-button-warning"
+  defp timeline_entry_badge_class(%{actor_class: :operator}), do: "bg-indigo-700"
+  defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "bg-violet-700"
+  defp timeline_entry_badge_class(%{actor_class: :external}), do: "bg-slate-700"
+  defp timeline_entry_badge_class(_), do: "bg-stone-600"
 
   defp timeline_entry_badge_text(%{actor_class: :system}), do: "SYS"
   defp timeline_entry_badge_text(%{actor_class: :operator}), do: "OP"
@@ -1013,18 +1414,18 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp timeline_entry_badge_text(_), do: "EV"
 
   defp timeline_entry_actor_class(%{actor_class: :system}),
-    do: "bg-amber-100 text-amber-900 border-amber-200"
+    do: "po-chip po-chip-warning"
 
   defp timeline_entry_actor_class(%{actor_class: :operator}),
-    do: "bg-violet-100 text-violet-900 border-blue-200"
+    do: "po-chip po-chip-info"
 
   defp timeline_entry_actor_class(%{actor_class: :copilot}),
-    do: "bg-violet-100 text-violet-900 border-violet-200"
+    do: "po-chip po-chip-info"
 
   defp timeline_entry_actor_class(%{actor_class: :external}),
-    do: "bg-slate-100 text-slate-900 border-slate-200"
+    do: "po-chip"
 
-  defp timeline_entry_actor_class(_), do: "bg-stone-100 text-stone-900 border-stone-200"
+  defp timeline_entry_actor_class(_), do: "po-chip"
 
   defp timeline_actor_copy(:system), do: "System"
   defp timeline_actor_copy(:operator), do: "Operator"
@@ -1037,13 +1438,13 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp escalation_chain_status_copy(_), do: "Pending"
 
   defp escalation_chain_status_class(:completed),
-    do: "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-200/50"
+    do: "po-chip po-chip-success"
 
   defp escalation_chain_status_class(:current),
-    do: "bg-amber-100 text-amber-900 border-amber-200"
+    do: "po-chip po-chip-warning"
 
   defp escalation_chain_status_class(_),
-    do: "bg-stone-100 text-stone-900 border-stone-200"
+    do: "po-chip"
 
   defp escalation_controls_enabled?(%{state: "open"}), do: true
   defp escalation_controls_enabled?(_incident), do: false
@@ -1142,6 +1543,30 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     |> String.replace("_", " ")
     |> String.capitalize()
   end
+
+  defp retrospective_blocks(markdown) when is_binary(markdown) do
+    markdown
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.trim/1)
+    |> Enum.reject(&(&1 == ""))
+    |> Enum.map(fn
+      "# " <> heading -> {:heading, heading}
+      "## " <> heading -> {:heading, heading}
+      paragraph -> {:paragraph, paragraph}
+    end)
+  end
+
+  defp retrospective_blocks(_markdown), do: []
+
+  defp readable_datetime(%DateTime{} = datetime) do
+    Calendar.strftime(datetime, "%b %d, %Y, %H:%M UTC")
+  end
+
+  defp readable_datetime(nil), do: "Not recorded"
+  defp readable_datetime(other), do: to_string(other)
+
+  defp exact_datetime(%DateTime{} = datetime), do: DateTime.to_iso8601(datetime)
+  defp exact_datetime(other), do: to_string(other)
 
   defp humanize_seconds(seconds) when seconds < 60, do: "#{seconds}s"
   defp humanize_seconds(seconds) when seconds < 3_600, do: "#{div(seconds, 60)}m"

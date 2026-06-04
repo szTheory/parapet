@@ -159,10 +159,8 @@ defmodule Parapet.EvidenceTest do
       :telemetry.attach(
         handler_id,
         [:parapet, :audit, :created],
-        fn _name, _measurements, metadata, _config ->
-          send(self(), {:telemetry_event, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_metadata_event/4,
+        %{pid: self()}
       )
 
       on_exit(fn -> :telemetry.detach(handler_id) end)
@@ -208,10 +206,8 @@ defmodule Parapet.EvidenceTest do
       :telemetry.attach(
         handler_id,
         [:parapet, :audit, :created],
-        fn _name, _measurements, metadata, _config ->
-          send(self(), {:telemetry_event, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_metadata_event/4,
+        %{pid: self()}
       )
 
       on_exit(fn -> :telemetry.detach(handler_id) end)

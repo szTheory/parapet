@@ -1,12 +1,68 @@
 # Parapet Troubleshooting
 
-This guide answers the five most common obstacles you will hit after following [Parapet Getting Started](docs/getting-started.md). Each section names the exact surface involved so you can confirm the fix against your specific setup.
+This guide answers common obstacles you may hit after following [Parapet Getting Started](docs/getting-started.md). Each section names the exact surface involved so you can confirm the fix against your specific setup.
 
 For UI-specific doctor checks, see [Parapet Operator UI Guide](docs/operator-ui.md).
 
+## Demo app Docker port conflicts
+
+If you are running several Phoenix demos at once and the Parapet demo cannot bind
+to `4000`, `3000`, or `9090`, start it with automatic port selection from the
+demo app directory:
+
+```bash
+cd examples/demo_app
+make up-auto
+```
+
+The command prints the actual `/parapet`, `/parapet/actions`, `/parapet/history`,
+Grafana, and Prometheus URLs. It writes generated settings to
+`examples/demo_app/.docker/auto.env` so `make urls`, `make down`, and
+`make reset` keep targeting the same generated Compose project.
+
+If another process grabs a generated port between selection and container
+startup, rerun:
+
+```bash
+make up-auto
+```
+
+Refresh the URLs after any restart before copying links:
+
+```bash
+make urls
+```
+
+The demo intentionally does not publish Postgres on host port `5432` by default.
+The Phoenix app reaches Postgres through the Compose network, which keeps the
+demo from colliding with other local databases. If you need direct `psql` access
+from your host, run:
+
+```bash
+cd examples/demo_app
+make up-db-port
+```
+
+Compose resources are scoped by `COMPOSE_PROJECT_NAME`. Use a different project
+name for parallel copies of the demo, but remember that changing it also changes
+the volume namespace, so an existing demo database can appear to disappear until
+you switch back to the original project name.
+
+If you switch demo seed scenarios with `make up-response`, `make up-recovery`,
+`make up-escalation`, `make up-history`, or `make scenario SCENARIO=...`, reset
+the demo database first or use a fresh `COMPOSE_PROJECT_NAME`. The entrypoint
+skips seeds once incidents already exist.
+
+Grafana and Prometheus are part of the default demo stack. `make up` binds them
+to `127.0.0.1:${GRAFANA_PORT:-3000}` and
+`127.0.0.1:${PROMETHEUS_PORT:-9090}`. `make up-auto` generates free localhost
+ports for Grafana and Prometheus too, updates the seeded Grafana evidence URL,
+and prints the local demo credentials. Anonymous viewer access is enabled for
+convenience.
+
 ## Prometheus target is blank
 
-If Prometheus shows no metrics from your app, the most common causes are a missing metrics plug and a missing `/metrics` route.
+If Prometheus shows no metrics from your app, the most common causes are a missing metrics plug and a missing `/metrics` route or reporter.
 
 Run the doctor to check both:
 

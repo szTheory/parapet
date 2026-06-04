@@ -195,59 +195,60 @@ defmodule DemoAppWeb.Parapet.OperatorDetailLive do
     ~H"""
     <.operator_theme_bootstrap />
     <div class="parapet-ui antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
-      <.operator_nav active={:response} />
+      <.operator_nav active={detail_nav_active(@incident)} />
 
       <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
-        <.link navigate={"/parapet"} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
-          <span>&larr; Back to active response</span>
-        </.link>
+        <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <.link navigate={detail_back_path(@incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
+            <span>&larr; <%= detail_back_label(@incident) %></span>
+          </.link>
+          <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500"><%= detail_context_label(@incident) %></p>
+        </div>
       </div>
 
-      <main class="grid min-h-0 w-full max-w-full flex-1 gap-0 overflow-x-hidden md:grid-cols-[minmax(0,1fr)_22rem]">
-        <section class="min-w-0 max-w-full overflow-x-hidden bg-white">
-          <div class="border-b border-stone-200 p-4 md:p-6">
-        <.incident_summary detail={@incident} />
-      </div>
-
-          <div class="border-b border-stone-200 p-4 md:p-6">
-        <h3 class="mb-4 text-lg font-semibold">Timeline</h3>
-        <.incident_timeline detail={@incident} />
-      </div>
-        </section>
-      
-        <aside class="min-w-0 max-w-full overflow-x-hidden bg-stone-50 p-4 md:overflow-y-auto">
-        <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
-
-        <%= if @incident.incident.state == "resolved" && is_map(@incident.incident.runbook_data) && Map.get(@incident.incident.runbook_data, "retrospective") do %>
-          <div class="mb-6 p-4 ring-1 ring-stone-900/5 rounded-xl bg-white shadow-sm">
-            <div class="flex justify-between items-center mb-4">
-              <h3 class="text-lg font-semibold">Automated Retrospective</h3>
-              <button 
-                onclick="navigator.clipboard.writeText(this.dataset.content); alert('Copied to clipboard!')"
-                data-content={@incident.incident.runbook_data["retrospective"]}
-                class="bg-stone-100 hover:bg-stone-200 ring-1 ring-stone-300 rounded-lg text-sm text-stone-700 transition-transform duration-100 ease-out active:scale-[0.96] min-h-[40px] px-4 py-2 flex items-center justify-center font-medium"
-                type="button"
-              >
-                Copy to Clipboard
-              </button>
+      <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+        <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+          <section class="min-w-0 space-y-6">
+            <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6">
+              <.incident_summary detail={@incident} />
             </div>
-            <pre class="bg-stone-800 text-stone-100 p-4 rounded-lg text-sm overflow-x-auto whitespace-pre-wrap font-mono tabular-nums"><code><%= @incident.incident.runbook_data["retrospective"] %></code></pre>
-          </div>
-        <% end %>
 
-        <%= if @incident.derived.runbook_steps != [] do %>
-          <.runbook_card detail={@incident} />
-        <% end %>
+            <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6" aria-label="Incident timeline">
+              <h3 class="mb-4 text-lg font-semibold text-stone-950">Timeline</h3>
+              <.incident_timeline detail={@incident} />
+            </section>
+          </section>
 
-        <%= if @incident.derived.active_preview do %>
-          <.preview_panel detail={@incident} />
-        <% end %>
+          <aside class="min-w-0 space-y-6">
+            <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
 
-        <h3 class="mb-4 text-lg font-semibold">Actions</h3>
-        <.action_rail detail={@incident} />
-        </aside>
+            <.retrospective_card detail={@incident} />
+
+            <%= if @incident.derived.runbook_steps != [] do %>
+              <.runbook_card detail={@incident} />
+            <% end %>
+
+            <%= if @incident.incident.state != "resolved" && @incident.derived.active_preview do %>
+              <.preview_panel detail={@incident} />
+            <% end %>
+
+            <.action_rail detail={@incident} />
+          </aside>
+        </div>
       </main>
     </div>
     """
   end
+
+  defp detail_nav_active(%{incident: %{state: "resolved"}}), do: :history
+  defp detail_nav_active(_incident), do: :response
+
+  defp detail_back_path(%{incident: %{state: "resolved"}}), do: "/parapet/history"
+  defp detail_back_path(_incident), do: "/parapet"
+
+  defp detail_back_label(%{incident: %{state: "resolved"}}), do: "Back to history"
+  defp detail_back_label(_incident), do: "Back to active response"
+
+  defp detail_context_label(%{incident: %{state: "resolved"}}), do: "Resolved incident review"
+  defp detail_context_label(_incident), do: "Active incident detail"
 end

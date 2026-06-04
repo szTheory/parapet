@@ -22,10 +22,8 @@ defmodule Parapet.Metrics.ObanTest do
     :telemetry.attach(
       "test-oban-emitted",
       [:parapet, :oban, :job],
-      fn _event, measurements, metadata, _config ->
-        send(test_pid, {:oban_job, measurements, metadata})
-      end,
-      nil
+      &Parapet.TestSupport.TelemetryForwarder.forward_named_payload/4,
+      %{pid: test_pid, name: :oban_job}
     )
 
     duration_native = System.convert_time_unit(100, :millisecond, :native)

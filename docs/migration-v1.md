@@ -51,11 +51,16 @@ defmodule MyApp.Parapet.SLOs do
 end
 ```
 
-Then activate it during application boot:
+Then activate it through Parapet's provider configuration:
 
 ```elixir
-Parapet.attach(providers: [MyApp.Parapet.SLOs])
+config :parapet,
+  providers: [MyApp.Parapet.SLOs]
 ```
+
+`Parapet.attach/1` activates integration adapters through `:adapters`; it does not
+register SLO providers. Put providers in config so Parapet can load them consistently
+during boot and generator runs.
 
 The old function remains available for the deprecation window, but it emits compile-time warnings. Treat those warnings as upgrade blockers now so a future major release is uneventful.
 

@@ -98,17 +98,34 @@ defmodule Parapet.DocsPhase33Test do
     makefile = read!("examples/demo_app/Makefile")
     compose = read!("examples/demo_app/docker-compose.yml")
 
-    assert readme =~ "docker compose up --build"
-    assert readme =~ "curl -f http://localhost:${WEB_PORT:-4000}/parapet"
-    assert readme =~ "docker compose down -v"
+    assert readme =~ "make up"
+    assert readme =~ "make up-auto"
+    assert readme =~ "make urls"
+    assert readme =~ "curl -f http://127.0.0.1:"
+    assert readme =~ "make down"
+    assert readme =~ "make reset"
+    assert readme =~ "make up-response"
+    assert readme =~ "make up-recovery"
+    assert readme =~ "make up-escalation"
+    assert readme =~ "make up-history"
     assert readme =~ "WEB_PORT"
-    assert readme =~ "DB_PORT"
-    assert readme =~ ~r/demo only/i
+    assert readme =~ "GRAFANA_ADMIN_USER"
+    assert readme =~ "Prometheus"
+    assert readme =~ "Grafana"
+    assert readme =~ "make up-db-port"
+    assert readme =~ ~r/route in this demo app is intentionally\s+open/i
     assert readme =~ "Production deployments must wrap these routes in an authenticated scope"
 
     assert makefile =~ "docker compose"
     assert makefile =~ "docker-compose"
+    assert makefile =~ "PARAPET_DEMO_SCENARIO"
+    assert makefile =~ "SCENARIO=response|recovery|escalation|history|all"
     assert compose =~ "WEB_PORT"
-    assert compose =~ "DB_PORT"
+    assert compose =~ "GRAFANA_PORT"
+    assert compose =~ "PROMETHEUS_PORT"
+    assert compose =~ "prom/prometheus"
+    assert compose =~ "grafana/grafana"
+    assert compose =~ "GF_AUTH_ANONYMOUS_ENABLED=true"
+    assert compose =~ "PARAPET_DEMO_SCENARIO"
   end
 end

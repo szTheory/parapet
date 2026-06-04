@@ -10,7 +10,8 @@ config :demo_app, DemoApp.Repo,
 
 config :demo_app, DemoAppWeb.Endpoint,
   http: [ip: {127, 0, 0, 1}, port: 4002],
-  secret_key_base: "demo_app_secret_key_base_for_local_development_only_not_for_production_use_00",
+  secret_key_base:
+    "demo_app_secret_key_base_for_local_development_only_not_for_production_use_00",
   server: false
 
 config :logger, level: :warning

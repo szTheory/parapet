@@ -46,10 +46,8 @@ defmodule Parapet.Metrics.ProbeTest do
       :telemetry.attach(
         "probe-metrics-test",
         [:parapet, :probe, :run],
-        fn event, measurements, metadata, _config ->
-          send(parent, {ref, event, measurements, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+        %{pid: parent, ref: ref}
       )
 
       duration = System.convert_time_unit(100, :millisecond, :native)
@@ -74,10 +72,8 @@ defmodule Parapet.Metrics.ProbeTest do
       :telemetry.attach(
         "probe-metrics-test-exception",
         [:parapet, :probe, :run],
-        fn event, measurements, metadata, _config ->
-          send(parent, {ref, event, measurements, metadata})
-        end,
-        nil
+        &Parapet.TestSupport.TelemetryForwarder.forward_ref/4,
+        %{pid: parent, ref: ref}
       )
 
       Probe.handle_event(

@@ -63,6 +63,9 @@ defmodule Mix.Tasks.Parapet.Gen.SpineTest do
                migration_ast,
                "create(index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at]))"
              )
+
+      assert Regex.scan(~r/timestamps\(type: :utc_datetime_usec\)/, migration_source)
+             |> length() == 5
     end
   end
 

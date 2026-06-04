@@ -22,18 +22,38 @@ defmodule Parapet.Spine.AlertProcessor do
     if valid_payload?(payload) do
       alerts = Map.get(payload, "alerts", [])
 
-      alerts
-      |> Enum.filter(&(&1["status"] == "firing"))
-      |> Enum.each(&process_firing_alert/1)
+      failures =
+        alerts
+        |> Enum.filter(&(&1["status"] in ["firing", "resolved"]))
+        |> Enum.map(&process_alert/1)
+        |> Enum.reject(&match?(:ok, &1))
 
-      alerts
-      |> Enum.filter(&(&1["status"] == "resolved"))
-      |> Enum.each(&process_resolved_alert/1)
-
-      :ok
+      if failures == [] do
+        :ok
+      else
+        {:error, failures}
+      end
     else
       {:error, :invalid_payload}
     end
+  end
+
+  defp process_alert(%{"status" => "firing"} = alert),
+    do: normalize_alert_result(alert, process_firing_alert(alert))
+
+  defp process_alert(%{"status" => "resolved"} = alert),
+    do: normalize_alert_result(alert, process_resolved_alert(alert))
+
+  defp normalize_alert_result(_alert, :ok), do: :ok
+  defp normalize_alert_result(_alert, {:ok, _result}), do: :ok
+
+  defp normalize_alert_result(alert, result) do
+    %{
+      status: Map.get(alert, "status"),
+      alertname: get_in(alert, ["labels", "alertname"]),
+      fingerprint: Map.get(alert, "fingerprint"),
+      result: result
+    }
   end
 
   defp valid_payload?(payload) when is_map(payload) do
