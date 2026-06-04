@@ -11,6 +11,63 @@ This changelog tracks **published Hex releases** using Semantic Versioning headi
 Separately, maintainers track development tranches as planning milestones in [`.planning/MILESTONES.md`](.planning/MILESTONES.md).
 For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
+## [1.1.0](https://github.com/szTheory/parapet/compare/v1.0.3...v1.1.0) (2026-06-04)
+
+
+### Features
+
+* **23-01:** ship contract test + docs for RecoveryAction telemetry family ([641ec82](https://github.com/szTheory/parapet/commit/641ec8202e7d5bc6f19302471174d2af6a29963e))
+* **23-01:** ship Parapet.Telemetry.RecoveryAction contract module ([f23ac3e](https://github.com/szTheory/parapet/commit/f23ac3e81c31d4ffa41e83b83811808ab5eeef13))
+* **23-02:** add lease_until column migration, schema field, bootstrap DDL ([b4ee8b8](https://github.com/szTheory/parapet/commit/b4ee8b8189973c5f77b73e505a2abf53409447e8))
+* **23-02:** wire ClaimService lease defaulting and expired-claim self-heal ([ef29a78](https://github.com/szTheory/parapet/commit/ef29a7833262717750f09c5815291395732441b4))
+* **24-01:** create Parapet.Recovery behaviour module ([e05f3fa](https://github.com/szTheory/parapet/commit/e05f3fa0d48f09bcf885ad118a1d674c068f03a1))
+* **24-02:** widen [@valid](https://github.com/valid)_capabilities from 3 atoms to 5 ([18b174b](https://github.com/szTheory/parapet/commit/18b174b6e133cf2cc8f069b05cfa2a154d1a749d))
+* **25-01:** add target_refs_hash to preview payload ([d978f62](https://github.com/szTheory/parapet/commit/d978f6247fc706a78b78a31b8adf452afc0f26ba))
+* **25-01:** route confirm_runbook_step through ClaimService ([213b619](https://github.com/szTheory/parapet/commit/213b61905a48948538927fe8375fdc5ae51da885))
+* **25-02:** add Action Name cell to preview_panel with server-side capability resolution ([4444d52](https://github.com/szTheory/parapet/commit/4444d52f2ca725b981e66286f8a7a77b79dfecd0))
+* **25-02:** grow confirm_mitigation handler to 4 arms with reason-specific flash text ([c325d63](https://github.com/szTheory/parapet/commit/c325d6324481214a8b4841a182543c973920354d))
+* **26-01:** add recovery_confirmed and recovery_failed format_payload clauses ([638c8bc](https://github.com/szTheory/parapet/commit/638c8bcbf7e2536fe211def7a131a8a048db9483))
+* **26-01:** enrich recovery_confirmed audit writes and add recovery_failed write ([0f00b1e](https://github.com/szTheory/parapet/commit/0f00b1e42500f7266a2b8bc03c5432104827db33))
+* **27-01:** author deploy_tied_incident + cardinality_blowout templates, harden suppression_drift ([63a24bd](https://github.com/szTheory/parapet/commit/63a24bdd397a1cdcac202019a31d8c8823b8a385))
+* **27-01:** wire deploy_tied_incident + cardinality_blowout into generator and test ([694299c](https://github.com/szTheory/parapet/commit/694299c31aec18f7e8bd955fb34980fc925c5687))
+* **28-01:** author DemoApp.Recovery.RetryAsyncItem capability ([471b0b6](https://github.com/szTheory/parapet/commit/471b0b63922e79f4d06f4527d7968bd90cd0fa31))
+* **28-01:** author DemoApp.Runbooks.StalledExecutor ([21c5f9f](https://github.com/szTheory/parapet/commit/21c5f9f48fcaa505bb1a1cef1ffb645418cda856))
+* **28-02:** add demo.reset alias to demo_app mix.exs ([fbcd31e](https://github.com/szTheory/parapet/commit/fbcd31e34e2b7ca455481fcea08fea8607a4dcfb))
+* **28-03:** wire boot-time Parapet.Recovery.attach in DemoApp.Application ([7a374ec](https://github.com/szTheory/parapet/commit/7a374ecd78e58fde40abce4c31f7d67d839c772b))
+* **28-04:** add capability-backed incident seed block (Incident 4) ([00695cd](https://github.com/szTheory/parapet/commit/00695cdf8563fad0b678a57f79ef628fed20b074))
+* **28-05:** add recovery_loop_test.exs with all four :smoke scenarios ([48d5d3b](https://github.com/szTheory/parapet/commit/48d5d3b3ff21aebca035d1b613263b4baceaad39))
+* **28:** automate browser Preview→Confirm UAT as a LiveViewTest :smoke scenario ([cdfc213](https://github.com/szTheory/parapet/commit/cdfc2131b5967385e9733ec0113e95c30ca1116c))
+* **29-01:** flip Parapet.Recovery moduledoc to Stable + add callback-freeze prose ([10ff69f](https://github.com/szTheory/parapet/commit/10ff69fa764af6aabef753c82b753d3ce8aeb2b7))
+* **29-02:** add mix parapet.gen.recovery Igniter task ([980c892](https://github.com/szTheory/parapet/commit/980c8928dea3ad4d1c6627823af37c662b8b8d67))
+* **29-02:** add recovery.ex.eex EEx template for gen.recovery ([983b8bb](https://github.com/szTheory/parapet/commit/983b8bbf3aee3fb2e206ec851ff666977e7d6dab))
+* **29-03:** add check_recovery to mix parapet.doctor (GREEN) ([a97c583](https://github.com/szTheory/parapet/commit/a97c583701a806c7621a11187b97cfa28c5ac475))
+* **31-igniter-slo-task-01:** implement parapet.gen.slo generator ([aa7db8d](https://github.com/szTheory/parapet/commit/aa7db8d7cc66c378f98f04e01726a7d712b3a8ca))
+* **35-01:** consolidate generated operator design system ([6e52508](https://github.com/szTheory/parapet/commit/6e525083175cf65c64de186b47a3022fef123b0c))
+* **dx:** implement optimized Docker dev setup for demo app ([f9b6193](https://github.com/szTheory/parapet/commit/f9b61936131ec85acca91c0bf1ccc71f7ffa143b))
+* polish generated operator UI dark mode and default focus ([e509d37](https://github.com/szTheory/parapet/commit/e509d375f3c9e1817ad3869ce923613f4b0f5142))
+* **ui:** complete 'Industrial Zen' design system rewrite for Operator UI ([00378db](https://github.com/szTheory/parapet/commit/00378dbe65db748d78c6fa108df9063a77e13142))
+* **ui:** complete v1.3 operator demo verification ([b058d02](https://github.com/szTheory/parapet/commit/b058d024b961d8a9c66b9db46d4c74ddf8300519))
+
+
+### Bug Fixes
+
+* **23:** CR-01 use String.to_existing_atom in RecoveryAction normalizers ([66bef29](https://github.com/szTheory/parapet/commit/66bef29685188562cdd13e78d3df824cb156efc7))
+* **23:** WR-01 accept nil/keyword refs in RecoveryAction.shape_metadata ([75eabf8](https://github.com/szTheory/parapet/commit/75eabf873b3f05ef0fb550afd7c1943069e39011))
+* **23:** WR-02 raise clear ArgumentError for unrecognized event names ([3dafb79](https://github.com/szTheory/parapet/commit/3dafb7900dc1b89cecd2a54e162971900ba09c3c))
+* **23:** WR-03 isolate ActionClaim changeset validation assertions ([ade422c](https://github.com/szTheory/parapet/commit/ade422c48fbb074a5bb922e0caa7c612e56934ce))
+* **23:** WR-04 document migration table-lock implication for adopters ([4c834fe](https://github.com/szTheory/parapet/commit/4c834fe70137586877aa41f62443db22edf221e5))
+* **23:** WR-05 WR-06 align backfill teardown with canonical bootstrap DDL ([5ab87e2](https://github.com/szTheory/parapet/commit/5ab87e24ff898dbe90ab78add5f93f1c7c8752f8))
+* **25:** claim-protect operator confirm edge cases (CR-01/CR-02/CR-03) ([65e5ee5](https://github.com/szTheory/parapet/commit/65e5ee570de3e3213ffcac942e2ae9b6f104ac2e))
+* **25:** clear Confirm affordance after recovery_confirmed (WR-04) ([b39b402](https://github.com/szTheory/parapet/commit/b39b402f1aa570b0869ce9f1cbedb00b2b21246f))
+* **26-01:** guard failure-path audit write and unify audit attrs (CR-01, WR-03) ([874fc76](https://github.com/szTheory/parapet/commit/874fc76720b89489c6e0600d5919aa282ef4b3ee))
+* **26-01:** robust retrospective recovery rendering (WR-01, WR-02) ([9b0cee1](https://github.com/szTheory/parapet/commit/9b0cee18319c4104af9c13c304aa97edbe94ca75))
+* **28:** address code review — seed open ActionItem for browser Confirm, use valid ActionItem kind/state ([ca32395](https://github.com/szTheory/parapet/commit/ca32395b22a51248ae54255db956343e46de84a8))
+* **32-02:** send branch protection JSON body ([304f5fe](https://github.com/szTheory/parapet/commit/304f5feff406ab2a7a5cef168398680bbea696b7))
+* **33-02:** correct demo compose port override example ([9333cae](https://github.com/szTheory/parapet/commit/9333cae763d6c70d0686d3dd926df2fe192884ef))
+* avoid cached claim insert plan reuse ([489636e](https://github.com/szTheory/parapet/commit/489636e59985e989420a364fc5079f521511abf9))
+* pass keyword assigns to recovery generator ([227fcae](https://github.com/szTheory/parapet/commit/227fcaee474ffbcaa21d17385b658932953e6f37))
+* **recovery:** wire telemetry emit-sites and fix generated UI crash ([7737945](https://github.com/szTheory/parapet/commit/77379453ce5e2001cff963b4728061fe9b33c110))
+
 ## [1.0.3](https://github.com/szTheory/parapet/compare/v1.0.2...v1.0.3) (2026-05-27)
 
 
