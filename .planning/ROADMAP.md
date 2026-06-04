@@ -22,6 +22,7 @@
 **Goal:** Make archive/export/prune behavior preserve complete durable evidence or fail loudly with actionable results.
 
 **Success criteria:**
+
 1. Archive maintenance treats incident evidence as a complete bundle for Parapet-owned records.
 2. Partial failures return or surface actionable failure information.
 3. Resolved-only retention remains test-pinned, including boundary dates and active/investigating exclusions.
@@ -34,11 +35,20 @@
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 38-01-PLAN.md — Generated route base path and scoped template tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 38-02-PLAN.md — Demo scoped-route synchronization and runnable proof
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 38-03-PLAN.md — Router guidance, focused docs, and stability/security guards
 
 **Success criteria:**
+
 1. Generated templates support default `/parapet` mounting and at least one nested host scope such as `/ops/parapet`.
 2. Demo app generated-copy tests prove template/demo synchronization.
 3. Route changes do not alter auth ownership, router ownership, public API tier, or dependency surface.
@@ -48,6 +58,7 @@ Plans:
 **Goal:** Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers.
 
 **Success criteria:**
+
 1. README and docs include copy-pasteable archive maintenance guidance.
 2. README and generated UI docs include default and scoped Phoenix router examples.
 3. Troubleshooting notes cover the likely first errors for archive runs and scoped UI mounting.
