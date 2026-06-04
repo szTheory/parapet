@@ -35,7 +35,9 @@ defmodule Parapet.OperatorUICompileOutTest do
       assert content =~ "Parapet.Operator.resolve_incident"
       assert content =~ "%Parapet.Operator.ActionPayload{"
       assert content =~ "assign(incident: Parapet.Operator.incident_detail(id))"
-      assert content =~ ~S|/parapet/incidents/#{id}|
+      assert content =~ "incident_detail_path(socket.assigns.operator_base_path, id)"
+      assert content =~ "defp incident_detail_path(operator_base_path, incident_id)"
+      refute content =~ ~S|/parapet/incidents/#{id}|
       assert content =~ "Integer.parse(minutes)"
       refute content =~ "String.to_integer(minutes)"
     end
