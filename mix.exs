@@ -114,7 +114,7 @@ defmodule Parapet.MixProject do
       {:ecto, "~> 3.10"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, "~> 0.20"},
-      {:igniter, "~> 0.7.9"},
+      {:igniter, "~> 0.8.1"},
       {:opentelemetry_api, "~> 1.3", optional: true},
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
