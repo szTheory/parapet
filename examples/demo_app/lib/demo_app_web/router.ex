@@ -24,4 +24,16 @@ defmodule DemoAppWeb.Router do
       live("/parapet/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
     end
   end
+
+  scope "/ops" do
+    pipe_through(:browser)
+
+    live_session :parapet_operator_scoped do
+      live("/parapet", DemoAppWeb.Parapet.OperatorLive, :index)
+      live("/parapet/actions", DemoAppWeb.Parapet.OperatorLive, :actions)
+      live("/parapet/history", DemoAppWeb.Parapet.OperatorLive, :history)
+      live("/parapet/incidents/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
+      live("/parapet/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
+    end
+  end
 end
