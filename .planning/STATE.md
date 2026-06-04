@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Trust Hardening & Host-App Compatibility
-status: executing
-last_updated: "2026-06-04T19:45:05.577Z"
-last_activity: 2026-06-04 -- Completed Phase 38 Plan 01
+status: verifying
+last_updated: "2026-06-04T20:32:04.357Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 3
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 4
-  percent: 33
+  completed_plans: 6
+  percent: 67
 ---
 
 # Project State
@@ -24,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-04 after starting v1.4 Trust Hardenin
 
 ## Current Position
 
-Phase: 38 (Scoped UI Routes) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-06-04 -- Completed Phase 38 Plan 01
+Phase: 38 (Scoped UI Routes) — VERIFYING
+Plan: 3 of 3
+Status: Phase complete — ready for verification
+Last activity: 2026-06-04
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Last activity: 2026-06-04 -- Completed Phase 38 Plan 01
 | Phase 37 P02 | 8 min | 2 tasks | 3 files |
 | Phase 37 P03 | 7 min | 2 tasks | 2 files |
 | Phase 38 P01 | 8min | 3 tasks | 5 files |
+| Phase 38 P03 | 4min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,9 @@ Recent decisions affecting current work:
 - [Phase 38]: Keep scoped route ownership in generated host-owned LiveView/component code rather than adding a Parapet router abstraction. — Preserves host auth/router ownership and Parapet core compile-out boundary.
 - [Phase 38]: Derive the active Operator UI base path from the current LiveView URI path only. — Avoids using scheme, host, query, or user params as redirect targets while supporting nested host scopes.
 - [Phase 38]: No generated route-bearing form surfaces were found, so no form route handling was added. — The form audit returned no matches; adding form route behavior would invent unsupported semantics.
+- [Phase 38]: Document scoped mounting as host-owned router guidance rather than adding a mix parapet.gen.ui option. — Preserves host router ownership and keeps the generator CLI stable.
+- [Phase 38]: Treat Phoenix entries in mix.lock as transitive dependency evidence while rejecting direct root :phoenix and :phoenix_live_view deps. — The lockfile already contains Phoenix through existing transitive packages, so the root dependency contract is the stable boundary.
+- [Phase 38]: Keep external links outside operator_base_path; only local Operator UI emitters are routed through scoped helpers. — External evidence links must stay external while scoped route helpers cover host-local navigation.
 
 ### Pending Todos
 
@@ -131,11 +135,11 @@ None. v1.3 closed with 13/13 requirements satisfied, milestone audit passed, and
 
 ## Session Continuity
 
-Last session: 2026-06-04T19:45:05.573Z
-Stopped at: Completed 38-01-PLAN.md
+Last session: 2026-06-04T20:31:58.131Z
+Stopped at: Completed 38-03-PLAN.md
 Resume file: None
-Next step: Execute Phase 38 Plan 02
+Next step: Verify Phase 38
 
 ## Operator Next Steps
 
-- Execute Phase 38 Plan 02.
+- Verify Phase 38.

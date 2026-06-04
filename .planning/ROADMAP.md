@@ -12,7 +12,7 @@
 | Phase | Name | Goal | Requirements |
 |---:|---|---|---|
 | 37 | 3/3 | Complete    | 2026-06-04 |
-| 38 | 1/3 | In Progress|  |
+| 38 | 3/3 | Complete   | 2026-06-04 |
 | 39 | Adoption Proof | Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers. | ADOPT-01, ADOPT-02, ADOPT-03 |
 
 ## Phase Details
@@ -32,7 +32,7 @@
 
 **Goal:** Make generated Operator UI links, forms, redirects, and patches respect host-owned route scopes.
 
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -41,11 +41,11 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 38-02-PLAN.md — Demo scoped-route synchronization and runnable proof
+- [x] 38-02-PLAN.md — Demo scoped-route synchronization and runnable proof
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 38-03-PLAN.md — Router guidance, focused docs, and stability/security guards
+- [x] 38-03-PLAN.md — Router guidance, focused docs, and stability/security guards
 
 **Success criteria:**
 
