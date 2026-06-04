@@ -353,17 +353,17 @@ Use this pattern for default and nested route render proofs. [VERIFIED: test/par
 | A2 | Phoenix helper-to-VerifiedRoutes transition timing is Phoenix 1.7+ era. | State of the Art | Low; historical timing does not affect Phase 38 implementation. |
 | A3 | LiveView `<.link>` replacement of older helpers is LiveView 0.18+ era. | State of the Art | Low; current generated code already uses `<.link>`. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Should demo router itself add `/ops/parapet` routes or should tests simulate scoped URI only?**
    - What we know: Phase requires generated templates and demo copy behavior for default and one scoped mount. [VERIFIED: 38-CONTEXT.md]
-   - What's unclear: The context does not lock whether the runnable demo router must expose both route maps at once. [VERIFIED: 38-CONTEXT.md]
-   - Recommendation: Keep the demo's default route map stable and add a generated/demo-copy render contract for `/ops/parapet`; only add demo scoped routes if smoke tests need an actual runnable endpoint. [ASSUMED]
+   - Resolution: Plan 38-02 includes runnable `/ops/parapet` demo route proof while preserving the default `/parapet` demo route map. [VERIFIED: 38-02-PLAN.md]
+   - Planning outcome: Demo proof is not simulated-only; it is test-pinned through the checked-in demo router/copies and demo smoke proof. [VERIFIED: 38-02-PLAN.md]
 
 2. **Should compatibility detail route `/parapet/:id` remain generated for nested scopes?**
    - What we know: Current route map includes preferred `/parapet/incidents/:id` and compatibility `/parapet/:id`. [VERIFIED: router_snippet.ex.eex + docs/operator-ui.md]
-   - What's unclear: Phase 38 does not explicitly decide whether nested examples must include both preferred and compatibility routes. [VERIFIED: 38-CONTEXT.md]
-   - Recommendation: Preserve both route shapes under any host scope because removing compatibility would alter route behavior. [VERIFIED: 38-CONTEXT.md]
+   - Resolution: Compatibility detail routes remain preserved under nested scopes, including `/ops/parapet/incidents/:id` and `/ops/parapet/:id`. [VERIFIED: 38-02-PLAN.md]
+   - Planning outcome: Plans preserve both preferred and compatibility detail route shapes because removing compatibility would alter route behavior. [VERIFIED: 38-CONTEXT.md; VERIFIED: 38-02-PLAN.md]
 
 ## Environment Availability
 
