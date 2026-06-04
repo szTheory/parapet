@@ -11,5 +11,6 @@
     "skip_discuss": false,
     "_auto_chain_active": false
   },
-  "granularity": "coarse"
+  "granularity": "coarse",
+  "model_profile": "balanced"
 }
