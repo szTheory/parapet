@@ -4,6 +4,74 @@ This guide answers common obstacles you may hit after following [Parapet Getting
 
 For UI-specific doctor checks, see [Parapet Operator UI Guide](docs/operator-ui.md).
 
+## When to run archive maintenance
+
+Run archive maintenance with the existing Mix task:
+
+```bash
+mix parapet.archive
+mix parapet.archive --days 30
+mix parapet.archive --path priv/parapet/archive.jsonl
+```
+
+The default `--path` is `priv/parapet/archive.jsonl`. A successful run writes a
+JSONL archive artifact plus a sidecar manifest and prints JSON with `status`,
+`run_id`, `path`, `manifest_path`, `retention_days`, `cutoff`,
+`selected_count`, `archived_count`, `deleted_count`, `skipped_count`,
+`bytes_written`, and `checksum`.
+
+Use it for routine resolved-incident retention, before widening retention or pruning old evidence, and after confirming host backups cover host-owned data.
+Parapet archive maintenance is operational evidence export/prune for Parapet-owned records, not host backup/restore. Retention currently means resolved incidents created before the cutoff (`inserted_at < cutoff`), not incidents resolved before the cutoff.
+
+## Archive failures before pruning
+
+An archive can fail before any prune occurs during the `write`, `verify`,
+`manifest`, or `publish` work. The CLI reports the failing `stage`, `run_id`,
+`path`, `manifest_path`, selected/archived/deleted counts, and `reason` so you
+can tell whether the JSONL file, manifest, destination path, or verification
+step failed.
+
+Fix the reported file, manifest, repo, retention, path, or delete issue first.
+A safe rerun depends on fixing that underlying issue; rerunning without changing
+anything should produce the same failure.
+
+## Delete-stage archive failures
+
+A delete-stage failure is different from a write, verify, manifest, or publish
+failure. At the delete stage, the JSONL artifact and manifest can already be
+published while the database prune did not complete.
+
+Inspect `stage`, `run_id`, `path`, `manifest_path`, `selected_count`,
+`archived_count`, `deleted_count`, and `reason`. If `stage` points at delete
+work, confirm the archive artifact and manifest exist, fix the delete problem,
+and then rerun. The selected records are pruned only after the export and
+manifest stages succeed.
+
+## Missing Parapet repo config
+
+`mix parapet.archive` needs the host app to configure the Parapet repo:
+
+```elixir
+config :parapet, :repo, MyApp.Repo
+```
+
+If the task raises before printing success JSON, confirm that
+`config :parapet, :repo` is present in the runtime config loaded by the Mix
+environment you are using.
+
+## Invalid retention or path usage
+
+Use a positive integer for `--days` and a writable path for `--path`:
+
+```bash
+mix parapet.archive --days 30
+mix parapet.archive --path priv/parapet/archive.jsonl
+```
+
+If `--days` is invalid, fix the retention value before rerunning. If `--path`
+points at a missing or unwritable directory, create the directory or choose a
+writable path before rerunning.
+
 ## Demo app Docker port conflicts
 
 If you are running several Phoenix demos at once and the Parapet demo cannot bind

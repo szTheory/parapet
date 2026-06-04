@@ -177,7 +177,23 @@ Parapet can generate an optional, evidence-first LiveView operator workbench dir
 
 For instructions on generating the UI and securing its routes, see the [Operator UI Guide](docs/operator-ui.md).
 
-### 6. Synthetic Probes
+### 6. Archive Maintenance
+
+Run archive maintenance when you need to export and prune old resolved Parapet evidence:
+
+```bash
+mix parapet.archive
+mix parapet.archive --days 30
+mix parapet.archive --path priv/parapet/archive.jsonl
+```
+
+The default archive path is `priv/parapet/archive.jsonl`. The command writes a JSONL artifact plus a sidecar manifest and prints success JSON with `status`, `run_id`, `path`, `manifest_path`, `retention_days`, `cutoff`, `selected_count`, `archived_count`, `deleted_count`, `skipped_count`, `bytes_written`, and `checksum`.
+
+For when to run archive maintenance: use it for routine resolved-incident retention, before widening retention or pruning old evidence, and after confirming host backups cover host-owned data. Parapet archive maintenance is operational evidence export/prune for Parapet-owned records, not host backup/restore. Retention currently means resolved incidents created before the cutoff (`inserted_at < cutoff`), not incidents resolved before the cutoff.
+
+If a run fails, inspect the reported `stage`, `run_id`, `path`, `manifest_path`, counts, and `reason`, then see [Troubleshooting](docs/troubleshooting.md) for safe rerun guidance.
+
+### 7. Synthetic Probes
 
 Parapet provides active checks to maintain SLO signal quality using Synthetic Probes. You can define a probe by implementing the `Parapet.Probe` behavior:
 
@@ -201,7 +217,7 @@ To schedule probes, Parapet includes two pluggable schedulers:
 - **ObanScheduler:** A distributed, cron-like scheduler for clustered setups without retries. Requires [Oban](https://getoban.pro/). Configure it in your Oban cron jobs:
   `{"* * * * *", Parapet.Probe.ObanScheduler, args: %{probe: to_string(MyApp.Probes.Checkout)}}`
 
-### 7. Deploy Markers
+### 8. Deploy Markers
 
 Parapet can automatically track your deployments. Simply add the `Parapet.Plug.DeployMarker` to your authentication or administration pipeline:
 
