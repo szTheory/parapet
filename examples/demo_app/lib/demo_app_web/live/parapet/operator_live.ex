@@ -6,6 +6,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   import DemoAppWeb.Parapet.OperatorComponents
 
   @default_page_size 30
+  @default_operator_base_path "/parapet"
 
   def mount(_params, _session, socket) do
     action_items = DemoApp.Repo.all(Parapet.Operator.action_items_query())
@@ -26,6 +27,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        visible_incidents: [],
        queue_page: empty_queue_page(),
        queue_params: %{"status" => "active"},
+       operator_base_path: @default_operator_base_path,
        selection_source: :none,
        queue_refresh_available?: false
      )
@@ -33,8 +35,9 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
      |> stream(:incidents, [], reset: true)}
   end
 
-  def handle_params(params, _uri, socket) do
+  def handle_params(params, uri, socket) do
     page_mode = page_mode(socket.assigns.live_action)
+    operator_base_path = operator_base_path(uri)
     queue_params = queue_params(params, page_mode)
     queue_page = load_queue_page(queue_params)
 
@@ -43,6 +46,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
     {:noreply,
      socket
+     |> assign(operator_base_path: operator_base_path)
      |> assign(
        selected_incident: selected,
        selection_source: selection_source,
@@ -115,7 +119,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     ~H"""
     <.operator_theme_bootstrap />
     <div class="parapet-ui antialiased flex min-h-screen flex-col bg-stone-100 text-stone-900">
-      <.operator_nav active={@page_mode} />
+      <.operator_nav active={@page_mode} operator_base_path={@operator_base_path} />
 
       <%= if @page_mode == :actions do %>
         <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
@@ -127,7 +131,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               journeys={@journeys}
               page_mode={@page_mode}
             />
-            <.action_center items={@action_items} />
+            <.action_center items={@action_items} operator_base_path={@operator_base_path} />
           </div>
         </main>
       <% else %>
@@ -151,7 +155,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       Use history to inspect completed evidence, retrospective notes, and operator actions without mixing them into the active response queue.
                     </p>
                   </div>
-                  <.link navigate="/parapet" class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+                  <.link navigate={@operator_base_path} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
                     Return to Response
                   </.link>
                 </div>
@@ -161,11 +165,12 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   selected={nil}
                   queue_params={@queue_params}
                   page_mode={@page_mode}
+                  operator_base_path={@operator_base_path}
                 />
 
                 <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
                   <.link
-                    patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+                    patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
                     class={[
                       "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_previous_page?)
@@ -175,7 +180,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   </.link>
                   <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Resolved archive</p>
                   <.link
-                    patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+                    patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
                     class={[
                       "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_next_page?)
@@ -191,9 +196,9 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
             <div class="mx-auto max-w-7xl">
               <.response_cockpit
-                detail={@selected_incident}
-                visible_incidents={@visible_incidents}
-                action_items={@action_items}
+                    detail={@selected_incident}
+                    visible_incidents={@visible_incidents}
+                    action_items={@action_items}
                 journeys={@journeys}
               />
 
@@ -221,7 +226,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
                     </div>
                     <.link
-                      patch={history_path()}
+                      patch={history_path(@operator_base_path)}
                       class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
                     >
                       History
@@ -232,10 +237,11 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                     selected={selected_queue_incident(@selected_incident)}
                     queue_params={@queue_params}
                     page_mode={@page_mode}
+                    operator_base_path={@operator_base_path}
                   />
                   <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
                     <.link
-                      patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+                      patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
                       class={[
                         "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_previous_page?)
@@ -245,7 +251,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                     </.link>
                     <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced</p>
                     <.link
-                      patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+                      patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
                       class={[
                         "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_next_page?)
@@ -268,7 +274,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       </div>
                       <aside class="border-t border-stone-200 bg-stone-50 p-4 lg:border-l lg:border-t-0">
                         <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-stone-700">Next Safe Actions</h3>
-                        <.action_rail detail={@selected_incident} />
+                        <.action_rail detail={@selected_incident} operator_base_path={@operator_base_path} />
                       </aside>
                     </div>
                   <% else %>
@@ -400,32 +406,68 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     }
   end
 
-  defp queue_page_path(queue_params, nil, _direction), do: queue_path(queue_params, %{})
+  defp queue_page_path(operator_base_path, queue_params, nil, _direction),
+    do: queue_path(operator_base_path, queue_params, %{})
 
-  defp queue_page_path(queue_params, cursor, direction) do
-    queue_path(queue_params, %{"cursor" => cursor, "direction" => direction, "id" => nil})
+  defp queue_page_path(operator_base_path, queue_params, cursor, direction) do
+    queue_path(operator_base_path, queue_params, %{
+      "cursor" => cursor,
+      "direction" => direction,
+      "id" => nil
+    })
   end
 
   defp queue_path(%{assigns: assigns}, extra_params) do
-    queue_path(assigns.queue_params, extra_params)
+    queue_path(assigns.operator_base_path, assigns.queue_params, extra_params)
   end
 
-  defp queue_path(queue_params, extra_params) do
+  defp queue_path(operator_base_path, queue_params, extra_params) do
     params =
       queue_params
       |> Map.merge(extra_params)
       |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
 
     case params do
-      [] -> queue_base_path(queue_params)
-      _ -> queue_base_path(queue_params) <> "?" <> URI.encode_query(params)
+      [] -> queue_base_path(operator_base_path, queue_params)
+      _ -> queue_base_path(operator_base_path, queue_params) <> "?" <> URI.encode_query(params)
     end
   end
 
-  defp queue_base_path(%{"status" => "resolved"}), do: "/parapet/history"
-  defp queue_base_path(_queue_params), do: "/parapet"
+  defp queue_base_path(operator_base_path, %{"status" => "resolved"}),
+    do: operator_base_path <> "/history"
 
-  defp history_path, do: "/parapet/history"
+  defp queue_base_path(operator_base_path, _queue_params), do: operator_base_path
+
+  defp history_path(operator_base_path), do: operator_base_path <> "/history"
+
+  defp operator_base_path(uri) when is_binary(uri) do
+    uri
+    |> URI.parse()
+    |> Map.get(:path)
+    |> operator_base_path_from_path()
+  end
+
+  defp operator_base_path(_uri), do: @default_operator_base_path
+
+  defp operator_base_path_from_path(path) when is_binary(path) do
+    segments = String.split(path, "/", trim: true)
+    reversed_segments = Enum.reverse(segments)
+
+    case Enum.find_index(reversed_segments, &(&1 == "parapet")) do
+      nil ->
+        @default_operator_base_path
+
+      reverse_index ->
+        keep_count = length(segments) - reverse_index
+
+        case Enum.take(segments, keep_count) do
+          [] -> @default_operator_base_path
+          scoped_segments -> "/" <> Enum.join(scoped_segments, "/")
+        end
+    end
+  end
+
+  defp operator_base_path_from_path(_path), do: @default_operator_base_path
 
   defp pagination_link_class(true),
     do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:ring-teal-700 hover:text-teal-700"

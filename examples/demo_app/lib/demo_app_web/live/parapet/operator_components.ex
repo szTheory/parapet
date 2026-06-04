@@ -359,6 +359,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   end
 
   attr(:active, :atom, required: true)
+  attr(:operator_base_path, :string, default: "/parapet")
 
   def operator_nav(assigns) do
     ~H"""
@@ -369,9 +370,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           <h1 class="po-operator-title mt-1 text-lg font-semibold">Active response workbench</h1>
         </div>
         <nav aria-label="Parapet operator sections" class="flex flex-wrap gap-2">
-          <.nav_item href="/parapet" active={@active == :response}>Respond</.nav_item>
-          <.nav_item href="/parapet/actions" active={@active == :actions}>Actions</.nav_item>
-          <.nav_item href="/parapet/history" active={@active == :history}>History</.nav_item>
+          <.nav_item href={operator_path(@operator_base_path)} active={@active == :response}>Respond</.nav_item>
+          <.nav_item href={operator_path(@operator_base_path, :actions)} active={@active == :actions}>Actions</.nav_item>
+          <.nav_item href={operator_path(@operator_base_path, :history)} active={@active == :history}>History</.nav_item>
         </nav>
         <.theme_control />
       </div>
@@ -530,6 +531,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   end
 
   attr(:items, :list, required: true)
+  attr(:operator_base_path, :string, default: "/parapet")
 
   def action_center(assigns) do
     ~H"""
@@ -542,7 +544,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             Items here are the operator-facing work queue behind preview and recovery flows. Review the linked incident before executing a mutating action.
           </p>
         </div>
-        <.link navigate="/parapet" class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+        <.link navigate={operator_path(@operator_base_path)} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
           Return to response
         </.link>
       </div>
@@ -565,6 +567,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   attr(:selected, :any, default: nil)
   attr(:queue_params, :map, default: %{})
   attr(:page_mode, :atom, default: :response)
+  attr(:operator_base_path, :string, default: "/parapet")
 
   def incident_list(assigns) do
     ~H"""
@@ -572,7 +575,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       <%= for incident <- @incidents do %>
         <%= if @page_mode == :history do %>
           <.link
-            navigate={incident_detail_path(incident)}
+            navigate={incident_detail_path(@operator_base_path, incident)}
             aria-current="false"
             data-incident-id={incident.id}
             class={[
@@ -584,7 +587,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           </.link>
         <% else %>
           <.link
-            patch={queue_item_path(@queue_params, incident)}
+            patch={queue_item_path(@operator_base_path, @queue_params, incident)}
             aria-current={if @selected && @selected.id == incident.id, do: "true", else: "false"}
             data-incident-id={incident.id}
             class={[
@@ -644,6 +647,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   end
 
   attr(:detail, :map, required: true)
+  attr(:operator_base_path, :string, default: "/parapet")
 
   def incident_summary(assigns) do
     ~H"""
@@ -1051,6 +1055,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   end
 
   attr(:detail, :map, required: true)
+  attr(:operator_base_path, :string, default: "/parapet")
 
   def action_rail(assigns) do
     ~H"""
@@ -1062,7 +1067,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           <p class="mt-2 text-sm leading-6 text-stone-600">
             This incident is closed. History keeps the final timeline, retrospective, and audit evidence together for review.
           </p>
-          <a href="/parapet/history" class="mt-4 flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+          <a href={operator_path(@operator_base_path, :history)} class="mt-4 flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
             Back to history
           </a>
         </section>
@@ -1242,19 +1247,25 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp overview_mode_label(:actions), do: "Action center"
   defp overview_mode_label(_), do: "Active response"
 
-  defp queue_item_path(queue_params, incident) do
+  defp operator_path(operator_base_path), do: operator_base_path
+
+  defp operator_path(operator_base_path, :actions), do: operator_base_path <> "/actions"
+  defp operator_path(operator_base_path, :history), do: operator_base_path <> "/history"
+
+  defp queue_item_path(operator_base_path, queue_params, incident) do
     params =
       queue_params
       |> Map.merge(%{"id" => incident.id})
       |> Enum.reject(fn {_key, value} -> is_nil(value) or value == "" or value == "active" end)
 
     case params do
-      [] -> "/parapet"
-      _ -> "/parapet?" <> URI.encode_query(params)
+      [] -> operator_path(operator_base_path)
+      _ -> operator_path(operator_base_path) <> "?" <> URI.encode_query(params)
     end
   end
 
-  defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"
+  defp incident_detail_path(operator_base_path, incident),
+    do: operator_base_path <> "/incidents/#{incident.id}"
 
   defp queue_row_class(selected, incident) do
     if selected && selected.id == incident.id do

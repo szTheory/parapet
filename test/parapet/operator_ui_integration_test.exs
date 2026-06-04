@@ -50,8 +50,14 @@ defmodule Parapet.OperatorUIIntegrationTest do
     test "generated direct detail prefers incident detail route after actions" do
       content = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
 
-      assert content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
-      assert content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert content =~
+               ~S|push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))|
+
+      assert content =~
+               ~S|push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))|
+
+      assert content =~ "defp incident_detail_path(operator_base_path, incident_id)"
+      assert content =~ "operator_base_path_from_path"
       assert content =~ "Parapet.Operator.acknowledge_incident"
       assert content =~ "Parapet.Operator.resolve_incident"
       assert content =~ "Parapet.Operator.incident_detail(id)"
@@ -112,10 +118,14 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "selected_incident(params, page_mode, visible_incidents)"
       assert content =~ "selection_source"
       assert content =~ "No incident selected"
-      assert components_content =~ "navigate={incident_detail_path(incident)}"
 
       assert components_content =~
-               ~S|defp incident_detail_path(incident), do: "/parapet/incidents/#{incident.id}"|
+               "navigate={incident_detail_path(@operator_base_path, incident)}"
+
+      assert components_content =~
+               ~S|defp incident_detail_path(operator_base_path, incident),|
+
+      assert components_content =~ ~S|do: operator_base_path <> "/incidents/#{incident.id}"|
 
       assert live_content =~ "page_mode={@page_mode}"
     end
@@ -204,8 +214,21 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert live_content =~ "response_cockpit"
       assert live_content =~ "Next Safe Actions"
       refute live_content =~ "Back to Queue"
-      assert detail_content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
-      assert detail_content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert live_content =~ "@default_operator_base_path"
+      assert live_content =~ "operator_base_path_from_path"
+      assert live_content =~ "operator_base_path: @default_operator_base_path"
+      assert live_content =~ "queue_page_path(@operator_base_path"
+      assert live_content =~ "history_path(@operator_base_path)"
+
+      assert detail_content =~
+               ~S|push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))|
+
+      assert detail_content =~
+               ~S|push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))|
+
+      assert detail_content =~ "def handle_params(%{\"id\" => id}, uri, socket)"
+      assert detail_content =~ "detail_back_path(@operator_base_path, @incident)"
+      assert detail_content =~ "operator_base_path_from_path"
       assert components_content =~ "surface_class(:action_card)"
       assert components_content =~ "control_class(:recovery"
       assert components_content =~ "chip_class(:state"
@@ -218,7 +241,21 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert components_content =~ "po-theme-control"
       assert components_content =~ "po-chip-warning"
       assert components_content =~ "po-link"
-      assert components_content =~ "navigate={incident_detail_path(incident)}"
+      assert components_content =~ "attr(:operator_base_path, :string, default: \"/parapet\")"
+      assert components_content =~ "href={operator_path(@operator_base_path, :history)}"
+
+      assert components_content =~
+               "navigate={incident_detail_path(@operator_base_path, incident)}"
+
+      assert components_content =~
+               "patch={queue_item_path(@operator_base_path, @queue_params, incident)}"
+
+      assert components_content =~ "defp operator_path(operator_base_path)"
+
+      assert components_content =~
+               "defp queue_item_path(operator_base_path, queue_params, incident)"
+
+      assert components_content =~ "defp incident_detail_path(operator_base_path, incident)"
       assert live_content =~ "Resolved archive"
       assert detail_content =~ "Back to history"
       assert detail_content =~ "Resolved incident review"
@@ -234,6 +271,10 @@ defmodule Parapet.OperatorUIIntegrationTest do
                "Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome."
 
       refute components_content =~ "bg-white shadow-sm ring-1 ring-stone-900/5 bg-white"
+      refute live_content =~ ~S|navigate="/parapet"|
+      refute components_content =~ ~S|href="/parapet/history"|
+      refute detail_content =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
+      refute detail_content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
     end
 
     test "operator UI docs show preferred and compatibility route map" do
