@@ -57,9 +57,15 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "Parapet.Operator.resolve_incident(incident, payload)"
       assert operator_live_source =~ ~S|@default_operator_base_path "/parapet"|
       assert operator_live_source =~ "operator_base_path(uri)"
-      assert operator_live_source =~ "defp operator_base_path_from_path(path) when is_binary(path)"
+
+      assert operator_live_source =~
+               "defp operator_base_path_from_path(path) when is_binary(path)"
+
       assert operator_live_source =~ "assign(operator_base_path:"
-      assert operator_live_source =~ "queue_path(assigns.operator_base_path, assigns.queue_params, extra_params)"
+
+      assert operator_live_source =~
+               "queue_path(assigns.operator_base_path, assigns.queue_params, extra_params)"
+
       assert operator_live_source =~ "history_path(@operator_base_path)"
       assert operator_live_source =~ "defp history_path(operator_base_path)"
 
@@ -71,8 +77,12 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
         |> Rewrite.Source.get(:content)
 
       assert operator_components_source =~ "data-incident-id"
-      assert operator_components_source =~ "attr(:operator_base_path, :string, default: \"/parapet\")"
-      assert operator_components_source =~ "navigate={incident_detail_path(@operator_base_path, incident)}"
+
+      assert operator_components_source =~
+               "attr(:operator_base_path, :string, default: \"/parapet\")"
+
+      assert operator_components_source =~
+               "navigate={incident_detail_path(@operator_base_path, incident)}"
 
       assert operator_components_source =~
                "patch={queue_item_path(@operator_base_path, @queue_params, incident)}"
@@ -141,8 +151,12 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
 
       assert operator_detail_source =~ ~S|@default_operator_base_path "/parapet"|
       assert operator_detail_source =~ "operator_base_path(uri)"
-      assert operator_detail_source =~ "defp operator_base_path_from_path(path) when is_binary(path)"
+
+      assert operator_detail_source =~
+               "defp operator_base_path_from_path(path) when is_binary(path)"
+
       assert operator_detail_source =~ "assign(operator_base_path:"
+
       assert operator_detail_source =~
                "push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))"
 
@@ -150,6 +164,7 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
                "push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))"
 
       assert operator_detail_source =~ "detail_back_path(@operator_base_path, @incident)"
+
       assert operator_detail_source =~
                ~S|defp incident_detail_path(operator_base_path, incident_id)|
 
@@ -205,15 +220,18 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
 
       route_surface_expectations = [
         {"push_patch", sources.operator_live, "queue_path(socket,"},
-        {"push_navigate", sources.operator_detail, "incident_detail_path(socket.assigns.operator_base_path, id)"},
+        {"push_navigate", sources.operator_detail,
+         "incident_detail_path(socket.assigns.operator_base_path, id)"},
         {"navigate", sources.operator_components, "operator_path(@operator_base_path"},
         {"patch", sources.operator_components, "queue_item_path(@operator_base_path"},
         {"href", sources.operator_components, "operator_path(@operator_base_path, :history)"},
         {"queue_page_path", sources.operator_live, "queue_page_path(@operator_base_path"},
         {"queue_item_path", sources.operator_components, "queue_item_path(@operator_base_path"},
         {"history_path", sources.operator_live, "history_path(@operator_base_path)"},
-        {"incident_detail_path", sources.operator_components, "incident_detail_path(@operator_base_path, incident)"},
-        {"detail_back_path", sources.operator_detail, "detail_back_path(@operator_base_path, @incident)"}
+        {"incident_detail_path", sources.operator_components,
+         "incident_detail_path(@operator_base_path, incident)"},
+        {"detail_back_path", sources.operator_detail,
+         "detail_back_path(@operator_base_path, @incident)"}
       ]
 
       for {surface, source, scoped_pattern} <- route_surface_expectations do
@@ -264,8 +282,7 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       |> Ui.igniter()
 
     %{
-      operator_live:
-        generated_source(igniter, "lib/test_web/live/parapet/operator_live.ex"),
+      operator_live: generated_source(igniter, "lib/test_web/live/parapet/operator_live.ex"),
       operator_detail:
         generated_source(igniter, "lib/test_web/live/parapet/operator_detail_live.ex"),
       operator_components:

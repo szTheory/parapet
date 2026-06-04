@@ -348,7 +348,9 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "Scoped mount: `/ops/parapet`"
       assert content =~ ~S|scope "/ops", MyAppWeb do|
       assert content =~ "generated `operator_base_path` helper"
-      assert content =~ "Host app scopes, pipelines, authentication, and authorization remain owner-controlled"
+
+      assert content =~
+               "Host app scopes, pipelines, authentication, and authorization remain owner-controlled"
     end
 
     test "generated queue rows render bounded triage fields instead of raw ids only" do
