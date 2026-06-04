@@ -4,10 +4,19 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
 
   import <%= inspect(@web_module) %>.Parapet.OperatorComponents
 
+  @default_operator_base_path "/parapet"
+
   def mount(%{"id" => id}, _session, socket) do
     selected = Parapet.Operator.incident_detail(id)
 
-    {:ok, assign(socket, incident: selected)}
+    {:ok, assign(socket, incident: selected, operator_base_path: @default_operator_base_path)}
+  end
+
+  def handle_params(%{"id" => id}, uri, socket) do
+    {:noreply,
+     socket
+     |> assign(operator_base_path: operator_base_path(uri))
+     |> assign(incident: Parapet.Operator.incident_detail(id))}
   end
 
   def handle_event("acknowledge", %{"id" => id}, socket) do
@@ -25,7 +34,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:info, "Incident acknowledged successfully")
-         |> push_navigate(to: "/parapet/incidents/#{id}")}
+         |> push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
@@ -44,7 +53,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
 
     case Parapet.Operator.resolve_incident(incident, payload) do
       {:ok, _result} ->
-        {:noreply, push_navigate(socket, to: "/parapet/incidents/#{id}")}
+        {:noreply, push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))}
 
       {:error, _reason} ->
         {:noreply, put_flash(socket, :error, "Failed to resolve")}
@@ -195,11 +204,11 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
     ~H"""
     <.operator_theme_bootstrap />
     <div class="parapet-ui antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
-      <.operator_nav active={detail_nav_active(@incident)} />
+      <.operator_nav active={detail_nav_active(@incident)} operator_base_path={@operator_base_path} />
 
       <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <.link navigate={detail_back_path(@incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
+          <.link navigate={detail_back_path(@operator_base_path, @incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
             <span>&larr; <%%= detail_back_label(@incident) %></span>
           </.link>
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500"><%%= detail_context_label(@incident) %></p>
@@ -232,7 +241,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
               <.preview_panel detail={@incident} />
             <%% end %>
 
-            <.action_rail detail={@incident} />
+            <.action_rail detail={@incident} operator_base_path={@operator_base_path} />
           </aside>
         </div>
       </main>
@@ -243,8 +252,42 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
   defp detail_nav_active(%{incident: %{state: "resolved"}}), do: :history
   defp detail_nav_active(_incident), do: :response
 
-  defp detail_back_path(%{incident: %{state: "resolved"}}), do: "/parapet/history"
-  defp detail_back_path(_incident), do: "/parapet"
+  defp detail_back_path(operator_base_path, %{incident: %{state: "resolved"}}),
+    do: operator_base_path <> "/history"
+
+  defp detail_back_path(operator_base_path, _incident), do: operator_base_path
+
+  defp incident_detail_path(operator_base_path, incident_id),
+    do: operator_base_path <> "/incidents/#{incident_id}"
+
+  defp operator_base_path(uri) when is_binary(uri) do
+    uri
+    |> URI.parse()
+    |> Map.get(:path)
+    |> operator_base_path_from_path()
+  end
+
+  defp operator_base_path(_uri), do: @default_operator_base_path
+
+  defp operator_base_path_from_path(path) when is_binary(path) do
+    segments = String.split(path, "/", trim: true)
+    reversed_segments = Enum.reverse(segments)
+
+    case Enum.find_index(reversed_segments, &(&1 == "parapet")) do
+      nil ->
+        @default_operator_base_path
+
+      reverse_index ->
+        keep_count = length(segments) - reverse_index
+
+        case Enum.take(segments, keep_count) do
+          [] -> @default_operator_base_path
+          scoped_segments -> "/" <> Enum.join(scoped_segments, "/")
+        end
+    end
+  end
+
+  defp operator_base_path_from_path(_path), do: @default_operator_base_path
 
   defp detail_back_label(%{incident: %{state: "resolved"}}), do: "Back to history"
   defp detail_back_label(_incident), do: "Back to active response"

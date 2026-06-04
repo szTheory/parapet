@@ -55,6 +55,13 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       assert operator_live_source =~ "handle_event(\"acknowledge\""
       assert operator_live_source =~ "handle_event(\"resolve\""
       assert operator_live_source =~ "Parapet.Operator.resolve_incident(incident, payload)"
+      assert operator_live_source =~ ~S|@default_operator_base_path "/parapet"|
+      assert operator_live_source =~ "operator_base_path(uri)"
+      assert operator_live_source =~ "defp operator_base_path_from_path(path) when is_binary(path)"
+      assert operator_live_source =~ "assign(operator_base_path:"
+      assert operator_live_source =~ "queue_path(assigns.operator_base_path, assigns.queue_params, extra_params)"
+      assert operator_live_source =~ "history_path(@operator_base_path)"
+      assert operator_live_source =~ "defp history_path(operator_base_path)"
 
       refute operator_live_source =~
                "Parapet.Operator.record_note(incident, \"Resolved\", payload)"
@@ -114,8 +121,22 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
         Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_detail_live.ex")
         |> Rewrite.Source.get(:content)
 
-      assert operator_detail_source =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
-      assert operator_detail_source =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
+      assert operator_detail_source =~ ~S|@default_operator_base_path "/parapet"|
+      assert operator_detail_source =~ "operator_base_path(uri)"
+      assert operator_detail_source =~ "defp operator_base_path_from_path(path) when is_binary(path)"
+      assert operator_detail_source =~ "assign(operator_base_path:"
+      assert operator_detail_source =~
+               "push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))"
+
+      assert operator_detail_source =~
+               "push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))"
+
+      assert operator_detail_source =~ "detail_back_path(@operator_base_path, @incident)"
+      assert operator_detail_source =~
+               ~S|defp incident_detail_path(operator_base_path, incident_id)|
+
+      refute operator_detail_source =~ ~S|push_navigate(to: "/parapet/incidents/#{id}")|
+      refute operator_detail_source =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
       assert operator_detail_source =~ "Parapet.Operator.acknowledge_incident"
       assert operator_detail_source =~ "Parapet.Operator.resolve_incident"
       assert operator_detail_source =~ "Parapet.Operator.incident_detail(id)"
