@@ -277,6 +277,51 @@ defmodule Parapet.OperatorUIIntegrationTest do
       refute detail_content =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
     end
 
+    test "demo copied LiveViews preserve workbench presentation while using scoped route helpers" do
+      live_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex")
+
+      detail_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex")
+
+      components_content =
+        File.read!("examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex")
+
+      content = live_content <> "\n" <> detail_content <> "\n" <> components_content
+
+      for marker <- [
+            "Active response workbench",
+            "Next Safe Actions",
+            "Load Latest Changes",
+            "Back to history",
+            "Resolved incident review",
+            "response_cockpit",
+            "lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]",
+            "po-operator-header",
+            "po-theme-control",
+            "focus:outline-none focus:ring-2"
+          ] do
+        assert content =~ marker
+      end
+
+      for helper <- [
+            "operator_base_path",
+            "operator_base_path_from_path",
+            "queue_page_path(@operator_base_path",
+            "history_path(@operator_base_path)",
+            "detail_back_path(@operator_base_path, @incident)",
+            "operator_path(@operator_base_path",
+            "queue_item_path(@operator_base_path",
+            "incident_detail_path(@operator_base_path"
+          ] do
+        assert content =~ helper
+      end
+
+      for explanatory_copy <- ["Default mount:", "Scoped mount:", "/ops/parapet"] do
+        refute content =~ explanatory_copy
+      end
+    end
+
     test "operator UI docs show preferred and compatibility route map" do
       content = File.read!("docs/operator-ui.md")
 
