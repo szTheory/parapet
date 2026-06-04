@@ -72,6 +72,53 @@ If `--days` is invalid, fix the retention value before rerunning. If `--path`
 points at a missing or unwritable directory, create the directory or choose a
 writable path before rerunning.
 
+## Stale generated UI files still point at `/parapet`
+
+If stale generated UI files still point at `/parapet`, the generated links
+likely predate scoped route support. Generated Operator UI files are host-owned,
+so older workbench files can still point directly at `/parapet` instead of
+deriving paths through `operator_base_path`.
+
+Regenerate the UI files, or regenerate or manually port `operator_base_path` helpers into host-owned generated files. After updating, confirm links from `/ops/parapet`, `/ops/parapet/actions`, `/ops/parapet/history`, and detail pages all stay under the same scoped mount.
+
+## Scoped Operator UI mount is visible without auth
+
+Host apps own authentication, authorization, pipelines, live sessions, and
+router scopes. If `/ops/parapet` is visible without signing in, the route map is
+outside the host app's authenticated pipeline or the `live_session` protection
+is missing. A scoped Operator UI mount is visible without auth when those
+host-owned guards are absent.
+
+To recover, keep routes inside the host app's authenticated pipeline and `live_session`:
+
+```elixir
+scope "/ops", MyAppWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  live_session :parapet_operator,
+    on_mount: [{MyAppWeb.UserAuth, :ensure_authenticated}] do
+    live "/parapet", MyAppWeb.Parapet.OperatorLive, :index
+    live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions
+    live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history
+    live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+    live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+  end
+end
+```
+
+## Some `/ops/parapet` links return 404
+
+If some `/ops/parapet` links return 404, only part of the generated route map
+may be mounted under the nested scope. Partial nested route maps break local
+navigation. If the index route is under `/ops/parapet` but actions, history,
+preferred detail, or compatibility detail routes are not mounted in the same
+scope, links will fail.
+
+The fix is to mount the whole route map under the same `/ops` scope. The
+complete map includes `live "/parapet"`, `live "/parapet/actions"`,
+`live "/parapet/history"`, `live "/parapet/incidents/:id"`, and
+`live "/parapet/:id"`.
+
 ## Demo app Docker port conflicts
 
 If you are running several Phoenix demos at once and the Parapet demo cannot bind

@@ -46,7 +46,7 @@ This will scaffold three files into your `lib/my_app_web/live/parapet/` director
 
 ### Mounting the Operator UI
 
-The generated files belong to your application. The UI is only relevant when Phoenix LiveView is present, and Parapet does **not** provide its own authentication system. You must mount the operator routes inside your application's authenticated scope to ensure the UI is secured according to your app's existing authorization policies.
+Generated Operator UI files are host-owned. Host apps own authentication, authorization, pipelines, live sessions, and router scopes. The UI is only relevant when Phoenix LiveView is present, and Parapet does **not** provide its own authentication system. You must mount the operator routes inside your application's authenticated scope to ensure the UI is secured according to your app's existing authorization policies.
 
 Update your `router.ex` to include the Parapet routes within a protected area.
 
@@ -93,6 +93,14 @@ end
 The route map keeps `/parapet` as the active-response overview, `/parapet/actions` as pending recovery work, and `/parapet/history` as resolved incident review. /parapet/incidents/:id is the preferred incident detail route, while /parapet/:id remains available for compatibility with existing deep links.
 
 Generated local links derive from the current LiveView URI through the generated `operator_base_path` helper, so the same editable host-owned files render links for `/parapet` or nested mounts such as `/ops/parapet`. Host app scopes, pipelines, authentication, and authorization remain owner-controlled.
+
+### Scoped Mount Gotchas
+
+- Stale generated UI files from before scoped route support can still emit local links for `/parapet` instead of deriving them through `operator_base_path`.
+- Mounts that omit an authenticated pipeline or `live_session` leave host-owned Operator UI routes outside the protection model your app expects.
+- Broken local links can come from partial nested route maps, where only some Operator UI routes are mounted under `/ops` while the rest remain elsewhere.
+
+Scoped support does not require a generator flag, Parapet router abstraction, stable public API change, or dependency change. See [Troubleshooting](troubleshooting.md) for recovery steps in `docs/troubleshooting.md`.
 
 ## Security and Verification
 

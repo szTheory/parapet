@@ -175,6 +175,42 @@ This writes the dashboard JSON and provisioning YAML to `priv/parapet/grafana/`.
 
 Parapet can generate an optional, evidence-first LiveView operator workbench directly inside your host application. This UI is not part of the default install path unless you opt in with `mix parapet.install --with-ui`, and it remains host-owned.
 
+Default mount: `/parapet`
+
+```elixir
+scope "/", MyAppWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  live_session :parapet_operator,
+    on_mount: [{MyAppWeb.UserAuth, :ensure_authenticated}] do
+    live "/parapet", MyAppWeb.Parapet.OperatorLive, :index
+    live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions
+    live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history
+    live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+    live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+  end
+end
+```
+
+Scoped mount: `/ops/parapet`
+
+```elixir
+scope "/ops", MyAppWeb do
+  pipe_through [:browser, :require_authenticated_user]
+
+  live_session :parapet_operator,
+    on_mount: [{MyAppWeb.UserAuth, :ensure_authenticated}] do
+    live "/parapet", MyAppWeb.Parapet.OperatorLive, :index
+    live "/parapet/actions", MyAppWeb.Parapet.OperatorLive, :actions
+    live "/parapet/history", MyAppWeb.Parapet.OperatorLive, :history
+    live "/parapet/incidents/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+    live "/parapet/:id", MyAppWeb.Parapet.OperatorDetailLive, :show
+  end
+end
+```
+
+Generated Operator UI files are host-owned. Host apps own authentication, authorization, pipelines, live sessions, and router scopes.
+
 For instructions on generating the UI and securing its routes, see the [Operator UI Guide](docs/operator-ui.md).
 
 ### 6. Archive Maintenance
