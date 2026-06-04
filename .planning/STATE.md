@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.3
-milestone_name: Operator UI Polish & Design System
-status: Awaiting next milestone
-last_updated: "2026-06-04T06:56:12.233Z"
-last_activity: 2026-06-04 — Milestone v1.3 completed and archived
+milestone: v1.4
+milestone_name: Trust Hardening & Host-App Compatibility
+status: Roadmap ready
+last_updated: "2026-06-04T16:23:01.926Z"
+last_activity: 2026-06-04 — Milestone v1.4 requirements and roadmap created
 progress:
   total_phases: 3
-  completed_phases: 3
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-04 after v1.3 Operator UI Polish & Design System milestone close)
+See: .planning/PROJECT.md (updated 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Planning next milestone
+**Current focus:** v1.4 Trust Hardening & Host-App Compatibility
 
 ## Current Position
 
-Phase: Milestone v1.3 complete
+Phase: 37 Archive Durability
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-06-04 — Milestone v1.3 completed and archived
+Status: Roadmap ready
+Last activity: 2026-06-04 — Milestone v1.4 requirements and roadmap created
 
 ## Performance Metrics
 
@@ -119,15 +119,15 @@ None. v1.3 closed with 13/13 requirements satisfied, milestone audit passed, and
 | Polish | Logo/favicon, demo Docker Compose, v0.x → v1.0 migration guide, deployment guide | v1.2 | shipped | Delivered in Phase 33 |
 | Recovery extensions | MCP Preview surface (read-only) for recovery actions; per-capability cooldown rules; adapter-provided capabilities (Rulestead → `:revert_feature_flag`) | v1.2/v1.3 | deferred from v1.1 | Defer until MCP graduates from Experimental |
 | Team workflow | Responder coordination, handoff, on-call rotation hooks (PagerDuty/Opsgenie/webhook) | v1.3 | candidate | JTBD-MAP #2 |
-| Cross-boundary | Multi-app journey correlation + vertical packs | v1.4+ | long-tail | JTBD-MAP #4 |
+| Cross-boundary | Multi-app journey correlation + vertical packs | v1.5+ | long-tail | JTBD-MAP #4 |
 
 ## Session Continuity
 
 Last session: 2026-06-03T22:52:35Z
-Stopped at: Completed 36-01-PLAN.md
+Stopped at: Started v1.4 roadmap
 Resume file: None
-Next step: /gsd-new-milestone when ready to open the next milestone
+Next step: /gsd-plan-phase 37
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan Phase 37 Archive Durability with /gsd-plan-phase 37

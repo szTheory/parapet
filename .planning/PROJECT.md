@@ -25,7 +25,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Next:** No active milestone. Start the next requirements/roadmap cycle with `$gsd-new-milestone` when there is a concrete PR-shaped slice worth opening.
+**Current milestone:** v1.4 Trust Hardening & Host-App Compatibility — Closing the quality-evaluation risks most likely to damage adoption trust: archive evidence durability and generated Operator UI behavior inside real host-app route scopes.
 
 ## Last Milestone: v1.3 Operator UI Polish & Design System
 
@@ -52,12 +52,23 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 **Decisions surfaced 2026-05-27:**
 - **In scope (v1.1):** operator UI executes runbooks; preview-before-mutate is the safety posture.
 - **Out of scope (permanent):** autonomous (no-human) remediation; replacing the operator's Grafana / log tool; hosted SaaS control plane; Team Workflow & Coordination (JTBD #2) such as PagerDuty routing, as the target audience is strictly solo operators; Cross-boundary journey correlation.
-- **Deferred to v1.4+:** multi-tenant SLO scoping and per-org operator views.
+- **Deferred to v1.5+:** multi-tenant SLO scoping and per-org operator views.
 - **Dropped earlier:** SLO-B1's formal Bundle abstraction (superseded by the documented Provider pattern).
 
 **Activation rule:** candidate work stays parked until a concrete slice is ready to be worked through a PR without weakening the stable-main posture.
 
 **Key context:** The public surface is already frozen under `docs/stability.md`; future work should assume that contract. Research backing the additive follow-up still lives in `.planning/research/V1-*.md`. The 2026-05-27 strategic assessment lives at `.planning/NEXT-STEP-ASSESSMENT.md` and expires when v1.1 ships.
+
+## Current Milestone: v1.4 Trust Hardening & Host-App Compatibility
+
+**Goal:** Close the repo-evidenced quality gaps most likely to make adopters lose trust without broadening Parapet's public product surface.
+
+**Target features:**
+- Archive/export/prune behavior preserves complete durable evidence or fails loudly with actionable results.
+- Generated Operator UI route helpers, links, and forms work correctly when mounted under a non-default host-app scope.
+- Adoption and troubleshooting docs tell users how to run archive maintenance and mount generated UI in realistic Phoenix apps.
+
+**Key context:** `.planning/QUALITY-EVALUATION.md` is the source artifact for this milestone. The top risks are not generic polish: archive durability is a trust boundary, and scoped-route compatibility is a host-app respect boundary. Keep the public API, dependency surface, auth ownership, and runtime behavior stable unless a phase explicitly proves the change is additive and necessary.
 
 ## Requirements
 
@@ -167,9 +178,13 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ### Active
 
-<!-- v1.0 Stable Release shipped 2026-05-26. Quiet stable-line mode is the default until a new PR-shaped slice is explicitly opened. -->
+<!-- v1.4 opened from .planning/QUALITY-EVALUATION.md after v1.3 archive. -->
 
-No active feature milestone by default. v1.3 requirements are archived in `.planning/milestones/v1.3-REQUIREMENTS.md`; fresh active requirements should be created by `$gsd-new-milestone`.
+v1.4 is active. It is a trust-hardening milestone, not a product-scope expansion.
+
+- [ ] Archive durability hardening — resolved evidence archive/export/prune must preserve complete durable evidence, fail loudly on partial failure, and expose actionable run summaries.
+- [ ] Generated UI scoped-route compatibility — generated Operator UI must work when mounted below a host-owned route scope such as `/ops/parapet`, without taking ownership of auth/router decisions.
+- [ ] Adoption proof and docs — archive maintenance and scoped UI mounting must be documented, tested, and reflected in the quality-evaluation follow-up trail.
 
 Dropped:
 
@@ -286,4 +301,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-04 after v1.3 Operator UI Polish & Design System milestone*
+*Last updated: 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility*
