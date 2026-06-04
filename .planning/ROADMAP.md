@@ -12,7 +12,7 @@
 | Phase | Name | Goal | Requirements |
 |---:|---|---|---|
 | 37 | 3/3 | Complete    | 2026-06-04 |
-| 38 | 3/3 | Complete   | 2026-06-04 |
+| 38 | 3/3 | Complete    | 2026-06-04 |
 | 39 | Adoption Proof | Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers. | ADOPT-01, ADOPT-02, ADOPT-03 |
 
 ## Phase Details
