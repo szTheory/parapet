@@ -57,11 +57,13 @@ completed: 2026-06-04
 - Documented the archive boundary as Parapet-owned evidence export/prune, not host backup/restore.
 - Documented the retention limitation: resolved incidents created before cutoff via `inserted_at < cutoff`, not resolved-before-cutoff semantics.
 - Added an Unreleased changelog note for the Experimental archive return-shape change and CLI failure behavior.
+- Closed the verifier's D-15 gap by adding encode failure, verification mismatch, manifest failure, and delete-stage rerun/idempotency tests.
 - Ran focused archive verification plus repository-level format, compile, and full test suite.
 
 ## Task Commits
 
 1. **Tasks 1-2: archive docs and verification evidence** - `20495ab` (docs)
+2. **Verifier gap closure: archive failure-injection matrix** - `1e564fe` (test)
 
 ## Files Created/Modified
 
@@ -87,11 +89,12 @@ None - no external service configuration required.
 
 ## Verification
 
-- `mix test test/parapet/evidence/archiver_test.exs test/mix/tasks/parapet.archive_test.exs test/parapet/evidence/archive_worker_test.exs` - passed, 10 tests, 0 failures
+- `mix test test/parapet/evidence/archiver_test.exs test/mix/tasks/parapet.archive_test.exs test/parapet/evidence/archive_worker_test.exs` - passed, 14 tests, 0 failures
 - `mix format --check-formatted` - passed
 - `mix compile --warnings-as-errors` - passed
-- `mix test` - passed, 535 tests, 0 failures
+- `mix test` - passed, 539 tests, 0 failures
 - `git diff -- mix.exs priv/repo examples/demo_app/priv/repo priv/templates` - no diff
+- `gsd-verifier` - passed, 22/22 must-haves verified
 
 ## Next Phase Readiness
 

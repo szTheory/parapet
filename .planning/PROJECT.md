@@ -25,7 +25,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Current milestone:** v1.4 Trust Hardening & Host-App Compatibility — Closing the quality-evaluation risks most likely to damage adoption trust: archive evidence durability and generated Operator UI behavior inside real host-app route scopes.
+**Current milestone:** v1.4 Trust Hardening & Host-App Compatibility — Closing the quality-evaluation risks most likely to damage adoption trust: archive evidence durability is complete as of Phase 37, and generated Operator UI behavior inside real host-app route scopes remains the next host-app compatibility boundary.
 
 ## Last Milestone: v1.3 Operator UI Polish & Design System
 
@@ -182,7 +182,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 v1.4 is active. It is a trust-hardening milestone, not a product-scope expansion.
 
-- [ ] Archive durability hardening — resolved evidence archive/export/prune must preserve complete durable evidence, fail loudly on partial failure, and expose actionable run summaries.
+- [x] Archive durability hardening — resolved evidence archive/export/prune preserves complete durable evidence, fails loudly on partial failure, and exposes actionable run summaries. Validated in Phase 37.
 - [ ] Generated UI scoped-route compatibility — generated Operator UI must work when mounted below a host-owned route scope such as `/ops/parapet`, without taking ownership of auth/router decisions.
 - [ ] Adoption proof and docs — archive maintenance and scoped UI mounting must be documented, tested, and reflected in the quality-evaluation follow-up trail.
 

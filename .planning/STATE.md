@@ -2,8 +2,8 @@
 gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Trust Hardening & Host-App Compatibility
-status: verifying
-last_updated: "2026-06-04T18:21:41.057Z"
+status: ready_to_plan
+last_updated: 2026-06-04T18:30:24.909Z
 last_activity: 2026-06-04
 progress:
   total_phases: 3
@@ -11,6 +11,7 @@ progress:
   total_plans: 3
   completed_plans: 3
   percent: 33
+stopped_at: Phase 37 complete (3/3) — ready to discuss Phase 38
 ---
 
 # Project State
@@ -20,20 +21,20 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 37 — archive-durability
+**Current focus:** Phase 38 — scoped ui routes
 
 ## Current Position
 
-Phase: 37 (archive-durability) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
+Phase: 38
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-06-04
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 4 (v1.3)
+- Total plans completed: 13 (v1.3)
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -57,6 +58,7 @@ Last activity: 2026-06-04
 | 29 | 4 | - | - |
 | 32 | 2 | - | - |
 | 35 | 1 | - | - |
+| 37 | 3 | - | - |
 
 **Recent Trend:**
 
