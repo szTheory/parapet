@@ -26,8 +26,19 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --po-link: #1d4ed8;
         --po-link-hover: #1e3a8a;
         --po-focus: #0f766e;
+        --po-focus-offset: #ffffff;
+        --po-header-bg: #ffffff;
+        --po-header-border: #e7e5e4;
+        --po-header-title: #1c1917;
+        --po-header-muted: #0f766e;
+        --po-nav-fg: #44403c;
+        --po-nav-hover-bg: #f5f5f4;
+        --po-nav-hover-fg: #1c1917;
         --po-nav-active-bg: #5eead4;
         --po-nav-active-fg: #042f2e;
+        --po-theme-control-bg: #fafaf9;
+        --po-theme-control-border: #d6d3d1;
+        --po-theme-control-fg: #44403c;
         --po-chip-neutral-bg: #f5f5f4;
         --po-chip-neutral-fg: #292524;
         --po-chip-neutral-border: #d6d3d1;
@@ -70,8 +81,19 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --po-link: #93c5fd;
         --po-link-hover: #bfdbfe;
         --po-focus: #5eead4;
+        --po-focus-offset: #0c0a09;
+        --po-header-bg: #0c0a09;
+        --po-header-border: #292524;
+        --po-header-title: #fafaf9;
+        --po-header-muted: #5eead4;
+        --po-nav-fg: #e7e5e4;
+        --po-nav-hover-bg: #292524;
+        --po-nav-hover-fg: #ffffff;
         --po-nav-active-bg: #5eead4;
         --po-nav-active-fg: #042f2e;
+        --po-theme-control-bg: #1c1917;
+        --po-theme-control-border: #57534e;
+        --po-theme-control-fg: #e7e5e4;
         --po-chip-neutral-bg: #292524;
         --po-chip-neutral-fg: #f5f5f4;
         --po-chip-neutral-border: #57534e;
@@ -120,8 +142,19 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           --po-link: #93c5fd;
           --po-link-hover: #bfdbfe;
           --po-focus: #5eead4;
+          --po-focus-offset: #0c0a09;
+          --po-header-bg: #0c0a09;
+          --po-header-border: #292524;
+          --po-header-title: #fafaf9;
+          --po-header-muted: #5eead4;
+          --po-nav-fg: #e7e5e4;
+          --po-nav-hover-bg: #292524;
+          --po-nav-hover-fg: #ffffff;
           --po-nav-active-bg: #5eead4;
           --po-nav-active-fg: #042f2e;
+          --po-theme-control-bg: #1c1917;
+          --po-theme-control-border: #57534e;
+          --po-theme-control-fg: #e7e5e4;
           --po-chip-neutral-bg: #292524;
           --po-chip-neutral-fg: #f5f5f4;
           --po-chip-neutral-border: #57534e;
@@ -190,9 +223,46 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         color: var(--po-link-hover);
       }
 
+      .parapet-ui .po-focus {
+        --tw-ring-color: var(--po-focus);
+        --tw-ring-offset-color: var(--po-focus-offset);
+      }
+
+      .parapet-ui .po-operator-header {
+        border-color: var(--po-header-border);
+        background: var(--po-header-bg);
+        color: var(--po-header-title);
+      }
+
+      .parapet-ui .po-operator-brand {
+        color: var(--po-header-muted);
+      }
+
+      .parapet-ui .po-operator-title {
+        color: var(--po-header-title);
+      }
+
+      .parapet-ui .po-nav-item {
+        color: var(--po-nav-fg);
+      }
+
+      .parapet-ui .po-nav-item:hover {
+        background: var(--po-nav-hover-bg);
+        color: var(--po-nav-hover-fg);
+      }
+
       .parapet-ui .po-nav-active {
         background: var(--po-nav-active-bg);
         color: var(--po-nav-active-fg);
+      }
+
+      .parapet-ui .po-theme-control {
+        background: var(--po-theme-control-bg);
+        box-shadow: inset 0 0 0 1px var(--po-theme-control-border);
+      }
+
+      .parapet-ui .po-theme-option {
+        color: var(--po-theme-control-fg);
       }
 
       .parapet-ui .po-chip {
@@ -235,15 +305,15 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       }
 
       .parapet-theme-option[aria-pressed="true"] {
-        background: var(--parapet-accent);
-        color: var(--parapet-bg);
+        background: var(--po-nav-active-bg);
+        color: var(--po-nav-active-fg);
       }
 
       html[data-parapet-theme="light"] .parapet-theme-option[data-parapet-theme-value="light"],
       html[data-parapet-theme="dark"] .parapet-theme-option[data-parapet-theme-value="dark"],
       html[data-parapet-theme="system"] .parapet-theme-option[data-parapet-theme-value="system"] {
-        background: var(--parapet-accent);
-        color: var(--parapet-bg);
+        background: var(--po-nav-active-bg);
+        color: var(--po-nav-active-fg);
       }
 
       html[data-parapet-theme="dark"] .parapet-theme-option[aria-pressed="true"] {
@@ -292,11 +362,11 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   def operator_nav(assigns) do
     ~H"""
-    <header class="border-b border-stone-900/10 bg-stone-950 text-stone-50">
+    <header class="po-operator-header border-b">
       <div class="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
         <div>
-          <p class="text-xs font-semibold uppercase tracking-[0.18em] text-teal-300">Parapet Operator</p>
-          <h1 class="mt-1 text-lg font-semibold text-white">Active response workbench</h1>
+          <p class="po-operator-brand text-xs font-semibold uppercase tracking-[0.18em]">Parapet Operator</p>
+          <h1 class="po-operator-title mt-1 text-lg font-semibold">Active response workbench</h1>
         </div>
         <nav aria-label="Parapet operator sections" class="flex flex-wrap gap-2">
           <.nav_item href="/parapet" active={@active == :response}>Respond</.nav_item>
@@ -311,14 +381,14 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   def theme_control(assigns) do
     ~H"""
-    <div class="flex min-h-[40px] items-center gap-1 rounded-lg bg-stone-900 px-1 py-1 ring-1 ring-stone-700" role="group" aria-label="Operator color theme">
-      <button type="button" data-parapet-theme-value="light" onclick="window.parapetSetTheme && window.parapetSetTheme('light')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+    <div class="po-theme-control flex min-h-[40px] items-center gap-1 rounded-lg px-1 py-1" role="group" aria-label="Operator color theme">
+      <button type="button" data-parapet-theme-value="light" onclick="window.parapetSetTheme && window.parapetSetTheme('light')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         Light
       </button>
-      <button type="button" data-parapet-theme-value="dark" onclick="window.parapetSetTheme && window.parapetSetTheme('dark')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+      <button type="button" data-parapet-theme-value="dark" onclick="window.parapetSetTheme && window.parapetSetTheme('dark')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         Dark
       </button>
-      <button type="button" data-parapet-theme-value="system" onclick="window.parapetSetTheme && window.parapetSetTheme('system')" aria-pressed="false" class="parapet-theme-option flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold text-stone-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950">
+      <button type="button" data-parapet-theme-value="system" onclick="window.parapetSetTheme && window.parapetSetTheme('system')" aria-pressed="false" class="parapet-theme-option po-theme-option po-focus flex min-h-[32px] items-center rounded-md px-2 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2">
         System
       </button>
     </div>
@@ -408,8 +478,8 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       navigate={@href}
       aria-current={if @active, do: "page", else: nil}
       class={[
-        "flex min-h-[40px] items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-teal-300 focus:ring-offset-2 focus:ring-offset-stone-950",
-        if(@active, do: "po-nav-active", else: "text-stone-200 hover:bg-stone-800 hover:text-white")
+        "po-focus flex min-h-[40px] items-center rounded-lg px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2",
+        if(@active, do: "po-nav-active", else: "po-nav-item")
       ]}
     >
       <%= render_slot(@inner_block) %>

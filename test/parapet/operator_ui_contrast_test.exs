@@ -9,10 +9,18 @@ defmodule Parapet.OperatorUIContrastTest do
   @themes %{
     light: %{
       panel: "#ffffff",
+      header_bg: "#ffffff",
+      header_title: "#1c1917",
+      header_muted: "#0f766e",
       link: "#1d4ed8",
       link_hover: "#1e3a8a",
+      nav_fg: "#44403c",
+      nav_hover_bg: "#f5f5f4",
+      nav_hover_fg: "#1c1917",
       nav_active_bg: "#5eead4",
       nav_active_fg: "#042f2e",
+      theme_control_bg: "#fafaf9",
+      theme_control_fg: "#44403c",
       neutral_bg: "#f5f5f4",
       neutral_fg: "#292524",
       success_bg: "#dcfce7",
@@ -28,10 +36,18 @@ defmodule Parapet.OperatorUIContrastTest do
     },
     dark: %{
       panel: "#1c1917",
+      header_bg: "#0c0a09",
+      header_title: "#fafaf9",
+      header_muted: "#5eead4",
       link: "#93c5fd",
       link_hover: "#bfdbfe",
+      nav_fg: "#e7e5e4",
+      nav_hover_bg: "#292524",
+      nav_hover_fg: "#ffffff",
       nav_active_bg: "#5eead4",
       nav_active_fg: "#042f2e",
+      theme_control_bg: "#1c1917",
+      theme_control_fg: "#e7e5e4",
       neutral_bg: "#292524",
       neutral_fg: "#f5f5f4",
       success_bg: "#052e16",
@@ -49,9 +65,22 @@ defmodule Parapet.OperatorUIContrastTest do
 
   test "semantic operator tokens meet contrast minimums" do
     for {theme, tokens} <- @themes do
+      assert_contrast(theme, :header_title, tokens.header_title, tokens.header_bg, 4.5)
+      assert_contrast(theme, :header_muted, tokens.header_muted, tokens.header_bg, 4.5)
       assert_contrast(theme, :link, tokens.link, tokens.panel, 4.5)
       assert_contrast(theme, :link_hover, tokens.link_hover, tokens.panel, 4.5)
+      assert_contrast(theme, :nav, tokens.nav_fg, tokens.header_bg, 4.5)
+      assert_contrast(theme, :nav_hover, tokens.nav_hover_fg, tokens.nav_hover_bg, 4.5)
       assert_contrast(theme, :nav_active, tokens.nav_active_fg, tokens.nav_active_bg, 4.5)
+
+      assert_contrast(
+        theme,
+        :theme_control,
+        tokens.theme_control_fg,
+        tokens.theme_control_bg,
+        4.5
+      )
+
       assert_contrast(theme, :neutral_chip, tokens.neutral_fg, tokens.neutral_bg, 4.5)
       assert_contrast(theme, :success_chip, tokens.success_fg, tokens.success_bg, 4.5)
       assert_contrast(theme, :warning_chip, tokens.warning_fg, tokens.warning_bg, 4.5)
@@ -76,10 +105,20 @@ defmodule Parapet.OperatorUIContrastTest do
       assert content =~ "po-chip-warning"
       assert content =~ "po-button-warning"
       assert content =~ "po-link"
+      assert content =~ "--po-header-bg"
+      assert content =~ "--po-theme-control-bg"
+      assert content =~ "po-operator-header"
+      assert content =~ "po-operator-brand"
+      assert content =~ "po-theme-control"
+      assert content =~ "po-theme-option"
       assert content =~ "po-nav-active"
       assert content =~ ~S|aria-label="Close Recovery Preview"|
 
       refute content =~ "text-blue-600"
+      refute content =~ "border-stone-900/10 bg-stone-950 text-stone-50"
+      refute content =~ "text-teal-300"
+      refute content =~ "text-white\">Active response workbench"
+      refute content =~ "bg-stone-900 px-1 py-1 ring-1 ring-stone-700"
       refute content =~ "bg-teal-400 text-stone-950"
       refute content =~ "bg-amber-100 text-amber"
       refute content =~ "text-[10px]"
