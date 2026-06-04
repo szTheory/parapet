@@ -13,7 +13,7 @@
 |---:|---|---|---|
 | 37 | 3/3 | Complete    | 2026-06-04 |
 | 38 | 3/3 | Complete    | 2026-06-04 |
-| 39 | Adoption Proof | Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers. | ADOPT-01, ADOPT-02, ADOPT-03 |
+| 39 | 1/2 | In Progress|  |
 
 ## Phase Details
 
@@ -57,12 +57,12 @@ Plans:
 
 **Goal:** Update docs and proof surfaces so archive maintenance and scoped UI mounting are understandable and supportable by strangers.
 
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 39-01-PLAN.md — Archive and scoped UI adoption docs with focused guard tests
+- [x] 39-01-PLAN.md — Archive and scoped UI adoption docs with focused guard tests
 
 **Wave 2** *(blocked on Wave 1 completion)*
 

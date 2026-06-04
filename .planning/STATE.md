@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.4
 milestone_name: Trust Hardening & Host-App Compatibility
 status: executing
-last_updated: "2026-06-04T21:21:54.721Z"
-last_activity: 2026-06-04 -- Phase 39 planning complete
+last_updated: "2026-06-04T21:30:44.996Z"
+last_activity: 2026-06-04
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 8
-  completed_plans: 6
-  percent: 67
+  completed_plans: 7
+  percent: 88
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-04 after starting v1.4 Trust Hardening & Host-App Compatibility)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 39 — adoption proof
+**Current focus:** Phase 39 — Adoption Proof
 
 ## Current Position
 
-Phase: 39
-Plan: Not started
+Phase: 39 (Adoption Proof) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-06-04 -- Phase 39 planning complete
+Last activity: 2026-06-04
 
 ## Performance Metrics
 
@@ -83,6 +83,7 @@ Last activity: 2026-06-04 -- Phase 39 planning complete
 | Phase 37 P03 | 7 min | 2 tasks | 2 files |
 | Phase 38 P01 | 8min | 3 tasks | 5 files |
 | Phase 38 P03 | 4min | 3 tasks | 6 files |
+| Phase 39 P01 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Recent decisions affecting current work:
 - [Phase 38]: Document scoped mounting as host-owned router guidance rather than adding a mix parapet.gen.ui option. — Preserves host router ownership and keeps the generator CLI stable.
 - [Phase 38]: Treat Phoenix entries in mix.lock as transitive dependency evidence while rejecting direct root :phoenix and :phoenix_live_view deps. — The lockfile already contains Phoenix through existing transitive packages, so the root dependency contract is the stable boundary.
 - [Phase 38]: Keep external links outside operator_base_path; only local Operator UI emitters are routed through scoped helpers. — External evidence links must stay external while scoped route helpers cover host-local navigation.
+- [Phase 39]: Plan 01 documented scoped UI mounting as host-owned router and auth guidance — Preserves the Phase 38 decision to avoid generator flags and Parapet-owned router abstractions.
+- [Phase 39]: Plan 01 kept adoption proof to documentation and ExUnit docs guards only — No runtime, API, dependency, auth, router ownership, or install-surface changes were introduced.
 
 ### Pending Todos
 
@@ -136,10 +139,10 @@ None. v1.3 closed with 13/13 requirements satisfied, milestone audit passed, and
 
 ## Session Continuity
 
-Last session: 2026-06-04T20:59:24.026Z
-Stopped at: Phase 39 UI-SPEC approved
-Resume file: .planning/phases/39-adoption-proof/39-UI-SPEC.md
-Next step: Discuss Phase 39
+Last session: 2026-06-04T21:30:03.765Z
+Stopped at: Completed 39-01-PLAN.md
+Resume file: None
+Next step: Execute 39-02-PLAN.md
 
 ## Operator Next Steps
 
