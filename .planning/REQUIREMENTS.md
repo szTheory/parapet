@@ -23,7 +23,7 @@
 
 - [x] **ADOPT-01**: README and docs explain archive maintenance in practical production terms: when to run it, what it preserves, what failure looks like, and how to recover.
 - [x] **ADOPT-02**: README and generated UI docs explain default and scoped Operator UI mounting with copy-pasteable Phoenix router examples and known gotchas.
-- [ ] **ADOPT-03**: The quality-evaluation artifact is updated or cross-referenced at milestone close so future milestone planning can see which top risks were actually closed.
+- [x] **ADOPT-03**: The quality-evaluation artifact is updated or cross-referenced at milestone close so future milestone planning can see which top risks were actually closed.
 
 ## Future Requirements
 
@@ -52,4 +52,4 @@
 | UIROUTE-03 | 38 | planned |
 | ADOPT-01 | 39 | complete |
 | ADOPT-02 | 39 | complete |
-| ADOPT-03 | 39 | planned |
+| ADOPT-03 | 39 | complete |
