@@ -114,133 +114,178 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   def render(assigns) do
     ~H"""
     <.operator_theme_bootstrap />
-    <div class="parapet-ui antialiased text-stone-900 flex h-screen flex-col overflow-hidden bg-stone-100">
+    <div class="parapet-ui antialiased flex min-h-screen flex-col bg-stone-100 text-stone-900">
       <.operator_nav active={@page_mode} />
 
-      <div class="border-b border-stone-200 bg-stone-50 px-4 py-3 md:px-6">
-        <.operator_overview
-          queue_page={@queue_page}
-          visible_incidents={@visible_incidents}
-          action_items={@action_items}
-          journeys={@journeys}
-          page_mode={@page_mode}
-        />
-      </div>
-
       <%= if @page_mode == :actions do %>
-        <main class="min-h-0 flex-1 overflow-y-auto bg-stone-50 px-4 py-6 md:px-8">
+        <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
           <div class="mx-auto max-w-5xl">
+            <.operator_overview
+              queue_page={@queue_page}
+              visible_incidents={@visible_incidents}
+              action_items={@action_items}
+              journeys={@journeys}
+              page_mode={@page_mode}
+            />
             <.action_center items={@action_items} />
           </div>
         </main>
       <% else %>
-        <div class="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row">
-      <div class={"w-full md:w-80 border-r border-stone-200 bg-white flex flex-col flex-shrink-0 #{queue_pane_visibility(@selection_source)}"}>
-        <div class="p-4 border-b border-stone-200 bg-stone-50">
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
-                <%= queue_scope_label(@queue_params["status"]) %>
-              </p>
-              <h2 class="mt-2 text-lg font-semibold text-stone-900">Incident Queue</h2>
-              <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
-            </div>
-            <.link
-              patch={history_path()}
-              class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
-            >
-              History
-            </.link>
-          </div>
-        </div>
-        <%= if @queue_refresh_available? do %>
-          <div class="border-b border-stone-200 bg-stone-100 px-4 py-3">
-            <p class="text-sm font-medium text-stone-800">New incidents or queue changes are available.</p>
-            <button
-              type="button"
-              phx-click="queue_refresh"
-              class="mt-3 flex min-h-[40px] items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-teal-800"
-            >
-              Load latest changes
-            </button>
-          </div>
-        <% end %>
-        <div class="flex-1 overflow-y-auto border-b border-stone-200">
-          <.incident_list
-            incidents={@visible_incidents}
-            selected={selected_queue_incident(@selected_incident)}
-            queue_params={@queue_params}
-          />
-        </div>
-        <div class="flex items-center justify-between gap-3 border-b border-stone-200 bg-stone-50 px-4 py-3">
-          <.link
-            patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
-            class={[
-              "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
-              pagination_link_class(@queue_page.has_previous_page?)
-            ]}
-          >
-            Previous
-          </.link>
-          <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced queue</p>
-          <.link
-            patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
-            class={[
-              "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
-              pagination_link_class(@queue_page.has_next_page?)
-            ]}
-          >
-            Next
-          </.link>
-        </div>
+        <%= if @page_mode == :history do %>
+          <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+            <div class="mx-auto max-w-6xl">
+              <.operator_overview
+                queue_page={@queue_page}
+                visible_incidents={@visible_incidents}
+                action_items={@action_items}
+                journeys={@journeys}
+                page_mode={@page_mode}
+              />
 
-        <div class="p-4 border-b border-stone-200 bg-stone-50">
-          <h2 class="text-lg font-semibold text-stone-900">Action Items</h2>
-        </div>
-        <div class="flex-1 overflow-y-auto bg-stone-50">
-          <.action_item_list items={@action_items} />
-        </div>
-      </div>
+              <section class="mt-6 rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6">
+                <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                  <div>
+                    <p class="text-sm font-semibold uppercase tracking-[0.16em] text-stone-500">Resolved history</p>
+                    <h2 class="mt-1 text-2xl font-semibold text-stone-950 text-balance">Review resolved incidents</h2>
+                    <p class="mt-2 max-w-2xl text-sm text-stone-600">
+                      Use history to inspect completed evidence, retrospective notes, and operator actions without mixing them into the active response queue.
+                    </p>
+                  </div>
+                  <.link navigate="/parapet" class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+                    Return to Response
+                  </.link>
+                </div>
 
-      <div class={"flex-1 flex-col md:flex-row min-w-0 bg-stone-50 #{detail_pane_visibility(@selected_incident, @selection_source)}"}>
-        <div class={["md:hidden p-4 border-b border-stone-200 bg-white", if(@selection_source == :explicit, do: "block", else: "hidden")]}>
-          <.link patch={queue_path(@queue_params, %{})} class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium">
-            &larr; Back to active response
-          </.link>
-        </div>
+                <.incident_list
+                  incidents={@visible_incidents}
+                  selected={nil}
+                  queue_params={@queue_params}
+                  page_mode={@page_mode}
+                />
 
-        <div class="flex-1 flex flex-col min-w-0 bg-white border-r border-stone-200">
-          <%= if @selected_incident do %>
-            <div class="p-6 border-b border-stone-200">
-              <.incident_summary detail={@selected_incident} />
+                <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
+                  <.link
+                    patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+                    class={[
+                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                      pagination_link_class(@queue_page.has_previous_page?)
+                    ]}
+                  >
+                    Newer
+                  </.link>
+                  <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Resolved archive</p>
+                  <.link
+                    patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+                    class={[
+                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                      pagination_link_class(@queue_page.has_next_page?)
+                    ]}
+                  >
+                    Older
+                  </.link>
+                </div>
+              </section>
             </div>
-            <div class="flex-1 overflow-y-auto p-6">
-              <.incident_timeline detail={@selected_incident} />
-            </div>
-          <% else %>
-            <div class="flex-1 flex items-center justify-center p-8 text-stone-500">
-              <div class="max-w-md rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
-                <p class="text-sm font-semibold text-stone-800">No incident selected</p>
-                <p class="mt-2 text-sm text-stone-500">
-                  Active incidents appear in the queue. Select one to review impact, evidence, and the next safe action.
-                </p>
+          </main>
+      <% else %>
+          <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+            <div class="mx-auto max-w-7xl">
+              <.response_cockpit
+                detail={@selected_incident}
+                visible_incidents={@visible_incidents}
+                action_items={@action_items}
+                journeys={@journeys}
+              />
+
+              <%= if @queue_refresh_available? do %>
+                <div class="mt-4 rounded-xl bg-teal-50 px-4 py-3 shadow-sm ring-1 ring-teal-200">
+                  <p class="text-sm font-medium text-teal-950">New incidents or queue changes are available.</p>
+                  <button
+                    type="button"
+                    phx-click="queue_refresh"
+                    class="mt-3 flex min-h-[40px] items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+                  >
+                    Load Latest Changes
+                  </button>
+                </div>
+              <% end %>
+
+              <div class="mt-6 grid gap-6 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+                <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-5">
+                  <div class="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <p class="text-sm font-semibold uppercase tracking-[0.16em] text-stone-500">
+                        <%= queue_scope_label(@queue_params["status"]) %>
+                      </p>
+                      <h2 class="mt-1 text-xl font-semibold text-stone-950">Incident Queue</h2>
+                      <p class="mt-1 text-sm text-stone-600"><%= queue_window_copy(@queue_page, @visible_incidents) %></p>
+                    </div>
+                    <.link
+                      patch={history_path()}
+                      class="text-sm font-medium text-stone-700 underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
+                    >
+                      History
+                    </.link>
+                  </div>
+                  <.incident_list
+                    incidents={@visible_incidents}
+                    selected={selected_queue_incident(@selected_incident)}
+                    queue_params={@queue_params}
+                    page_mode={@page_mode}
+                  />
+                  <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
+                    <.link
+                      patch={queue_page_path(@queue_params, @queue_page.previous_cursor, "previous")}
+                      class={[
+                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                        pagination_link_class(@queue_page.has_previous_page?)
+                      ]}
+                    >
+                      Previous
+                    </.link>
+                    <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced</p>
+                    <.link
+                      patch={queue_page_path(@queue_params, @queue_page.next_cursor, "next")}
+                      class={[
+                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                        pagination_link_class(@queue_page.has_next_page?)
+                      ]}
+                    >
+                      Next
+                    </.link>
+                  </div>
+                </section>
+
+                <section class="min-w-0 rounded-xl bg-white shadow-sm ring-1 ring-stone-900/5">
+                  <%= if @selected_incident do %>
+                    <div class="border-b border-stone-200 p-4 md:p-6">
+                      <.incident_summary detail={@selected_incident} />
+                    </div>
+                    <div class="grid gap-0 lg:grid-cols-[minmax(0,1fr)_22rem]">
+                      <div class="min-w-0 p-4 md:p-6">
+                        <h3 class="mb-4 text-lg font-semibold text-stone-950">Evidence Timeline</h3>
+                        <.incident_timeline detail={@selected_incident} />
+                      </div>
+                      <aside class="border-t border-stone-200 bg-stone-50 p-4 lg:border-l lg:border-t-0">
+                        <h3 class="mb-4 text-sm font-semibold uppercase tracking-[0.16em] text-stone-700">Next Safe Actions</h3>
+                        <.action_rail detail={@selected_incident} />
+                      </aside>
+                    </div>
+                  <% else %>
+                    <div class="flex min-h-[28rem] items-center justify-center p-8 text-stone-500">
+                      <div class="max-w-md rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+                        <p class="text-sm font-semibold text-stone-800">No incident selected</p>
+                        <p class="mt-2 text-sm text-stone-500">
+                          Active incidents appear in the queue. Select one to review impact, evidence, and the next safe action.
+                        </p>
+                      </div>
+                    </div>
+                  <% end %>
+                </section>
               </div>
             </div>
-          <% end %>
-        </div>
-
-        <%= if @selected_incident do %>
-          <div class="w-full md:w-80 bg-stone-50 flex flex-col flex-shrink-0">
-            <div class="p-4 border-b border-stone-200 bg-white md:bg-transparent">
-              <h3 class="text-sm font-semibold text-stone-700 uppercase tracking-wider">Actions</h3>
-            </div>
-            <div class="p-4 overflow-y-auto">
-              <.action_rail detail={@selected_incident} />
-            </div>
-          </div>
+          </main>
         <% end %>
-      </div>
-        </div>
       <% end %>
     </div>
     """
@@ -252,9 +297,13 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     %{id: incident.id}
   end
 
-  defp selected_incident(%{"id" => id}, _page_mode, _visible_incidents)
+  defp selected_incident(%{"id" => id}, _page_mode, visible_incidents)
        when is_binary(id) and id != "" do
-    {Parapet.Operator.incident_detail(id), :explicit}
+    if Enum.any?(visible_incidents, &(&1.id == id)) do
+      {Parapet.Operator.incident_detail(id), :explicit}
+    else
+      selected_incident(%{}, :response, visible_incidents)
+    end
   end
 
   defp selected_incident(_params, :response, [%{id: id} | _visible_incidents]) do
@@ -262,14 +311,6 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   end
 
   defp selected_incident(_params, _page_mode, _visible_incidents), do: {nil, :none}
-
-  defp queue_pane_visibility(:explicit), do: "hidden md:flex"
-  defp queue_pane_visibility(_selection_source), do: "flex"
-
-  defp detail_pane_visibility(nil, _selection_source), do: "hidden md:flex"
-  defp detail_pane_visibility(_selected_incident, :explicit), do: "flex"
-  defp detail_pane_visibility(_selected_incident, :auto), do: "hidden md:flex"
-  defp detail_pane_visibility(_selected_incident, _selection_source), do: "hidden md:flex"
 
   defp queue_stream_item(item) do
     item

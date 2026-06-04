@@ -34,6 +34,7 @@ defmodule DemoApp.MixProject do
       {:bandit, "~> 1.5"},
       {:phoenix_html, "~> 4.1"},
       {:jason, "~> 1.2"},
+      {:peep, "~> 4.4"},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:tailwind, "~> 0.2", runtime: Mix.env() == :dev},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},

@@ -5,4 +5,8 @@ defmodule DemoApp.ParapetInstrumenter do
     Parapet.Metrics.Probe.setup()
     :ok
   end
+
+  def metrics do
+    Parapet.Metrics.HTTP.metrics() ++ Parapet.Metrics.Probe.metrics()
+  end
 end

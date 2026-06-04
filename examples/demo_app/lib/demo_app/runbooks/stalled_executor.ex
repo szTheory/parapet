@@ -6,12 +6,15 @@ defmodule DemoApp.Runbooks.StalledExecutor do
 
   step(:investigate_logs,
     label: "Check Worker Logs",
-    description: "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
+    description:
+      "Verify if the worker process crashed without reporting, or if it is currently deadlocked.",
     type: :manual,
     kind: :guidance,
     preview_only: true,
-    guidance: "Search your APM for the worker executing this item. Look for crash reports, timeout events, or lock-acquisition failures around the item's last-attempt timestamp.",
-    warning: "If logs show the item is still actively executing, do not retry — a concurrent retry will cause a duplicate execution race. Wait for the current attempt to complete or time out first."
+    guidance:
+      "Search your APM for the worker executing this item. Look for crash reports, timeout events, or lock-acquisition failures around the item's last-attempt timestamp.",
+    warning:
+      "If logs show the item is still actively executing, do not retry — a concurrent retry will cause a duplicate execution race. Wait for the current attempt to complete or time out first."
   )
 
   step(:retry_item,
@@ -22,7 +25,8 @@ defmodule DemoApp.Runbooks.StalledExecutor do
     capability: :retry_async_item,
     target_kind: :async_item,
     requires_preview: true,
-    warning: "Retrying without identifying the root cause may reproduce the deadlock. Confirm the underlying resource or lock contention is resolved before proceeding."
+    warning:
+      "Retrying without identifying the root cause may reproduce the deadlock. Confirm the underlying resource or lock contention is resolved before proceeding."
   )
 
   step(:verify_recovery,
@@ -31,6 +35,7 @@ defmodule DemoApp.Runbooks.StalledExecutor do
     type: :manual,
     kind: :guidance,
     preview_only: true,
-    guidance: "Check the item's status in the job backend — it should transition from executing or scheduled to completed. Verify in your APM that no new stall events have occurred for this item."
+    guidance:
+      "Check the item's status in the job backend — it should transition from executing or scheduled to completed. Verify in your APM that no new stall events have occurred for this item."
   )
 end

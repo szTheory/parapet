@@ -8,8 +8,7 @@ defmodule DemoAppWeb.Endpoint do
     same_site: "Lax"
   ]
 
-  socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [session: @session_options]]
+  socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
   plug Plug.Static,
     at: "/",
@@ -24,6 +23,7 @@ defmodule DemoAppWeb.Endpoint do
 
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+  plug Peep.Plug, peep_worker: :parapet_demo_metrics
 
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],

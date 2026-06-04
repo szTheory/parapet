@@ -205,8 +205,11 @@ defmodule DemoApp.RecoveryLoopTest do
       idempotency_key: Ecto.UUID.generate()
     }
 
-    result_1 = Parapet.Operator.confirm_runbook_step(incident, :retry_item, token, confirm_payload_1)
-    result_2 = Parapet.Operator.confirm_runbook_step(incident, :retry_item, token, confirm_payload_2)
+    result_1 =
+      Parapet.Operator.confirm_runbook_step(incident, :retry_item, token, confirm_payload_1)
+
+    result_2 =
+      Parapet.Operator.confirm_runbook_step(incident, :retry_item, token, confirm_payload_2)
 
     assert {:ok, _} = result_1
     assert {:conflicted, _claim_id} = result_2
