@@ -11,9 +11,9 @@
 
 ## Brand Pressure-Test
 
-- [ ] **BRAND-01**: A maintainer can read a single distilled brand reference (`brandbook/notes/research.md`) capturing the research doc's load-bearing values — color tokens with roles, type scale, spacing/radius/shadow tokens, voice rules, the four logo directions, and the AVOID list — each cited back to `prompts/parapet-brand-identity-deep-research.md`, with no value re-derived or invented.
-- [ ] **BRAND-02**: Every text-on-surface token pairing in the brand palette is checked for WCAG AA contrast and recorded in `brandbook/notes/accessibility.md`, flagging any failing pair, so token usage in the brand book is provably accessible.
-- [ ] **BRAND-03**: `brandbook/notes/decision-log.md` records why the existing `docs/assets/parapet-logo.svg`/`favicon.svg` are off-brand (off-palette `#0f172a`/`#38bdf8`, Arial, rectangular background cage, detached lockup) as explicit anti-criteria, alongside a frozen logo acceptance checklist (transparent, no cage, unified mark+type, no primary subtitle, ≥1 integrated typemark, palette-locked, favicon-legible at 16px).
+- [x] **BRAND-01**: A maintainer can read a single distilled brand reference (`brandbook/notes/research.md`) capturing the research doc's load-bearing values — color tokens with roles, type scale, spacing/radius/shadow tokens, voice rules, the four logo directions, and the AVOID list — each cited back to `prompts/parapet-brand-identity-deep-research.md`, with no value re-derived or invented.
+- [x] **BRAND-02**: Every text-on-surface token pairing in the brand palette is checked for WCAG AA contrast and recorded in `brandbook/notes/accessibility.md`, flagging any failing pair, so token usage in the brand book is provably accessible.
+- [x] **BRAND-03**: `brandbook/notes/decision-log.md` records why the existing `docs/assets/parapet-logo.svg`/`favicon.svg` are off-brand (off-palette `#0f172a`/`#38bdf8`, Arial, rectangular background cage, detached lockup) as explicit anti-criteria, alongside a frozen logo acceptance checklist (transparent, no cage, unified mark+type, no primary subtitle, ≥1 integrated typemark, palette-locked, favicon-legible at 16px).
 
 ## Logo System
 
@@ -61,9 +61,9 @@ Explicitly excluded for this milestone, with reasoning, to prevent scope creep.
 
 | Requirement | Phase | Status |
 |---|---:|---|
-| BRAND-01 | 40 | Pending |
-| BRAND-02 | 40 | Pending |
-| BRAND-03 | 40 | Pending |
+| BRAND-01 | 40 | Complete |
+| BRAND-02 | 40 | Complete |
+| BRAND-03 | 40 | Complete |
 | LOGO-01 | 41 | Pending |
 | LOGO-02 | 41 | Pending |
 | LOGO-03 | 41 | Pending |

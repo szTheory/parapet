@@ -19,7 +19,7 @@
 
 ### Phase Checklist
 
-- [ ] **Phase 40: Brand Pressure-Test & Critique Gate** - Distill brand reference, build WCAG AA matrix, freeze logo acceptance checklist
+- [x] **Phase 40: Brand Pressure-Test & Critique Gate** - Distill brand reference, build WCAG AA matrix, freeze logo acceptance checklist
 - [ ] **Phase 41: Logo Exploration & User Selection Gate** - Author 4 SVG directions, render gallery, await user selection (hard gate)
 - [ ] **Phase 42: Token System & HTML Brand Book** - Emit tokens, expand logo variations, build self-contained HTML brand book *(blocked on Phase 41 user selection)*
 - [ ] **Phase 43: Collateral, Wiring & QA/Audit Gate** - Build collateral, swap HexDocs assets, pass hygiene audit *(blocked on Phase 42)*
@@ -108,7 +108,7 @@
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 40. Brand Pressure-Test & Critique Gate | 0/? | Not started | - |
+| 40. Brand Pressure-Test & Critique Gate | 1/1 | Complete | 2026-06-23 |
 | 41. Logo Exploration & User Selection Gate | 0/? | Not started | - |
 | 42. Token System & HTML Brand Book | 0/? | Not started | - |
 | 43. Collateral, Wiring & QA/Audit Gate | 0/? | Not started | - |
