@@ -27,7 +27,24 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Current milestone:** None. v1.4 is archived; the next milestone should be defined from the remaining quality-evaluation findings and strategic follow-up candidates.
+**Current milestone:** v1.5 Brand Book & Logo System (started 2026-06-23).
+
+## Current Milestone: v1.5 Brand Book & Logo System
+
+**Goal:** Operationalize the existing text-only brand research (`prompts/parapet-brand-identity-deep-research.md`) into a shippable, self-contained, repo-lean HTML brand book under `brandbook/` — with real on-brand hand-authored SVG logo assets (presented as options for selection), design tokens (CSS + JSON), and marketing/UI collateral — and replace the off-brand HexDocs logo/favicon.
+
+**Target features:**
+- Brand pressure-test — distill the research doc's load-bearing values (tokens, type scale, voice, logo directions) into a working reference with a WCAG contrast matrix and a frozen logo acceptance checklist; document why the existing `docs/assets/*.svg` is off-brand.
+- Logo system — 4 distinct on-brand, transparent, hand-authored SVG directions (incl. ≥1 fully-integrated typemark) rendered in a side-by-side comparison gallery; user selects one before downstream build (hard human gate).
+- Design tokens — `tokens.css` (custom properties) + `tokens.json`, emitted verbatim from the research doc with no re-derivation.
+- HTML brand book — self-contained `brandbook/index.html` (logo gallery, color system, type scale, spacing/radius/shadow tokens, voice/microcopy, do/don't, accessibility), opens from `file://` with no build step.
+- Collateral + wiring — component/landing/readme-header examples on tokens; replace `docs/assets/parapet-logo.svg` + `favicon.svg` with on-brand winners (paths unchanged → zero-config HexDocs swap).
+
+**Key context:**
+- Self-contained in `brandbook/`; no unrelated diffs. SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. Size budget ≤ ~250 KB.
+- Logo constraints (user-stated, non-negotiable): no rectangular background cage; unified mark+type (never icon-left-of-plain-text); no subtitle on the primary lockup (separate optional tagline lockup); ≥1 fully-integrated typemark; hand-authored SVG.
+- Existing `docs/assets/parapet-logo.svg` / `favicon.svg` are off-brand (Tailwind `#0f172a`/`#38bdf8`, Arial, `rx` background cage, detached lockup) and are replaced this milestone.
+- Approved plan: `/Users/jon/.claude/plans/existing-brand-book-is-jaunty-mitten.md`.
 
 ## Last Milestone: v1.4 Trust Hardening & Host-App Compatibility
 
@@ -176,7 +193,12 @@ Define the next milestone with `$gsd-new-milestone`. Candidate inputs include th
 
 ### Active
 
-No active requirements. A fresh `.planning/REQUIREMENTS.md` will be created by the next `$gsd-new-milestone` run.
+Milestone v1.5 Brand Book & Logo System — see `.planning/REQUIREMENTS.md`:
+
+- BRAND-01 to BRAND-03 — brand pressure-test reference, WCAG contrast matrix, off-brand critique + frozen logo acceptance checklist
+- LOGO-01 to LOGO-04 — 4 on-brand hand-authored SVG logo directions, side-by-side comparison gallery, monochrome/16px reduction proof, user selection gate
+- TOKEN-01 to TOKEN-03 — `tokens.css` + `tokens.json` from the research doc, full winning-logo variation set, self-contained `index.html` brand book
+- COLLAT-01 to COLLAT-03 — collateral examples (components/landing/readme-header), HexDocs logo/favicon replacement, repo-hygiene audit
 
 Dropped:
 
@@ -299,4 +321,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-04 after v1.4 Trust Hardening & Host-App Compatibility milestone*
+*Last updated: 2026-06-23 — started v1.5 Brand Book & Logo System milestone*
