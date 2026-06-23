@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-labelledby="t d">
+  <title id="t">Parapet mark — P monogram</title>
+  <desc id="d">A squared P with a crenellated bowl and a signal slot through its counter.</desc>
+  <g fill="#2E3A42">
+    <rect x="16" y="12" width="9" height="40"/>
+    <rect x="25" y="12" width="7" height="8"/>
+    <rect x="32" y="16" width="6" height="4"/>
+    <rect x="38" y="12" width="8" height="8"/>
+    <rect x="40" y="12" width="6" height="24"/>
+    <rect x="25" y="28" width="21" height="8"/>
+  </g>
+  <rect x="28" y="22.5" width="14" height="3" fill="#256C82"/>
+</svg>

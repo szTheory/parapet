@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 64" width="208" height="64" role="img" aria-labelledby="t d">
+  <title id="t">Parapet</title>
+  <desc id="d">Direction A — a low stepped parapet wall whose openings are signal windows, with a calm sightline showing through, beside the Parapet wordmark.</desc>
+  <line x1="2" y1="37" x2="62" y2="37" stroke="#256C82" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M8 50 L8 34 L18 34 L18 40 L28 40 L28 34 L38 34 L38 40 L46 40 L46 34 L56 34 L56 50 Z" fill="#2E3A42"/>
+  <line x1="4" y1="53.5" x2="196" y2="53.5" stroke="#D8D0C3" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="78" y="44" font-family="'IBM Plex Sans', Inter, ui-sans-serif, system-ui, sans-serif" font-size="32" font-weight="600" letter-spacing="0.2" fill="#101820">Parapet</text>
+</svg>

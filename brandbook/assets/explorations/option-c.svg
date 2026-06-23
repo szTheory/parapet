@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 64" width="210" height="64" role="img" aria-labelledby="t d">
+  <title id="t">Parapet</title>
+  <desc id="d">Direction C — a P-as-parapet monogram: a squared P with a crenellated bowl and a signal slot through its counter, beside the wordmark.</desc>
+  <g fill="#2E3A42">
+    <rect x="16" y="12" width="9" height="40"/>
+    <rect x="25" y="12" width="7" height="8"/>
+    <rect x="32" y="16" width="6" height="4"/>
+    <rect x="38" y="12" width="8" height="8"/>
+    <rect x="40" y="12" width="6" height="24"/>
+    <rect x="25" y="28" width="21" height="8"/>
+  </g>
+  <rect x="28" y="22.5" width="14" height="3" fill="#256C82"/>
+  <text x="70" y="44" font-family="'IBM Plex Sans', Inter, ui-sans-serif, system-ui, sans-serif" font-size="32" font-weight="600" letter-spacing="0.2" fill="#101820">Parapet</text>
+</svg>

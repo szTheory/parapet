@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parapet — Logo Directions (selection gate)</title>
+<style>
+  :root{
+    --parapet-black:#101820; --deep-slate:#18232B; --wall-slate:#2E3A42;
+    --stone:#D8D0C3; --mortar:#EAE2D4; --limestone:#F8F4EC;
+    --watch-blue:#256C82; --beacon-amber:#B45309; --budget-moss:#567236; --incident-red:#B13A32;
+    --font-sans:"IBM Plex Sans",Inter,ui-sans-serif,system-ui,sans-serif;
+    --font-mono:"IBM Plex Mono","SFMono-Regular",Consolas,"Liberation Mono",monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--limestone);color:var(--parapet-black);
+       font-family:var(--font-sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1040px;margin:0 auto;padding:48px 32px 80px}
+  header.intro{border-bottom:1px solid rgba(16,24,32,.12);padding-bottom:28px;margin-bottom:8px}
+  h1{font-size:40px;line-height:1.08;font-weight:600;margin:0 0 8px}
+  h2{font-size:30px;line-height:1.16;font-weight:600;margin:0}
+  .lede{font-size:18px;max-width:70ch;color:#2E3A42}
+  .gate{display:inline-block;margin-top:16px;padding:6px 12px;border-radius:999px;
+        background:var(--watch-blue);color:var(--limestone);font-size:13px;font-weight:600;letter-spacing:.3px}
+  .crit{font-family:var(--font-mono);font-size:13px;background:var(--mortar);
+        border-left:3px solid var(--watch-blue);padding:14px 18px;border-radius:6px;margin:22px 0 0}
+  .crit b{font-family:var(--font-sans)}
+  section.opt{margin-top:56px;padding-top:28px;border-top:1px solid rgba(16,24,32,.12)}
+  .opthead{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .tag{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--watch-blue)}
+  .rationale{font-size:16px;color:#2E3A42;margin:8px 0 4px;max-width:74ch}
+  .meta{font-size:13px;color:var(--wall-slate);margin:2px 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
+  .cell{border:1px solid rgba(16,24,32,.12);border-radius:10px;overflow:hidden}
+  .swatch{display:flex;align-items:center;justify-content:center;padding:22px 16px;min-height:96px}
+  .bg-lime{background:var(--limestone)}
+  .bg-slate{background:var(--deep-slate)}
+  .bg-stone{background:var(--stone)}
+  .label{font-family:var(--font-mono);font-size:11px;color:var(--wall-slate);
+         background:var(--mortar);padding:6px 10px;border-top:1px solid rgba(16,24,32,.12)}
+  .bg-slate + .label{}
+  img.lockup{height:34px;width:auto;display:block}
+  img.lockup.hero{height:46px}
+  img.mk64{height:56px;width:auto}
+  img.mk16{height:16px;width:auto;image-rendering:auto}
+  .row{display:flex;align-items:center;gap:28px;flex-wrap:wrap;margin-top:14px}
+  .stack{display:flex;flex-direction:column;align-items:center;gap:8px}
+  .stack .cap{font-family:var(--font-mono);font-size:11px;color:var(--wall-slate)}
+  .mono img{filter:grayscale(1) contrast(1.04)}
+  .mini{display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px dashed rgba(16,24,32,.2);border-radius:8px}
+  .mini.bg-slate{border-color:rgba(248,244,236,.22)}
+  footer{margin-top:64px;padding-top:28px;border-top:1px solid rgba(16,24,32,.12);font-size:15px;color:#2E3A42}
+  code{font-family:var(--font-mono);font-size:.92em;background:var(--mortar);padding:1px 6px;border-radius:4px}
+  .legend{font-size:13px;color:var(--wall-slate);margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="intro">
+  <h1>Parapet — Logo Directions</h1>
+  <p class="lede">Four on-brand, hand-authored SVG directions for the Parapet identity. Each is grounded in a named direction from the brand research doc, palette-locked, transparent (no background cage), with the mark and wordmark visually unified. <strong>Pick one direction</strong> (or a blend) — the winner is then refined into the full variation set in Phase&nbsp;42.</p>
+  <span class="gate">Selection gate · Phase 41 (LOGO-04)</span>
+  <p class="crit"><b>Every direction is judged against the frozen acceptance checklist:</b> transparent · palette-locked · on-brand IBM&nbsp;Plex type · unified mark+type · calm/architectural (not neon) · no primary subtitle · on-metaphor (off the AVOID list) · survives mono + 16px.
+  <br><br><b>Note on type:</b> wordmarks here render in live IBM&nbsp;Plex Sans (with a system fallback) so you can compare directions fairly. The winning wordmark is hand-refined into outlined, font-independent paths in Phase&nbsp;42 — no font binaries are committed.</p>
+</header>
+
+<!-- ============ OPTION A ============ -->
+<section class="opt">
+  <div class="opthead"><h2>Direction A — Stepped parapet</h2><span class="tag">research §6.2 (1) · stepped mark</span></div>
+  <p class="rationale">The headline metaphor made literal: a crenellated low wall whose <em>openings</em> are signal windows. A Watch&nbsp;Blue sightline runs behind the wall and shows through the gaps — telemetry seen through the parapet. Mark and wordmark stand on one shared stone ground line.</p>
+  <p class="meta">Spawns: primary lockup · logomark · favicon · mono · inverse. Strong, distinctive, unmistakably "parapet."</p>
+  <div class="grid">
+    <div class="cell"><div class="swatch bg-lime"><img class="lockup hero" src="../assets/explorations/option-a.svg" alt="Direction A lockup on limestone"></div><div class="label">Lockup · Limestone</div></div>
+    <div class="cell"><div class="swatch bg-slate"><img class="lockup hero" src="../assets/explorations/option-a.svg" alt="Direction A lockup on deep slate"></div><div class="label">Lockup · Deep Slate (note: dark needs inverse variant in P42)</div></div>
+    <div class="cell"><div class="swatch bg-stone"><img class="lockup hero" src="../assets/explorations/option-a.svg" alt="Direction A lockup on stone"></div><div class="label">Lockup · Stone</div></div>
+  </div>
+  <div class="row">
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-a-mark.svg" alt="A mark 64"></div><div class="cap">mark · 64px</div></div>
+    <div class="stack"><div class="mini bg-lime"><img class="mk16" src="../assets/explorations/option-a-mark.svg" alt="A favicon 16"><span style="font-family:var(--font-mono);font-size:11px;color:var(--wall-slate)">16px favicon</span></div><div class="cap">reduction test</div></div>
+    <div class="stack mono"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-a-mark.svg" alt="A mark grayscale"></div><div class="cap">grayscale (mono proof)</div></div>
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:8px 12px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="lockup" src="../assets/explorations/option-a.svg" alt="A lockup inline"></div><div class="cap">inline · 34px</div></div>
+  </div>
+</section>
+
+<!-- ============ OPTION B ============ -->
+<section class="opt">
+  <div class="opthead"><h2>Direction B — Integrated typemark</h2><span class="tag">required typemark · motif in the word</span></div>
+  <p class="rationale">No separate icon. The wordmark itself <em>wears</em> a stepped parapet crown and stands on a single calm sightline — the metaphor is built into the logotype. The most "designed type treatment," and the one that reads as one indivisible unit.</p>
+  <p class="meta">Spawns: typemark (primary) · crowned-P favicon · mono · inverse · tagline lockup. Satisfies the "fully-integrated typemark" requirement.</p>
+  <div class="grid">
+    <div class="cell"><div class="swatch bg-lime"><img class="lockup hero" src="../assets/explorations/option-b.svg" alt="Direction B on limestone"></div><div class="label">Typemark · Limestone</div></div>
+    <div class="cell"><div class="swatch bg-slate"><img class="lockup hero" src="../assets/explorations/option-b.svg" alt="Direction B on deep slate"></div><div class="label">Typemark · Deep Slate (inverse in P42)</div></div>
+    <div class="cell"><div class="swatch bg-stone"><img class="lockup hero" src="../assets/explorations/option-b.svg" alt="Direction B on stone"></div><div class="label">Typemark · Stone</div></div>
+  </div>
+  <div class="row">
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-b-mark.svg" alt="B mark 64"></div><div class="cap">crowned P · 64px</div></div>
+    <div class="stack"><div class="mini bg-lime"><img class="mk16" src="../assets/explorations/option-b-mark.svg" alt="B favicon 16"><span style="font-family:var(--font-mono);font-size:11px;color:var(--wall-slate)">16px favicon</span></div><div class="cap">reduction test</div></div>
+    <div class="stack mono"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-b-mark.svg" alt="B mark grayscale"></div><div class="cap">grayscale (mono proof)</div></div>
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:8px 12px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="lockup" src="../assets/explorations/option-b.svg" alt="B inline"></div><div class="cap">inline · 34px</div></div>
+  </div>
+</section>
+
+<!-- ============ OPTION C ============ -->
+<section class="opt">
+  <div class="opthead"><h2>Direction C — P-as-parapet monogram</h2><span class="tag">research §6.2 (2) · avatar-first</span></div>
+  <p class="rationale">A bold squared <strong>P</strong> crowned with crenellation, with a Watch&nbsp;Blue signal slot passing through its counter (the "signal slot" idea). Built for square contexts — GitHub avatar, Hex icon, favicon — then paired with the wordmark for the horizontal lockup.</p>
+  <p class="meta">Spawns: avatar/logomark (primary use) · favicon · primary lockup · stacked · mono. Best small-size performer.</p>
+  <div class="grid">
+    <div class="cell"><div class="swatch bg-lime"><img class="lockup hero" src="../assets/explorations/option-c.svg" alt="Direction C on limestone"></div><div class="label">Lockup · Limestone</div></div>
+    <div class="cell"><div class="swatch bg-slate"><img class="lockup hero" src="../assets/explorations/option-c.svg" alt="Direction C on deep slate"></div><div class="label">Lockup · Deep Slate (inverse in P42)</div></div>
+    <div class="cell"><div class="swatch bg-stone"><img class="lockup hero" src="../assets/explorations/option-c.svg" alt="Direction C on stone"></div><div class="label">Lockup · Stone</div></div>
+  </div>
+  <div class="row">
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-c-mark.svg" alt="C mark 64"></div><div class="cap">monogram · 64px</div></div>
+    <div class="stack"><div class="mini bg-lime"><img class="mk16" src="../assets/explorations/option-c-mark.svg" alt="C favicon 16"><span style="font-family:var(--font-mono);font-size:11px;color:var(--wall-slate)">16px favicon</span></div><div class="cap">reduction test</div></div>
+    <div class="stack mono"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-c-mark.svg" alt="C mark grayscale"></div><div class="cap">grayscale (mono proof)</div></div>
+    <div class="stack"><div class="swatch bg-stone" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-c-mark.svg" alt="C mark on stone"></div><div class="cap">avatar · on stone</div></div>
+  </div>
+</section>
+
+<!-- ============ OPTION D ============ -->
+<section class="opt">
+  <div class="opthead"><h2>Direction D — Edge &amp; sightline</h2><span class="tag">research §6.2 (3) · minimalist</span></div>
+  <p class="rationale">The most restrained: a low parapet wall and the wordmark share <em>one continuous Watch&nbsp;Blue sightline</em>, with a stone horizon above (seeing over the edge, not hiding behind a fortress). The shared line physically bridges mark and type.</p>
+  <p class="meta">Spawns: lockup · logomark · mono · inverse. Elegant in one color. <strong>Known tradeoff:</strong> weakest standalone at 16px — see favicon cell.</p>
+  <div class="grid">
+    <div class="cell"><div class="swatch bg-lime"><img class="lockup hero" src="../assets/explorations/option-d.svg" alt="Direction D on limestone"></div><div class="label">Lockup · Limestone</div></div>
+    <div class="cell"><div class="swatch bg-slate"><img class="lockup hero" src="../assets/explorations/option-d.svg" alt="Direction D on deep slate"></div><div class="label">Lockup · Deep Slate (inverse in P42)</div></div>
+    <div class="cell"><div class="swatch bg-stone"><img class="lockup hero" src="../assets/explorations/option-d.svg" alt="Direction D on stone"></div><div class="label">Lockup · Stone</div></div>
+  </div>
+  <div class="row">
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-d-mark.svg" alt="D mark 64"></div><div class="cap">mark · 64px</div></div>
+    <div class="stack"><div class="mini bg-lime"><img class="mk16" src="../assets/explorations/option-d-mark.svg" alt="D favicon 16"><span style="font-family:var(--font-mono);font-size:11px;color:var(--wall-slate)">16px favicon</span></div><div class="cap">reduction test (watch this one)</div></div>
+    <div class="stack mono"><div class="swatch bg-lime" style="min-height:0;padding:10px 14px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="mk64" src="../assets/explorations/option-d-mark.svg" alt="D mark grayscale"></div><div class="cap">grayscale (mono proof)</div></div>
+    <div class="stack"><div class="swatch bg-lime" style="min-height:0;padding:8px 12px;border:1px solid rgba(16,24,32,.12);border-radius:8px"><img class="lockup" src="../assets/explorations/option-d.svg" alt="D inline"></div><div class="cap">inline · 34px</div></div>
+  </div>
+</section>
+
+<footer>
+  <p><strong>How to choose:</strong> pick the direction whose <em>mark</em> you'd be happy to see as the GitHub/Hex avatar and favicon, and whose <em>lockup</em> feels like Parapet (calm, architectural, evidence-first). You can also say "B's typemark but with A's wall mark" or request tweaks (weight, spacing, a different signal color). Reply with <code>A</code>, <code>B</code>, <code>C</code>, or <code>D</code>.</p>
+  <p class="legend">Once chosen, Phase 42 produces the full set — primary lockup (no subtitle), integrated typemark, icon-only, stacked, monochrome, inverse, optional tagline lockup, favicon — plus <code>tokens.css</code> / <code>tokens.json</code> and the full HTML brand book.</p>
+</footer>
+
+</div>
+</body>
+</html>
