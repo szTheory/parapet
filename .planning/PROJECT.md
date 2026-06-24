@@ -27,7 +27,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Current milestone:** v1.5 Brand Book & Logo System (started 2026-06-23).
+**Shipped:** v1.5 Brand Book & Logo System (2026-06-24) — Operationalized the brand research into a repo-lean (192 KB) self-contained HTML brand book under `brandbook/`: locked corbelled-tower stacked emblem (Space Grotesk, outlined), CSS+JSON design tokens, WCAG matrix, component/landing/README collateral, and a zero-config swap of the off-brand HexDocs logo + favicon. SVG/HTML/CSS/JSON only — no rasters or font binaries; public API and telemetry contract untouched. 4/4 phases, 13/13 requirements (see `.planning/milestones/v1.5-MILESTONE-AUDIT.md`).
 
 ## Current Milestone: v1.5 Brand Book & Logo System
 
@@ -321,4 +321,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-23 — started v1.5 Brand Book & Logo System milestone*
+*Last updated: 2026-06-24 — completed v1.5 Brand Book & Logo System milestone (Phase 43 final)*
