@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Brand Book & Logo System
-status: planning
-last_updated: "2026-06-23T00:00:00.000Z"
-last_activity: 2026-06-23
+status: executing
+last_updated: "2026-06-24T00:00:00.000Z"
+last_activity: 2026-06-24
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 3
   total_plans: 0
   completed_plans: 0
-  percent: 0
+  percent: 75
 ---
 
 # Project State
@@ -20,16 +20,19 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-23 after v1.5 Brand Book & Logo System milestone started)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** v1.5 Brand Book & Logo System — Phase 40 (Brand Pressure-Test & Critique Gate)
+**Current focus:** v1.5 Brand Book & Logo System — Phase 43 (Collateral, Wiring & QA/Audit Gate)
 
 ## Current Position
 
-Phase: 40 — Brand Pressure-Test & Critique Gate
-Plan: —
-Status: Ready to plan
-Last activity: 2026-06-23 — Roadmap created for v1.5
+Phase: 43 — Collateral, Wiring & QA/Audit Gate (FINAL)
+Plan: see `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff)
+Status: Ready to execute — Phases 40–42 complete
+Last activity: 2026-06-24 — Phase 42 done (tokens + HTML brand book); logo identity LOCKED
 
-Progress: `░░░░░░░░░░` 0% (0/4 phases complete)
+Progress: `███████░░░` 75% (3/4 phases complete)
+
+**Done:** Phase 40 (`09e1cb8` research/WCAG/critique) · Phase 41 (`6a1c519` logo locked after 6-round tournament — corbelled-tower stacked emblem, Space Grotesk, outlined) · Phase 42 (`e1bf9db` tokens.css/json + index.html brand book + 9 logo assets).
+**Remaining (Phase 43):** collateral examples (components/landing/readme-header) · swap live HexDocs logo+favicon (`docs/assets/*.svg`, zero-config) · trim exploration HTMLs · QA + `v1.5-MILESTONE-AUDIT.md` + MILESTONES.md.
 
 ## Performance Metrics
 
@@ -77,7 +80,7 @@ None.
 
 ### Blockers/Concerns
 
-Phase 41 contains a hard human gate (LOGO-04). Execution must pause after the comparison gallery is built and wait for the user to record their logo selection in `brandbook/notes/decision-log.md` before Phase 42 can begin.
+None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-emblem identity (decision-log.md D-003). Phase 43's only outward-facing change is the HexDocs logo/favicon swap (user pre-approved; zero-config, path-stable).
 
 ## Candidate Work
 
@@ -91,11 +94,13 @@ Phase 41 contains a hard human gate (LOGO-04). Execution must pause after the co
 
 ## Session Continuity
 
-Last session: 2026-06-23
-Stopped at: Roadmap created, STATE.md initialized for v1.5
-Resume file: None
-Next step: Plan Phase 40 with `/gsd-plan-phase 40`
+Last session: 2026-06-24
+Stopped at: Phases 40–42 complete and committed; logo identity locked. Queued Phase 43 for a fresh context.
+Resume file: `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff — read first)
+Next step: Execute Phase 43 (collateral + HexDocs wiring + cleanup + audit)
 
 ## Operator Next Steps
 
-- Plan Phase 40: `/gsd-plan-phase 40`
+- New context: read `.planning/phases/43-collateral-wiring/43-CONTEXT.md`, then execute Phase 43.
+- Build collateral (`brandbook/examples/`), swap `docs/assets/parapet-logo.svg`+`favicon.svg`, verify `mix docs`, trim exploration HTMLs, write `v1.5-MILESTONE-AUDIT.md`.
+- Do NOT re-open the logo — it is locked (decision-log.md D-003).
