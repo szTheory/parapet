@@ -10,10 +10,12 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
-**Shipped:** v1.4 Trust Hardening & Host-App Compatibility (2026-06-04) — Closed the repo-evidenced adoption-trust gaps most likely to hurt real host-app use: archive/export/prune now preserves complete Parapet-owned evidence bundles or fails loudly with structured run context; generated Operator UI links and patches respect default and nested host scopes such as `/ops/parapet`; and first-contact docs explain archive maintenance, scoped mounting, and the v1.4 quality-evaluation closeout.
+**Shipped:** v1.5 Brand Book & Logo System (2026-06-24) — Operationalized the brand research into a repo-lean (192 KB) self-contained HTML brand book under `brandbook/`: locked corbelled-tower stacked emblem (Space Grotesk, outlined to paths), CSS+JSON design tokens, a WCAG AA contrast matrix, component/landing/README collateral, and a zero-config swap of the off-brand HexDocs logo + favicon. SVG/HTML/CSS/JSON only — no rasters or font binaries; public API and telemetry contract untouched. 4/4 phases, 13/13 requirements (see `.planning/milestones/v1.5-MILESTONE-AUDIT.md`).
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.4 Trust Hardening & Host-App Compatibility (2026-06-04) — Closed the repo-evidenced adoption-trust gaps most likely to hurt real host-app use: archive/export/prune now preserves complete Parapet-owned evidence bundles or fails loudly with structured run context; generated Operator UI links and patches respect default and nested host scopes such as `/ops/parapet`; and first-contact docs explain archive maintenance, scoped mounting, and the v1.4 quality-evaluation closeout.
 
 **Previously shipped:** v1.3 Operator UI Polish & Design System (2026-06-04) — Completed the generated Operator UI polish pass: reframed `/parapet` around active response, explicit response/actions/history lanes, and preferred incident detail navigation; consolidated generated Tailwind component helpers and audit-safe action copy; expanded demo state coverage; and captured browser screenshot proof across desktop and mobile routes.
 
@@ -27,37 +29,7 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
-**Shipped:** v1.5 Brand Book & Logo System (2026-06-24) — Operationalized the brand research into a repo-lean (192 KB) self-contained HTML brand book under `brandbook/`: locked corbelled-tower stacked emblem (Space Grotesk, outlined), CSS+JSON design tokens, WCAG matrix, component/landing/README collateral, and a zero-config swap of the off-brand HexDocs logo + favicon. SVG/HTML/CSS/JSON only — no rasters or font binaries; public API and telemetry contract untouched. 4/4 phases, 13/13 requirements (see `.planning/milestones/v1.5-MILESTONE-AUDIT.md`).
-
-## Current Milestone: v1.5 Brand Book & Logo System
-
-**Goal:** Operationalize the existing text-only brand research (`prompts/parapet-brand-identity-deep-research.md`) into a shippable, self-contained, repo-lean HTML brand book under `brandbook/` — with real on-brand hand-authored SVG logo assets (presented as options for selection), design tokens (CSS + JSON), and marketing/UI collateral — and replace the off-brand HexDocs logo/favicon.
-
-**Target features:**
-- Brand pressure-test — distill the research doc's load-bearing values (tokens, type scale, voice, logo directions) into a working reference with a WCAG contrast matrix and a frozen logo acceptance checklist; document why the existing `docs/assets/*.svg` is off-brand.
-- Logo system — 4 distinct on-brand, transparent, hand-authored SVG directions (incl. ≥1 fully-integrated typemark) rendered in a side-by-side comparison gallery; user selects one before downstream build (hard human gate).
-- Design tokens — `tokens.css` (custom properties) + `tokens.json`, emitted verbatim from the research doc with no re-derivation.
-- HTML brand book — self-contained `brandbook/index.html` (logo gallery, color system, type scale, spacing/radius/shadow tokens, voice/microcopy, do/don't, accessibility), opens from `file://` with no build step.
-- Collateral + wiring — component/landing/readme-header examples on tokens; replace `docs/assets/parapet-logo.svg` + `favicon.svg` with on-brand winners (paths unchanged → zero-config HexDocs swap).
-
-**Key context:**
-- Self-contained in `brandbook/`; no unrelated diffs. SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. Size budget ≤ ~250 KB.
-- Logo constraints (user-stated, non-negotiable): no rectangular background cage; unified mark+type (never icon-left-of-plain-text); no subtitle on the primary lockup (separate optional tagline lockup); ≥1 fully-integrated typemark; hand-authored SVG.
-- Existing `docs/assets/parapet-logo.svg` / `favicon.svg` are off-brand (Tailwind `#0f172a`/`#38bdf8`, Arial, `rx` background cage, detached lockup) and are replaced this milestone.
-- Approved plan: `/Users/jon/.claude/plans/existing-brand-book-is-jaunty-mitten.md`.
-
-## Last Milestone: v1.4 Trust Hardening & Host-App Compatibility
-
-**Goal:** Close the repo-evidenced quality gaps most likely to make adopters lose trust without broadening Parapet's public product surface.
-
-**Delivered:**
-- Archive/export/prune durability for complete Parapet-owned incident evidence bundles, including incidents, timeline entries, tool audits, action items, and action claims.
-- Structured archive Summary/Failure result contracts surfaced through the library, Mix task, and optional Oban worker.
-- Scoped generated Operator UI route helpers for default `/parapet` and nested host scopes such as `/ops/parapet`, mirrored into the demo app and smoke-tested.
-- Default and scoped Phoenix router examples plus troubleshooting notes for archive maintenance and generated UI mounting.
-- Dated quality-evaluation closeout that identifies the v1.4 risks closed without erasing unrelated future quality candidates.
-
-## Previous Posture: Released Maintenance
+## Posture: Released Maintenance
 
 **Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
 
@@ -80,7 +52,12 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Next Milestone Goals
 
-Define the next milestone with `$gsd-new-milestone`. Candidate inputs include the still-open quality-evaluation findings, long-tail cross-boundary journey correlation, MCP/recovery extensions after MCP stability improves, and any concrete release-readiness gaps found after v1.4 adoption hardening.
+Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate inputs:
+
+- **Brand follow-ups deferred from v1.5** (see candidate list): self-hosted webfont bundle, raster/OpenGraph exports, token → Tailwind/daisyUI theme generator + HEEx snippets, retheme of the generated Operator LiveView UI to the new tokens.
+- Still-open quality-evaluation findings carried from prior milestones.
+- Long-tail cross-boundary journey correlation; MCP/recovery extensions after MCP stability improves.
+- Any concrete release-readiness gaps found after v1.5 adoption.
 
 ## Requirements
 
@@ -190,15 +167,14 @@ Define the next milestone with `$gsd-new-milestone`. Candidate inputs include th
 - ✓ Per-integration guides — consistent Sigra/Accrue/Rulestead/Threadline guides (prerequisites, honest "what it unlocks", uniform activation line, config keys, troubleshooting), backed by a new `Parapet.Integration` behaviour that makes `Parapet.attach(adapters: […])` uniform and crash-proof across all eight adapters (fixes the Rulestead `attach/0` defect) — v0.10 Phase 18 (ADOPT-05)
 - ✓ SLO authoring guide — journey-slicing decision tree with good-vs-bad examples anchored to the real WebSaaS slices — v0.10 Phase 18 (SLO-03)
 - ✓ Low-traffic / low-volume SLO guardrails — documents the exact engine output (the rendered `min_total_rate: 0.01` denominator guard, the six multi-burn windows, synthetic-probe fallback) and names the "lower-the-objective" anti-pattern explicitly — v0.10 Phase 18 (SLO-04)
+- ✓ Brand pressure-test — distilled cite-backed brand reference, WCAG AA contrast matrix, and frozen off-brand anti-criteria + logo acceptance checklist — v1.5 (BRAND-01 to BRAND-03)
+- ✓ Logo system — locked corbelled-tower stacked emblem (Space Grotesk, outlined) via a 6-round comparison-gallery tournament with monochrome/16px reduction proof and a hard human selection gate — v1.5 (LOGO-01 to LOGO-04)
+- ✓ Token system & HTML brand book — `tokens.css` + `tokens.json` verbatim from the research doc, full winning-logo variation set, and a self-contained `file://`-openable `brandbook/index.html` — v1.5 (TOKEN-01 to TOKEN-03)
+- ✓ Collateral, wiring & hygiene — token-driven component/landing/README collateral, zero-config path-stable HexDocs logo/favicon swap, and a passing repo-hygiene audit (palette-clean, binary-free, 192 KB) — v1.5 (COLLAT-01 to COLLAT-03)
 
 ### Active
 
-Milestone v1.5 Brand Book & Logo System — see `.planning/REQUIREMENTS.md`:
-
-- BRAND-01 to BRAND-03 — brand pressure-test reference, WCAG contrast matrix, off-brand critique + frozen logo acceptance checklist
-- LOGO-01 to LOGO-04 — 4 on-brand hand-authored SVG logo directions, side-by-side comparison gallery, monochrome/16px reduction proof, user selection gate
-- TOKEN-01 to TOKEN-03 — `tokens.css` + `tokens.json` from the research doc, full winning-logo variation set, self-contained `index.html` brand book
-- COLLAT-01 to COLLAT-03 — collateral examples (components/landing/readme-header), HexDocs logo/favicon replacement, repo-hygiene audit
+Next milestone not yet defined — start with `$gsd-new-milestone`. Candidate inputs are listed under **Next Milestone Goals** above.
 
 Dropped:
 
@@ -233,6 +209,7 @@ Shipped v1.1 Actionable Recovery adding an operator-in-the-loop action execution
 Shipped v1.2 Authoring DX & Maturity adding ETS-backed state isolation for SLO/capability registries, a flag-based SLO Igniter task, CI matrix and supply-chain hardening, migration/deployment guides, release-maintenance docs, HexDocs branding, and a validated demo Compose path.
 Shipped v1.3 Operator UI Polish & Design System adding active-response-first generated UI navigation, private Tailwind helper families, richer demo state coverage, and browser screenshot proof without adding repo dependencies.
 Shipped v1.4 Trust Hardening & Host-App Compatibility adding durable archive evidence bundles and structured failure context, scoped generated Operator UI routes for host-owned mount paths, and copy-pasteable adoption docs backed by focused guard tests.
+Shipped v1.5 Brand Book & Logo System: a docs/brand-assets-only milestone (no source, public API, or telemetry change) operationalizing the 1,874-line brand research into a self-contained 192 KB `brandbook/` — a locked corbelled-tower stacked emblem (Space Grotesk, outlined to paths) chosen via a 6-round tournament, CSS+JSON design tokens, a WCAG AA matrix, `file://`-openable HTML brand book + collateral, and a zero-config path-stable swap of the off-brand HexDocs logo/favicon. SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. 4 phases / 11 plans over 2 days; audit `passed` 13/13.
 
 ## Constraints
 
@@ -302,6 +279,11 @@ Shipped v1.4 Trust Hardening & Host-App Compatibility adding durable archive evi
 | Structured archive failures over silent success | Summary/Failure tuples and CLI failure context make partial archive persistence/export/delete failures actionable | ✓ Good |
 | Scoped route ownership stays in generated host-owned code | Supports `/parapet` and nested scopes like `/ops/parapet` without adding Parapet router/auth ownership or generator flags | ✓ Good |
 | Quality closeout as dated addendum | Preserves the original quality evaluation as historical input while documenting exactly which v1.4 risks closed | ✓ Good |
+| Repo-lean brand book: SVG/HTML/CSS/JSON only, zero binaries | Keeps `brandbook/` at 192 KB (≤ 250 KB), enforced by a grep/`du`/scope QA gate — no raster or font bloat creeping into the repo | ✓ Good |
+| Logo outlined to paths, not font-dependent | Assets render identically everywhere without shipping a font binary; preserves the repo-lean constraint while keeping the Space Grotesk typemark exact | ✓ Good |
+| Hard human selection gate before downstream brand work | A 6-round tournament locked the identity (D-003) before any token or brand-book build — prevents rework on a contested mark | ✓ Good |
+| Zero-config path-stable HexDocs swap | Replaced `docs/assets/parapet-logo.svg`/`favicon.svg` in place so `mix.exs` doc paths stay unchanged — on-brand HexDocs with no config edit | ✓ Good |
+| Brand research is operationalized, not re-litigated | Every token/value cited back to the source research doc; nothing re-derived — keeps the brand strategy single-sourced | ✓ Good |
 
 ## Evolution
 

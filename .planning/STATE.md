@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Brand Book & Logo System
 current_phase: 43
-status: verifying
-stopped_at: Session resumed — context restored; proceeding to plan Phase 43 (final).
+status: shipped
+stopped_at: v1.5 milestone archived and tagged. Next milestone not yet defined.
 last_updated: "2026-06-24T18:06:07.391Z"
 last_activity: 2026-06-24
-last_activity_desc: Phase 43 complete
+last_activity_desc: v1.5 milestone complete — archived, PROJECT.md evolved, tagged v1.5
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 5
-  completed_plans: 6
-  percent: 75
+  completed_phases: 4
+  total_plans: 4
+  completed_plans: 4
+  percent: 100
 current_phase_name: collateral-wiring
 ---
 
@@ -21,19 +21,18 @@ current_phase_name: collateral-wiring
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-23 after v1.5 Brand Book & Logo System milestone started)
+See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo System milestone completed)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 43 — collateral-wiring
+**Current focus:** Planning next milestone — run `/gsd-new-milestone`
 
 ## Current Position
 
-Phase: 43
-Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-06-24 — Phase 43 complete
+Milestone: v1.5 Brand Book & Logo System — ✅ SHIPPED 2026-06-24 (tagged `v1.5`)
+Status: Milestone complete — archived to `.planning/milestones/v1.5-*`
+Last activity: 2026-06-24 — v1.5 milestone closed
 
-Progress: `███████░░░` 75% (3/4 phases complete)
+Progress: `██████████` 100% (4/4 phases complete)
 
 **Done:** Phase 40 (`09e1cb8` research/WCAG/critique) · Phase 41 (`6a1c519` logo locked after 6-round tournament — corbelled-tower stacked emblem, Space Grotesk, outlined) · Phase 42 (`e1bf9db` tokens.css/json + index.html brand book + 9 logo assets).
 **Remaining (Phase 43):** collateral examples (components/landing/readme-header) · swap live HexDocs logo+favicon (`docs/assets/*.svg`, zero-config) · trim exploration HTMLs · QA + `v1.5-MILESTONE-AUDIT.md` + MILESTONES.md.

@@ -121,6 +121,42 @@
 - Keep validation metadata synchronized with verification reports, or milestone closeout will rediscover already-solved Wave 0 work.
 - Adoption docs benefit from link-target and output-shape assertions, not just broad phrase checks.
 
+## Milestone: v1.5 — Brand Book & Logo System
+
+**Shipped:** 2026-06-24
+**Phases:** 4 | **Plans:** 11
+
+### What Was Built
+- A distilled, cite-backed brand reference (`brandbook/notes/research.md`), a computed WCAG AA contrast matrix over 26 text pairings, and a frozen logo acceptance checklist with explicit off-brand anti-criteria — all before any SVG was authored.
+- A locked corbelled-tower stacked-emblem logo (Space Grotesk tight-caps, outlined to paths, single Watch Blue loophole accent) chosen via a 6-round interactive comparison-gallery tournament, with monochrome and 16px-favicon legibility proven before selection.
+- A complete design-token system (`tokens.css` + matching `tokens.json`) emitted verbatim from the research doc, the full 9-SVG logo variation set, and a self-contained `file://`-openable HTML brand book.
+- Three token-driven collateral artifacts (component gallery, landing hero, README/social banner), a zero-config path-stable swap of the off-brand HexDocs logo + favicon, and a passing repo-hygiene QA gate (palette-clean, binary-free, 192 KB).
+
+### What Worked
+- **Pressure-test-before-author gate (Phase 40):** distilling the 1,874-line research doc and freezing anti-criteria up front meant every later token and asset had a single cited source — nothing was re-derived or re-litigated.
+- **Hard human selection gate before downstream build:** locking the identity (D-003) after the tournament, before any token or brand-book work, prevented expensive rework on a contested mark.
+- **Repo-lean constraint enforced by an executable QA gate:** a grep (palette) + `find` (binaries) + `du` (size) + `git status` (scope) bash gate made "no bloat, no off-palette hex, no out-of-scope diff" a checkable property rather than a hope.
+- **Zero-config path-stable HexDocs swap:** replacing the assets in place left `mix.exs` untouched, so on-brand docs shipped with no config edit and no risk to the doc build.
+
+### What Was Inefficient
+- The logo took 6 tournament rounds to converge — early icon-beside-text directions were rejected for not being integrated, a constraint that could have been front-loaded harder from the acceptance checklist.
+- Outlining the typemark to paths (to avoid a font binary) is exact but makes future wordmark edits a re-outline rather than a text change.
+
+### Patterns Established
+- Brand/design milestones validate against artifact content + an executable hygiene gate + `file://` render proof, not ExUnit — and that is a sufficient, designed validation surface (no test files created or modified all milestone).
+- Programmatic logo design: real OFL fonts + path-outlining + headless-Chrome comparison galleries, never hand-built letterforms.
+- Keep docs/brand-asset milestones strictly scoped: SVG/HTML/CSS/JSON only, public API and telemetry contract frozen, diff scoped to `brandbook/` + `docs/assets/*.svg`.
+
+### Key Lessons
+- Front-load non-negotiable design constraints (integrated mark+type, no cage, no subtitle) into the acceptance checklist so the first tournament round already respects them.
+- A self-contained `file://`-openable artifact set (no build step, fonts degrade gracefully) is the cheapest way to make a brand book reviewable and durable.
+- For asset-only milestones, an explicit repo-lean budget with an automated check keeps a vector-first repo from accumulating binary bloat.
+
+### Cost Observations
+- Model mix: predominantly opus (design iteration + research distillation).
+- Sessions: spread across 2 days (2026-06-23 → 2026-06-24).
+- Notable: 28 commits, +4,044/−7,012 lines — net deletion, driven by trimming exploration HTMLs after the logo locked; final `brandbook/` footprint 192 KB.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -136,6 +172,7 @@
 | v1.2 | 4 / 6 | 1 | - | 6 plans / 1 day (maturity/docs-heavy) |
 | v1.3 | 3 / 4 | 1 | ~29632 | 4 plans / 1 day (UI polish/browser proof) |
 | v1.4 | 3 / 8 | 1 | - | 8 plans / 1 day (trust hardening/docs proof) |
+| v1.5 | 4 / 11 | 2 | - | 11 plans / 2 days (brand/design assets; +4044/−7012, brandbook 192 KB) |
 
 ## Milestone: v0.10 — Adopter Success
 
