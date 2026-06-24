@@ -28,3 +28,7 @@ parapet-*.tar
 generated_components.ex
 run_debug.exs
 test.exs
+
+# Python bytecode (brandbook logo generator)
+__pycache__/
+*.pyc
