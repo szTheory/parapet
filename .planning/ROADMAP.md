@@ -100,7 +100,10 @@
   3. The repo-hygiene audit passes: `brandbook/` is within the ≤ ~250 KB size budget, contains zero raster or font binaries, has no full-viewBox rectangular background in any logo asset, and has no off-palette hex in any SVG or CSS file.
   4. The git diff for this milestone is scoped exclusively to `brandbook/`, the two `docs/assets/*.svg` files, and the `mix.exs` doc block — no unrelated files are touched.
 
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
+- [ ] 43-02-PLAN.md — COLLAT-02: zero-config HexDocs logo/favicon swap + trim exploration HTMLs
+- [ ] 43-03-PLAN.md — COLLAT-03: repo-hygiene QA gate + v1.5 milestone audit + ledger updates
 
 ---
 
@@ -111,4 +114,4 @@
 | 40. Brand Pressure-Test & Critique Gate | 1/1 | Complete | 2026-06-23 |
 | 41. Logo Exploration & User Selection Gate | 6/6 | Complete | 2026-06-24 |
 | 42. Token System & HTML Brand Book | 3/3 | Complete | 2026-06-24 |
-| 43. Collateral, Wiring & QA/Audit Gate | 0/? | Not started | - |
+| 43. Collateral, Wiring & QA/Audit Gate | 0/3 | Not started | - |
