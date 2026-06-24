@@ -148,17 +148,86 @@ Explicitly excluded for this milestone, with reasoning, to prevent scope creep.
 
 ## Traceability
 
-Populated during roadmap creation (Phases 44–50). Each requirement maps to exactly one phase.
+Each requirement maps to exactly one phase (Phases 44–50).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| _pending roadmap_ | — | Pending |
+| TOKEN-01 | Phase 44 | Pending |
+| TOKEN-02 | Phase 44 | Pending |
+| TOKEN-03 | Phase 44 | Pending |
+| TOKEN-04 | Phase 44 | Pending |
+| TOKEN-05 | Phase 44 | Pending |
+| FONT-01 | Phase 44 | Pending |
+| FONT-02 | Phase 44 | Pending |
+| FONT-03 | Phase 44 | Pending |
+| A11Y-01 | Phase 44 | Pending |
+| MOTION-01 | Phase 44 | Pending |
+| GALLERY-01 | Phase 44 | Pending |
+| GUARD-01 | Phase 44 | Pending |
+| GUARD-02 | Phase 44 | Pending |
+| COMP-01 | Phase 45 | Pending |
+| COMP-02 | Phase 45 | Pending |
+| COMP-03 | Phase 45 | Pending |
+| COMP-04 | Phase 45 | Pending |
+| COMP-05 | Phase 45 | Pending |
+| COMP-06 | Phase 45 | Pending |
+| COMP-07 | Phase 45 | Pending |
+| COMP-08 | Phase 45 | Pending |
+| FORM-01 | Phase 45 | Pending |
+| FORM-02 | Phase 45 | Pending |
+| A11Y-02 | Phase 45 | Pending |
+| MOTION-02 | Phase 45 | Pending |
+| NAV-01 | Phase 46 | Pending |
+| NAV-02 | Phase 46 | Pending |
+| NAV-03 | Phase 46 | Pending |
+| NAV-04 | Phase 46 | Pending |
+| NAV-05 | Phase 46 | Pending |
+| DATA-01 | Phase 46 | Pending |
+| DATA-02 | Phase 46 | Pending |
+| DATA-03 | Phase 46 | Pending |
+| DATA-04 | Phase 46 | Pending |
+| DATA-05 | Phase 46 | Pending |
+| DATA-06 | Phase 46 | Pending |
+| A11Y-03 | Phase 46 | Pending |
+| A11Y-04 | Phase 46 | Pending |
+| GROUP-01 | Phase 47 | Pending |
+| GROUP-02 | Phase 47 | Pending |
+| GROUP-03 | Phase 47 | Pending |
+| GROUP-04 | Phase 47 | Pending |
+| GROUP-05 | Phase 47 | Pending |
+| GROUP-06 | Phase 47 | Pending |
+| A11Y-05 | Phase 47 | Pending |
+| MOTION-03 | Phase 47 | Pending |
+| FLOW-01 | Phase 48 | Pending |
+| FLOW-02 | Phase 48 | Pending |
+| FLOW-03 | Phase 48 | Pending |
+| FLOW-04 | Phase 48 | Pending |
+| FLOW-05 | Phase 48 | Pending |
+| COPY-01 | Phase 48 | Pending |
+| COPY-02 | Phase 48 | Pending |
+| COPY-03 | Phase 48 | Pending |
+| COPY-04 | Phase 48 | Pending |
+| COPY-05 | Phase 48 | Pending |
+| A11Y-06 | Phase 48 | Pending |
+| FIXTURE-01 | Phase 49 | Pending |
+| FIXTURE-02 | Phase 49 | Pending |
+| FIXTURE-03 | Phase 49 | Pending |
+| FIXTURE-04 | Phase 49 | Pending |
+| FIXTURE-05 | Phase 49 | Pending |
+| GALLERY-02 | Phase 49 | Pending |
+| GUARD-03 | Phase 50 | Pending |
+| GUARD-04 | Phase 50 | Pending |
+| GUARD-05 | Phase 50 | Pending |
+| GUARD-06 | Phase 50 | Pending |
+| GUARD-07 | Phase 50 | Pending |
 
 **Coverage:**
-- v1 requirements: 56 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 56 ⚠️
+- v1 requirements: 68 total
+- Mapped to phases: 68 ✓
+- Unmapped: 0 ✓
+
+> Note: an earlier draft of this file's Coverage block stated "56 total." The enumerated REQ-ID set (TOKEN 5 · FONT 3 · COMP 8 · FORM 2 · NAV 5 · DATA 6 · GROUP 6 · FLOW 5 · A11Y 6 · MOTION 3 · COPY 5 · FIXTURE 5 · GALLERY 2 · GUARD 7) totals **68**. The roadmap maps all 68 to exactly one phase each with zero duplicates.
 
 ---
 *Requirements defined: 2026-06-24*
-*Last updated: 2026-06-24 after initial definition*
+*Last updated: 2026-06-24 — roadmap created (Phases 44–50), traceability filled, coverage 68/68 mapped*
