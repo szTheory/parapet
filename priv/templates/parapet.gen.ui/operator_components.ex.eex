@@ -5,113 +5,153 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   def operator_theme_bootstrap(assigns) do
     ~H"""
     <style>
+      @font-face {
+        font-family: "IBM Plex Sans";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/parapet/fonts/IBMPlexSans-Regular-latin.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Sans";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("/parapet/fonts/IBMPlexSans-Medium-latin.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Sans";
+        font-style: normal;
+        font-weight: 600;
+        font-display: swap;
+        src: url("/parapet/fonts/IBMPlexSans-SemiBold-latin.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: normal;
+        font-weight: 400;
+        font-display: swap;
+        src: url("/parapet/fonts/IBMPlexMono-Regular-latin.woff2") format("woff2");
+      }
+      @font-face {
+        font-family: "IBM Plex Mono";
+        font-style: normal;
+        font-weight: 500;
+        font-display: swap;
+        src: url("/parapet/fonts/IBMPlexMono-Medium-latin.woff2") format("woff2");
+      }
       .parapet-ui {
         color-scheme: light;
-        --parapet-bg: #f5f5f4;
-        --parapet-panel: #ffffff;
-        --parapet-panel-muted: #fafaf9;
-        --parapet-text: #1c1917;
-        --parapet-text-muted: #57534e;
-        --parapet-border: #e7e5e4;
-        --parapet-border-strong: rgba(28, 25, 23, 0.14);
-        --parapet-shadow: 0 1px 2px rgba(28, 25, 23, 0.06), 0 0 0 1px rgba(28, 25, 23, 0.04);
-        --parapet-accent: #0f766e;
-        --parapet-accent-strong: #0f5f59;
-        --parapet-accent-soft: #ccfbf1;
-        --parapet-accent-text: #115e59;
-        --parapet-warning-bg: #fffbeb;
-        --parapet-warning-text: #78350f;
-        --parapet-info-bg: #f5f3ff;
-        --parapet-info-text: #4c1d95;
-        --po-link: #1d4ed8;
-        --po-link-hover: #1e3a8a;
-        --po-focus: #0f766e;
+        --parapet-bg: #F8F4EC;
+        --parapet-panel: #FFFFFF;
+        --parapet-panel-muted: #EAE2D4;
+        --parapet-text: #101820;
+        --parapet-text-muted: #2E3A42;
+        --parapet-border: rgba(16,24,32,0.12);
+        --parapet-border-strong: rgba(16,24,32,0.14);
+        --parapet-shadow: 0 1px 2px rgba(16,24,32,0.06), 0 0 0 1px rgba(16,24,32,0.04);
+        --parapet-accent: #256C82;
+        --parapet-accent-strong: #1A5066;
+        --parapet-accent-soft: #EFF6E8;
+        --parapet-accent-text: #256C82;
+        --parapet-warning-bg: #F8EFD7;
+        --parapet-warning-text: #B45309;
+        --parapet-info-bg: #ECEBFF;
+        --parapet-info-text: #4F46A5;
+        --po-link: #256C82;
+        --po-link-hover: #1A5066;
+        --po-focus: #256C82;
         --po-focus-offset: #ffffff;
-        --po-header-bg: #ffffff;
-        --po-header-border: #e7e5e4;
-        --po-header-title: #1c1917;
-        --po-header-muted: #0f766e;
-        --po-nav-fg: #44403c;
-        --po-nav-hover-bg: #f5f5f4;
-        --po-nav-hover-fg: #1c1917;
-        --po-nav-active-bg: #5eead4;
-        --po-nav-active-fg: #042f2e;
-        --po-theme-control-bg: #fafaf9;
-        --po-theme-control-border: #d6d3d1;
-        --po-theme-control-fg: #44403c;
-        --po-chip-neutral-bg: #f5f5f4;
-        --po-chip-neutral-fg: #292524;
-        --po-chip-neutral-border: #d6d3d1;
-        --po-chip-success-bg: #dcfce7;
-        --po-chip-success-fg: #14532d;
-        --po-chip-success-border: #86efac;
-        --po-chip-warning-bg: #fef3c7;
-        --po-chip-warning-fg: #78350f;
-        --po-chip-warning-border: #f59e0b;
-        --po-chip-danger-bg: #ffe4e6;
-        --po-chip-danger-fg: #881337;
-        --po-chip-danger-border: #fda4af;
-        --po-chip-info-bg: #e0e7ff;
-        --po-chip-info-fg: #312e81;
-        --po-chip-info-border: #a5b4fc;
-        --po-button-warning-bg: #b45309;
+        --po-header-bg: #FFFFFF;
+        --po-header-border: rgba(16,24,32,0.12);
+        --po-header-title: #101820;
+        --po-header-muted: #256C82;
+        --po-nav-fg: #2E3A42;
+        --po-nav-hover-bg: #EAE2D4;
+        --po-nav-hover-fg: #101820;
+        --po-nav-active-bg: #EFF6E8;
+        --po-nav-active-fg: #3F5E28;
+        --po-theme-control-bg: #F8F4EC;
+        --po-theme-control-border: rgba(16,24,32,0.12);
+        --po-theme-control-fg: #2E3A42;
+        --po-chip-neutral-bg: #ECEFF1;
+        --po-chip-neutral-fg: #2E3A42;
+        --po-chip-neutral-border: #CBD2D8;
+        --po-chip-success-bg: #EFF6E8;
+        --po-chip-success-fg: #3F5E28;
+        --po-chip-success-border: #B6C99A;
+        --po-chip-warning-bg: #F8EFD7;
+        --po-chip-warning-fg: #92400E;
+        --po-chip-warning-border: #E3B66E;
+        --po-chip-danger-bg: #FCE8E2;
+        --po-chip-danger-fg: #9F2D2D;
+        --po-chip-danger-border: #E3A19A;
+        --po-chip-info-bg: #ECEBFF;
+        --po-chip-info-fg: #4F46A5;
+        --po-chip-info-border: #B9B5F6;
+        --po-button-warning-bg: #B45309;
         --po-button-warning-fg: #ffffff;
-        --po-button-warning-hover: #92400e;
+        --po-button-warning-hover: #92400E;
+        --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+        --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+        --motion-fast: 120ms;
+        --motion-base: 200ms;
+        --motion-ease: cubic-bezier(.2, 0, 0, 1);
       }
 
       html[data-parapet-theme="dark"] .parapet-ui,
       html[data-parapet-theme="system"] .parapet-ui:is(.force-system-dark) {
         color-scheme: dark;
-        --parapet-bg: #12100d;
-        --parapet-panel: #1c1917;
-        --parapet-panel-muted: #292524;
-        --parapet-text: #fafaf9;
-        --parapet-text-muted: #d6d3d1;
-        --parapet-border: #44403c;
-        --parapet-border-strong: rgba(250, 250, 249, 0.16);
-        --parapet-shadow: 0 1px 2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(250, 250, 249, 0.08);
-        --parapet-accent: #2dd4bf;
-        --parapet-accent-strong: #5eead4;
-        --parapet-accent-soft: rgba(45, 212, 191, 0.16);
-        --parapet-accent-text: #99f6e4;
-        --parapet-warning-bg: rgba(146, 64, 14, 0.24);
-        --parapet-warning-text: #fde68a;
-        --parapet-info-bg: rgba(76, 29, 149, 0.24);
-        --parapet-info-text: #ddd6fe;
-        --po-link: #93c5fd;
-        --po-link-hover: #bfdbfe;
-        --po-focus: #5eead4;
-        --po-focus-offset: #0c0a09;
-        --po-header-bg: #0c0a09;
-        --po-header-border: #292524;
-        --po-header-title: #fafaf9;
-        --po-header-muted: #5eead4;
-        --po-nav-fg: #e7e5e4;
-        --po-nav-hover-bg: #292524;
-        --po-nav-hover-fg: #ffffff;
-        --po-nav-active-bg: #5eead4;
-        --po-nav-active-fg: #042f2e;
-        --po-theme-control-bg: #1c1917;
-        --po-theme-control-border: #57534e;
-        --po-theme-control-fg: #e7e5e4;
-        --po-chip-neutral-bg: #292524;
-        --po-chip-neutral-fg: #f5f5f4;
-        --po-chip-neutral-border: #57534e;
-        --po-chip-success-bg: #052e16;
-        --po-chip-success-fg: #bbf7d0;
-        --po-chip-success-border: #22c55e;
-        --po-chip-warning-bg: #451a03;
-        --po-chip-warning-fg: #fde68a;
-        --po-chip-warning-border: #d97706;
-        --po-chip-danger-bg: #4c0519;
-        --po-chip-danger-fg: #fecdd3;
-        --po-chip-danger-border: #fb7185;
-        --po-chip-info-bg: #1e1b4b;
-        --po-chip-info-fg: #c7d2fe;
-        --po-chip-info-border: #818cf8;
-        --po-button-warning-bg: #92400e;
-        --po-button-warning-fg: #fff7ed;
-        --po-button-warning-hover: #78350f;
+        --parapet-bg: #18232B;
+        --parapet-panel: #2E3A42;
+        --parapet-panel-muted: #101820;
+        --parapet-text: #F8F4EC;
+        --parapet-text-muted: #D8D0C3;
+        --parapet-border: rgba(248,244,236,0.16);
+        --parapet-border-strong: rgba(248,244,236,0.20);
+        --parapet-shadow: 0 1px 2px rgba(0,0,0,0.42), 0 0 0 1px rgba(248,244,236,0.08);
+        --parapet-accent: #7FB4C6;
+        --parapet-accent-strong: #A8D0DE;
+        --parapet-accent-soft: rgba(37,108,130,0.16);
+        --parapet-accent-text: #A8D0DE;
+        --parapet-warning-bg: rgba(180,83,9,0.24);
+        --parapet-warning-text: #D97706;
+        --parapet-info-bg: rgba(109,91,208,0.24);
+        --parapet-info-text: #B9B5F6;
+        --po-link: #7FB4C6;
+        --po-link-hover: #A8D0DE;
+        --po-focus: #F8F4EC;
+        --po-focus-offset: #18232B;
+        --po-header-bg: #101820;
+        --po-header-border: rgba(248,244,236,0.16);
+        --po-header-title: #F8F4EC;
+        --po-header-muted: #7FB4C6;
+        --po-nav-fg: #D8D0C3;
+        --po-nav-hover-bg: #2E3A42;
+        --po-nav-hover-fg: #F8F4EC;
+        --po-nav-active-bg: #3F5E28;
+        --po-nav-active-fg: #F8F4EC;
+        --po-theme-control-bg: #18232B;
+        --po-theme-control-border: rgba(248,244,236,0.16);
+        --po-theme-control-fg: #D8D0C3;
+        --po-chip-neutral-bg: #2E3A42;
+        --po-chip-neutral-fg: #ECEFF1;
+        --po-chip-neutral-border: #556B77;
+        --po-chip-success-bg: #3F5E28;
+        --po-chip-success-fg: #EFF6E8;
+        --po-chip-success-border: #567236;
+        --po-chip-warning-bg: #92400E;
+        --po-chip-warning-fg: #F8EFD7;
+        --po-chip-warning-border: #B45309;
+        --po-chip-danger-bg: #9F2D2D;
+        --po-chip-danger-fg: #FCE8E2;
+        --po-chip-danger-border: #B13A32;
+        --po-chip-info-bg: #4F46A5;
+        --po-chip-info-fg: #ECEBFF;
+        --po-chip-info-border: #6D5BD0;
+        --po-button-warning-bg: #D97706;
+        --po-button-warning-fg: #F8F4EC;
+        --po-button-warning-hover: #B45309;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -123,56 +163,56 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         html:not([data-parapet-theme]) .parapet-ui,
         html[data-parapet-theme="system"] .parapet-ui {
           color-scheme: dark;
-          --parapet-bg: #12100d;
-          --parapet-panel: #1c1917;
-          --parapet-panel-muted: #292524;
-          --parapet-text: #fafaf9;
-          --parapet-text-muted: #d6d3d1;
-          --parapet-border: #44403c;
-          --parapet-border-strong: rgba(250, 250, 249, 0.16);
-          --parapet-shadow: 0 1px 2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(250, 250, 249, 0.08);
-          --parapet-accent: #2dd4bf;
-          --parapet-accent-strong: #5eead4;
-          --parapet-accent-soft: rgba(45, 212, 191, 0.16);
-          --parapet-accent-text: #99f6e4;
-          --parapet-warning-bg: rgba(146, 64, 14, 0.24);
-          --parapet-warning-text: #fde68a;
-          --parapet-info-bg: rgba(76, 29, 149, 0.24);
-          --parapet-info-text: #ddd6fe;
-          --po-link: #93c5fd;
-          --po-link-hover: #bfdbfe;
-          --po-focus: #5eead4;
-          --po-focus-offset: #0c0a09;
-          --po-header-bg: #0c0a09;
-          --po-header-border: #292524;
-          --po-header-title: #fafaf9;
-          --po-header-muted: #5eead4;
-          --po-nav-fg: #e7e5e4;
-          --po-nav-hover-bg: #292524;
-          --po-nav-hover-fg: #ffffff;
-          --po-nav-active-bg: #5eead4;
-          --po-nav-active-fg: #042f2e;
-          --po-theme-control-bg: #1c1917;
-          --po-theme-control-border: #57534e;
-          --po-theme-control-fg: #e7e5e4;
-          --po-chip-neutral-bg: #292524;
-          --po-chip-neutral-fg: #f5f5f4;
-          --po-chip-neutral-border: #57534e;
-          --po-chip-success-bg: #052e16;
-          --po-chip-success-fg: #bbf7d0;
-          --po-chip-success-border: #22c55e;
-          --po-chip-warning-bg: #451a03;
-          --po-chip-warning-fg: #fde68a;
-          --po-chip-warning-border: #d97706;
-          --po-chip-danger-bg: #4c0519;
-          --po-chip-danger-fg: #fecdd3;
-          --po-chip-danger-border: #fb7185;
-          --po-chip-info-bg: #1e1b4b;
-          --po-chip-info-fg: #c7d2fe;
-          --po-chip-info-border: #818cf8;
-          --po-button-warning-bg: #92400e;
-          --po-button-warning-fg: #fff7ed;
-          --po-button-warning-hover: #78350f;
+          --parapet-bg: #18232B;
+          --parapet-panel: #2E3A42;
+          --parapet-panel-muted: #101820;
+          --parapet-text: #F8F4EC;
+          --parapet-text-muted: #D8D0C3;
+          --parapet-border: rgba(248,244,236,0.16);
+          --parapet-border-strong: rgba(248,244,236,0.20);
+          --parapet-shadow: 0 1px 2px rgba(0,0,0,0.42), 0 0 0 1px rgba(248,244,236,0.08);
+          --parapet-accent: #7FB4C6;
+          --parapet-accent-strong: #A8D0DE;
+          --parapet-accent-soft: rgba(37,108,130,0.16);
+          --parapet-accent-text: #A8D0DE;
+          --parapet-warning-bg: rgba(180,83,9,0.24);
+          --parapet-warning-text: #D97706;
+          --parapet-info-bg: rgba(109,91,208,0.24);
+          --parapet-info-text: #B9B5F6;
+          --po-link: #7FB4C6;
+          --po-link-hover: #A8D0DE;
+          --po-focus: #F8F4EC;
+          --po-focus-offset: #18232B;
+          --po-header-bg: #101820;
+          --po-header-border: rgba(248,244,236,0.16);
+          --po-header-title: #F8F4EC;
+          --po-header-muted: #7FB4C6;
+          --po-nav-fg: #D8D0C3;
+          --po-nav-hover-bg: #2E3A42;
+          --po-nav-hover-fg: #F8F4EC;
+          --po-nav-active-bg: #3F5E28;
+          --po-nav-active-fg: #F8F4EC;
+          --po-theme-control-bg: #18232B;
+          --po-theme-control-border: rgba(248,244,236,0.16);
+          --po-theme-control-fg: #D8D0C3;
+          --po-chip-neutral-bg: #2E3A42;
+          --po-chip-neutral-fg: #ECEFF1;
+          --po-chip-neutral-border: #556B77;
+          --po-chip-success-bg: #3F5E28;
+          --po-chip-success-fg: #EFF6E8;
+          --po-chip-success-border: #567236;
+          --po-chip-warning-bg: #92400E;
+          --po-chip-warning-fg: #F8EFD7;
+          --po-chip-warning-border: #B45309;
+          --po-chip-danger-bg: #9F2D2D;
+          --po-chip-danger-fg: #FCE8E2;
+          --po-chip-danger-border: #B13A32;
+          --po-chip-info-bg: #4F46A5;
+          --po-chip-info-fg: #ECEBFF;
+          --po-chip-info-border: #6D5BD0;
+          --po-button-warning-bg: #D97706;
+          --po-button-warning-fg: #F8F4EC;
+          --po-button-warning-hover: #B45309;
         }
       }
 
@@ -321,11 +361,15 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       }
 
       @media (prefers-reduced-motion: reduce) {
+        :root {
+          --motion-fast: 0ms;
+          --motion-base: 0ms;
+        }
         .parapet-ui * {
-          animation-duration: 0.01ms;
-          animation-iteration-count: 1;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
           scroll-behavior: auto;
-          transition-duration: 0.01ms;
+          transition-duration: 0.01ms !important;
         }
       }
     </style>
