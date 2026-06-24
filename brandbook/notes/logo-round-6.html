@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parapet — Logo Round 6 (stacked emblem)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700&family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@600&family=Jost:wght@600&family=Space+Grotesk:wght@600&display=swap" rel="stylesheet">
+<style>
+  :root{--pb:#101820;--ds:#18232B;--ws:#2E3A42;--stone:#D8D0C3;--mortar:#EAE2D4;--lime:#F8F4EC;--blue:#256C82;
+    --ui:"IBM Plex Sans",system-ui,sans-serif;--mono:"IBM Plex Mono",monospace;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--lime);color:var(--pb);font-family:var(--ui);line-height:1.6}
+  .wrap{max-width:1060px;margin:0 auto;padding:48px 32px 80px}
+  h1{font-size:38px;font-weight:600;line-height:1.1;margin:0 0 8px}
+  .lede{font-size:18px;max-width:74ch;color:var(--ws)}
+  .note{font-family:var(--mono);font-size:13px;background:var(--mortar);border-left:3px solid var(--blue);padding:14px 18px;border-radius:6px;margin:20px 0 0}
+  h2.sec{font-size:14px;font-family:var(--mono);color:var(--ws);text-transform:uppercase;letter-spacing:1px;margin:34px 0 4px}
+  .marks{display:flex;gap:16px;flex-wrap:wrap}
+  .mc{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .mc .box{width:118px;height:118px;border:1px solid rgba(16,24,32,.12);border-radius:12px;display:flex;align-items:center;justify-content:center}
+  .mc .box.d{background:var(--ds)} .mc .box.s{background:var(--stone)}
+  .mc small{font-family:var(--mono);font-size:11px;color:var(--ws)}
+  .v{margin-top:22px;padding-top:18px;border-top:1px solid rgba(16,24,32,.12)}
+  .vh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+  .vh .id{font-family:var(--mono);font-weight:600;font-size:15px;color:var(--blue)}
+  .vh .nm{font-weight:600;font-size:18px}.vh .ds{font-size:14px;color:var(--ws)}
+  .rec{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--lime);background:var(--blue);padding:3px 8px;border-radius:999px}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .cell{border:1px solid rgba(16,24,32,.12);border-radius:10px;display:flex;flex-direction:column}
+  .pad{flex:1;display:flex;align-items:center;justify-content:center;height:150px;padding:16px;overflow:hidden}
+  .lite{background:var(--lime)}.dark{background:var(--ds)}
+  .lab{font-family:var(--mono);font-size:10px;color:var(--ws);background:var(--mortar);padding:4px 8px;border-top:1px solid rgba(16,24,32,.12);text-align:center}
+  svg.em{max-height:122px;width:auto;max-width:92%}
+  footer{margin-top:42px;padding-top:20px;border-top:1px solid rgba(16,24,32,.12);font-size:15px;color:var(--ws)}
+  code{font-family:var(--mono);background:var(--mortar);padding:1px 6px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Logo — Round 6 · stacked emblem</h1>
+<p class="lede">Locked direction: the <strong>corbelled parapet tower stacked above the wordmark</strong>. The symbol stands alone as the avatar/favicon, and the same symbol caps the full lockup. This round explores the pairing <em>within</em> that structure — typeface, case, tracking, mark size, and an on-brand sightline rule.</p>
+<p class="note">The mark alone = avatar / Hex icon / favicon. The stacked lockup = README / docs / site header. Pick a row (e.g. <code>S2</code>) or mix.</p>
+
+<h2 class="sec">The symbol, standalone</h2>
+<div class="marks">
+  <div class="mc"><div class="box"><svg viewBox="0 0 40 64" style="height:80px"><g id="mL"></g></svg></div><small>light</small></div>
+  <div class="mc"><div class="box d"><svg viewBox="0 0 40 64" style="height:80px"><g id="mD"></g></svg></div><small>dark</small></div>
+  <div class="mc"><div class="box s"><svg viewBox="0 0 40 64" style="height:80px"><g id="mS"></g></svg></div><small>stone</small></div>
+  <div class="mc"><div class="box"><svg viewBox="0 0 40 64" style="height:18px"><g id="mF"></g></svg></div><small>favicon 16px</small></div>
+</div>
+
+<h2 class="sec">The stacked lockup</h2>
+<div id="rows"></div>
+<footer>
+  <p><strong>Pick the pairing.</strong> Winner gets final optical tracking, the favicon + horizontal fallback lockup + inverse/mono set, outlined assets, then tokens + brand book (Phase 42).</p>
+</footer>
+</div>
+<script>
+const T2='<path d="M13 56 V24 H27 V56 Z M7 24 V16 H33 V24 Z M7 16 V10 H12 V16 Z M16 16 V10 H24 V16 Z M28 16 V10 H33 V16 Z" fill="VAR"/><rect x="18" y="31" width="4" height="15" fill="#256C82"/>';
+mL.innerHTML=T2.replace('VAR','#2E3A42');mD.innerHTML=T2.replace('VAR','#F8F4EC');mS.innerHTML=T2.replace('VAR','#101820');mF.innerHTML=T2.replace('VAR','#101820');
+function emblem(font,text,cap,ls,markH,gap,wt,rule){
+ const s=markH/47, tw=text.length*(cap*0.62+ls), markW=26*s, vbW=Math.max(markW,tw)+30, vbH=markH+gap+cap+22, cx=vbW/2;
+ const tx=cx-20*s, base=8+markH+gap+cap*0.80;
+ let r='';
+ if(rule){const ry=8+markH+gap*0.5, half=Math.max(markW,tw)*0.42; r=`<line x1="${(cx-half).toFixed(0)}" y1="${ry.toFixed(0)}" x2="${(cx+half).toFixed(0)}" y2="${ry.toFixed(0)}" stroke="#256C82" stroke-width="2" stroke-linecap="round"/>`;}
+ return `<svg class="em" viewBox="0 0 ${vbW.toFixed(0)} ${vbH.toFixed(0)}"><g transform="translate(${tx.toFixed(1)},8) scale(${s.toFixed(3)})">${T2.replace('VAR','INK')}</g>${r}<text x="${cx.toFixed(0)}" y="${base.toFixed(0)}" text-anchor="middle" letter-spacing="${ls}" font-family="${font}" font-weight="${wt}" font-size="${cap}" fill="INK">${text}</text></svg>`;
+}
+const data=[
+ ['S1','Space · wide caps','PARAPET tracked toward the mark column','',emblem("'Space Grotesk'",'PARAPET',20,4,50,15,600,0)],
+ ['S2','Space · tight caps','balanced, compact — modern & clean','rec',emblem("'Space Grotesk'",'PARAPET',23,1.5,46,12,600,0)],
+ ['S3','Plex Sans · caps','the brand sans, generous tracking','',emblem("'IBM Plex Sans'",'PARAPET',20,5,50,15,600,0)],
+ ['S4','Plex Mono · lower','package name as code — developer-native','',emblem("'IBM Plex Mono'",'parapet',22,1,48,12,500,0)],
+ ['S5','Archivo · caps','heavy engineered, monumental','',emblem("Archivo",'PARAPET',20,3,48,13,700,0)],
+ ['S6','Jost · geometric','geometric, airy tracking','',emblem("Jost",'PARAPET',22,6,50,15,600,0)],
+ ['S7','Sightline rule','Space caps + a Watch Blue sightline between mark & word — most on-brand','rec',emblem("'Space Grotesk'",'PARAPET',19,4,46,18,600,1)],
+ ['S8','Title case','Space Grotesk, "Parapet" (softer than caps)','',emblem("'Space Grotesk'",'Parapet',27,0,46,12,600,0)],
+ ['S9','Mark-dominant','big tower, small wide caps','',emblem("'Space Grotesk'",'PARAPET',15,5,62,12,600,0)],
+];
+let h='';
+for(const [id,nm,ds,flag,svg] of data){
+ h+=`<div class="v"><div class="vh"><span class="id">${id}</span><span class="nm">${nm}</span>${flag==='rec'?'<span class="rec">recommended</span>':''}<span class="ds">${ds}</span></div>`+
+  `<div class="pair">`+
+   `<div class="cell"><div class="pad lite">${svg.replaceAll('INK','#101820')}</div><div class="lab">light</div></div>`+
+   `<div class="cell"><div class="pad dark">${svg.replaceAll('INK','#F8F4EC')}</div><div class="lab">dark</div></div>`+
+  `</div></div>`;
+}
+document.getElementById('rows').innerHTML=h;
+</script>
+</body>
+</html>
