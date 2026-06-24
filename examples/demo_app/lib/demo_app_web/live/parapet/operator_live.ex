@@ -203,7 +203,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               />
 
               <%= if @queue_refresh_available? do %>
-                <div class="mt-4 rounded-xl bg-teal-50 px-4 py-3 shadow-sm ring-1 ring-teal-200">
+                <div class="mt-4 rounded-xl bg-teal-50 px-4 py-3 shadow-sm ring-1 ring-stone-300">
                   <p class="text-sm font-medium text-teal-950">New incidents or queue changes are available.</p>
                   <button
                     type="button"

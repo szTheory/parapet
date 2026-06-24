@@ -208,7 +208,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
 
       <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-          <.link navigate={detail_back_path(@operator_base_path, @incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-teal-200 underline-offset-4 hover:text-teal-950">
+          <.link navigate={detail_back_path(@operator_base_path, @incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold text-teal-800 underline decoration-stone-300 underline-offset-4 hover:text-teal-950">
             <span>&larr; <%%= detail_back_label(@incident) %></span>
           </.link>
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500"><%%= detail_context_label(@incident) %></p>
