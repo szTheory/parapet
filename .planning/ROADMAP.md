@@ -104,7 +104,7 @@
   3. The repo-hygiene audit passes: `brandbook/` is within the ≤ ~250 KB size budget, contains zero raster or font binaries, has no full-viewBox rectangular background in any logo asset, and has no off-palette hex in any SVG or CSS file.
   4. The git diff for this milestone is scoped exclusively to `brandbook/`, the two `docs/assets/*.svg` files, and the `mix.exs` doc block — no unrelated files are touched.
 
-**Plans**: 3 plans
+**Plans**: 3/3 plans complete
 
 - [x] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
 - [x] 43-02-PLAN.md — COLLAT-02: zero-config HexDocs logo/favicon swap + trim exploration HTMLs

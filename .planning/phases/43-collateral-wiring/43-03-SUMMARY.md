@@ -149,7 +149,7 @@ SCOPE OK
 
 | Task | Commit | Description |
 |------|--------|-------------|
-| Tasks 1+2+3 (QA gate, audit, ledger updates) | TBD (after commit) | docs(43-03): v1.5 milestone audit + COLLAT-03 QA gate + ledger close |
+| Tasks 1+2+3 (QA gate, audit, ledger updates) | `4561a93` | docs(43-03): v1.5 milestone audit + COLLAT-03 QA gate + ledger close |
 
 ## Deviations from Plan
 
