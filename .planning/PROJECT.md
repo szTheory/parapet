@@ -29,6 +29,18 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 </details>
 
+## Current Milestone: v1.6 Operator UI Brand & Design-System Audit
+
+**Goal:** Re-skin the generated, host-owned Operator UI to the v1.5 brand book and run a layered, researched, JTBD-focused design-system audit that ships an award-winning, WCAG 2.2 AA, mobile-first, on-brand operator console with forward-only regression guardrails.
+
+**Target features:**
+- Brand-token re-skin of the three generated `.eex` operator templates (+ demo mirrors): brand neutrals/signals/six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings — values-only edits to `operator_theme_bootstrap/1`, no public-API or markup-color change.
+- Self-hosted IBM Plex woff2 (subsetted) shipped with the library and wired by the generator with system-stack fallback — explicitly relaxes the "no font binaries" rule for operator-UI fonts only.
+- Layer-by-layer audit (foundations → primitives → forms → nav/shell → data-display → component groups → pages/flows) fixing real usability bugs (scrim/modal stacking, broken/trapped scroll, hover on non-interactive empty states, squished columns, tabs without active state, dark-mode legibility, fake-disabled controls), each decision researched + adversarially judged.
+- Demo-only `/parapet/_gallery` component-stress route, expanded stress seed scenarios, and forward-only guardrails (re-pinned contrast gate, normalized template↔demo byte-parity test, off-palette-hex gate, motion assertion, screenshot baselines, audit matrix).
+
+**Scope guardrails:** No public API or telemetry contract change; UI stays host-owned/generated (no new Parapet-owned auth/router/runtime UI dependency); no token→Tailwind generator this milestone (adopt token values, not a generator); brand/palette/logo stay locked. Phases **44–50**. Plan: `~/.claude/plans/design-system-stress-test-glimmering-pie.md`.
+
 ## Posture: Released Maintenance
 
 **Goal:** Preserve the stable-main 1.x posture and remain quiet by default unless there is concrete release-affecting work or a scoped PR-shaped feature slice worth opening.
@@ -174,7 +186,7 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 
 ### Active
 
-Next milestone not yet defined — start with `$gsd-new-milestone`. Candidate inputs are listed under **Next Milestone Goals** above.
+**v1.6 Operator UI Brand & Design-System Audit** — see `.planning/REQUIREMENTS.md` for the full REQ-ID set. Categories: TOKEN (token re-skin), FONT (self-hosted IBM Plex), COMP (primitives), FORM, NAV (shell), DATA (data-display), GROUP (meta-components), FLOW (pages/flows), A11Y (WCAG 2.2 AA), MOTION, COPY (microcopy), FIXTURE (stress seeds), GALLERY (demo component lab), GUARD (forward-only guardrails). Mapped to Phases 44–50 in `.planning/ROADMAP.md`.
 
 Dropped:
 
@@ -284,6 +296,9 @@ Shipped v1.5 Brand Book & Logo System: a docs/brand-assets-only milestone (no so
 | Hard human selection gate before downstream brand work | A 6-round tournament locked the identity (D-003) before any token or brand-book build — prevents rework on a contested mark | ✓ Good |
 | Zero-config path-stable HexDocs swap | Replaced `docs/assets/parapet-logo.svg`/`favicon.svg` in place so `mix.exs` doc paths stay unchanged — on-brand HexDocs with no config edit | ✓ Good |
 | Brand research is operationalized, not re-litigated | Every token/value cited back to the source research doc; nothing re-derived — keeps the brand strategy single-sourced | ✓ Good |
+| Self-hosted IBM Plex woff2 over CDN/system-only (v1.6) | Operator console runs in air-gapped/privacy-sensitive contexts; self-hosted subsetted fonts give offline, no-CDN, pixel-consistent brand type with no FOUT — accepted cost is relaxing the "no font binaries" rule for operator-UI fonts only (`brandbook/` stays binary-free), bounded by latin-subset + needed-weights + a tracked package-size budget | ⏳ v1.6 |
+| Operator-UI brand re-skin is values-only (v1.6) | Retheme by re-pointing the existing `--parapet-*`/`--po-*` CSS vars at brand values inside `operator_theme_bootstrap/1`; no class/selector/JS/markup-color change keeps the switcher, query-param, localStorage, and contrast test intact and the diff reviewable | ⏳ v1.6 |
+| Watch-blue links/focus brightened on dark surfaces (v1.6) | Brand watch-blue fails WCAG AA on deep-slate (1.97:1) — dark links use `#7FB4C6` and focus rings flip to limestone, enforced by the contrast gate so the re-skin is provably AA on both themes | ⏳ v1.6 |
 
 ## Evolution
 
@@ -303,4 +318,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-24 — completed v1.5 Brand Book & Logo System milestone (Phase 43 final)*
+*Last updated: 2026-06-24 — started v1.6 Operator UI Brand & Design-System Audit milestone (Phases 44–50)*

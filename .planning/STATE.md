@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.5
-milestone_name: Brand Book & Logo System
-current_phase: 43
-status: shipped
-stopped_at: v1.5 milestone archived and tagged. Next milestone not yet defined.
-last_updated: "2026-06-24T18:06:07.391Z"
+milestone: v1.6
+milestone_name: Operator UI Brand & Design-System Audit
+status: planning
+last_updated: "2026-06-24T19:08:57.758Z"
 last_activity: 2026-06-24
-last_activity_desc: v1.5 milestone complete — archived, PROJECT.md evolved, tagged v1.5
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 4
-  completed_plans: 4
-  percent: 100
-current_phase_name: collateral-wiring
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,14 +24,10 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 
 ## Current Position
 
-Milestone: v1.5 Brand Book & Logo System — ✅ SHIPPED 2026-06-24 (tagged `v1.5`)
-Status: Milestone complete — archived to `.planning/milestones/v1.5-*`
-Last activity: 2026-06-24 — v1.5 milestone closed
-
-Progress: `██████████` 100% (4/4 phases complete)
-
-**Done:** Phase 40 (`09e1cb8` research/WCAG/critique) · Phase 41 (`6a1c519` logo locked after 6-round tournament — corbelled-tower stacked emblem, Space Grotesk, outlined) · Phase 42 (`e1bf9db` tokens.css/json + index.html brand book + 9 logo assets).
-**Remaining (Phase 43):** collateral examples (components/landing/readme-header) · swap live HexDocs logo+favicon (`docs/assets/*.svg`, zero-config) · trim exploration HTMLs · QA + `v1.5-MILESTONE-AUDIT.md` + MILESTONES.md.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-06-24 — Milestone v1.6 started
 
 ## Performance Metrics
 
