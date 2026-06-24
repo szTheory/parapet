@@ -67,6 +67,25 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
     |> add_router_guidance(assigns)
   end
 
+  def run(argv) do
+    super(argv)
+    copy_fonts_to_host()
+  end
+
+  defp copy_fonts_to_host do
+    source_dir = Path.join(:code.priv_dir(:parapet), "static/parapet/fonts")
+    dest_dir = Path.join(File.cwd!(), "priv/static/parapet/fonts")
+    File.mkdir_p!(dest_dir)
+
+    for filename <- File.ls!(source_dir) do
+      File.cp!(Path.join(source_dir, filename), Path.join(dest_dir, filename))
+    end
+
+    Mix.shell().info(
+      "* copying #{length(File.ls!(source_dir))} font files to priv/static/parapet/fonts/"
+    )
+  end
+
   defp add_router_guidance(igniter, assigns) do
     template_path =
       Path.join([

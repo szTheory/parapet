@@ -40,7 +40,8 @@ defmodule Parapet.MixProject do
   defp package do
     [
       files:
-        ~w(lib priv .formatter.exs mix.exs README* CHANGELOG* CONTRIBUTING* SECURITY* LICENSE* docs),
+        ~w(lib priv priv/static/parapet/fonts/*.woff2 priv/static/parapet/fonts/LICENSE.txt
+           .formatter.exs mix.exs README* CHANGELOG* CONTRIBUTING* SECURITY* LICENSE* docs),
       licenses: ["MIT"],
       links: %{
         "GitHub" => @source_url,
