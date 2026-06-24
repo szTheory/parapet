@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parapet — Landing Section</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);
+       font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+
+  /* Deep Slate hero section */
+  .hero{background:var(--deep-slate);color:var(--limestone);
+        padding:var(--space-8) 0}
+  .hero .inner{max-width:900px;margin:0 auto;padding:0 var(--space-6);
+               display:flex;flex-direction:column;gap:var(--space-5)}
+
+  .hero img.mark{height:64px;width:auto;align-self:flex-start}
+
+  .hero h1{font-size:var(--fs-display);font-weight:var(--fw-display);
+           line-height:var(--lh-display);color:var(--limestone);margin:0}
+
+  .hero p.sub{font-size:var(--fs-h3);line-height:1.40;color:var(--stone);
+              max-width:56ch;margin:0}
+
+  /* install snippet */
+  .snippet{background:var(--wall-slate);border-radius:var(--radius-md);
+           padding:var(--space-4) var(--space-5);display:inline-block}
+  .snippet code{font-family:var(--font-mono);font-size:var(--fs-code);
+                color:var(--limestone);white-space:pre}
+
+  /* CTA row */
+  .cta-row{display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:center}
+  .btn{font-family:var(--font-sans);font-weight:600;font-size:var(--fs-body-sm);
+       border-radius:8px;padding:9px 18px;border:1px solid transparent;cursor:pointer;
+       text-decoration:none;display:inline-block}
+  .btn-primary{background:var(--watch-blue);color:var(--limestone)}
+  .btn-ghost{background:transparent;color:var(--limestone);border-color:var(--border)}
+  .btn:focus-visible{outline:var(--focus-ring-on-dark);outline-offset:var(--focus-offset)}
+
+  /* proof stripe below hero */
+  .proof{padding:var(--space-7) 0;background:var(--bg)}
+  .proof .inner{max-width:900px;margin:0 auto;padding:0 var(--space-6)}
+  .proof h2{font-size:var(--fs-h2);font-weight:var(--fw-h2);margin:0 0 var(--space-3)}
+  .proof p{color:var(--text-muted);max-width:60ch;margin:0}
+
+  @media(max-width:600px){
+    .hero h1{font-size:var(--fs-h1)}
+    .snippet code{font-size:var(--fs-caption)}
+  }
+</style>
+</head>
+<body>
+
+<!-- Deep Slate hero -->
+<section class="hero">
+  <div class="inner">
+    <img class="mark" src="../assets/parapet-inverse.svg" alt="Parapet">
+    <h1>A protective edge,<br>not a fortress.</h1>
+    <p class="sub">Turn Phoenix telemetry into user-journey SLOs, burn-rate alerts, and runbooks — before silent failures reach your users.</p>
+    <div class="snippet">
+      <code>mix parapet.gen.ui Parapet.OperatorLive</code>
+    </div>
+    <div class="cta-row">
+      <a href="https://hex.pm/packages/parapet" class="btn btn-primary">Get started on Hex</a>
+      <a href="https://github.com/szTheory/parapet" class="btn btn-ghost">View on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- Light proof section (optional; remove if hero-only is preferred) -->
+<section class="proof">
+  <div class="inner">
+    <h2>Evidence before explanation</h2>
+    <p>Parapet separates facts, hypotheses, and actions. Every alert includes a measured burn rate, a correlated deploy, and a runbook — not just a threshold breach.</p>
+  </div>
+</section>
+
+</body>
+</html>
