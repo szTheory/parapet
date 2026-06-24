@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parapet — Brand Book</title>
+<link rel="icon" href="assets/favicon.svg">
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);
+       font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 var(--space-6)}
+  a{color:var(--link)}
+  code,kbd{font-family:var(--font-mono);font-size:.92em;background:var(--mortar);padding:1px 6px;border-radius:var(--radius-xs)}
+
+  /* header */
+  header.hero{background:var(--deep-slate);color:var(--limestone);padding:var(--space-8) 0 var(--space-7)}
+  header.hero .wrap{display:flex;flex-direction:column;gap:var(--space-4)}
+  header.hero img{height:84px;width:auto;align-self:flex-start}
+  header.hero p{max-width:62ch;color:var(--stone);font-size:var(--fs-h3);line-height:1.4;margin:0}
+  header.hero .meta{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--wall-slate);
+       color:#9fb0bb;letter-spacing:.4px;text-transform:uppercase}
+
+  /* nav */
+  nav.toc{position:sticky;top:0;z-index:10;background:var(--limestone);border-bottom:var(--border-light);
+       padding:var(--space-3) 0}
+  nav.toc .wrap{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-5);font-family:var(--font-mono);font-size:var(--fs-caption)}
+  nav.toc a{color:var(--text-muted);text-decoration:none}
+  nav.toc a:hover{color:var(--link)}
+
+  section{padding:var(--space-8) 0;border-bottom:var(--border-light)}
+  h2.sec{font-size:var(--fs-h2);line-height:var(--lh-h2);font-weight:var(--fw-h2);margin:0 0 var(--space-2)}
+  .kicker{font-family:var(--font-mono);font-size:var(--fs-caption);letter-spacing:1px;text-transform:uppercase;color:var(--watch-blue);margin:0 0 var(--space-3)}
+  .sub{max-width:68ch;color:var(--text-muted);margin:0 0 var(--space-6)}
+  h3{font-size:var(--fs-h3);font-weight:var(--fw-h3);margin:var(--space-6) 0 var(--space-3)}
+
+  .grid{display:grid;gap:var(--space-4)}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:760px){.g2,.g3,.g4{grid-template-columns:1fr 1fr}}
+
+  /* logo */
+  .logo-cell{border:var(--border-light);border-radius:var(--radius-md);overflow:hidden;background:var(--surface)}
+  .logo-cell .canvas{display:flex;align-items:center;justify-content:center;padding:var(--space-6);min-height:130px}
+  .logo-cell .canvas.dark{background:var(--deep-slate)} .logo-cell .canvas.stone{background:var(--stone)}
+  .logo-cell img{max-height:74px;max-width:86%} .logo-cell img.fav{max-height:24px}
+  .logo-cell .cap{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--text-muted);
+       padding:var(--space-2) var(--space-3);border-top:var(--border-light)}
+  .do,.dont{border-radius:var(--radius-md);padding:var(--space-4);border:var(--border-light)}
+  .do{background:var(--healthy-bg)} .dont{background:var(--burning-bg)}
+  .do b{color:var(--healthy-text)} .dont b{color:var(--burning-text)}
+  .do ul,.dont ul{margin:var(--space-2) 0 0;padding-left:var(--space-5)} li{margin:2px 0}
+
+  /* color swatches */
+  .sw{border:var(--border-light);border-radius:var(--radius-md);overflow:hidden}
+  .sw .chip{height:78px} .sw .info{padding:var(--space-3)}
+  .sw .name{font-weight:600;font-size:var(--fs-body-sm)} .sw .hex{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--text-muted)}
+  .sw .role{font-size:var(--fs-caption);color:var(--text-muted);margin-top:2px}
+  .status-row{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-3) var(--space-4);border-radius:var(--radius-md);font-size:var(--fs-body-sm);font-weight:500}
+  .dot{width:10px;height:10px;border-radius:var(--radius-pill);flex:0 0 auto}
+
+  /* type */
+  .specimen{border-bottom:var(--border-light);padding:var(--space-3) 0;display:flex;align-items:baseline;gap:var(--space-5)}
+  .specimen .tag{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--text-muted);width:130px;flex:0 0 auto}
+  .scale-bars{display:flex;flex-direction:column;gap:6px;margin-top:var(--space-3)}
+
+  /* tokens */
+  .tok{display:flex;align-items:center;gap:var(--space-3);font-family:var(--font-mono);font-size:var(--fs-caption);padding:6px 0}
+  .tok .demo{background:var(--watch-blue);border-radius:2px;height:16px}
+  .radii{display:flex;gap:var(--space-4);flex-wrap:wrap;align-items:flex-end}
+  .radii div{width:84px;height:84px;background:var(--wall-slate);display:flex;align-items:flex-end;justify-content:center;color:var(--limestone);font-family:var(--font-mono);font-size:11px;padding:6px}
+
+  /* components */
+  .panel{border:var(--border-light);border-radius:var(--radius-md);padding:var(--space-5);background:var(--surface)}
+  .panel.dark{background:var(--deep-slate);border-color:var(--border-dark)}
+  .btn{font-family:var(--font-sans);font-weight:600;font-size:var(--fs-body-sm);border-radius:8px;
+       padding:9px 16px;border:1px solid transparent;cursor:pointer}
+  .btn-primary{background:var(--watch-blue);color:var(--limestone)}
+  .btn-ghost{background:transparent;color:var(--text);border-color:var(--border)}
+  .btn-danger{background:var(--incident-red);color:var(--limestone)}
+  .btn:focus-visible{outline:var(--focus-ring);outline-offset:var(--focus-offset)}
+  .dark .btn-ghost{color:var(--limestone);border-color:var(--border-dark)}
+  .dark .btn:focus-visible{outline:var(--focus-ring-on-dark)}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-caption);font-weight:600;
+       padding:3px 10px;border-radius:var(--radius-pill);border:1px solid}
+  .callout{border-left:3px solid var(--watch-blue);background:var(--mortar);padding:var(--space-3) var(--space-4);border-radius:var(--radius-sm)}
+  .slo{border:var(--border-light);border-radius:var(--radius-md);padding:var(--space-4);background:var(--surface)}
+  .codeblock{background:var(--deep-slate);color:var(--mortar);font-family:var(--font-mono);font-size:var(--fs-code);
+       line-height:var(--lh-code);padding:var(--space-4);border-radius:var(--radius-md);overflow:auto}
+  .codeblock .c-blue{color:#7FB4C6} .codeblock .c-amber{color:#E6A360} .codeblock .c-dim{color:var(--stone)}
+
+  /* voice */
+  .vt{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}
+  @media(max-width:760px){.vt{grid-template-columns:1fr}}
+  .good,.bad{border-radius:var(--radius-md);padding:var(--space-4);font-size:var(--fs-body-sm)}
+  .good{background:var(--healthy-bg);border:1px solid var(--healthy-border)}
+  .bad{background:var(--burning-bg);border:1px solid var(--burning-border)}
+  .good .h,.bad .h{font-family:var(--font-mono);font-size:var(--fs-caption);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .good .h{color:var(--healthy-text)} .bad .h{color:var(--burning-text)}
+
+  footer{padding:var(--space-7) 0;color:var(--text-muted);font-size:var(--fs-body-sm)}
+  .muted{color:var(--text-muted)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <img src="assets/parapet-inverse.svg" alt="Parapet">
+    <p>The calm protective edge between raw telemetry and operational action.</p>
+    <div class="meta">Brand Book · v1.5 · the reliability layer for Phoenix</div>
+  </div>
+</header>
+
+<nav class="toc"><div class="wrap">
+  <a href="#essence">Essence</a><a href="#logo">Logo</a><a href="#color">Color</a>
+  <a href="#type">Typography</a><a href="#tokens">Tokens</a><a href="#components">Components</a>
+  <a href="#voice">Voice</a><a href="#a11y">Accessibility</a><a href="#impl">Implementation</a>
+</div></nav>
+
+<div class="wrap">
+
+<section id="essence">
+  <p class="kicker">Essence</p>
+  <h2 class="sec">A protective edge, not a fortress</h2>
+  <p class="sub">Parapet is an open-source reliability layer for Phoenix: it turns telemetry into user-journey SLOs, burn-rate alerts, deploy correlation, incident evidence, and runbooks. The name is a <b>parapet</b> — a low protective wall at an edge that gives operators sightlines and prevents silent harm. The brand should feel calm, precise, protective, evidence-first, and Phoenix-native — never militaristic, neon, or like a generic observability vendor.</p>
+  <div class="grid g3">
+    <div class="callout"><b>Protect users, not graphs.</b><br><span class="muted">The first question is always: are users being hurt?</span></div>
+    <div class="callout"><b>Evidence before explanation.</b><br><span class="muted">Separate facts, hypotheses, and actions — never blur them.</span></div>
+    <div class="callout"><b>Calm by default.</b><br><span class="muted">Fewer, better signals. No theatrics, no war room.</span></div>
+  </div>
+</section>
+
+<section id="logo">
+  <p class="kicker">Logo</p>
+  <h2 class="sec">The parapet tower</h2>
+  <p class="sub">A corbelled parapet tower — its projecting crenellated top is a literal parapet — stacked above the wordmark. The mark stands alone as the avatar/favicon; the same mark caps the full lockup. The single Watch&nbsp;Blue loophole is the only accent. The wordmark is Space&nbsp;Grotesk, shipped as <b>outlined paths</b> (font-independent). No background cage; no subtitle on the primary.</p>
+  <div class="grid g3">
+    <div class="logo-cell"><div class="canvas"><img src="assets/parapet-logo.svg" alt="Parapet primary logo"></div><div class="cap">parapet-logo.svg · primary</div></div>
+    <div class="logo-cell"><div class="canvas dark"><img src="assets/parapet-inverse.svg" alt="Parapet inverse"></div><div class="cap">parapet-inverse.svg · dark</div></div>
+    <div class="logo-cell"><div class="canvas stone"><img src="assets/parapet-logo.svg" alt="Parapet on stone"></div><div class="cap">on warm neutral</div></div>
+    <div class="logo-cell"><div class="canvas"><img src="assets/parapet-horizontal.svg" alt="Horizontal lockup"></div><div class="cap">parapet-horizontal.svg</div></div>
+    <div class="logo-cell"><div class="canvas"><img src="assets/parapet-mono.svg" alt="Monochrome"></div><div class="cap">parapet-mono.svg · single ink</div></div>
+    <div class="logo-cell"><div class="canvas"><img src="assets/parapet-mark.svg" alt="Mark"> <img src="assets/parapet-mark.svg" class="fav" alt="favicon"></div><div class="cap">parapet-mark.svg + favicon @24/16</div></div>
+  </div>
+  <h3>Clear space &amp; minimum size</h3>
+  <p class="sub">Keep clear space ≥ the tower's width on all sides. Minimum: mark 16px (favicon), full lockup 120px wide. Below that, use the mark alone.</p>
+  <div class="grid g2">
+    <div class="do"><b>✓ Do</b><ul>
+      <li>Use the mark alone for avatars, favicons, and tight square spaces.</li>
+      <li>Keep the tower and wordmark on their shared vertical axis.</li>
+      <li>Place on Limestone, white, Stone, or Deep&nbsp;Slate (use the inverse on dark).</li>
+    </ul></div>
+    <div class="dont"><b>✗ Don't</b><ul>
+      <li>Box the mark in a rectangle or add a drop shadow.</li>
+      <li>Recolor the loophole or use off-palette colors.</li>
+      <li>Add a tagline to the primary lockup, stretch, or rotate it.</li>
+    </ul></div>
+  </div>
+</section>
+
+<section id="color">
+  <p class="kicker">Color</p>
+  <h2 class="sec">Warm stone, deep slate, measured signal</h2>
+  <p class="sub">Warm neutrals for surfaces, deep slate for authority, blue for calm insight, amber for warning, red for active burn, moss for healthy budget, violet only for the AI/assistive layer. All text pairings meet WCAG&nbsp;AA (see <a href="notes/accessibility.md">accessibility.md</a>).</p>
+  <h3>Neutrals</h3>
+  <div class="grid g3" id="neutrals"></div>
+  <h3>Signals</h3>
+  <div class="grid g3" id="signals"></div>
+  <h3>Status — always pair color with a word + icon</h3>
+  <div class="grid g2" id="status"></div>
+</section>
+
+<section id="type">
+  <p class="kicker">Typography</p>
+  <h2 class="sec">IBM Plex — a field manual with taste</h2>
+  <p class="sub">IBM Plex Sans for UI and docs, IBM Plex Mono for code, metrics, SHAs, and IDs, IBM Plex Serif for restrained editorial accents. All open-source. (The logo's Space&nbsp;Grotesk is not a UI typeface.)</p>
+  <div style="font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--text-muted);margin-bottom:var(--space-4)">
+    --font-sans: "IBM Plex Sans", Inter, ui-sans-serif, system-ui, sans-serif<br>
+    --font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace<br>
+    --font-serif: "IBM Plex Serif", Georgia, serif
+  </div>
+  <div id="scale"></div>
+  <h3>Code &amp; numerics use mono</h3>
+  <div class="codeblock"><span class="c-dim">deploy_sha:</span> 8f31c2a   <span class="c-dim">route:</span> GET /checkout/:id
+<span class="c-dim">slo:</span> checkout_completion   <span class="c-blue">burn_rate_5m: 14.2x</span></div>
+</section>
+
+<section id="tokens">
+  <p class="kicker">Tokens</p>
+  <h2 class="sec">Spacing, radius, elevation</h2>
+  <p class="sub">An 8px spatial grid, sturdy low-radius shapes, and borders over heavy shadows. Everything here is a CSS variable in <code>tokens/tokens.css</code> (and <code>tokens.json</code>).</p>
+  <h3>Spacing — 8px grid</h3>
+  <div id="spacing"></div>
+  <h3>Radius</h3>
+  <div class="radii">
+    <div style="border-radius:var(--radius-xs)">xs 4</div>
+    <div style="border-radius:var(--radius-sm)">sm 6</div>
+    <div style="border-radius:var(--radius-md)">md 10</div>
+    <div style="border-radius:var(--radius-lg)">lg 14</div>
+    <div style="border-radius:var(--radius-xl)">xl 20</div>
+  </div>
+  <h3>Elevation</h3>
+  <div class="grid g2" style="margin-top:var(--space-3)">
+    <div class="panel" style="box-shadow:var(--shadow-card)"><b>--shadow-card</b><br><span class="muted">0 1px 2px rgba(16,24,32,.06) — resting cards</span></div>
+    <div class="panel" style="box-shadow:var(--shadow-popover)"><b>--shadow-popover</b><br><span class="muted">0 12px 32px rgba(16,24,32,.16) — popovers only</span></div>
+  </div>
+</section>
+
+<section id="components">
+  <p class="kicker">Components</p>
+  <h2 class="sec">UI primitives</h2>
+  <p class="sub">Conventional patterns, calm density, visible focus. Shown light and dark — both driven by the same tokens.</p>
+  <div class="grid g2">
+    <div class="panel">
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)">
+        <button class="btn btn-primary">Open runbook</button>
+        <button class="btn btn-ghost">View evidence</button>
+        <button class="btn btn-danger">Roll back deploy</button>
+      </div>
+      <div style="display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-4)">
+        <span class="badge" style="color:var(--healthy-text);background:var(--healthy-bg);border-color:var(--healthy-border)"><span class="dot" style="background:var(--budget-moss)"></span>Healthy</span>
+        <span class="badge" style="color:var(--watch-text);background:var(--watch-bg);border-color:var(--watch-border)"><span class="dot" style="background:var(--beacon-amber)"></span>Watch</span>
+        <span class="badge" style="color:var(--burning-text);background:var(--burning-bg);border-color:var(--burning-border)"><span class="dot" style="background:var(--incident-red)"></span>Burning</span>
+      </div>
+      <div class="slo">
+        <div style="font-weight:600">Checkout completion</div>
+        <div style="font-family:var(--font-mono);font-size:var(--fs-metric-lg);font-weight:500;line-height:1">14.2<span style="font-size:var(--fs-metric-sm)">x</span> <span style="font-size:var(--fs-caption);color:var(--burning-text)">5m burn</span></div>
+        <div class="muted" style="font-size:var(--fs-caption);margin-top:4px">Target 99.5% · budget 41% · deploy 8f31c2a, 6 min before burn</div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:var(--space-3)">light</div>
+    </div>
+    <div class="panel dark" data-theme="dark" style="color:var(--limestone)">
+      <div style="display:flex;gap:var(--space-3);flex-wrap:wrap;margin-bottom:var(--space-4)">
+        <button class="btn btn-primary">Open runbook</button>
+        <button class="btn btn-ghost">View evidence</button>
+      </div>
+      <div class="callout" style="background:var(--wall-slate);color:var(--limestone);border-color:var(--beacon-amber-light)">
+        Login success SLO fast-burn: users may be unable to sign in.
+      </div>
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--stone);margin-top:var(--space-3)">dark — admin shell</div>
+    </div>
+  </div>
+</section>
+
+<section id="voice">
+  <p class="kicker">Voice</p>
+  <h2 class="sec">Calm, specific, evidence-backed</h2>
+  <p class="sub">Write like a careful SRE helping a tired Phoenix developer. Operational messages follow: symptom → measured evidence → likely correlation → safe next action → where to inspect.</p>
+  <div class="vt">
+    <div class="good"><div class="h">✓ Sounds like Parapet</div>Checkout completion is below target. The 5-minute burn rate is 14.2x. The first correlated change is deploy 8f31c2a. Suggested next step: open the rollback runbook.</div>
+    <div class="bad"><div class="h">✗ Not Parapet</div>🔥 Checkout is totally broken!! Massive anomaly detected across multiple dimensions. The system has entered a critical failure state.</div>
+    <div class="good"><div class="h">✓ Empty state</div>No journeys protected yet. Define one user journey to create its SLO, dashboard panel, and runbook.</div>
+    <div class="bad"><div class="h">✗ Avoid</div>Nothing to show. · Unlock next-gen observability. · Single pane of glass. · AI-powered autopilot.</div>
+  </div>
+  <h3>Words</h3>
+  <p class="sub"><b>Prefer:</b> evidence · journey · guardrail · budget · burn rate · sightline · signal · correlate · mitigate · runbook · doctor check. &nbsp;
+  <b>Avoid as flavor:</b> war room · battle-tested · mission control · magic · autopilot · military-grade · single pane of glass.</p>
+</section>
+
+<section id="a11y">
+  <p class="kicker">Accessibility</p>
+  <h2 class="sec">Accessible by default</h2>
+  <ul>
+    <li><b>Never color alone.</b> Status = color + word + icon (Healthy / Watch / Burning / Exhausted / Unknown).</li>
+    <li><b>AA contrast.</b> Every text-on-surface token pairing meets WCAG AA — verified in <a href="notes/accessibility.md">notes/accessibility.md</a> (reproduce with <code>notes/contrast.py</code>).</li>
+    <li><b>Focus is visible.</b> <code>--focus-ring</code> (Watch Blue) on light; <code>--focus-ring-on-dark</code> (Limestone) on dark — Watch Blue is only 2.7:1 on Deep Slate, so dark surfaces need the light ring.</li>
+    <li><b>Reduced motion respected.</b> Motion orients and confirms; it never dramatizes. <code>prefers-reduced-motion</code> zeroes durations.</li>
+  </ul>
+</section>
+
+<section id="impl">
+  <p class="kicker">Implementation</p>
+  <h2 class="sec">Using the tokens</h2>
+  <p class="sub">Link <code>tokens/tokens.css</code> and reference the variables; or consume <code>tokens/tokens.json</code> from tooling. Dark surfaces opt in with <code>data-theme="dark"</code>.</p>
+  <div class="codeblock">&lt;link rel="stylesheet" href="tokens/tokens.css"&gt;
+
+.btn-primary <span class="c-dim">{</span> background: <span class="c-blue">var(--watch-blue)</span>; color: <span class="c-blue">var(--limestone)</span>; border-radius: <span class="c-blue">8px</span>; <span class="c-dim">}</span>
+.card <span class="c-dim">{</span> background: <span class="c-blue">var(--surface)</span>; border: <span class="c-blue">var(--border-light)</span>; border-radius: <span class="c-blue">var(--radius-md)</span>; <span class="c-dim">}</span></div>
+  <p class="sub" style="margin-top:var(--space-4)">Logo assets live in <code>assets/</code> (primary, inverse, mono, horizontal, mark, favicon) — all transparent, outlined, palette-locked. HexDocs uses <code>assets/parapet-logo.svg</code> + <code>assets/favicon.svg</code>.</p>
+</section>
+
+<footer class="wrap">
+  <img src="assets/parapet-mark.svg" alt="" style="height:28px;vertical-align:middle;margin-right:10px">
+  Parapet brand book · generated for v1.5 · values sourced from <code>prompts/parapet-brand-identity-deep-research.md</code> · see <a href="notes/decision-log.md">notes/decision-log.md</a>.
+</footer>
+</div>
+
+<script>
+const NEUT=[["Parapet Black","#101820","headers, dark surfaces, primary text"],["Deep Slate","#18232B","admin shell, nav, dark cards"],["Wall Slate","#2E3A42","structural neutral, borders on dark"],["Stone","#D8D0C3","dividers, diagrams, disabled"],["Mortar","#EAE2D4","cards, doc callouts"],["Limestone","#F8F4EC","main light background"]];
+const SIG=[["Watch Blue","#256C82","links, selected, info, logo accent"],["Beacon Amber","#B45309","warning on light"],["Beacon Amber Light","#D97706","warning on dark"],["Budget Moss","#567236","healthy budget, success"],["Incident Red","#B13A32","critical burn, destructive"],["Trace Violet","#6D5BD0","AI / correlation only"]];
+const STAT=[["Healthy","#3F5E28","#EFF6E8","#B6C99A"],["Watch","#92400E","#F8EFD7","#E3B66E"],["Burning","#9F2D2D","#FCE8E2","#E3A19A"],["Exhausted","#7F1D1D","#F8D7D4","#C87670"],["Unknown","#2E3A42","#ECEFF1","#CBD2D8"],["AI Assist","#4F46A5","#ECEBFF","#B9B5F6"]];
+function swatch([name,hex,role]){const dark=parseInt(hex.slice(1),16)<0x808080;return `<div class="sw"><div class="chip" style="background:${hex}"></div><div class="info"><div class="name">${name}</div><div class="hex">${hex}</div><div class="role">${role}</div></div></div>`;}
+neutrals.innerHTML=NEUT.map(swatch).join('');
+signals.innerHTML=SIG.map(swatch).join('');
+document.getElementById('status').innerHTML=STAT.map(([n,t,b,br])=>`<div class="status-row" style="color:${t};background:${b};border:1px solid ${br}"><span class="dot" style="background:${t}"></span><b>${n}</b><span style="margin-left:auto;font-family:var(--font-mono);font-size:11px;opacity:.8">${t} on ${b}</span></div>`).join('');
+const SCALE=[["Display 56/500","display","Reliability starts at the user journey"],["H1 40/500","h1","See user harm before chaos"],["H2 30/500","h2","Fewer pages. Better evidence."],["H3 22/500","h3","The alert should know what changed"],["Body 16/400","body","Start with one user journey. You can add more once the first SLO is useful."],["Caption 12/500","caption","SLO · BURN RATE · DEPLOY MARKER"]];
+document.getElementById('scale').innerHTML=SCALE.map(([tag,t,txt])=>`<div class="specimen"><span class="tag">${tag}</span><span style="font-size:var(--fs-${t});line-height:1.05;font-weight:var(--fw-${t})">${txt}</span></div>`).join('');
+const SP=[["1",4],["2",8],["3",12],["4",16],["5",24],["6",32],["7",48],["8",64]];
+document.getElementById('spacing').innerHTML=SP.map(([n,px])=>`<div class="tok"><span style="width:64px">--space-${n}</span><span class="demo" style="width:${px}px"></span><span>${px}px</span></div>`).join('');
+</script>
+</body>
+</html>

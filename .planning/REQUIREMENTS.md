@@ -24,9 +24,9 @@
 
 ## Token System & HTML Brand Book
 
-- [ ] **TOKEN-01**: `brandbook/tokens/tokens.css` (CSS custom properties) and `brandbook/tokens/tokens.json` (same values, machine-readable) express the research doc's color, type-scale, spacing (8px grid), radius, shadow, and border tokens verbatim, with no new values invented.
-- [ ] **TOKEN-02**: The selected logo is expanded into the full variation set as separate optimized transparent SVGs in `brandbook/assets/` — primary horizontal lockup (no subtitle), integrated typemark, icon-only logomark, stacked, monochrome, inverse/dark-background, optional tagline lockup, and favicon.
-- [ ] **TOKEN-03**: A self-contained `brandbook/index.html` brand book — driven by `tokens.css` — presents the logo gallery (transparent default, on preview swatches), color system (swatch + hex + role), type-scale specimens, spacing/radius/shadow tokens, voice/tone + microcopy, logo do/don't, and accessibility notes, and opens correctly from `file://` with no build step or network dependency.
+- [x] **TOKEN-01**: `brandbook/tokens/tokens.css` (CSS custom properties) + `brandbook/tokens/tokens.json` (machine-readable mirror) express the research doc's color, type-scale, spacing (8px grid), radius, shadow, border, focus-ring (incl. dark-surface fix), and motion tokens verbatim. Validated agreeing.
+- [x] **TOKEN-02**: Selected logo expanded into the variation set in `brandbook/assets/` — primary stacked lockup (no subtitle), horizontal (+inverse), icon-only mark (+inverse), monochrome, inverse, favicon, and optional tagline lockup. All transparent, outlined (font-independent), palette-locked.
+- [x] **TOKEN-03**: Self-contained `brandbook/index.html` — driven by `tokens.css` — presents logo gallery, color system (swatch + hex + role + status), type-scale specimens, spacing/radius/shadow tokens, components (light+dark), voice/microcopy do/don't, accessibility notes, and implementation guidance. Opens from `file://` (IBM Plex via Google Fonts; degrades to system stack).
 
 ## Collateral, Wiring & QA
 
@@ -68,9 +68,9 @@ Explicitly excluded for this milestone, with reasoning, to prevent scope creep.
 | LOGO-02 | 41 | Complete |
 | LOGO-03 | 41 | Complete |
 | LOGO-04 | 41 | Complete |
-| TOKEN-01 | 42 | Pending |
-| TOKEN-02 | 42 | Pending |
-| TOKEN-03 | 42 | Pending |
+| TOKEN-01 | 42 | Complete |
+| TOKEN-02 | 42 | Complete |
+| TOKEN-03 | 42 | Complete |
 | COLLAT-01 | 43 | Pending |
 | COLLAT-02 | 43 | Pending |
 | COLLAT-03 | 43 | Pending |

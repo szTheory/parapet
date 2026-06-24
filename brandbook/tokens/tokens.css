@@ -1,0 +1,100 @@
+/*
+ * Parapet design tokens
+ * Source of truth: prompts/parapet-brand-identity-deep-research.md (§7 color, §8 type, §9 layout, §23 tokens).
+ * Values copied verbatim — not re-derived. Mirror of tokens.json.
+ * v1.5 Brand Book & Logo System.
+ */
+:root {
+  /* ---- Brand neutrals (warm stone + deep slate) ---- */
+  --parapet-black: #101820;  /* primary dark — headers, dark surfaces, primary text on light */
+  --deep-slate:    #18232B;  /* secondary dark — admin shell, nav, dark cards */
+  --wall-slate:    #2E3A42;  /* structural neutral — borders on dark, secondary panels */
+  --stone:         #D8D0C3;  /* warm neutral — dividers, diagrams, disabled fills */
+  --mortar:        #EAE2D4;  /* soft surface — cards, doc callouts */
+  --limestone:     #F8F4EC;  /* main light background — docs, marketing, empty states */
+
+  /* ---- Signal colors (measured, not neon) ---- */
+  --watch-blue:         #256C82;  /* calm signal — links, selected, info, logo accent */
+  --beacon-amber:       #B45309;  /* warning on light */
+  --beacon-amber-light: #D97706;  /* warning on dark */
+  --budget-moss:        #567236;  /* healthy budget, success */
+  --incident-red:       #B13A32;  /* critical SLO burn, destructive */
+  --trace-violet:       #6D5BD0;  /* AI / correlation / assistive layer only */
+
+  /* ---- Status color sets (text / bg / border) ---- */
+  --healthy-text:  #3F5E28; --healthy-bg:  #EFF6E8; --healthy-border:  #B6C99A;
+  --watch-text:    #92400E; --watch-bg:    #F8EFD7; --watch-border:    #E3B66E;
+  --burning-text:  #9F2D2D; --burning-bg:  #FCE8E2; --burning-border:  #E3A19A;
+  --exhausted-text:#7F1D1D; --exhausted-bg:#F8D7D4; --exhausted-border:#C87670;
+  --unknown-text:  #2E3A42; --unknown-bg:  #ECEFF1; --unknown-border:  #CBD2D8;
+  --ai-text:       #4F46A5; --ai-bg:       #ECEBFF; --ai-border:       #B9B5F6;
+
+  /* ---- Semantic roles (light surface) ---- */
+  --bg:            var(--limestone);
+  --surface:       #FFFFFF;
+  --surface-soft:  var(--mortar);
+  --text:          var(--parapet-black);
+  --text-muted:    var(--wall-slate);
+  --link:          var(--watch-blue);
+  --border:        rgba(16, 24, 32, 0.12);
+
+  /* ---- Typography ---- */
+  --font-sans:  "IBM Plex Sans", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono:  "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --font-serif: "IBM Plex Serif", Georgia, serif;
+  /* NOTE: the LOGO wordmark is Space Grotesk, shipped as OUTLINED PATHS (font-independent).
+     It is NOT a UI typeface — do not use Space Grotesk for product/docs text. */
+
+  /* Type scale — size / line-height / weight (doc §8.3) */
+  --fs-display: 56px; --lh-display: 1.00; --fw-display: 500;
+  --fs-h1: 40px;      --lh-h1: 1.08;     --fw-h1: 500;
+  --fs-h2: 30px;      --lh-h2: 1.16;     --fw-h2: 500;
+  --fs-h3: 22px;      --lh-h3: 1.25;     --fw-h3: 500;
+  --fs-body: 16px;    --lh-body: 1.60;   --fw-body: 400;
+  --fs-body-sm: 14px; --lh-body-sm: 1.50;--fw-body-sm: 400;
+  --fs-caption: 12px; --lh-caption: 1.40;--fw-caption: 500;
+  --fs-code: 13px;    --lh-code: 1.55;   --fw-code: 400;
+  --fs-metric-lg: 36px; --lh-metric-lg: 1.00; --fw-metric-lg: 500;
+  --fs-metric-sm: 20px; --lh-metric-sm: 1.10; --fw-metric-sm: 500;
+
+  /* ---- Spacing — 8px grid (doc §9.2) ---- */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+
+  /* ---- Radius (doc §9.3) ---- */
+  --radius-xs: 4px; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px;
+  /* usage: cards 10px · buttons 8px (use sm+2 or 8px) · badges 999px · modals 14px */
+  --radius-pill: 999px;
+
+  /* ---- Borders & shadows (doc §9.4 — prefer borders over heavy shadows) ---- */
+  --border-light: 1px solid rgba(16, 24, 32, 0.12);
+  --border-dark:  1px solid rgba(248, 244, 236, 0.16);
+  --shadow-card:    0 1px 2px rgba(16, 24, 32, 0.06);
+  --shadow-popover: 0 12px 32px rgba(16, 24, 32, 0.16);
+
+  /* ---- Focus ring (doc §22.2 + Phase-40 accessibility finding) ----
+     #256C82 passes 3:1 only on LIGHT surfaces (2.7:1 on Deep Slate). Use the
+     light ring on dark surfaces. */
+  --focus-ring:         2px solid #256C82;
+  --focus-ring-on-dark: 2px solid #F8F4EC;
+  --focus-offset: 2px;
+
+  /* ---- Motion (doc §21 — orient/confirm/reveal; respect reduced-motion) ---- */
+  --motion-fast: 120ms;
+  --motion-base: 200ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Dark surface remap (admin shell / dark sections). Apply on a dark container. */
+[data-theme="dark"] {
+  --bg:        var(--deep-slate);
+  --surface:   var(--wall-slate);
+  --text:      var(--limestone);
+  --text-muted:var(--stone);
+  --link:      #6FA8BC;              /* lightened Watch Blue for AA on dark */
+  --border:    rgba(248, 244, 236, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion-fast: 0ms; --motion-base: 0ms; }
+}
