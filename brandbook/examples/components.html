@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Parapet — Components</title>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-sans);
+       font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:var(--space-7) var(--space-6)}
+
+  /* section headings */
+  h1{font-size:var(--fs-h1);font-weight:var(--fw-h1);line-height:var(--lh-h1);margin:0 0 var(--space-2)}
+  h2{font-size:var(--fs-h2);font-weight:var(--fw-h2);line-height:var(--lh-h2);margin:var(--space-7) 0 var(--space-3);
+     border-bottom:var(--border-light);padding-bottom:var(--space-2)}
+  h3{font-size:var(--fs-h3);font-weight:var(--fw-h3);margin:var(--space-5) 0 var(--space-3)}
+  p.lead{max-width:68ch;color:var(--text-muted);margin:0 0 var(--space-5)}
+  .kicker{font-family:var(--font-mono);font-size:var(--fs-caption);letter-spacing:1px;
+          text-transform:uppercase;color:var(--watch-blue);margin:0 0 var(--space-3)}
+
+  /* layout */
+  .grid{display:grid;gap:var(--space-4)}
+  .g2{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  @media(max-width:760px){.g2,.g3{grid-template-columns:1fr}}
+
+  /* panel / card */
+  .panel{border:var(--border-light);border-radius:var(--radius-md);
+         padding:var(--space-5);background:var(--surface);box-shadow:var(--shadow-card)}
+  .card{border:var(--border-light);border-radius:var(--radius-md);
+        padding:var(--space-5);background:var(--surface);box-shadow:var(--shadow-card)}
+
+  /* buttons */
+  .btn{font-family:var(--font-sans);font-weight:600;font-size:var(--fs-body-sm);
+       border-radius:8px;padding:9px 16px;border:1px solid transparent;cursor:pointer;
+       transition:opacity var(--motion-fast) var(--motion-ease)}
+  .btn:hover{opacity:0.88}
+  .btn-primary{background:var(--watch-blue);color:var(--limestone)}
+  .btn-ghost{background:transparent;color:var(--text);border-color:var(--border)}
+  .btn-danger{background:var(--incident-red);color:var(--limestone)}
+  .btn:focus-visible{outline:var(--focus-ring);outline-offset:var(--focus-offset)}
+
+  /* dark-surface overrides for buttons */
+  [data-theme="dark"] .btn-ghost{color:var(--limestone);border-color:var(--border)}
+  [data-theme="dark"] .btn:focus-visible{outline:var(--focus-ring-on-dark)}
+
+  /* badges */
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-caption);
+         font-weight:600;padding:3px 10px;border-radius:var(--radius-pill);border:1px solid}
+  .dot{width:10px;height:10px;border-radius:var(--radius-pill);flex:0 0 auto}
+
+  /* callout */
+  .callout{border-left:3px solid var(--watch-blue);background:var(--mortar);
+           padding:var(--space-3) var(--space-4);border-radius:var(--radius-sm)}
+  [data-theme="dark"] .callout{background:var(--wall-slate);color:var(--limestone)}
+
+  /* SLO card */
+  .slo{border:var(--border-light);border-radius:var(--radius-md);
+       padding:var(--space-4);background:var(--surface)}
+  .slo-metric{font-family:var(--font-mono);font-size:var(--fs-metric-lg);
+              font-weight:500;line-height:1}
+  .slo-caption{font-size:var(--fs-caption);color:var(--text-muted);margin-top:var(--space-1)}
+
+  /* form inputs */
+  .field{display:flex;flex-direction:column;gap:var(--space-1)}
+  .field label{font-size:var(--fs-body-sm);font-weight:600;color:var(--text)}
+  .input{font-family:var(--font-sans);font-size:var(--fs-body-sm);color:var(--text);
+         background:var(--surface);border:var(--border-light);border-radius:var(--radius-sm);
+         padding:8px 12px;width:100%;outline:none}
+  .input:focus{outline:var(--focus-ring);outline-offset:var(--focus-offset)}
+  textarea.input{resize:vertical;min-height:72px}
+  [data-theme="dark"] .input{background:var(--wall-slate);color:var(--limestone);border-color:var(--border)}
+  [data-theme="dark"] .input:focus{outline:var(--focus-ring-on-dark)}
+
+  /* code block */
+  .codeblock{background:var(--deep-slate);color:var(--mortar);font-family:var(--font-mono);
+             font-size:var(--fs-code);line-height:var(--lh-code);
+             padding:var(--space-4);border-radius:var(--radius-md);overflow:auto}
+  .codeblock .c-muted{color:var(--stone)}
+
+  /* dark section wrapper */
+  .dark-section{background:var(--deep-slate);border-radius:var(--radius-lg);
+                padding:var(--space-6);margin-top:var(--space-6)}
+  .dark-label{font-family:var(--font-mono);font-size:var(--fs-caption);color:var(--stone);
+              text-transform:uppercase;letter-spacing:.5px;margin-bottom:var(--space-4)}
+
+  /* spacing */
+  .stack{display:flex;flex-direction:column;gap:var(--space-3)}
+  .row{display:flex;gap:var(--space-3);flex-wrap:wrap;align-items:center}
+
+  .muted{color:var(--text-muted)}
+  @media(prefers-reduced-motion:reduce){.btn{transition:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <p class="kicker">Parapet — Component Gallery</p>
+  <h1>UI Primitives</h1>
+  <p class="lead">Token-driven components shown in light and dark. Every color, size, and spacing value comes from <code>../tokens/tokens.css</code> custom properties — no hardcoded hex or px in this file.</p>
+
+  <!-- BUTTONS -->
+  <h2>Buttons</h2>
+  <div class="panel">
+    <div class="row">
+      <button class="btn btn-primary">Open runbook</button>
+      <button class="btn btn-ghost">View evidence</button>
+      <button class="btn btn-danger">Roll back deploy</button>
+    </div>
+    <p class="muted" style="font-size:var(--fs-body-sm);margin:var(--space-4) 0 0">Primary · Ghost · Danger — all using <code>var(--watch-blue)</code>, <code>var(--incident-red)</code>, and <code>var(--border)</code> tokens.</p>
+  </div>
+
+  <!-- BADGES -->
+  <h2>Status Badges</h2>
+  <div class="panel">
+    <div class="row" style="margin-bottom:var(--space-3)">
+      <span class="badge" style="color:var(--healthy-text);background:var(--healthy-bg);border-color:var(--healthy-border)">
+        <span class="dot" style="background:var(--budget-moss)"></span>Healthy
+      </span>
+      <span class="badge" style="color:var(--watch-text);background:var(--watch-bg);border-color:var(--watch-border)">
+        <span class="dot" style="background:var(--beacon-amber)"></span>Watch
+      </span>
+      <span class="badge" style="color:var(--burning-text);background:var(--burning-bg);border-color:var(--burning-border)">
+        <span class="dot" style="background:var(--incident-red)"></span>Burning
+      </span>
+      <span class="badge" style="color:var(--exhausted-text);background:var(--exhausted-bg);border-color:var(--exhausted-border)">
+        <span class="dot" style="background:var(--exhausted-text)"></span>Exhausted
+      </span>
+      <span class="badge" style="color:var(--unknown-text);background:var(--unknown-bg);border-color:var(--unknown-border)">
+        <span class="dot" style="background:var(--unknown-text)"></span>Unknown
+      </span>
+    </div>
+    <p class="muted" style="font-size:var(--fs-body-sm);margin:0">Always pair color with a word + icon. Status tokens: <code>--healthy-*</code>, <code>--watch-*</code>, <code>--burning-*</code>.</p>
+  </div>
+
+  <!-- CALLOUT -->
+  <h2>Callout</h2>
+  <div class="panel">
+    <div class="callout">
+      <strong>Login success SLO fast-burn</strong> — users may be unable to sign in. 5-minute burn rate is 9.3x. First correlated change: deploy 3c1a9bd.
+    </div>
+    <p class="muted" style="font-size:var(--fs-body-sm);margin:var(--space-4) 0 0">Left border <code>var(--watch-blue)</code> · background <code>var(--mortar)</code>.</p>
+  </div>
+
+  <!-- SLO CARD -->
+  <h2>SLO Card</h2>
+  <div class="grid g2">
+    <div class="slo">
+      <div style="font-weight:600;margin-bottom:var(--space-2)">Checkout completion</div>
+      <div class="slo-metric">14.2<span style="font-size:var(--fs-metric-sm)">x</span>
+        <span style="font-size:var(--fs-caption);color:var(--burning-text)">5m burn</span>
+      </div>
+      <div class="slo-caption">Target 99.5% · budget 41% · deploy 8f31c2a, 6 min before burn</div>
+    </div>
+    <div class="slo">
+      <div style="font-weight:600;margin-bottom:var(--space-2)">Login success</div>
+      <div class="slo-metric" style="color:var(--budget-moss)">99.8<span style="font-size:var(--fs-metric-sm)">%</span>
+        <span style="font-size:var(--fs-caption);color:var(--healthy-text)">healthy</span>
+      </div>
+      <div class="slo-caption">Target 99.5% · budget 82% · last deploy 4h ago</div>
+    </div>
+  </div>
+
+  <!-- CARDS -->
+  <h2>Cards</h2>
+  <div class="grid g2">
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:var(--space-2)">Deploy correlation</div>
+      <p class="muted" style="font-size:var(--fs-body-sm);margin:0">First anomalous deploy inside the burn window: <code style="font-family:var(--font-mono);font-size:.9em;background:var(--mortar);padding:1px 5px;border-radius:var(--radius-xs)">8f31c2a</code> — 6 minutes before burn onset.</p>
+    </div>
+    <div class="card">
+      <div style="font-weight:600;margin-bottom:var(--space-2)">Runbook</div>
+      <p class="muted" style="font-size:var(--fs-body-sm);margin:0">Checkout rollback procedure. Step 1: confirm deploy SHA. Step 2: run <code style="font-family:var(--font-mono);font-size:.9em;background:var(--mortar);padding:1px 5px;border-radius:var(--radius-xs)">mix parapet.rollback</code>. Step 3: verify SLO recovery.</p>
+    </div>
+  </div>
+
+  <!-- FORM INPUTS -->
+  <h2>Form Inputs</h2>
+  <div class="panel">
+    <div class="grid g3" style="gap:var(--space-5)">
+      <div class="field">
+        <label for="inp-journey">Journey name</label>
+        <input id="inp-journey" class="input" type="text" placeholder="checkout_completion">
+      </div>
+      <div class="field">
+        <label for="inp-target">SLO target</label>
+        <select id="inp-target" class="input">
+          <option>99.5%</option>
+          <option>99.9%</option>
+          <option>99.99%</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="inp-notes">Notes</label>
+        <textarea id="inp-notes" class="input" placeholder="Describe the journey…"></textarea>
+      </div>
+    </div>
+    <p class="muted" style="font-size:var(--fs-body-sm);margin:var(--space-4) 0 0">Border <code>var(--border-light)</code> · radius <code>var(--radius-sm)</code> · focus ring <code>var(--focus-ring)</code>.</p>
+  </div>
+
+  <!-- CODE BLOCK -->
+  <h2>Code Block</h2>
+  <div class="codeblock"><span class="c-muted">deploy_sha:</span> 8f31c2a   <span class="c-muted">route:</span> GET /checkout/:id
+<span class="c-muted">slo:</span> checkout_completion   burn_rate_5m: 14.2x
+<span class="c-muted">budget_remaining:</span> 41%   <span class="c-muted">window:</span> 6 min before burn</div>
+
+  <!-- DARK SURFACE -->
+  <h2>Dark Surface (<code>data-theme="dark"</code>)</h2>
+  <div class="dark-section" data-theme="dark">
+    <div class="dark-label">dark — admin shell</div>
+    <div class="stack">
+      <div class="row" style="margin-bottom:var(--space-2)">
+        <button class="btn btn-primary">Open runbook</button>
+        <button class="btn btn-ghost">View evidence</button>
+        <button class="btn btn-danger">Roll back deploy</button>
+      </div>
+      <div class="callout" style="border-color:var(--beacon-amber-light)">
+        Login success SLO fast-burn: users may be unable to sign in.
+      </div>
+      <div class="slo" style="background:var(--wall-slate);border-color:var(--border)">
+        <div style="font-weight:600;color:var(--limestone);margin-bottom:var(--space-2)">Checkout completion</div>
+        <div class="slo-metric" style="color:var(--limestone)">14.2<span style="font-size:var(--fs-metric-sm)">x</span>
+          <span style="font-size:var(--fs-caption);color:var(--burning-text)">5m burn</span>
+        </div>
+        <div style="font-size:var(--fs-caption);color:var(--stone);margin-top:var(--space-1)">Target 99.5% · budget 41% · deploy 8f31c2a</div>
+      </div>
+      <div class="field">
+        <label for="inp-dark-journey" style="color:var(--limestone)">Journey name</label>
+        <input id="inp-dark-journey" class="input" type="text" placeholder="checkout_completion">
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
