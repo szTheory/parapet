@@ -23,9 +23,9 @@
 
 ### Self-Hosted Fonts
 
-- [ ] **FONT-01**: Subsetted IBM Plex Sans (400/500/600) and IBM Plex Mono (400/500) woff2 files (latin subset) are vendored under `priv/static/parapet/fonts/`, with the subsetting command documented for reproducibility, and added to the Hex `files:` whitelist within a tracked package-size budget.
+- [x] **FONT-01**: Subsetted IBM Plex Sans (400/500/600) and IBM Plex Mono (400/500) woff2 files (latin subset) are vendored under `priv/static/parapet/fonts/`, with the subsetting command documented for reproducibility, and added to the Hex `files:` whitelist within a tracked package-size budget.
 - [ ] **FONT-02**: `operator_theme_bootstrap/1` emits `@font-face` rules referencing the host static path with `font-display: swap`, and the UI renders correctly on the system-stack fallback before fonts load (no FOUT breakage, no layout shift).
-- [ ] **FONT-03**: The generator (`mix parapet.gen.ui` or a focused asset step) copies the vendored woff2 into the host app's static directory, and the demo app vendors/serves the same fonts so screenshots render true IBM Plex.
+- [x] **FONT-03**: The generator (`mix parapet.gen.ui` or a focused asset step) copies the vendored woff2 into the host app's static directory, and the demo app vendors/serves the same fonts so screenshots render true IBM Plex.
 
 ### Primitive Components
 
@@ -157,9 +157,9 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | TOKEN-03 | Phase 44 | Pending |
 | TOKEN-04 | Phase 44 | Pending |
 | TOKEN-05 | Phase 44 | Pending |
-| FONT-01 | Phase 44 | Pending |
+| FONT-01 | Phase 44 | Complete |
 | FONT-02 | Phase 44 | Pending |
-| FONT-03 | Phase 44 | Pending |
+| FONT-03 | Phase 44 | Complete |
 | A11Y-01 | Phase 44 | Pending |
 | MOTION-01 | Phase 44 | Pending |
 | GALLERY-01 | Phase 44 | Pending |
@@ -222,6 +222,7 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | GUARD-07 | Phase 50 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 68 total
 - Mapped to phases: 68 ✓
 - Unmapped: 0 ✓

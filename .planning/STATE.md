@@ -2,17 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
-current_phase_name: defining requirements
+current_phase: 44
+current_phase_name: foundations-token-re-skin-fonts-audit-apparatus
 status: executing
 stopped_at: Phase 44 context gathered (assumptions mode)
-last_updated: "2026-06-24T21:31:57.027Z"
+last_updated: "2026-06-24T21:39:34.677Z"
 last_activity: 2026-06-24
-last_activity_desc: Milestone v1.6 started
+last_activity_desc: Phase 44 execution started
 progress:
   total_phases: 7
   completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_plans: 4
+  completed_plans: 1
   percent: 0
 ---
 
@@ -23,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo System milestone completed)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Planning next milestone — run `/gsd-new-milestone`
+**Current focus:** Phase 44 — foundations-token-re-skin-fonts-audit-apparatus
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
+Phase: 44 (foundations-token-re-skin-fonts-audit-apparatus) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-24 — Milestone v1.6 started
+Last activity: 2026-06-24 — Phase 44 execution started
 
 ## Performance Metrics
 
@@ -78,6 +79,8 @@ Recent decisions affecting current work:
 - [Phase ?]: readme-header.svg tagline as <text> element (IBM Plex Mono) — practical for README banner, palette-clean
 - [Phase ?]: parapet-mark.svg chosen for ExDoc sidebar logo — most compact 32x52 viewBox, mix docs clean
 - [Phase ?]: Zero-config path-stable HexDocs swap complete: mix.exs unchanged, five exploration HTMLs deleted
+- [Phase ?]: Use File.cp! for woff2 binary copy to avoid Igniter string-encoding corruption
+- [Phase ?]: IBM Plex latin woff2 vendored via python3 fontTools.subset: 53 KB total, 65% under 150 KB ceiling
 
 ### Pending Todos
 
@@ -99,7 +102,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-24T20:53:50.893Z
+Last session: 2026-06-24T21:39:17.652Z
 Stopped at: Phase 44 context gathered (assumptions mode)
 Resume file: .planning/phases/44-foundations-token-re-skin-fonts-audit-apparatus/44-CONTEXT.md
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
