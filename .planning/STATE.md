@@ -2,9 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
-status: planning
-last_updated: "2026-06-24T19:08:57.758Z"
-last_activity: 2026-06-24
+status: Defining requirements
+stopped_at: Phase 44 context gathered (assumptions mode)
+last_updated: "2026-06-24T20:53:50.897Z"
+last_activity: 2026-06-24 — Milestone v1.6 started
 progress:
   total_phases: 7
   completed_phases: 0
@@ -96,9 +97,9 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-24T17:48:10.603Z
-Stopped at: Session resumed — context restored; proceeding to plan Phase 43 (final).
-Resume file: `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff — read first)
+Last session: 2026-06-24T20:53:50.893Z
+Stopped at: Phase 44 context gathered (assumptions mode)
+Resume file: .planning/phases/44-foundations-token-re-skin-fonts-audit-apparatus/44-CONTEXT.md
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 
 ## Operator Next Steps
