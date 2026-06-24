@@ -48,7 +48,11 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   3. Motion is driven by the brand motion tokens and fully zeroed under `prefers-reduced-motion`; per-surface focus rings (watch-blue on light, limestone on dark) are enforced by the contrast gate, not left to component authors.
   4. A developer can open the demo-only `/parapet/_gallery` route (never shipped into generated host UI) and the committed `operator-audit-matrix.md` ledger enumerates every component × state cell with a todo/done/verified status.
   5. `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 44-01-PLAN.md — Vendor + subset IBM Plex woff2, whitelist for Hex, generator font-copy step, demo static_paths, font budget test (Wave 1)
+- [ ] 44-02-PLAN.md — Values-only token re-skin across all 3 CSS blocks + @font-face + motion + focus rings in template & demo mirror; verify secondary templates (Wave 1)
+- [ ] 44-03-PLAN.md — Demo-only `/parapet/_gallery` GalleryLive + route, and the `operator-audit-matrix.md` ledger (Wave 1)
+- [ ] 44-04-PLAN.md — Re-pin `operator_ui_contrast_test.exs` to brand hexes + additive demo-contract assertions (Wave 2)
 **UI hint**: yes
 
 ### Phase 45: Primitive components
