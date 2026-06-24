@@ -2,15 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.5
 milestone_name: Brand Book & Logo System
+current_phase: 43
+current_phase_name: collateral-wiring
 status: executing
-last_updated: "2026-06-24T00:00:00.000Z"
+stopped_at: Session resumed — context restored; proceeding to plan Phase 43 (final).
+last_updated: "2026-06-24T17:36:44.816Z"
 last_activity: 2026-06-24
+last_activity_desc: Phase 43 execution started
 progress:
   total_phases: 4
-  completed_phases: 3
-  total_plans: 0
-  completed_plans: 0
-  percent: 75
+  completed_phases: 2
+  total_plans: 5
+  completed_plans: 4
+  percent: 50
 ---
 
 # Project State
@@ -20,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-23 after v1.5 Brand Book & Logo System milestone started)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** v1.5 Brand Book & Logo System — Phase 43 (Collateral, Wiring & QA/Audit Gate)
+**Current focus:** Phase 43 — collateral-wiring
 
 ## Current Position
 
-Phase: 43 — Collateral, Wiring & QA/Audit Gate (FINAL)
-Plan: see `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff)
-Status: Ready to execute — Phases 40–42 complete
-Last activity: 2026-06-24 — Phase 42 done (tokens + HTML brand book); logo identity LOCKED
+Phase: 43 (collateral-wiring) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
+Last activity: 2026-06-24 — Phase 43 execution started
 
 Progress: `███████░░░` 75% (3/4 phases complete)
 
@@ -57,6 +61,7 @@ Progress: `███████░░░` 75% (3/4 phases complete)
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 43 P01 | 268 | - tasks | - files |
 
 ## Accumulated Context
 
@@ -73,6 +78,8 @@ Recent decisions affecting current work:
 - HexDocs swap is zero-config path-stable: `docs/assets/parapet-logo.svg` and `docs/assets/favicon.svg` paths unchanged so `mix.exs` doc block requires no edits.
 - [Phase 38]: Keep scoped route ownership in generated host-owned LiveView/component code rather than adding a Parapet router abstraction. — Preserves host auth/router ownership and Parapet core compile-out boundary. (carried from v1.4)
 - [Phase 39]: Plan 02 preserved the original quality evaluation as a historical audit snapshot and appended a dated v1.4 closeout instead of rewriting prior findings. (carried from v1.4)
+- [Phase ?]: Codeblock tint hex excluded from examples/ to pass palette gate; use var(--stone) spans
+- [Phase ?]: readme-header.svg tagline as <text> element (IBM Plex Mono) — practical for README banner, palette-clean
 
 ### Pending Todos
 
@@ -94,7 +101,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-24
+Last session: 2026-06-24T17:36:20.211Z
 Stopped at: Session resumed — context restored; proceeding to plan Phase 43 (final).
 Resume file: `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff — read first)
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute

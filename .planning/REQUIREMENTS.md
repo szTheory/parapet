@@ -30,7 +30,7 @@
 
 ## Collateral, Wiring & QA
 
-- [ ] **COLLAT-01**: Implementation-ready collateral is built on the tokens — `brandbook/examples/components.html` (buttons/cards/badges/callouts), `brandbook/examples/landing-section.html` (Deep Slate hero with a restrained stepped mark), and `brandbook/examples/readme-header.svg` (README/social banner) — each opening from `file://`.
+- [x] **COLLAT-01**: Implementation-ready collateral is built on the tokens — `brandbook/examples/components.html` (buttons/cards/badges/callouts), `brandbook/examples/landing-section.html` (Deep Slate hero with a restrained stepped mark), and `brandbook/examples/readme-header.svg` (README/social banner) — each opening from `file://`.
 - [ ] **COLLAT-02**: The off-brand `docs/assets/parapet-logo.svg` and `docs/assets/favicon.svg` are replaced with the on-brand winners, `mix.exs` logo/favicon paths are left unchanged (zero-config swap), and `mix docs` renders the new mark without error.
 - [ ] **COLLAT-03**: A repo-hygiene audit passes — `brandbook/` within the size budget (≤ ~250 KB), zero raster/font binaries, no full-viewBox rectangular background in any logo asset, no off-palette hex in any SVG/CSS, and the git diff scoped to `brandbook/`, the two `docs/assets/*.svg`, and the `mix.exs` doc block.
 
@@ -71,11 +71,12 @@ Explicitly excluded for this milestone, with reasoning, to prevent scope creep.
 | TOKEN-01 | 42 | Complete |
 | TOKEN-02 | 42 | Complete |
 | TOKEN-03 | 42 | Complete |
-| COLLAT-01 | 43 | Pending |
+| COLLAT-01 | 43 | Complete |
 | COLLAT-02 | 43 | Pending |
 | COLLAT-03 | 43 | Pending |
 
 **Coverage:**
+
 - v1.5 requirements: 13 total
 - Mapped to phases: 13
 - Unmapped: 0 ✓

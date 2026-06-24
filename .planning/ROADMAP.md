@@ -15,7 +15,7 @@
 | 40 — Brand Pressure-Test & Critique Gate | De-risk before authoring: distill load-bearing brand values, build WCAG AA contrast matrix, freeze logo acceptance checklist | BRAND-01, BRAND-02, BRAND-03 | Not started |
 | 41 — Logo Exploration & User Selection Gate | Author 4 distinct on-brand SVG logo directions, render comparison gallery, STOP for user selection | LOGO-01, LOGO-02, LOGO-03, LOGO-04 | Not started |
 | 42 — Token System & HTML Brand Book | Emit tokens.css + tokens.json, expand selected logo into full variation set, build self-contained brand book | TOKEN-01, TOKEN-02, TOKEN-03 | Not started |
-| 43 — Collateral, Wiring & QA/Audit Gate | Build token-driven collateral examples, replace off-brand HexDocs assets, pass repo-hygiene audit | COLLAT-01, COLLAT-02, COLLAT-03 | Not started |
+| 43 — Collateral, Wiring & QA/Audit Gate | 1/3 | In Progress|  |
 
 ### Phase Checklist
 
@@ -104,10 +104,10 @@
   3. The repo-hygiene audit passes: `brandbook/` is within the ≤ ~250 KB size budget, contains zero raster or font binaries, has no full-viewBox rectangular background in any logo asset, and has no off-palette hex in any SVG or CSS file.
   4. The git diff for this milestone is scoped exclusively to `brandbook/`, the two `docs/assets/*.svg` files, and the `mix.exs` doc block — no unrelated files are touched.
 
-**Plans**: 3 plans
+**Plans**: 1/3 plans executed
 **Wave 1**
 
-- [ ] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
+- [x] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
