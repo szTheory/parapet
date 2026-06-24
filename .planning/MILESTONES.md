@@ -1,5 +1,24 @@
 # Milestones
 
+## v1.5 Brand Book & Logo System (Shipped: 2026-06-24)
+
+**Phases completed:** 4 phases (40–43), 11 plans, 16 tasks
+
+**Key accomplishments:**
+
+- Distilled the 1,874-line brand research into a single maintainer-readable brand reference (`brandbook/notes/research.md`) with WCAG AA contrast matrix and frozen anti-criteria checklist — no values re-derived
+- Ran a 6-round logo tournament producing the locked corbelled-tower stacked emblem (Space Grotesk tight-caps, outlined to paths, Watch Blue loophole accent) — identity frozen in `decision-log.md` D-003 before any downstream work began
+- Emitted a complete token system (`brandbook/tokens/tokens.css` + `tokens.json`) and self-contained HTML brand book (`brandbook/index.html`) with logo gallery, color system, type-scale specimens, components (light + dark), voice/microcopy, and accessibility notes — opens from `file://` with no build step
+- Built three token-driven collateral artifacts (`brandbook/examples/components.html`, `landing-section.html`, `readme-header.svg`) all palette-locked, binary-free, and openable from `file://`
+- Replaced the off-brand Tailwind-slate/Arial `docs/assets/parapet-logo.svg` and `favicon.svg` with the on-brand corbelled-tower mark — zero-config path-stable swap; `mix.exs` paths unchanged; `mix docs` builds clean
+- Passed the full COLLAT-03 repo-hygiene gate: PALETTE OK (zero off-palette hex in all SVGs), BINARIES OK (zero raster/font binaries in `brandbook/`), SIZE OK (192 KB ≤ 250 KB budget), SCOPE OK (diff limited to `brandbook/`, `docs/assets/*.svg`, `.planning/`)
+
+**Audit:** Passed 2026-06-24: 13/13 requirements, 4/4 phases, 4/4 integration checks, 5/5 E2E flows. See [`milestones/v1.5-MILESTONE-AUDIT.md`](milestones/v1.5-MILESTONE-AUDIT.md).
+
+**Known deferred items at close:** Self-hosted webfont bundle (`@font-face` IBM Plex woff2) for pixel-consistent offline rendering; raster exports (PNG/ICO favicons, OpenGraph social-card images); token → Tailwind/daisyUI theme generator and HEEx component snippets; retheme the generated Operator LiveView UI to new tokens (host-owned, separate milestone); animated/motion logo, Figma source-of-truth, multi-page PDF brand book.
+
+---
+
 ## v1.4 Trust Hardening & Host-App Compatibility (Shipped: 2026-06-04)
 
 **Phases completed:** 3 phases, 8 plans, 21 tasks

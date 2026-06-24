@@ -15,14 +15,14 @@
 | 40 — Brand Pressure-Test & Critique Gate | De-risk before authoring: distill load-bearing brand values, build WCAG AA contrast matrix, freeze logo acceptance checklist | BRAND-01, BRAND-02, BRAND-03 | Not started |
 | 41 — Logo Exploration & User Selection Gate | Author 4 distinct on-brand SVG logo directions, render comparison gallery, STOP for user selection | LOGO-01, LOGO-02, LOGO-03, LOGO-04 | Not started |
 | 42 — Token System & HTML Brand Book | Emit tokens.css + tokens.json, expand selected logo into full variation set, build self-contained brand book | TOKEN-01, TOKEN-02, TOKEN-03 | Not started |
-| 43 — Collateral, Wiring & QA/Audit Gate | 2/3 | In Progress|  |
+| 43 — Collateral, Wiring & QA/Audit Gate | COLLAT-01, COLLAT-02, COLLAT-03 | Complete |
 
 ### Phase Checklist
 
 - [x] **Phase 40: Brand Pressure-Test & Critique Gate** - Distill brand reference, build WCAG AA matrix, freeze logo acceptance checklist
 - [x] **Phase 41: Logo Exploration & User Selection Gate** - 6-round tournament → locked S2 (corbelled-tower stacked emblem, Space Grotesk); outlined asset set shipped
 - [x] **Phase 42: Token System & HTML Brand Book** - tokens.css/json, full logo variation set, self-contained index.html brand book
-- [ ] **Phase 43: Collateral, Wiring & QA/Audit Gate** - Build collateral, swap HexDocs assets, pass hygiene audit *(blocked on Phase 42)*
+- [x] **Phase 43: Collateral, Wiring & QA/Audit Gate** - Build collateral, swap HexDocs assets, pass hygiene audit
 
 ## Phase Details
 
@@ -104,18 +104,11 @@
   3. The repo-hygiene audit passes: `brandbook/` is within the ≤ ~250 KB size budget, contains zero raster or font binaries, has no full-viewBox rectangular background in any logo asset, and has no off-palette hex in any SVG or CSS file.
   4. The git diff for this milestone is scoped exclusively to `brandbook/`, the two `docs/assets/*.svg` files, and the `mix.exs` doc block — no unrelated files are touched.
 
-**Plans**: 2/3 plans executed
-**Wave 1**
+**Plans**: 3 plans
 
 - [x] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
 - [x] 43-02-PLAN.md — COLLAT-02: zero-config HexDocs logo/favicon swap + trim exploration HTMLs
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [ ] 43-03-PLAN.md — COLLAT-03: repo-hygiene QA gate + v1.5 milestone audit + ledger updates
+- [x] 43-03-PLAN.md — COLLAT-03: repo-hygiene QA gate + v1.5 milestone audit + ledger updates
 
 ---
 
@@ -126,4 +119,4 @@
 | 40. Brand Pressure-Test & Critique Gate | 1/1 | Complete | 2026-06-23 |
 | 41. Logo Exploration & User Selection Gate | 6/6 | Complete | 2026-06-24 |
 | 42. Token System & HTML Brand Book | 3/3 | Complete | 2026-06-24 |
-| 43. Collateral, Wiring & QA/Audit Gate | 0/3 | Not started | - |
+| 43. Collateral, Wiring & QA/Audit Gate | 3/3 | Complete | 2026-06-24 |
