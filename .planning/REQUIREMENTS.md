@@ -17,10 +17,10 @@
 
 ## Logo System
 
-- [ ] **LOGO-01**: Four distinct, on-brand, transparent-background logo directions are hand-authored as optimized SVGs grounded in named brand directions (stepped-parapet mark, integrated typemark, P-monogram, edge+sightline), including at least one fully-integrated custom typemark where the motif is worked into the wordmark itself.
-- [ ] **LOGO-02**: A side-by-side comparison gallery (`brandbook/notes/logo-options.html`) renders every direction on Limestone / Deep Slate / Stone preview surfaces at hero, inline, and 16px sizes, each with a one-line rationale, openable from `file://` with no network dependency.
-- [ ] **LOGO-03**: Each direction demonstrates it survives reduction — shown in single-ink monochrome and cropped to a 16px favicon — so small-size legibility is provable before a winner is chosen.
-- [ ] **LOGO-04**: The user selects one direction (or a blend instruction) at the gallery gate, and the choice plus rationale is recorded in `decision-log.md` before any downstream token or brand-book build begins. *(Hard human gate — blocks Phases 42–43.)*
+- [x] **LOGO-01**: On-brand, transparent-background logo directions hand-authored as optimized SVGs grounded in named brand directions, including a fully-integrated typemark. *(Delivered across 6 rounds; final = corbelled-parapet-tower stacked emblem.)*
+- [x] **LOGO-02**: Side-by-side comparison galleries (`logo-options.html`, `logo-round-2..6.html`) render directions on Limestone / Deep Slate / Stone at multiple sizes, openable from `file://`.
+- [x] **LOGO-03**: Each direction proven in single-ink monochrome and at 16px favicon before selection.
+- [x] **LOGO-04**: User locked **S2** (Space Grotesk tight-caps stacked emblem); choice + 6-round rationale recorded in `decision-log.md` D-003. Final outlined asset set in `brandbook/assets/`. *(Gate cleared.)*
 
 ## Token System & HTML Brand Book
 
@@ -64,10 +64,10 @@ Explicitly excluded for this milestone, with reasoning, to prevent scope creep.
 | BRAND-01 | 40 | Complete |
 | BRAND-02 | 40 | Complete |
 | BRAND-03 | 40 | Complete |
-| LOGO-01 | 41 | Pending |
-| LOGO-02 | 41 | Pending |
-| LOGO-03 | 41 | Pending |
-| LOGO-04 | 41 | Pending |
+| LOGO-01 | 41 | Complete |
+| LOGO-02 | 41 | Complete |
+| LOGO-03 | 41 | Complete |
+| LOGO-04 | 41 | Complete |
 | TOKEN-01 | 42 | Pending |
 | TOKEN-02 | 42 | Pending |
 | TOKEN-03 | 42 | Pending |

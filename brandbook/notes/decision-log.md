@@ -45,10 +45,25 @@ A logo direction is **acceptable** only if:
 
 ## D-003 — Logo direction selection
 
-**Date:** _pending — Phase 41 user-selection gate (LOGO-04)._
-**Status:** OPEN. Phase 42 is blocked until this records a chosen direction.
+**Date:** 2026-06-24 (Phase 41, LOGO-04) · **Status:** LOCKED. Gate cleared; Phase 42 unblocked.
 
-> To be filled when the user picks from `logo-options.html`: chosen direction (A/B/C/D or blend), rationale, and any tweak instructions (color/weight/spacing).
+**Chosen:** a **stacked emblem** — a **corbelled parapet tower** mark above the wordmark **PARAPET** set in **Space Grotesk** (600, tight caps), with a single **Watch Blue `#256C82`** arrow-slit/loophole as the only accent. The tower's *projecting crenellated top* is a literal parapet (and reads as a chess rook); it works **standalone** as the avatar/favicon and **stacked** as the full lockup.
+
+**How we got here (6 rounds — see `logo-options.html`, `logo-round-2..6.html`):**
+1. Round 1 (A/B/C/D, icon-beside-text) — rejected: not integrated.
+2. Round 2 (carved-crenellation wordmark) — picked "Rook P lead".
+3. Round 3 (9 rook-P variants) — rejected: hand-built rectangle letters read as crude "8-bit/Atari" graphics; R confused with A; too samey. **Lesson: don't hand-build letterforms.**
+4. Round 4 (real OFL typefaces, 6 fresh directions) — user liked the **rook tower** concept; font/lockup/sizing still off.
+5. Round 5 (refined corbelled tower × font/layout/sizing) — user picked the **stacked emblem**.
+6. Round 6 (deep stacked-emblem tournament) — user locked **S2: Space Grotesk tight caps.**
+
+**Type/asset strategy:** Space Grotesk is OFL (shippable). The wordmark is **outlined to paths** (via fonttools from the woff2) so every asset is **font-independent** — no font binary committed, renders identically in HexDocs. Deviates from the research doc's IBM Plex Sans for the logo per the user's explicit permission to change fonts; IBM Plex Sans/Mono/Serif remain the **UI/docs/code** typefaces in the brand book.
+
+**Final asset set (`brandbook/assets/`):** `parapet-logo.svg` (primary stacked) · `parapet-inverse.svg` · `parapet-mono.svg` · `parapet-horizontal.svg` (+ `-inverse`) · `parapet-mark.svg` (+ `-inverse`) · `favicon.svg`. All transparent, palette-locked, no background cage, no subtitle on the primary. Colors: Parapet Black `#101820` ink, Watch Blue `#256C82` loophole; inverse uses Limestone `#F8F4EC` ink.
+
+**Acceptance checklist (D-002):** all pass — transparent ✓ palette-locked ✓ on-brand type (outlined, font-independent) ✓ unified mark+type (stacked, shared axis) ✓ calm/architectural ✓ no primary subtitle ✓ integrated/own typemark ✓ on-metaphor (parapet/rook, off the AVOID list*) ✓ survives mono + 16px favicon ✓ repo-lean (≤1.8 KB each) ✓.
+
+> *The research doc cautions against castles/turrets; the user explicitly steered toward the rook/tower and approved it. Kept restrained (a single low tower, not a fortress) to stay calm.
 
 ---
 
