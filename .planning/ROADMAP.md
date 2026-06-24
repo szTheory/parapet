@@ -35,6 +35,7 @@
 **Requirements**: BRAND-01, BRAND-02, BRAND-03
 
 **Success Criteria** (what must be TRUE):
+
   1. A maintainer can open `brandbook/notes/research.md` and read the load-bearing values (color tokens with roles, type scale, spacing/radius/shadow tokens, voice rules, the four logo directions, and the AVOID list) — each with a citation back to `prompts/parapet-brand-identity-deep-research.md` — without needing to read the 1,874-line source doc.
   2. Every text-on-surface token pairing in the brand palette has a recorded WCAG AA contrast result in `brandbook/notes/accessibility.md`, with any failing pair flagged, so token usage in the brand book is provably accessible before any HTML is written.
   3. `brandbook/notes/decision-log.md` names the exact off-brand properties of `docs/assets/parapet-logo.svg`/`favicon.svg` (off-palette `#0f172a`/`#38bdf8`, Arial, rectangular background cage, detached lockup) as anti-criteria, alongside a frozen logo acceptance checklist (transparent, no cage, unified mark+type, no primary subtitle, ≥1 integrated typemark, palette-locked, favicon-legible at 16px).
@@ -55,6 +56,7 @@
 **Blocking note**: This phase ends with a **HARD HUMAN GATE** (LOGO-04). Phase 42 and Phase 43 are **blocked** until the user selects a direction and records the choice in `decision-log.md`. No downstream phase may begin until this selection is committed.
 
 **Success Criteria** (what must be TRUE):
+
   1. Four distinct SVG logo directions (stepped-parapet mark, integrated typemark, P-monogram, edge+sightline) are hand-authored as optimized, transparent-background SVGs — including at least one fully-integrated custom typemark where the motif is worked into the wordmark itself — with no rectangular background cage and no subtitle on the primary lockup.
   2. A `file://`-openable `brandbook/notes/logo-options.html` renders all four directions side-by-side on Limestone, Deep Slate, and Stone preview surfaces at hero, inline, and 16px sizes, each with a one-line rationale, requiring no network connection.
   3. Each direction is shown in single-ink monochrome and cropped to a 16px favicon thumbnail, so small-size legibility is provable before the user commits to a winner.
@@ -75,6 +77,7 @@
 **Requirements**: TOKEN-01, TOKEN-02, TOKEN-03
 
 **Success Criteria** (what must be TRUE):
+
   1. `brandbook/tokens/tokens.css` and `brandbook/tokens/tokens.json` express the research doc's color, type-scale, spacing (8px grid), radius, shadow, and border tokens verbatim — with no new values invented and no re-derivation — and both files agree on every value.
   2. The selected logo is expanded into at least eight named variation files in `brandbook/assets/` — primary horizontal lockup (no subtitle), integrated typemark, icon-only logomark, stacked, monochrome, inverse/dark-background, optional tagline lockup, and favicon — all as optimized transparent SVGs.
   3. `brandbook/index.html` opens correctly from `file://` with no build step and no network dependency, and displays the logo gallery (transparent default + preview swatches), color system (swatch + hex + role), type-scale specimens, spacing/radius/shadow tokens, voice/tone + microcopy, logo do/don't, and accessibility notes.
@@ -95,14 +98,23 @@
 **Requirements**: COLLAT-01, COLLAT-02, COLLAT-03
 
 **Success Criteria** (what must be TRUE):
+
   1. Three collateral artifacts open correctly from `file://` — `brandbook/examples/components.html` (buttons, cards, badges, callouts), `brandbook/examples/landing-section.html` (Deep Slate hero with restrained stepped mark), and `brandbook/examples/readme-header.svg` (README/social banner) — each driven by the token system.
   2. `docs/assets/parapet-logo.svg` and `docs/assets/favicon.svg` are replaced with the on-brand winners; `mix.exs` doc block paths are unchanged; and `mix docs` renders the new mark without error or warning.
   3. The repo-hygiene audit passes: `brandbook/` is within the ≤ ~250 KB size budget, contains zero raster or font binaries, has no full-viewBox rectangular background in any logo asset, and has no off-palette hex in any SVG or CSS file.
   4. The git diff for this milestone is scoped exclusively to `brandbook/`, the two `docs/assets/*.svg` files, and the `mix.exs` doc block — no unrelated files are touched.
 
 **Plans**: 3 plans
+**Wave 1**
+
 - [ ] 43-01-PLAN.md — COLLAT-01: collateral examples (components.html, landing-section.html, readme-header.svg)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 43-02-PLAN.md — COLLAT-02: zero-config HexDocs logo/favicon swap + trim exploration HTMLs
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 43-03-PLAN.md — COLLAT-03: repo-hygiene QA gate + v1.5 milestone audit + ledger updates
 
 ---

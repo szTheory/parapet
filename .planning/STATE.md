@@ -95,9 +95,9 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 ## Session Continuity
 
 Last session: 2026-06-24
-Stopped at: Phases 40–42 complete and committed; logo identity locked. Queued Phase 43 for a fresh context.
+Stopped at: Session resumed — context restored; proceeding to plan Phase 43 (final).
 Resume file: `.planning/phases/43-collateral-wiring/43-CONTEXT.md` (full handoff — read first)
-Next step: Execute Phase 43 (collateral + HexDocs wiring + cleanup + audit)
+Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 
 ## Operator Next Steps
 
