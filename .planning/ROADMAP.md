@@ -39,95 +39,122 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 ## Phase Details
 
 ### Phase 44: Foundations — token re-skin, fonts & audit apparatus
+
 **Goal**: The operator theme is re-based on brand tokens (color/type/spacing/radius/shadow/motion/focus), self-hosted IBM Plex woff2 is vendored and wired with a clean system fallback, the demo-only component lab and audit ledger exist, and the contrast gate is re-pinned to brand hexes — establishing the foundation every later layer builds on.
 **Depends on**: Nothing (first phase of milestone)
 **Requirements**: TOKEN-01, TOKEN-02, TOKEN-03, TOKEN-04, TOKEN-05, FONT-01, FONT-02, FONT-03, A11Y-01, MOTION-01, GALLERY-01, GUARD-01, GUARD-02
 **Success Criteria** (what must be TRUE):
+
   1. An operator viewing the UI in both light and dark themes sees brand neutrals, brand signal colors, and the six brand status triplets — with no off-brand teal/blue/indigo/emerald/purple hues remaining — and the type scale, 8px grid, and radius scale applied with no layout shift on the system-font fallback.
   2. The UI renders true subsetted IBM Plex Sans/Mono served from the host static path with `font-display: swap`, falls back cleanly to the system stack before fonts load (no FOUT breakage, no layout shift), and the demo app serves the same fonts.
   3. Motion is driven by the brand motion tokens and fully zeroed under `prefers-reduced-motion`; per-surface focus rings (watch-blue on light, limestone on dark) are enforced by the contrast gate, not left to component authors.
   4. A developer can open the demo-only `/parapet/_gallery` route (never shipped into generated host UI) and the committed `operator-audit-matrix.md` ledger enumerates every component × state cell with a todo/done/verified status.
   5. `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
+
 **Plans**: 4 plans
+**Wave 1**
+
 - [ ] 44-01-PLAN.md — Vendor + subset IBM Plex woff2, whitelist for Hex, generator font-copy step, demo static_paths, font budget test (Wave 1)
 - [ ] 44-02-PLAN.md — Values-only token re-skin across all 3 CSS blocks + @font-face + motion + focus rings in template & demo mirror; verify secondary templates (Wave 1)
 - [ ] 44-03-PLAN.md — Demo-only `/parapet/_gallery` GalleryLive + route, and the `operator-audit-matrix.md` ledger (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 44-04-PLAN.md — Re-pin `operator_ui_contrast_test.exs` to brand hexes + additive demo-contract assertions (Wave 2)
+
 **UI hint**: yes
 
 ### Phase 45: Primitive components
+
 **Goal**: Every primitive component (buttons, links, badges, chips, status pills, stat cards, icons, dividers, focus rings, and the theme-switcher form controls) is tokenized, accessible, and visually correct across all interactive states in both themes — the building blocks every meta-component and page will compose.
 **Depends on**: Phase 44
 **Requirements**: COMP-01, COMP-02, COMP-03, COMP-04, COMP-05, COMP-06, COMP-07, COMP-08, FORM-01, FORM-02, A11Y-02, MOTION-02
 **Success Criteria** (what must be TRUE):
+
   1. An operator can visually distinguish a button's rest / hover / active / focus-visible / disabled states in both themes, and disabled controls are both visually and semantically disabled — no enabled-looking-but-dead or disabled-looking-but-live controls.
   2. Links meet WCAG AA on their actual surface (watch-blue on light, brightened `#7FB4C6` on dark) on both card and page background, and every interactive primitive shows a visible `:focus-visible` ring using the limestone ring on dark surfaces.
   3. Badges, chips, and status pills use the brand status triplets and remain legible (AA) in dark mode; stat/metric cards carry no spurious hover/pointer affordance.
   4. The theme switcher and action-confirmation inputs expose correct accessible names, AA-contrast focus indicators, and error/disabled states conveyed by more than color alone.
   5. All primitive text meets 4.5:1 (3:1 for large text) and UI components meet 3:1 in both themes; hover/press micro-interactions are fast (~120ms) and purposeful with no `transition-all` thrash, and no off-palette/raw-Tailwind color hex remains in the templates (gate-enforced).
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 46: Navigation, shell & data-display
+
 **Goal**: The app shell (header / nav / tabs / theme switcher / cockpit header) and all data-display surfaces (incident list/rows, timeline, tables) are responsive, keyboard-navigable, and render long and degenerate data deliberately — so an operator can orient and read evidence at any breakpoint and with any data shape.
 **Depends on**: Phase 45
 **Requirements**: NAV-01, NAV-02, NAV-03, NAV-04, NAV-05, DATA-01, DATA-02, DATA-03, DATA-04, DATA-05, DATA-06, A11Y-03, A11Y-04
 **Success Criteria** (what must be TRUE):
+
   1. Tabs and nav items show an unambiguous active state with `aria-current="page"` in both themes, IA labels follow plain-language least-surprise naming, and the Light/Dark/System switcher retains its `localStorage` + `data-parapet-theme` behavior at AA contrast in all three modes.
   2. The app shell is fully usable at 390px with no horizontal overflow and no squished controls, and keyboard users have a logical landmark structure with a working skip-to-content affordance.
   3. Incident lists/rows and tables truncate or wrap long fields deliberately (no collapsed or unreadably squished columns), and internal scroll regions scroll correctly with no trapped or nested-scroll dead-ends.
   4. The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries; empty states are designed (icon + copy + next action) and carry no hover/pointer affordance; loading/skeleton states are reduced-motion-safe with no layout jumps.
   5. Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), every interactive element is keyboard-reachable with a visible focus indicator, and tab order is logical with no keyboard traps.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 47: Component groups / meta-components
+
 **Goal**: The composed meta-components (response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, and all overlays/modals/drawers) render coherently across breakpoints with correct stacking, focus management, and brand-eased motion — so the response surfaces an operator actually works in behave correctly under interaction.
 **Depends on**: Phase 46
 **Requirements**: GROUP-01, GROUP-02, GROUP-03, GROUP-04, GROUP-05, GROUP-06, A11Y-05, MOTION-03
 **Success Criteria** (what must be TRUE):
+
   1. The response cockpit composes header/summary/actions coherently across all breakpoints, and incident summary copy follows the brand voice formula (symptom → evidence → correlation → safe next action → where to inspect).
   2. The runbook card and preview panel render fully above their scrim and are never clipped or hidden, and overlays have correct stacking order (modal above scrim above content) — no modal hidden behind its own scrim.
   3. The action rail and action-item cards communicate risk and audit outcome, with disabled actions clearly disabled.
   4. Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close — verified.
   5. Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 48: Pages, flows & microcopy
+
 **Goal**: The full operator flow (response → actions → history → incident detail) is navigable end-to-end with correct page semantics, designed empty/loading/error states, brand-voice microcopy, and complete mobile usability — the user-facing payoff where the re-skinned primitives and groups become a coherent, on-brand console.
 **Depends on**: Phase 47
 **Requirements**: FLOW-01, FLOW-02, FLOW-03, FLOW-04, FLOW-05, COPY-01, COPY-02, COPY-03, COPY-04, COPY-05, A11Y-06
 **Success Criteria** (what must be TRUE):
+
   1. An operator can click response → actions → history → incident-detail with no dead-ends or broken back-navigation, and the compatibility route `/parapet/:id` still renders alongside the preferred `/parapet/incidents/:id`.
   2. Each page has exactly one h1, ordered headings, correct landmarks, ARIA labels, and a descriptive page title; empty, loading, and error states are designed (not blank) and distinguish no-data vs unavailable vs permission-denied where applicable.
   3. Navigation/IA labels are plain and least-surprise, and incident/summary copy follows symptom → evidence → correlation → safe next action → where to inspect.
   4. Empty/error/loading copy is calm, specific, and evidence-backed (no "oops"/"something went wrong"/blame), action copy states the risk and safe next step for any mutating/destructive action, and no placeholder/lorem/TODO strings remain in the templates.
   5. Every page is fully usable on mobile (390px) across all states.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 49: Stress fixtures & seed coverage
+
 **Goal**: The demo app carries reproducible stress scenarios (long-string overflow, empty collections, max-items density, mixed-status, and a combined stress scenario) wired to `PARAPET_DEMO_SCENARIO`, and the component gallery is covered by the screenshot capture script and a demo contract test — so the audit can be re-run against worst-case data on demand.
 **Depends on**: Phase 48
 **Requirements**: FIXTURE-01, FIXTURE-02, FIXTURE-03, FIXTURE-04, FIXTURE-05, GALLERY-02
 **Success Criteria** (what must be TRUE):
+
   1. A developer can select a long-string/overflow scenario (long titles, IDs, module names, URLs), an empty-collection scenario (no incidents / empty timeline / no actions), and a max-items / dense-list scenario via the demo seed.
   2. A mixed-status scenario surfaces all six status triplets at once, and a combined "stress" scenario is wired to `PARAPET_DEMO_SCENARIO`.
   3. The combined stress scenario is covered by the screenshot capture script across desktop + mobile and light + dark.
   4. The `/parapet/_gallery` route is covered by the screenshot capture script and asserted by a demo contract test.
+
 **Plans**: TBD
 **UI hint**: yes
 
 ### Phase 50: Guardrails, parity & idempotence gate
+
 **Goal**: Forward-only regression guardrails are in place — template↔demo byte-parity, off-palette-hex gate, motion assertion, and a committed screenshot baseline manifest — and `v1.6-MILESTONE-AUDIT.md` proves per-requirement evidence, zero public-API/telemetry/host-ownership regression, the font package-size delta, and that the audit is forward-only and idempotent.
 **Depends on**: Phase 49
 **Requirements**: GUARD-03, GUARD-04, GUARD-05, GUARD-06, GUARD-07
 **Success Criteria** (what must be TRUE):
+
   1. A normalized template↔demo byte-parity test reproduces the generator transform and fails if any `.eex` template and its demo mirror diverge.
   2. An off-palette-hex gate over the templates fails if any non-token color hex appears (mirroring the v1.5 `brandbook/` palette gate), and a motion / reduced-motion assertion verifies the brand easing is used and motion is zeroed under `prefers-reduced-motion`.
   3. The screenshot capture script covers the stress scenario and the gallery, and a committed baseline manifest plus a documented re-run/compare procedure exists (no rasters committed — repo-lean).
   4. `v1.6-MILESTONE-AUDIT.md` records per-requirement evidence and proves no public-API/telemetry/host-ownership regression, the font package-size delta, and that the audit is forward-only/idempotent.
+
 **Plans**: TBD
 
 ---
