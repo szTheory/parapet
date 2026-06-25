@@ -77,7 +77,11 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. The theme switcher and action-confirmation inputs expose correct accessible names, AA-contrast focus indicators, and error/disabled states conveyed by more than color alone.
   5. All primitive text meets 4.5:1 (3:1 for large text) and UI components meet 3:1 in both themes; hover/press micro-interactions are fast (~120ms) and purposeful with no `transition-all` thrash, and no off-palette/raw-Tailwind color hex remains in the templates (gate-enforced).
 
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 45-01-PLAN.md — Wire Phase-45 verification gate into the contrast test (new button contrast pairs + off-palette/motion/focus/cursor refute-assert block; red scaffold)
+- [ ] 45-02-PLAN.md — CSS foundation + Elixir functions in operator_components.ex.eex + mirror (new .po-button-*/.po-guidance/.po-timeline-*/.po-queue-row-selected rules + vars; control_base/control_class/timeline/queue functions; #042f2e fix)
+- [ ] 45-03-PLAN.md — Inline markup re-skin in operator_components.ex.eex + mirror (preview_panel, suspect_changes_card, runbook_card, three standalone primary buttons; stat-card affordance)
+- [ ] 45-04-PLAN.md — Secondary templates operator_live/operator_detail_live + mirrors; phase-wide off-palette gate dry-run + full suite + audit-matrix update + gallery walkthrough
 **UI hint**: yes
 
 ### Phase 46: Navigation, shell & data-display
