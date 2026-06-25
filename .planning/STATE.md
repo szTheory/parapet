@@ -5,16 +5,16 @@ milestone_name: Operator UI Brand & Design-System Audit
 current_phase: 44
 current_phase_name: foundations-token-re-skin-fonts-audit-apparatus
 status: executing
-stopped_at: Completed 44-03-PLAN.md
-last_updated: "2026-06-25T02:24:51.079Z"
+stopped_at: Completed 44-04-PLAN.md
+last_updated: "2026-06-25T02:34:43.395Z"
 last_activity: 2026-06-24
 last_activity_desc: Phase 44 execution started
 progress:
   total_phases: 7
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 4
-  completed_plans: 3
-  percent: 0
+  completed_plans: 4
+  percent: 14
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 ## Current Position
 
 Phase: 44 (foundations-token-re-skin-fonts-audit-apparatus) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-24 — Phase 44 execution started
 
@@ -60,6 +60,7 @@ Last activity: 2026-06-24 — Phase 44 execution started
 | Phase 43 P02 | 180 | 2 tasks | 7 files |
 | Phase 43 P03 | 225 | 3 tasks | 4 files |
 | Phase 44 P03 | 22m | 2 tasks | 3 files |
+| Phase 44 P04 | 5m45s | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,8 @@ Recent decisions affecting current work:
 - [Phase ?]: IBM Plex latin woff2 vendored via python3 fontTools.subset: 53 KB total, 65% under 150 KB ceiling
 - [Phase ?]: Gallery route isolated to demo router only (live_session :parapet_gallery, D-13)
 - [Phase ?]: Audit matrix initialized with todo status; #7FB4C6 dark-link operator exception documented for Phase-50 GUARD-04 (D-07/D-08)
+- [Phase ?]: Dark warning button fg corrected to #101820 (parapet-black) on #D97706 bg: 5.62:1 WCAG AA pass; original plan specified #F8F4EC which yielded 2.9:1
+- [Phase ?]: @themes re-pinned to brand token hexes: six status triplets, dark links on surface+bg (#7FB4C6 D-07), focus rings at 3:1 floor
 
 ### Pending Todos
 
@@ -105,8 +108,8 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-25T02:24:51.073Z
-Stopped at: Completed 44-03-PLAN.md
+Last session: 2026-06-25T02:34:43.388Z
+Stopped at: Completed 44-04-PLAN.md
 Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 

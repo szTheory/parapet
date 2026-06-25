@@ -28,7 +28,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 
 **Idempotent layering order** (intentional — must be preserved): foundations → primitives → forms → nav/data → groups → pages → fixtures → guardrails.
 
-- [ ] **Phase 44: Foundations — token re-skin, fonts & audit apparatus** — Re-base color/type/spacing/radius/shadow/motion/focus on brand tokens, vendor self-hosted IBM Plex woff2, scaffold the demo `/parapet/_gallery` route, create the audit matrix, and re-pin the contrast gate.
+- [x] **Phase 44: Foundations — token re-skin, fonts & audit apparatus** — Re-base color/type/spacing/radius/shadow/motion/focus on brand tokens, vendor self-hosted IBM Plex woff2, scaffold the demo `/parapet/_gallery` route, create the audit matrix, and re-pin the contrast gate. (completed 2026-06-25)
 - [ ] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states.
 - [ ] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability.
 - [ ] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion.
@@ -51,7 +51,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. A developer can open the demo-only `/parapet/_gallery` route (never shipped into generated host UI) and the committed `operator-audit-matrix.md` ledger enumerates every component × state cell with a todo/done/verified status.
   5. `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 **Wave 1**
 
 - [x] 44-01-PLAN.md — Vendor + subset IBM Plex woff2, whitelist for Hex, generator font-copy step, demo static_paths, font budget test (Wave 1)
@@ -60,7 +60,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 44-04-PLAN.md — Re-pin `operator_ui_contrast_test.exs` to brand hexes + additive demo-contract assertions (Wave 2)
+- [x] 44-04-PLAN.md — Re-pin `operator_ui_contrast_test.exs` to brand hexes + additive demo-contract assertions (Wave 2)
 
 **UI hint**: yes
 
@@ -178,7 +178,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 41. Logo Exploration & User Selection Gate | v1.5 | 6/6 | Complete | 2026-06-24 |
 | 42. Token System & HTML Brand Book | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
-| 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 3/4 | In Progress|  |
+| 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 0/? | Pending | - |
 | 46. Navigation, shell & data-display | v1.6 | 0/? | Pending | - |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |

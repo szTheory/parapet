@@ -15,16 +15,16 @@
 
 ### Token Re-skin (Foundations)
 
-- [ ] **TOKEN-01**: The operator theme's neutral surface roles (`--parapet-bg`, `--parapet-panel`, `--parapet-text`, `--parapet-text-muted`, header/nav surfaces) resolve to brand neutrals (limestone/mortar/stone/wall-slate/deep-slate/parapet-black) in both light and dark themes.
-- [ ] **TOKEN-02**: Signal colors are brand-aligned — links/info/selected use watch-blue, warning uses beacon-amber, success uses budget-moss, destructive uses incident-red, AI/trace uses trace-violet — replacing the prior teal/blue/indigo/emerald/purple hues across all `--po-*` variables.
-- [ ] **TOKEN-03**: Every chip/badge/status pill is driven by the brand's six status triplets (text/bg/border for healthy, watch, burning, exhausted, unknown, ai) and is legible in both themes.
+- [x] **TOKEN-01**: The operator theme's neutral surface roles (`--parapet-bg`, `--parapet-panel`, `--parapet-text`, `--parapet-text-muted`, header/nav surfaces) resolve to brand neutrals (limestone/mortar/stone/wall-slate/deep-slate/parapet-black) in both light and dark themes.
+- [x] **TOKEN-02**: Signal colors are brand-aligned — links/info/selected use watch-blue, warning uses beacon-amber, success uses budget-moss, destructive uses incident-red, AI/trace uses trace-violet — replacing the prior teal/blue/indigo/emerald/purple hues across all `--po-*` variables.
+- [x] **TOKEN-03**: Every chip/badge/status pill is driven by the brand's six status triplets (text/bg/border for healthy, watch, burning, exhausted, unknown, ai) and is legible in both themes.
 - [ ] **TOKEN-04**: The type scale, 8px spacing grid, and radius scale (card 10px, control 8px, modal 14px, pill 999px) from the brand tokens are applied to the operator UI without layout shift on the system-font fallback.
-- [ ] **TOKEN-05**: Motion tokens (`--motion-fast` 120ms, `--motion-base` 200ms, `--motion-ease` cubic-bezier(.2,0,0,1)) are wired through the theme and zeroed under `prefers-reduced-motion`.
+- [x] **TOKEN-05**: Motion tokens (`--motion-fast` 120ms, `--motion-base` 200ms, `--motion-ease` cubic-bezier(.2,0,0,1)) are wired through the theme and zeroed under `prefers-reduced-motion`.
 
 ### Self-Hosted Fonts
 
 - [x] **FONT-01**: Subsetted IBM Plex Sans (400/500/600) and IBM Plex Mono (400/500) woff2 files (latin subset) are vendored under `priv/static/parapet/fonts/`, with the subsetting command documented for reproducibility, and added to the Hex `files:` whitelist within a tracked package-size budget.
-- [ ] **FONT-02**: `operator_theme_bootstrap/1` emits `@font-face` rules referencing the host static path with `font-display: swap`, and the UI renders correctly on the system-stack fallback before fonts load (no FOUT breakage, no layout shift).
+- [x] **FONT-02**: `operator_theme_bootstrap/1` emits `@font-face` rules referencing the host static path with `font-display: swap`, and the UI renders correctly on the system-stack fallback before fonts load (no FOUT breakage, no layout shift).
 - [x] **FONT-03**: The generator (`mix parapet.gen.ui` or a focused asset step) copies the vendored woff2 into the host app's static directory, and the demo app vendors/serves the same fonts so screenshots render true IBM Plex.
 
 ### Primitive Components
@@ -79,7 +79,7 @@
 
 ### Accessibility (WCAG 2.2 AA)
 
-- [ ] **A11Y-01**: Focus-ring contrast is handled per surface — watch-blue on light, limestone on dark — enforced by the contrast gate, not left to component authors.
+- [x] **A11Y-01**: Focus-ring contrast is handled per surface — watch-blue on light, limestone on dark — enforced by the contrast gate, not left to component authors.
 - [ ] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
 - [ ] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
 - [ ] **A11Y-04**: Tab order is logical with no keyboard traps.
@@ -88,7 +88,7 @@
 
 ### Motion
 
-- [ ] **MOTION-01**: Motion tokens are wired and fully zeroed under `prefers-reduced-motion`.
+- [x] **MOTION-01**: Motion tokens are wired and fully zeroed under `prefers-reduced-motion`.
 - [ ] **MOTION-02**: Hover/press micro-interactions are fast (≈120ms) and purposeful, not decorative; no `transition-all` thrash.
 - [ ] **MOTION-03**: Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
@@ -116,7 +116,7 @@
 ### Forward-Only Guardrails
 
 - [x] **GUARD-01**: A committed audit matrix (`brandbook/notes/operator-audit-matrix.md`) enumerates every component × state cell with a `todo`/`done`/`verified` status, serving as the idempotence ledger.
-- [ ] **GUARD-02**: `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
+- [x] **GUARD-02**: `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
 - [ ] **GUARD-03**: A normalized template↔demo byte-parity test reproduces the generator transform and fails if any `.eex` template and its demo mirror diverge.
 - [ ] **GUARD-04**: An off-palette-hex gate over the templates fails if any non-token color hex appears (mirrors the v1.5 `brandbook/` palette gate).
 - [ ] **GUARD-05**: A motion / reduced-motion assertion test verifies the brand easing is used and motion is zeroed under `prefers-reduced-motion`.
@@ -152,19 +152,19 @@ Each requirement maps to exactly one phase (Phases 44–50).
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TOKEN-01 | Phase 44 | Pending |
-| TOKEN-02 | Phase 44 | Pending |
-| TOKEN-03 | Phase 44 | Pending |
+| TOKEN-01 | Phase 44 | Complete |
+| TOKEN-02 | Phase 44 | Complete |
+| TOKEN-03 | Phase 44 | Complete |
 | TOKEN-04 | Phase 44 | Pending |
-| TOKEN-05 | Phase 44 | Pending |
+| TOKEN-05 | Phase 44 | Complete |
 | FONT-01 | Phase 44 | Complete |
-| FONT-02 | Phase 44 | Pending |
+| FONT-02 | Phase 44 | Complete |
 | FONT-03 | Phase 44 | Complete |
-| A11Y-01 | Phase 44 | Pending |
-| MOTION-01 | Phase 44 | Pending |
+| A11Y-01 | Phase 44 | Complete |
+| MOTION-01 | Phase 44 | Complete |
 | GALLERY-01 | Phase 44 | Complete |
 | GUARD-01 | Phase 44 | Complete |
-| GUARD-02 | Phase 44 | Pending |
+| GUARD-02 | Phase 44 | Complete |
 | COMP-01 | Phase 45 | Pending |
 | COMP-02 | Phase 45 | Pending |
 | COMP-03 | Phase 45 | Pending |
