@@ -23,6 +23,10 @@ defmodule DemoAppWeb.Router do
       live("/parapet/incidents/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
       live("/parapet/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
     end
+
+    live_session :parapet_gallery do
+      live("/parapet/_gallery", DemoAppWeb.Parapet.GalleryLive, :index)
+    end
   end
 
   scope "/ops" do
