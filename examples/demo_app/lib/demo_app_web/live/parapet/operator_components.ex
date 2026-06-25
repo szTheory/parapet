@@ -685,7 +685,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             Items here are the operator-facing work queue behind preview and recovery flows. Review the linked incident before executing a mutating action.
           </p>
         </div>
-        <.link navigate={operator_path(@operator_base_path)} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+        <.link navigate={operator_path(@operator_base_path)} class={[control_class(:primary)]}>
           Return to response
         </.link>
       </div>
@@ -1030,7 +1030,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             type="button"
             data-content={@retrospective}
             onclick="navigator.clipboard && navigator.clipboard.writeText(this.dataset.content); const label = this.querySelector('[data-copy-label]'); if (label) { const previous = label.textContent; label.textContent = 'Copied'; setTimeout(() => label.textContent = previous, 1400); }"
-            class="flex min-h-[40px] shrink-0 items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+            class={["shrink-0", control_class(:primary)]}
           >
             <span data-copy-label>Copy retrospective</span>
           </button>
@@ -1208,7 +1208,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           <p class="mt-2 text-sm leading-6 text-stone-600">
             This incident is closed. History keeps the final timeline, retrospective, and audit evidence together for review.
           </p>
-          <a href={operator_path(@operator_base_path, :history)} class="mt-4 flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+          <a href={operator_path(@operator_base_path, :history)} class={["mt-4", control_class(:primary)]}>
             Back to history
           </a>
         </section>
