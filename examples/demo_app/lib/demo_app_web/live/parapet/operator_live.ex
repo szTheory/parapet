@@ -155,7 +155,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       Use history to inspect completed evidence, retrospective notes, and operator actions without mixing them into the active response queue.
                     </p>
                   </div>
-                  <.link navigate={@operator_base_path} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-stone-800">
+                  <.link navigate={@operator_base_path} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-[--motion-fast] ease-out active:scale-[0.96] hover:bg-stone-800">
                     Return to Response
                   </.link>
                 </div>
@@ -172,7 +172,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   <.link
                     patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
                     class={[
-                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_previous_page?)
                     ]}
                   >
@@ -182,7 +182,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   <.link
                     patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
                     class={[
-                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                      "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_next_page?)
                     ]}
                   >
@@ -208,7 +208,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   <button
                     type="button"
                     phx-click="queue_refresh"
-                    class="mt-3 flex min-h-[40px] items-center justify-center rounded-lg bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition-transform duration-100 ease-out active:scale-[0.96] hover:bg-teal-800 focus:outline-none focus:ring-2 focus:ring-teal-300"
+                    class="mt-3 flex min-h-[40px] items-center justify-center rounded-lg bg-[color:var(--parapet-accent)] px-4 py-2 text-sm font-semibold text-white transition-colors duration-[--motion-fast] ease-out active:scale-[0.96] hover:bg-[color:var(--parapet-accent-strong)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus"
                   >
                     Load Latest Changes
                   </button>
@@ -243,7 +243,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                     <.link
                       patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
                       class={[
-                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_previous_page?)
                       ]}
                     >
@@ -253,7 +253,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                     <.link
                       patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
                       class={[
-                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-100 ease-out active:scale-[0.96]",
+                        "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_next_page?)
                       ]}
                     >
@@ -470,7 +470,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   defp operator_base_path_from_path(_path), do: @default_operator_base_path
 
   defp pagination_link_class(true),
-    do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:ring-teal-700 hover:text-teal-700"
+    do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:text-[color:var(--parapet-accent)] hover:ring-[color:var(--parapet-border)]"
 
   defp pagination_link_class(false),
     do: "pointer-events-none ring-1 ring-stone-200 bg-stone-100 text-stone-400"
