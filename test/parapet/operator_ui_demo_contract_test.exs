@@ -99,6 +99,16 @@ defmodule Parapet.OperatorUIDemoContractTest do
         ] do
       assert smoke =~ smoke_path
     end
+
+    # GALLERY-01: gallery route exists in demo router (demo-only)
+    assert router =~ ~S|live("/parapet/_gallery", DemoAppWeb.Parapet.GalleryLive, :index)|
+    assert router =~ "live_session :parapet_gallery"
+
+    # FONT-03: generator wires font static path in demo
+    assert File.exists?("priv/static/parapet/fonts/IBMPlexSans-Regular-latin.woff2")
+
+    # GUARD-01: audit matrix is committed
+    assert File.exists?("brandbook/notes/operator-audit-matrix.md")
   end
 
   test "browser screenshot verification captures desktop and mobile operator paths" do
