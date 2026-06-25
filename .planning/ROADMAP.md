@@ -51,12 +51,12 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. A developer can open the demo-only `/parapet/_gallery` route (never shipped into generated host UI) and the committed `operator-audit-matrix.md` ledger enumerates every component × state cell with a todo/done/verified status.
   5. `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
 
-**Plans**: 1/4 plans executed
+**Plans**: 3/4 plans executed
 **Wave 1**
 
 - [x] 44-01-PLAN.md — Vendor + subset IBM Plex woff2, whitelist for Hex, generator font-copy step, demo static_paths, font budget test (Wave 1)
-- [ ] 44-02-PLAN.md — Values-only token re-skin across all 3 CSS blocks + @font-face + motion + focus rings in template & demo mirror; verify secondary templates (Wave 1)
-- [ ] 44-03-PLAN.md — Demo-only `/parapet/_gallery` GalleryLive + route, and the `operator-audit-matrix.md` ledger (Wave 1)
+- [x] 44-02-PLAN.md — Values-only token re-skin across all 3 CSS blocks + @font-face + motion + focus rings in template & demo mirror; verify secondary templates (Wave 1)
+- [x] 44-03-PLAN.md — Demo-only `/parapet/_gallery` GalleryLive + route, and the `operator-audit-matrix.md` ledger (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -178,7 +178,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 41. Logo Exploration & User Selection Gate | v1.5 | 6/6 | Complete | 2026-06-24 |
 | 42. Token System & HTML Brand Book | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
-| 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 1/4 | In Progress|  |
+| 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 3/4 | In Progress|  |
 | 45. Primitive components | v1.6 | 0/? | Pending | - |
 | 46. Navigation, shell & data-display | v1.6 | 0/? | Pending | - |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |

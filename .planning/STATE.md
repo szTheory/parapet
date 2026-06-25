@@ -5,15 +5,15 @@ milestone_name: Operator UI Brand & Design-System Audit
 current_phase: 44
 current_phase_name: foundations-token-re-skin-fonts-audit-apparatus
 status: executing
-stopped_at: Phase 44 context gathered (assumptions mode)
-last_updated: "2026-06-24T21:39:34.677Z"
+stopped_at: Completed 44-03-PLAN.md
+last_updated: "2026-06-25T02:24:51.079Z"
 last_activity: 2026-06-24
 last_activity_desc: Phase 44 execution started
 progress:
   total_phases: 7
   completed_phases: 0
   total_plans: 4
-  completed_plans: 1
+  completed_plans: 3
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 ## Current Position
 
 Phase: 44 (foundations-token-re-skin-fonts-audit-apparatus) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-06-24 — Phase 44 execution started
 
@@ -59,6 +59,7 @@ Last activity: 2026-06-24 — Phase 44 execution started
 | Phase 43 P01 | 268 | - tasks | - files |
 | Phase 43 P02 | 180 | 2 tasks | 7 files |
 | Phase 43 P03 | 225 | 3 tasks | 4 files |
+| Phase 44 P03 | 22m | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Zero-config path-stable HexDocs swap complete: mix.exs unchanged, five exploration HTMLs deleted
 - [Phase ?]: Use File.cp! for woff2 binary copy to avoid Igniter string-encoding corruption
 - [Phase ?]: IBM Plex latin woff2 vendored via python3 fontTools.subset: 53 KB total, 65% under 150 KB ceiling
+- [Phase ?]: Gallery route isolated to demo router only (live_session :parapet_gallery, D-13)
+- [Phase ?]: Audit matrix initialized with todo status; #7FB4C6 dark-link operator exception documented for Phase-50 GUARD-04 (D-07/D-08)
 
 ### Pending Todos
 
@@ -102,9 +105,9 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-24T21:39:17.652Z
-Stopped at: Phase 44 context gathered (assumptions mode)
-Resume file: .planning/phases/44-foundations-token-re-skin-fonts-audit-apparatus/44-CONTEXT.md
+Last session: 2026-06-25T02:24:51.073Z
+Stopped at: Completed 44-03-PLAN.md
+Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 
 ## Operator Next Steps

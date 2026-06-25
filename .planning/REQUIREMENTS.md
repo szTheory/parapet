@@ -110,12 +110,12 @@
 
 ### Component Gallery (Demo-Only)
 
-- [ ] **GALLERY-01**: A demo-only `/parapet/_gallery` route (never shipped into generated host UI) renders every component across {light, dark, empty, overflow, disabled, long-string} states for manual + screenshot audit.
+- [x] **GALLERY-01**: A demo-only `/parapet/_gallery` route (never shipped into generated host UI) renders every component across {light, dark, empty, overflow, disabled, long-string} states for manual + screenshot audit.
 - [ ] **GALLERY-02**: The gallery route is covered by the screenshot capture script and asserted by a demo contract test.
 
 ### Forward-Only Guardrails
 
-- [ ] **GUARD-01**: A committed audit matrix (`brandbook/notes/operator-audit-matrix.md`) enumerates every component × state cell with a `todo`/`done`/`verified` status, serving as the idempotence ledger.
+- [x] **GUARD-01**: A committed audit matrix (`brandbook/notes/operator-audit-matrix.md`) enumerates every component × state cell with a `todo`/`done`/`verified` status, serving as the idempotence ledger.
 - [ ] **GUARD-02**: `operator_ui_contrast_test.exs` is re-pinned to the brand token hexes (all six status triplets, dark links on surface and bg, focus rings at the 3:1 UI floor) and passes at WCAG AA.
 - [ ] **GUARD-03**: A normalized template↔demo byte-parity test reproduces the generator transform and fails if any `.eex` template and its demo mirror diverge.
 - [ ] **GUARD-04**: An off-palette-hex gate over the templates fails if any non-token color hex appears (mirrors the v1.5 `brandbook/` palette gate).
@@ -162,8 +162,8 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | FONT-03 | Phase 44 | Complete |
 | A11Y-01 | Phase 44 | Pending |
 | MOTION-01 | Phase 44 | Pending |
-| GALLERY-01 | Phase 44 | Pending |
-| GUARD-01 | Phase 44 | Pending |
+| GALLERY-01 | Phase 44 | Complete |
+| GUARD-01 | Phase 44 | Complete |
 | GUARD-02 | Phase 44 | Pending |
 | COMP-01 | Phase 45 | Pending |
 | COMP-02 | Phase 45 | Pending |
