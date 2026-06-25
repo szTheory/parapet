@@ -78,7 +78,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   5. All primitive text meets 4.5:1 (3:1 for large text) and UI components meet 3:1 in both themes; hover/press micro-interactions are fast (~120ms) and purposeful with no `transition-all` thrash, and no off-palette/raw-Tailwind color hex remains in the templates (gate-enforced).
 
 **Plans**: 4 plans
-- [ ] 45-01-PLAN.md — Wire Phase-45 verification gate into the contrast test (new button contrast pairs + off-palette/motion/focus/cursor refute-assert block; red scaffold)
+- [x] 45-01-PLAN.md — Wire Phase-45 verification gate into the contrast test (new button contrast pairs + off-palette/motion/focus/cursor refute-assert block; red scaffold)
 - [ ] 45-02-PLAN.md — CSS foundation + Elixir functions in operator_components.ex.eex + mirror (new .po-button-*/.po-guidance/.po-timeline-*/.po-queue-row-selected rules + vars; control_base/control_class/timeline/queue functions; #042f2e fix)
 - [ ] 45-03-PLAN.md — Inline markup re-skin in operator_components.ex.eex + mirror (preview_panel, suspect_changes_card, runbook_card, three standalone primary buttons; stat-card affordance)
 - [ ] 45-04-PLAN.md — Secondary templates operator_live/operator_detail_live + mirrors; phase-wide off-palette gate dry-run + full suite + audit-matrix update + gallery walkthrough
@@ -183,7 +183,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 42. Token System & HTML Brand Book | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
-| 45. Primitive components | v1.6 | 0/? | Pending | - |
+| 45. Primitive components | v1.6 | 1/4 | In Progress|  |
 | 46. Navigation, shell & data-display | v1.6 | 0/? | Pending | - |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
