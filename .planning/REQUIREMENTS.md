@@ -29,19 +29,19 @@
 
 ### Primitive Components
 
-- [ ] **COMP-01**: Buttons (primary/secondary/ghost/destructive/warning) have tokenized, visually distinct rest / hover / active / focus-visible / disabled states in both themes.
-- [ ] **COMP-02**: Disabled controls are both visually and semantically disabled (`disabled`/`aria-disabled`, reduced affordance) — no enabled-looking-but-dead controls and no disabled-looking-but-live controls.
-- [ ] **COMP-03**: Links meet WCAG AA on their actual surface — watch-blue on light, brightened watch-blue (`#7FB4C6`) on dark surfaces — verified on both card surface and page background.
-- [ ] **COMP-04**: Badges, chips, and status pills use the brand status triplets and remain legible (AA) in dark mode.
-- [ ] **COMP-05**: Stat/metric cards use the metric type tokens and carry no spurious hover/pointer affordance.
-- [ ] **COMP-06**: Every interactive primitive shows a visible `:focus-visible` ring, using the limestone ring on dark surfaces per the brand's documented dark-surface contrast fix.
-- [ ] **COMP-07**: Icons, dividers, and separators follow the border-over-shadow philosophy with tokenized borders; icons never carry meaning by shape alone where a label is needed.
-- [ ] **COMP-08**: No off-palette/raw-Tailwind hex remains in the templates for color (gate-enforced).
+- [x] **COMP-01**: Buttons (primary/secondary/ghost/destructive/warning) have tokenized, visually distinct rest / hover / active / focus-visible / disabled states in both themes.
+- [x] **COMP-02**: Disabled controls are both visually and semantically disabled (`disabled`/`aria-disabled`, reduced affordance) — no enabled-looking-but-dead controls and no disabled-looking-but-live controls.
+- [x] **COMP-03**: Links meet WCAG AA on their actual surface — watch-blue on light, brightened watch-blue (`#7FB4C6`) on dark surfaces — verified on both card surface and page background.
+- [x] **COMP-04**: Badges, chips, and status pills use the brand status triplets and remain legible (AA) in dark mode.
+- [x] **COMP-05**: Stat/metric cards use the metric type tokens and carry no spurious hover/pointer affordance.
+- [x] **COMP-06**: Every interactive primitive shows a visible `:focus-visible` ring, using the limestone ring on dark surfaces per the brand's documented dark-surface contrast fix.
+- [x] **COMP-07**: Icons, dividers, and separators follow the border-over-shadow philosophy with tokenized borders; icons never carry meaning by shape alone where a label is needed.
+- [x] **COMP-08**: No off-palette/raw-Tailwind hex remains in the templates for color (gate-enforced).
 
 ### Form Components
 
-- [ ] **FORM-01**: The theme switcher and any action-confirmation inputs have tokenized states, accessible labels, and AA-contrast focus indicators.
-- [ ] **FORM-02**: Form/confirmation controls expose correct accessible names and error/disabled states (not color-only).
+- [x] **FORM-01**: The theme switcher and any action-confirmation inputs have tokenized states, accessible labels, and AA-contrast focus indicators.
+- [x] **FORM-02**: Form/confirmation controls expose correct accessible names and error/disabled states (not color-only).
 
 ### Navigation & Shell
 
@@ -80,7 +80,7 @@
 ### Accessibility (WCAG 2.2 AA)
 
 - [x] **A11Y-01**: Focus-ring contrast is handled per surface — watch-blue on light, limestone on dark — enforced by the contrast gate, not left to component authors.
-- [ ] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
+- [x] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
 - [ ] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
 - [ ] **A11Y-04**: Tab order is logical with no keyboard traps.
 - [ ] **A11Y-05**: Modal/overlay focus management (trap + restore) is correct and verified.
@@ -89,7 +89,7 @@
 ### Motion
 
 - [x] **MOTION-01**: Motion tokens are wired and fully zeroed under `prefers-reduced-motion`.
-- [ ] **MOTION-02**: Hover/press micro-interactions are fast (≈120ms) and purposeful, not decorative; no `transition-all` thrash.
+- [x] **MOTION-02**: Hover/press micro-interactions are fast (≈120ms) and purposeful, not decorative; no `transition-all` thrash.
 - [ ] **MOTION-03**: Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
 ### Microcopy
@@ -165,18 +165,18 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | GALLERY-01 | Phase 44 | Complete |
 | GUARD-01 | Phase 44 | Complete |
 | GUARD-02 | Phase 44 | Complete |
-| COMP-01 | Phase 45 | Pending |
-| COMP-02 | Phase 45 | Pending |
-| COMP-03 | Phase 45 | Pending |
-| COMP-04 | Phase 45 | Pending |
-| COMP-05 | Phase 45 | Pending |
-| COMP-06 | Phase 45 | Pending |
-| COMP-07 | Phase 45 | Pending |
-| COMP-08 | Phase 45 | Pending |
-| FORM-01 | Phase 45 | Pending |
-| FORM-02 | Phase 45 | Pending |
-| A11Y-02 | Phase 45 | Pending |
-| MOTION-02 | Phase 45 | Pending |
+| COMP-01 | Phase 45 | Complete |
+| COMP-02 | Phase 45 | Complete |
+| COMP-03 | Phase 45 | Complete |
+| COMP-04 | Phase 45 | Complete |
+| COMP-05 | Phase 45 | Complete |
+| COMP-06 | Phase 45 | Complete |
+| COMP-07 | Phase 45 | Complete |
+| COMP-08 | Phase 45 | Complete |
+| FORM-01 | Phase 45 | Complete |
+| FORM-02 | Phase 45 | Complete |
+| A11Y-02 | Phase 45 | Complete |
+| MOTION-02 | Phase 45 | Complete |
 | NAV-01 | Phase 46 | Pending |
 | NAV-02 | Phase 46 | Pending |
 | NAV-03 | Phase 46 | Pending |

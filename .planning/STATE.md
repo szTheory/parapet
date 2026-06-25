@@ -6,14 +6,14 @@ current_phase: 45
 current_phase_name: primitive-components
 status: executing
 stopped_at: Phase 45 UI-SPEC approved
-last_updated: "2026-06-25T16:21:08.210Z"
+last_updated: "2026-06-25T16:31:53.359Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 7
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 8
-  completed_plans: 7
-  percent: 14
+  completed_plans: 8
+  percent: 29
 ---
 
 # Project State
@@ -94,6 +94,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Plan 45-03: completed inline markup re-skin
 - [Phase ?]: Three always-active navigation anchors use control_class(:primary) without aria-disabled (COMP-02: no disabled branch needed)
 - [Phase ?]: COMP-05 confirmed zero cursor-pointer on stat/metric containers in operator_components
+- [Phase ?]: Plan 45-04 complete: secondary template stubs cleared; phase-wide off-palette gate passes (one CSS-interceptor false-positive documented)
+- [Phase ?]: operator_live.ex.eex queue-refresh button uses inline bg-[color:var(--parapet-accent)] since it does not call control_class/2 (per 45-RESEARCH.md Open Question 3)
+- [Phase ?]: bg-indigo-50 at operator_components.ex.eex line 280 is a CSS interceptor SELECTOR not a violation — Phase-50 GUARD-04 gate must exclude CSS style block from grep scan
 
 ### Pending Todos
 
@@ -115,7 +118,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-25T16:20:09.954Z
+Last session: 2026-06-25T16:31:53.353Z
 Stopped at: Phase 45 UI-SPEC approved
 Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute

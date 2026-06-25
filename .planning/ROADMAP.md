@@ -29,7 +29,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 **Idempotent layering order** (intentional — must be preserved): foundations → primitives → forms → nav/data → groups → pages → fixtures → guardrails.
 
 - [x] **Phase 44: Foundations — token re-skin, fonts & audit apparatus** — Re-base color/type/spacing/radius/shadow/motion/focus on brand tokens, vendor self-hosted IBM Plex woff2, scaffold the demo `/parapet/_gallery` route, create the audit matrix, and re-pin the contrast gate. (completed 2026-06-25)
-- [ ] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states.
+- [x] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states. (completed 2026-06-25)
 - [ ] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability.
 - [ ] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion.
 - [ ] **Phase 48: Pages, flows & microcopy** — Response/actions/history tabs + incident detail end-to-end with one h1/landmarks/title, designed empty/loading/error states, brand-voice copy, and full mobile usability.
@@ -77,12 +77,12 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. The theme switcher and action-confirmation inputs expose correct accessible names, AA-contrast focus indicators, and error/disabled states conveyed by more than color alone.
   5. All primitive text meets 4.5:1 (3:1 for large text) and UI components meet 3:1 in both themes; hover/press micro-interactions are fast (~120ms) and purposeful with no `transition-all` thrash, and no off-palette/raw-Tailwind color hex remains in the templates (gate-enforced).
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 - [x] 45-01-PLAN.md — Wire Phase-45 verification gate into the contrast test (new button contrast pairs + off-palette/motion/focus/cursor refute-assert block; red scaffold)
 - [x] 45-02-PLAN.md — CSS foundation + Elixir functions in operator_components.ex.eex + mirror (new .po-button-*/.po-guidance/.po-timeline-*/.po-queue-row-selected rules + vars; control_base/control_class/timeline/queue functions; #042f2e fix)
 - [x] 45-03-PLAN.md — Inline markup re-skin in operator_components.ex.eex + mirror (preview_panel, suspect_changes_card, runbook_card, three standalone primary buttons; stat-card affordance)
-- [ ] 45-04-PLAN.md — Secondary templates operator_live/operator_detail_live + mirrors; phase-wide off-palette gate dry-run + full suite + audit-matrix update + gallery walkthrough
+- [x] 45-04-PLAN.md — Secondary templates operator_live/operator_detail_live + mirrors; phase-wide off-palette gate dry-run + full suite + audit-matrix update + gallery walkthrough
 
 **UI hint**: yes
 
@@ -185,7 +185,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 42. Token System & HTML Brand Book | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
-| 45. Primitive components | v1.6 | 3/4 | In Progress|  |
+| 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 46. Navigation, shell & data-display | v1.6 | 0/? | Pending | - |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
