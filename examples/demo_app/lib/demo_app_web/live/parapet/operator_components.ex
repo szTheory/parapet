@@ -92,6 +92,18 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --po-button-warning-bg: #B45309;
         --po-button-warning-fg: #ffffff;
         --po-button-warning-hover: #92400E;
+        --po-button-primary-bg: var(--parapet-text);
+        --po-button-primary-fg: var(--parapet-panel);
+        --po-button-primary-hover: var(--parapet-text-muted);
+        --po-button-recovery-bg: var(--parapet-accent);
+        --po-button-recovery-fg: #FFFFFF;
+        --po-button-recovery-hover: var(--parapet-accent-strong);
+        --po-button-destructive-bg: #B13A32;
+        --po-button-destructive-fg: #FFFFFF;
+        --po-button-destructive-hover: #8C2E27;
+        --po-button-success-bg: #567236;
+        --po-button-success-fg: #FFFFFF;
+        --po-button-success-hover: #3F5E28;
         --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
         --font-mono: "IBM Plex Mono", ui-monospace, monospace;
         --motion-fast: 120ms;
@@ -170,6 +182,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --po-button-warning-bg: #D97706;
         --po-button-warning-fg: #101820;
         --po-button-warning-hover: #B45309;
+        --po-button-success-bg: #3F5E28;
+        --po-button-success-fg: #EFF6E8;
+        --po-button-success-hover: #567236;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -231,6 +246,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           --po-button-warning-bg: #D97706;
           --po-button-warning-fg: #101820;
           --po-button-warning-hover: #B45309;
+          --po-button-success-bg: #3F5E28;
+          --po-button-success-fg: #EFF6E8;
+          --po-button-success-hover: #567236;
         }
       }
 
@@ -362,6 +380,67 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         background: var(--po-button-warning-hover);
       }
 
+      .parapet-ui .po-button-primary {
+        background: var(--po-button-primary-bg);
+        color: var(--po-button-primary-fg);
+      }
+      .parapet-ui .po-button-primary:hover {
+        background: var(--po-button-primary-hover);
+      }
+
+      .parapet-ui .po-button-recovery {
+        background: var(--po-button-recovery-bg);
+        color: var(--po-button-recovery-fg);
+      }
+      .parapet-ui .po-button-recovery:hover {
+        background: var(--po-button-recovery-hover);
+      }
+
+      .parapet-ui .po-button-destructive {
+        background: var(--po-button-destructive-bg);
+        color: var(--po-button-destructive-fg);
+      }
+      .parapet-ui .po-button-destructive:hover {
+        background: var(--po-button-destructive-hover);
+      }
+
+      .parapet-ui .po-button-success {
+        background: var(--po-button-success-bg);
+        color: var(--po-button-success-fg);
+      }
+      .parapet-ui .po-button-success:hover {
+        background: var(--po-button-success-hover);
+      }
+
+      .parapet-ui .po-guidance {
+        background: var(--parapet-info-bg);
+        color: var(--parapet-info-text);
+        border: 1px solid var(--parapet-border);
+      }
+
+      .parapet-ui .po-timeline-badge-operator {
+        background: var(--parapet-accent);
+        color: #FFFFFF;
+      }
+
+      .parapet-ui .po-timeline-badge-copilot {
+        background: var(--parapet-info-text);
+        color: var(--parapet-bg);
+      }
+
+      .parapet-ui .po-timeline-badge-external {
+        background: var(--parapet-text-muted);
+        color: var(--parapet-panel);
+      }
+
+      .parapet-ui .po-queue-row-selected {
+        border-left-color: var(--parapet-accent);
+        background: var(--parapet-accent-soft);
+      }
+      .parapet-ui .po-queue-row-selected:hover {
+        background: var(--parapet-accent-soft);
+      }
+
       .parapet-theme-option[aria-pressed="true"] {
         background: var(--po-nav-active-bg);
         color: var(--po-nav-active-fg);
@@ -375,7 +454,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       }
 
       html[data-parapet-theme="dark"] .parapet-theme-option[aria-pressed="true"] {
-        color: #042f2e;
+        color: var(--po-nav-active-fg);
       }
 
       @media (prefers-reduced-motion: reduce) {
