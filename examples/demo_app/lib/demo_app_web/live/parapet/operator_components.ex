@@ -150,7 +150,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         --po-chip-info-fg: #ECEBFF;
         --po-chip-info-border: #6D5BD0;
         --po-button-warning-bg: #D97706;
-        --po-button-warning-fg: #F8F4EC;
+        --po-button-warning-fg: #101820;
         --po-button-warning-hover: #B45309;
       }
 
@@ -211,7 +211,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           --po-chip-info-fg: #ECEBFF;
           --po-chip-info-border: #6D5BD0;
           --po-button-warning-bg: #D97706;
-          --po-button-warning-fg: #F8F4EC;
+          --po-button-warning-fg: #101820;
           --po-button-warning-hover: #B45309;
         }
       }

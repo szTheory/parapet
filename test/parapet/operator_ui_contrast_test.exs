@@ -8,58 +8,52 @@ defmodule Parapet.OperatorUIContrastTest do
 
   @themes %{
     light: %{
-      panel: "#ffffff",
-      header_bg: "#ffffff",
-      header_title: "#1c1917",
-      header_muted: "#0f766e",
-      link: "#1d4ed8",
-      link_hover: "#1e3a8a",
-      nav_fg: "#44403c",
-      nav_hover_bg: "#f5f5f4",
-      nav_hover_fg: "#1c1917",
-      nav_active_bg: "#5eead4",
-      nav_active_fg: "#042f2e",
-      theme_control_bg: "#fafaf9",
-      theme_control_fg: "#44403c",
-      neutral_bg: "#f5f5f4",
-      neutral_fg: "#292524",
-      success_bg: "#dcfce7",
-      success_fg: "#14532d",
-      warning_bg: "#fef3c7",
-      warning_fg: "#78350f",
-      danger_bg: "#ffe4e6",
-      danger_fg: "#881337",
-      info_bg: "#e0e7ff",
-      info_fg: "#312e81",
-      warning_button_bg: "#b45309",
-      warning_button_fg: "#ffffff"
+      bg: "#F8F4EC",
+      panel: "#FFFFFF",
+      header_bg: "#FFFFFF",
+      header_title: "#101820",
+      header_muted: "#256C82",
+      link_on_panel: "#256C82",
+      link_on_bg: "#256C82",
+      focus_ring: "#256C82",
+      nav_fg: "#2E3A42",
+      nav_hover_bg: "#EAE2D4",
+      nav_hover_fg: "#101820",
+      nav_active_bg: "#EFF6E8",
+      nav_active_fg: "#3F5E28",
+      theme_control_bg: "#F8F4EC",
+      theme_control_fg: "#2E3A42",
+      healthy_bg: "#EFF6E8", healthy_fg: "#3F5E28",
+      watch_bg: "#F8EFD7",   watch_fg: "#92400E",
+      burning_bg: "#FCE8E2", burning_fg: "#9F2D2D",
+      exhausted_bg: "#F8D7D4", exhausted_fg: "#7F1D1D",
+      unknown_bg: "#ECEFF1", unknown_fg: "#2E3A42",
+      ai_bg: "#ECEBFF",      ai_fg: "#4F46A5",
+      warning_button_bg: "#B45309", warning_button_fg: "#FFFFFF"
     },
     dark: %{
-      panel: "#1c1917",
-      header_bg: "#0c0a09",
-      header_title: "#fafaf9",
-      header_muted: "#5eead4",
-      link: "#93c5fd",
-      link_hover: "#bfdbfe",
-      nav_fg: "#e7e5e4",
-      nav_hover_bg: "#292524",
-      nav_hover_fg: "#ffffff",
-      nav_active_bg: "#5eead4",
-      nav_active_fg: "#042f2e",
-      theme_control_bg: "#1c1917",
-      theme_control_fg: "#e7e5e4",
-      neutral_bg: "#292524",
-      neutral_fg: "#f5f5f4",
-      success_bg: "#052e16",
-      success_fg: "#bbf7d0",
-      warning_bg: "#451a03",
-      warning_fg: "#fde68a",
-      danger_bg: "#4c0519",
-      danger_fg: "#fecdd3",
-      info_bg: "#1e1b4b",
-      info_fg: "#c7d2fe",
-      warning_button_bg: "#92400e",
-      warning_button_fg: "#fff7ed"
+      bg: "#18232B",
+      panel: "#2E3A42",
+      header_bg: "#101820",
+      header_title: "#F8F4EC",
+      header_muted: "#7FB4C6",
+      link_on_panel: "#7FB4C6",
+      link_on_bg: "#7FB4C6",
+      focus_ring: "#F8F4EC",
+      nav_fg: "#D8D0C3",
+      nav_hover_bg: "#2E3A42",
+      nav_hover_fg: "#F8F4EC",
+      nav_active_bg: "#3F5E28",
+      nav_active_fg: "#F8F4EC",
+      theme_control_bg: "#18232B",
+      theme_control_fg: "#D8D0C3",
+      healthy_bg: "#3F5E28", healthy_fg: "#EFF6E8",
+      watch_bg: "#92400E",   watch_fg: "#F8EFD7",
+      burning_bg: "#9F2D2D", burning_fg: "#FCE8E2",
+      exhausted_bg: "#7F1D1D", exhausted_fg: "#F8D7D4",
+      unknown_bg: "#2E3A42", unknown_fg: "#ECEFF1",
+      ai_bg: "#4F46A5",      ai_fg: "#ECEBFF",
+      warning_button_bg: "#D97706", warning_button_fg: "#101820"
     }
   }
 
@@ -67,33 +61,22 @@ defmodule Parapet.OperatorUIContrastTest do
     for {theme, tokens} <- @themes do
       assert_contrast(theme, :header_title, tokens.header_title, tokens.header_bg, 4.5)
       assert_contrast(theme, :header_muted, tokens.header_muted, tokens.header_bg, 4.5)
-      assert_contrast(theme, :link, tokens.link, tokens.panel, 4.5)
-      assert_contrast(theme, :link_hover, tokens.link_hover, tokens.panel, 4.5)
+      assert_contrast(theme, :link_on_panel, tokens.link_on_panel, tokens.panel, 4.5)
+      assert_contrast(theme, :link_on_bg, tokens.link_on_bg, tokens.bg, 4.5)
       assert_contrast(theme, :nav, tokens.nav_fg, tokens.header_bg, 4.5)
       assert_contrast(theme, :nav_hover, tokens.nav_hover_fg, tokens.nav_hover_bg, 4.5)
       assert_contrast(theme, :nav_active, tokens.nav_active_fg, tokens.nav_active_bg, 4.5)
-
-      assert_contrast(
-        theme,
-        :theme_control,
-        tokens.theme_control_fg,
-        tokens.theme_control_bg,
-        4.5
-      )
-
-      assert_contrast(theme, :neutral_chip, tokens.neutral_fg, tokens.neutral_bg, 4.5)
-      assert_contrast(theme, :success_chip, tokens.success_fg, tokens.success_bg, 4.5)
-      assert_contrast(theme, :warning_chip, tokens.warning_fg, tokens.warning_bg, 4.5)
-      assert_contrast(theme, :danger_chip, tokens.danger_fg, tokens.danger_bg, 4.5)
-      assert_contrast(theme, :info_chip, tokens.info_fg, tokens.info_bg, 4.5)
-
-      assert_contrast(
-        theme,
-        :warning_button,
-        tokens.warning_button_fg,
-        tokens.warning_button_bg,
-        4.5
-      )
+      assert_contrast(theme, :theme_control, tokens.theme_control_fg, tokens.theme_control_bg, 4.5)
+      assert_contrast(theme, :healthy_chip, tokens.healthy_fg, tokens.healthy_bg, 4.5)
+      assert_contrast(theme, :watch_chip, tokens.watch_fg, tokens.watch_bg, 4.5)
+      assert_contrast(theme, :burning_chip, tokens.burning_fg, tokens.burning_bg, 4.5)
+      assert_contrast(theme, :exhausted_chip, tokens.exhausted_fg, tokens.exhausted_bg, 4.5)
+      assert_contrast(theme, :unknown_chip, tokens.unknown_fg, tokens.unknown_bg, 4.5)
+      assert_contrast(theme, :ai_chip, tokens.ai_fg, tokens.ai_bg, 4.5)
+      assert_contrast(theme, :warning_button, tokens.warning_button_fg, tokens.warning_button_bg, 4.5)
+      # GUARD-02: focus ring at 3:1 UI floor
+      focus_surface = if theme == :light, do: tokens.panel, else: tokens.bg
+      assert_contrast(theme, :focus_ring, tokens.focus_ring, focus_surface, 3.0)
     end
   end
 
@@ -122,6 +105,18 @@ defmodule Parapet.OperatorUIContrastTest do
       refute content =~ "bg-teal-400 text-stone-950"
       refute content =~ "bg-amber-100 text-amber"
       refute content =~ "text-[10px]"
+
+      # MOTION-01: motion tokens wired
+      assert content =~ "--motion-fast"
+      assert content =~ "--motion-base"
+      assert content =~ "--motion-ease"
+      # MOTION-01: motion zeroed under prefers-reduced-motion
+      assert content =~ "prefers-reduced-motion"
+      assert content =~ "--motion-fast: 0ms"
+      # FONT-02: @font-face emitted
+      assert content =~ "@font-face"
+      assert content =~ "IBM Plex Sans"
+      assert content =~ "font-display: swap"
     end
   end
 
