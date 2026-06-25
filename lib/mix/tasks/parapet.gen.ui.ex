@@ -69,7 +69,11 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
 
   def run(argv) do
     super(argv)
-    copy_fonts_to_host()
+    # The font copy writes outside Igniter's transaction model, so it must
+    # honor --dry-run (which super/1 respects and makes no file writes for).
+    unless "--dry-run" in argv do
+      copy_fonts_to_host()
+    end
   end
 
   defp copy_fonts_to_host do
@@ -77,12 +81,19 @@ defmodule Mix.Tasks.Parapet.Gen.Ui do
     dest_dir = Path.join(File.cwd!(), "priv/static/parapet/fonts")
     File.mkdir_p!(dest_dir)
 
-    for filename <- File.ls!(source_dir) do
+    # List once, and copy only regular files so a stray subdirectory or dotfile
+    # (e.g. .DS_Store dir, packaging artifact) can't crash the copy mid-stream.
+    files =
+      source_dir
+      |> File.ls!()
+      |> Enum.filter(&File.regular?(Path.join(source_dir, &1)))
+
+    for filename <- files do
       File.cp!(Path.join(source_dir, filename), Path.join(dest_dir, filename))
     end
 
     Mix.shell().info(
-      "* copying #{length(File.ls!(source_dir))} font files to priv/static/parapet/fonts/"
+      "* copying #{length(files)} font files to priv/static/parapet/fonts/"
     )
   end
 
