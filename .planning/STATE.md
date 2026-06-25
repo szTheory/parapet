@@ -6,13 +6,13 @@ current_phase: 45
 current_phase_name: primitive-components
 status: executing
 stopped_at: Phase 45 UI-SPEC approved
-last_updated: "2026-06-25T16:01:43.868Z"
+last_updated: "2026-06-25T16:21:08.210Z"
 last_activity: 2026-06-25
 progress:
   total_phases: 7
   completed_phases: 1
   total_plans: 8
-  completed_plans: 6
+  completed_plans: 7
   percent: 14
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 ## Current Position
 
 Phase: 45 (primitive-components) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-06-25
 
@@ -61,6 +61,7 @@ Last activity: 2026-06-25
 | Phase 44 P03 | 22m | 2 tasks | 3 files |
 | Phase 44 P04 | 5m45s | 2 tasks | 4 files |
 | Phase 45 P02 | 6 | 2 tasks | 2 files |
+| Phase 45 P03 | 5 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -90,6 +91,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Applied all CSS/function edits identically to template and demo mirror in same commit
 - [Phase ?]: Added --po-button-success dark overrides to both dark blocks; primary/recovery/destructive derive from already-overridden base vars (no dark override needed)
 - [Phase ?]: disabled:opacity-50/cursor-not-allowed/pointer-events-none wired into control_base() so every button variant automatically handles COMP-02
+- [Phase ?]: Plan 45-03: completed inline markup re-skin
+- [Phase ?]: Three always-active navigation anchors use control_class(:primary) without aria-disabled (COMP-02: no disabled branch needed)
+- [Phase ?]: COMP-05 confirmed zero cursor-pointer on stat/metric containers in operator_components
 
 ### Pending Todos
 
@@ -111,7 +115,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-25T16:01:07.406Z
+Last session: 2026-06-25T16:20:09.954Z
 Stopped at: Phase 45 UI-SPEC approved
 Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
