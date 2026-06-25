@@ -29,7 +29,10 @@ defmodule Parapet.OperatorUIContrastTest do
       exhausted_bg: "#F8D7D4", exhausted_fg: "#7F1D1D",
       unknown_bg: "#ECEFF1", unknown_fg: "#2E3A42",
       ai_bg: "#ECEBFF",      ai_fg: "#4F46A5",
-      warning_button_bg: "#B45309", warning_button_fg: "#FFFFFF"
+      warning_button_bg: "#B45309", warning_button_fg: "#FFFFFF",
+      primary_button_bg: "#101820", primary_button_fg: "#FFFFFF",
+      destructive_button_bg: "#B13A32", destructive_button_fg: "#FFFFFF",
+      success_button_bg: "#567236", success_button_fg: "#FFFFFF"
     },
     dark: %{
       bg: "#18232B",
@@ -53,7 +56,10 @@ defmodule Parapet.OperatorUIContrastTest do
       exhausted_bg: "#7F1D1D", exhausted_fg: "#F8D7D4",
       unknown_bg: "#2E3A42", unknown_fg: "#ECEFF1",
       ai_bg: "#4F46A5",      ai_fg: "#ECEBFF",
-      warning_button_bg: "#D97706", warning_button_fg: "#101820"
+      warning_button_bg: "#D97706", warning_button_fg: "#101820",
+      primary_button_bg: "#F8F4EC", primary_button_fg: "#2E3A42",
+      destructive_button_bg: "#B13A32", destructive_button_fg: "#FFFFFF",
+      success_button_bg: "#3F5E28", success_button_fg: "#EFF6E8"
     }
   }
 
@@ -74,6 +80,9 @@ defmodule Parapet.OperatorUIContrastTest do
       assert_contrast(theme, :unknown_chip, tokens.unknown_fg, tokens.unknown_bg, 4.5)
       assert_contrast(theme, :ai_chip, tokens.ai_fg, tokens.ai_bg, 4.5)
       assert_contrast(theme, :warning_button, tokens.warning_button_fg, tokens.warning_button_bg, 4.5)
+      assert_contrast(theme, :primary_button, tokens.primary_button_fg, tokens.primary_button_bg, 4.5)
+      assert_contrast(theme, :destructive_button, tokens.destructive_button_fg, tokens.destructive_button_bg, 4.5)
+      assert_contrast(theme, :success_button, tokens.success_button_fg, tokens.success_button_bg, 4.5)
       # GUARD-02: focus ring at 3:1 UI floor
       focus_surface = if theme == :light, do: tokens.panel, else: tokens.bg
       assert_contrast(theme, :focus_ring, tokens.focus_ring, focus_surface, 3.0)
