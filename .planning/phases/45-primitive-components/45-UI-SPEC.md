@@ -53,6 +53,9 @@ Source: `brandbook/tokens/tokens.css` §9.2 (8px grid, locked).
 | `--space-8` | 64px | Page-level only |
 
 **Exceptions:**
+- `--space-3` = 12px is a multiple of 4 (4×3), the 8px-grid midpoint from the locked
+  brand scale in tokens.css, used for compact control padding (`px-3`). It is a locked
+  brand token, not a Phase-45 spacing invention.
 - Touch-target minimum for interactive controls: `min-h-[40px]` (already in
   `control_base()` and `nav_item`). Retain for all button/nav/theme-option controls.
 - Chips/badges/pills are exempt from 40px height — they are non-interactive display
@@ -66,15 +69,36 @@ Source: `brandbook/tokens/tokens.css` §9.2 (8px grid, locked).
 Source: `brandbook/tokens/tokens.css` §8.3 (locked). Only roles used by primitive
 components are listed.
 
+> **Locked-brand exception:** Type sizes are locked v1.5 brand tokens (tokens.css),
+> not Phase-45 choices; metric tokens are numeric-display-only and sit outside the
+> 4-tier UI prose scale.
+
+### UI prose type scale (4 tiers)
+
+These are the four sizes used for actual UI prose — labels, button text, links, and
+body copy in the primitive components.
+
 | Role | Token | Size | Weight | Line Height | Usage |
 |------|-------|------|--------|-------------|-------|
 | Caption / label | `--fs-caption` | 12px | 500 (`--fw-caption`) | 1.40 | Chip text, badge text, pill text, stat-card label |
 | Body small | `--fs-body-sm` | 14px | 400 (`--fw-body-sm`) | 1.50 | Button label, link text, theme-switcher option |
 | Body | `--fs-body` | 16px | 400 (`--fw-body`) | 1.60 | General body, card body copy |
-| Metric small | `--fs-metric-sm` | 20px | 500 (`--fw-metric-sm`) | 1.10 | Stat-card secondary metric value |
-| Metric large | `--fs-metric-lg` | 36px | 500 (`--fw-metric-lg`) | 1.00 | Primary stat/metric number |
+| Metric large | `--fs-metric-lg` | 36px | 500 (`--fw-metric-lg`) | 1.00 | Primary stat/metric number (numeric display) |
 
-**Weights used in primitives:** regular (400) and medium/semibold (500/600).
+### Numeric-display-only tokens (outside the 4-tier prose scale)
+
+These render numbers, never prose. They are locked brand tokens, exempt from the
+4-tier UI prose scale above.
+
+| Role | Token | Size | Weight | Line Height | Usage |
+|------|-------|------|--------|-------------|-------|
+| Metric small | `--fs-metric-sm` | 20px | 500 (`--fw-metric-sm`) | 1.10 | Stat-card secondary metric value (numeric only) |
+
+**Weights — primitives declare exactly two:** regular **400** and medium **500**.
+Weight **600** appears only where the locked brand token already sets it (e.g.
+`--fs-h1`..`--fs-h3` headings inherited by composing components and the IBM Plex Sans
+600 face vendored in Phase 44); it is a brand-token passthrough value, NOT a separately
+declared primitive weight. Primitives themselves declare 400/500 only.
 Avoid weight-only distinction for state; always pair with color or shape.
 
 **Font family:** All UI text uses `var(--font-sans)` = `"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif`.
@@ -265,6 +289,10 @@ The chip text label is the status word itself. No color-only status.
 raw `border-amber-*` utilities; replace with `.po-chip` + semantic modifiers as above.
 
 ### Stat / Metric Cards (COMP-05)
+
+**Primary visual anchor:** the metric count in the stat/metric card at `--fs-metric-lg`
+(36px, weight 500) is the dominant focal point of the operator overview — every other
+primitive is sized below it so the live counts read first.
 
 No pointer cursor, no hover affordance. `cursor-default` on stat card containers.
 
