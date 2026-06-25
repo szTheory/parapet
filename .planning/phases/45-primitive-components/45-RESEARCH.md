@@ -14,7 +14,7 @@
 | COMP-01 | Buttons (primary/secondary/ghost/destructive/warning) have tokenized, visually distinct rest/hover/active/focus-visible/disabled states in both themes | `control_class/2` function remediation; add `:primary`, `:destructive`, `:ghost` variants; wire `po-focus`; update `control_base()` motion token |
 | COMP-02 | Disabled controls are both visually and semantically disabled | Add `disabled` attr to `<button>` elements; `aria-disabled="true"` + `pointer-events-none` on `<a>` links; `opacity-50 cursor-not-allowed` visual |
 | COMP-03 | Links meet WCAG AA on their actual surface — watch-blue on light, brightened `#7FB4C6` on dark | `.po-link` already wired to `--po-link` token (already correct); verify no hard-coded link colors remain |
-| COMP-04 | Badges, chips, and status pills use the brand status triplets and remain legible (AA) in dark mode | `chip_class/2` and `state_color/1` functions already return `.po-chip` semantic classes; fix `escalation_chain_status_class/1` raw `border-amber-*` uses |
+| COMP-04 | Badges, chips, and status pills use the brand status triplets and remain legible (AA) in dark mode | `chip_class/2`, `state_color/1`, and `escalation_chain_status_class/1` already return `.po-chip` semantic classes (VERIFIED clean). Remaining COMP-04 gap is raw, NON-INTERCEPTED `border-amber-300`/`border-amber-100` utilities in the escalation-chain inline markup (lines 742, 754, 1007) — replace with `border-[color:var(--po-chip-warning-border)]` |
 | COMP-05 | Stat/metric cards use the metric type tokens and carry no spurious hover/pointer affordance | Verify `text-stone-950` on stat numbers is intercepted; add `cursor-default` on non-interactive card containers if missing |
 | COMP-06 | Every interactive primitive shows a visible `:focus-visible` ring using limestone ring on dark surfaces | Replace `focus:ring-teal-300`, `focus:ring-indigo-300`, `focus:ring-emerald-300`, `focus:ring-amber-300` with `po-focus` on all buttons |
 | COMP-07 | Icons, dividers, and separators follow border-over-shadow philosophy with tokenized borders | `bg-stone-200` on timeline spine intercepted (verify); fix `suspect_changes_card` and `runbook_card` icon/info badges |
@@ -705,22 +705,22 @@ This is the authoritative list of all items requiring remediation in Phase 45. S
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **`.po-button-recovery` vs inline `var()` expressions for the recovery button**
    - What we know: `control_class(:warning)` uses a semantic `.po-button-warning` class. The recovery button maps to accent color.
    - What's unclear: Whether to create `.po-button-recovery` CSS class or use inline `bg-[color:var(--parapet-accent)] hover:bg-[color:var(--parapet-accent-strong)]` Tailwind arbitrary value expressions.
-   - Recommendation: Create `.po-button-recovery` CSS class matching the pattern of `.po-button-warning`. More consistent; avoids Tailwind arbitrary value syntax which is less readable.
+   - RESOLVED: Create a `.po-button-recovery` CSS class matching the pattern of `.po-button-warning`. More consistent; avoids Tailwind arbitrary-value syntax which is less readable. (Implemented in Plan 02.)
 
 2. **`po-timeline-badge-copilot` color on dark surfaces**
    - What we know: UI-SPEC says use `var(--parapet-info-bg)` pattern. In dark mode, `--parapet-info-bg` is `rgba(109,91,208,0.24)` (semi-transparent). The badge needs solid background for readability.
    - What's unclear: Whether to use `var(--parapet-info-text)` as solid bg (dark: `#B9B5F6`) with white text, or the light chip approach (light bg, colored text).
-   - Recommendation: For icon badges (filled circle with letter), use solid bg approach: `background: var(--parapet-info-text)` + `color: var(--parapet-bg)` so it's solid on both themes. This mirrors how `po-timeline-badge-operator` uses `var(--parapet-accent)`.
+   - RESOLVED: For icon badges (filled circle with letter), use the solid-bg approach: `background: var(--parapet-info-text)` + `color: var(--parapet-bg)` so it is solid on both themes, mirroring how `po-timeline-badge-operator` uses `var(--parapet-accent)`. (Implemented in Plan 02 `.po-timeline-badge-copilot` rule.)
 
 3. **`operator_live.ex.eex` queue-refresh button accessibility**
    - What we know: This button is a notification-driven refresh trigger (`phx-click="refresh_queue"`). It carries `bg-teal-700 text-white` which is contrast-safe but off-brand.
    - What's unclear: Does this button need a `control_class/2` variant, or is inline replacement sufficient since it's in a different template?
-   - Recommendation: Since `operator_live.ex.eex` doesn't import `control_class/2` as a module function (it uses helper functions inline), apply the token expression directly in the class string. Use: `bg-[color:var(--parapet-accent)] text-white hover:bg-[color:var(--parapet-accent-strong)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus duration-[--motion-fast]`.
+   - RESOLVED: `operator_live.ex.eex` does not import `control_class/2` as a module function, so apply the token expression directly in the class string: `bg-[color:var(--parapet-accent)] text-white hover:bg-[color:var(--parapet-accent-strong)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus duration-[--motion-fast]`. (Implemented in Plan 04.)
 
 ---
 
