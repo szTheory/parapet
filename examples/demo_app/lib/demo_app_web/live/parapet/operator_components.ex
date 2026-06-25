@@ -1351,7 +1351,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       control_width(width) <>
         " " <>
         control_base() <>
-        " bg-white text-amber-900 ring-1 ring-amber-300 hover:bg-amber-50 focus:ring-amber-300"
+        " bg-white text-amber-900 ring-1 ring-amber-300 hover:bg-amber-50"
 
   defp control_class(:success, width),
     do: control_width(width) <> " " <> control_base() <> " po-button-success"
