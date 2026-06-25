@@ -818,7 +818,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
               <%= escalation_status_copy(@detail.escalation_summary.status) %>
             </p>
           </div>
-          <span class="self-start px-2.5 py-1 text-xs font-semibold rounded-full border border-amber-300 bg-white text-amber-900">
+          <span class="self-start px-2.5 py-1 text-xs font-semibold rounded-full border border-[color:var(--po-chip-warning-border)] bg-white text-amber-900">
             <%= escalation_status_badge(@detail.escalation_summary.status) %>
           </span>
         </div>
@@ -830,7 +830,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
               <dd class="mt-2">
                 <ol class="grid grid-cols-1 gap-2 md:grid-cols-2">
                   <%= for step <- @detail.escalation_summary.escalation_chain do %>
-                    <li class="flex flex-col gap-2 rounded-md border border-amber-100 bg-amber-50/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
+                    <li class="flex flex-col gap-2 rounded-md border border-[color:var(--po-chip-warning-border)] bg-amber-50/60 px-3 py-2 sm:flex-row sm:items-center sm:justify-between">
                       <div class="min-w-0">
                         <p class="text-sm font-medium text-amber-950"><%= step.label %></p>
                         <%= if step.delay do %>
@@ -1083,7 +1083,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <% end %>
 
                 <%= if step.warning do %>
-                  <div class="mt-2 p-2 bg-amber-50 border border-amber-100 rounded text-xs text-amber-800">
+                  <div class="mt-2 p-2 bg-amber-50 border border-[color:var(--po-chip-warning-border)] rounded text-xs text-amber-800">
                     <%= step.warning %>
                   </div>
                 <% end %>
@@ -1334,17 +1334,17 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   defp control_class(kind), do: control_class(kind, nil)
 
+  defp control_class(:primary, width),
+    do: control_width(width) <> " " <> control_base() <> " po-button-primary"
+
+  defp control_class(:destructive, width),
+    do: control_width(width) <> " " <> control_base() <> " po-button-destructive"
+
   defp control_class(:recovery, width),
-    do:
-      control_width(width) <>
-        " " <>
-        control_base() <> " bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-300"
+    do: control_width(width) <> " " <> control_base() <> " po-button-recovery"
 
   defp control_class(:warning, width),
-    do:
-      control_width(width) <>
-        " " <>
-        control_base() <> " po-button-warning focus:ring-amber-300"
+    do: control_width(width) <> " " <> control_base() <> " po-button-warning"
 
   defp control_class(:warning_secondary, width),
     do:
@@ -1354,13 +1354,10 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
         " bg-white text-amber-900 ring-1 ring-amber-300 hover:bg-amber-50 focus:ring-amber-300"
 
   defp control_class(:success, width),
-    do:
-      control_width(width) <>
-        " " <>
-        control_base() <> " bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-300"
+    do: control_width(width) <> " " <> control_base() <> " po-button-success"
 
   defp control_base do
-    "flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-transform duration-100 ease-out active:scale-[0.96] focus:outline-none focus:ring-2"
+    "flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-transform duration-[--motion-fast] ease-out active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
   end
 
   defp control_width(:full), do: "w-full"
@@ -1410,7 +1407,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   defp queue_row_class(selected, incident) do
     if selected && selected.id == incident.id do
-      "border-l-teal-700 bg-teal-50/80 hover:bg-teal-50"
+      "po-queue-row-selected"
     else
       "border-l-transparent bg-stone-50/40 hover:bg-stone-100"
     end
@@ -1554,9 +1551,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   defp external_link_entry?(_entry), do: false
 
   defp timeline_entry_badge_class(%{actor_class: :system}), do: "po-button-warning"
-  defp timeline_entry_badge_class(%{actor_class: :operator}), do: "bg-indigo-700"
-  defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "bg-violet-700"
-  defp timeline_entry_badge_class(%{actor_class: :external}), do: "bg-slate-700"
+  defp timeline_entry_badge_class(%{actor_class: :operator}), do: "po-timeline-badge-operator"
+  defp timeline_entry_badge_class(%{actor_class: :copilot}), do: "po-timeline-badge-copilot"
+  defp timeline_entry_badge_class(%{actor_class: :external}), do: "po-timeline-badge-external"
   defp timeline_entry_badge_class(_), do: "bg-stone-600"
 
   defp timeline_entry_badge_text(%{actor_class: :system}), do: "SYS"
