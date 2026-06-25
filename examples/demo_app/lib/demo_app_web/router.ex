@@ -16,16 +16,19 @@ defmodule DemoAppWeb.Router do
   scope "/" do
     pipe_through(:browser)
 
+    # Gallery must be declared before the "/parapet/:id" catch-all below —
+    # Phoenix matches routes in declaration order, so an earlier ":id" route
+    # would otherwise capture "_gallery" as an incident id (Ecto binary_id cast error).
+    live_session :parapet_gallery do
+      live("/parapet/_gallery", DemoAppWeb.Parapet.GalleryLive, :index)
+    end
+
     live_session :parapet_operator do
       live("/parapet", DemoAppWeb.Parapet.OperatorLive, :index)
       live("/parapet/actions", DemoAppWeb.Parapet.OperatorLive, :actions)
       live("/parapet/history", DemoAppWeb.Parapet.OperatorLive, :history)
       live("/parapet/incidents/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
       live("/parapet/:id", DemoAppWeb.Parapet.OperatorDetailLive, :show)
-    end
-
-    live_session :parapet_gallery do
-      live("/parapet/_gallery", DemoAppWeb.Parapet.GalleryLive, :index)
     end
   end
 
