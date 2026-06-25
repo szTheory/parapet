@@ -975,7 +975,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             <div class="flex justify-between items-start bg-white ring-1 ring-stone-900/5 rounded-lg p-3 shadow-sm">
               <div class="flex items-start gap-3">
                 <div class="mt-0.5">
-                  <span class="h-6 w-6 rounded-full bg-purple-100 text-purple-800 flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                  <span class="h-6 w-6 rounded-full po-chip po-chip-info flex items-center justify-center text-xs font-bold ring-2 ring-white">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor">
                       <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
                     </svg>
@@ -991,7 +991,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1">
-                <span class="px-2 py-1 text-xs font-medium rounded-full bg-violet-100 text-violet-800 ring-1 ring-violet-200/50">
+                <span class="po-chip po-chip-info">
                   <%= inspect(scope) %>
                 </span>
                 <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="text-sm text-stone-500"><%= readable_datetime(entry.inserted_at) %></time>
@@ -1077,7 +1077,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <p class="text-xs text-stone-500 mt-1"><%= step.description %></p>
                 
                 <%= if step.state == :guidance && step.guidance do %>
-                  <div class="mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs text-violet-800 italic">
+                  <div class="po-guidance mt-2 p-2 rounded text-xs italic">
                     <%= step.guidance %>
                   </div>
                 <% end %>
@@ -1134,10 +1134,10 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     ~H"""
     <% preview = @detail.derived.active_preview %>
     <div class="fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
-      <div class="bg-white ring-1 ring-indigo-500 rounded-xl shadow-xl overflow-hidden">
-        <div class="bg-indigo-500 px-4 py-2 flex justify-between items-center">
+      <div class="bg-white ring-1 ring-[color:var(--parapet-border)] rounded-xl shadow-xl overflow-hidden">
+        <div class="px-4 py-2 flex justify-between items-center" style="background: var(--parapet-accent);">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
-          <button type="button" phx-click="cancel_preview" aria-label="Close Recovery Preview" class="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-white hover:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-white/80">
+          <button type="button" phx-click="cancel_preview" aria-label="Close Recovery Preview" class="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-white hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-white/80">
             <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
@@ -1173,7 +1173,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           <% end %>
 
           <div class="flex gap-2">
-            <p class="mb-3 rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-900 ring-1 ring-indigo-100">
+            <p class="po-guidance mb-3 rounded-lg px-3 py-2 text-xs ring-1">
               Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome.
             </p>
             <button 
