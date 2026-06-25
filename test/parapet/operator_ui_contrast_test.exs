@@ -126,6 +126,41 @@ defmodule Parapet.OperatorUIContrastTest do
       assert content =~ "@font-face"
       assert content =~ "IBM Plex Sans"
       assert content =~ "font-display: swap"
+
+      # COMP-08: off-palette class remediation complete
+      refute content =~ "bg-indigo-600"
+      refute content =~ "bg-indigo-500"
+      refute content =~ "bg-indigo-50 ring-indigo-100"
+      refute content =~ "bg-emerald-600"
+      refute content =~ "bg-purple-100"
+      refute content =~ "bg-violet-100"
+      refute content =~ "bg-blue-50"
+      refute content =~ "bg-teal-700"
+      refute content =~ "hover:ring-teal-700"
+      refute content =~ "#042f2e"
+
+      # MOTION-02: duration token used; no transition-all
+      refute content =~ "transition-all"
+      assert content =~ "duration-[--motion-fast]"
+
+      # COMP-06: po-focus on all controls
+      assert content =~ "po-focus"
+
+      # COMP-07: no raw badge color utilities
+      refute content =~ "bg-purple-100 text-purple-800"
+      refute content =~ "bg-violet-100 text-violet-800"
+      refute content =~ "bg-indigo-700"
+      refute content =~ "bg-violet-700"
+      refute content =~ "bg-slate-700"
+
+      # COMP-05: no spurious pointer cursor on stat cards
+      refute content =~ "cursor-pointer"
+
+      # COMP-02: disabled affordance wired in control_base()
+      assert content =~ "disabled:opacity"
+
+      # COMP-04: no raw amber border utilities in escalation-chain markup
+      refute content =~ "border-amber-"
     end
   end
 
