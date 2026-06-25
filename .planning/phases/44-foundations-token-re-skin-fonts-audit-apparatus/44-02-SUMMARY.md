@@ -151,3 +151,26 @@ Files exist:
 Commits exist:
 - b3d710d — feat(44-02): re-skin all three CSS blocks + @font-face + motion
 - 2c57f01 — chore(44-02): replace un-intercepted color classes in secondary templates
+
+## Gap-Closure Follow-up: Brand type/spacing/radius/shadow token declarations
+
+The phase goal requires the operator theme foundation to carry the full brand token
+set (color/type/spacing/radius/shadow/motion/focus). The initial pass declared color,
+`--motion-*`, and `--font-*` only. This follow-up adds the remaining theme-independent
+foundation tokens to the LIGHT/`:root` block of `operator_theme_bootstrap/1` (light block
+only, like `--motion-*`/`--font-*`), copied VERBATIM from `brandbook/tokens/tokens.css`
+(doc §8.3 type scale, §9.2 spacing, §9.3 radius, §9.4 borders & shadows):
+
+- Type scale: `--fs-*`/`--lh-*`/`--fw-*` (display, h1-h3, body, body-sm, caption, code, metric-lg, metric-sm)
+- Spacing 8px grid: `--space-1` through `--space-8`
+- Radius: `--radius-xs/sm/md/lg/xl/pill`
+- Borders & shadows: `--border-light`, `--border-dark`, `--shadow-card`, `--shadow-popover`
+
+Values-only DECLARATIONS — no markup/class/selector/`.po-*` changes. Per-component
+APPLICATION remains Phase 45. Added byte-identically to both
+`priv/templates/parapet.gen.ui/operator_components.ex.eex` and the demo mirror
+`examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex` (16 lines each, verified identical).
+
+Gates: `mix compile --warnings-as-errors` PASS; `mix test operator_ui_contrast_test.exs
+operator_ui_demo_contract_test.exs` PASS (7 tests, 0 failures — additive declarations,
+no existing var values changed).

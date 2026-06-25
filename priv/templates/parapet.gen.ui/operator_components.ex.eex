@@ -97,6 +97,24 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         --motion-fast: 120ms;
         --motion-base: 200ms;
         --motion-ease: cubic-bezier(.2, 0, 0, 1);
+        --fs-display: 56px; --lh-display: 1.00; --fw-display: 500;
+        --fs-h1: 40px; --lh-h1: 1.08; --fw-h1: 500;
+        --fs-h2: 30px; --lh-h2: 1.16; --fw-h2: 500;
+        --fs-h3: 22px; --lh-h3: 1.25; --fw-h3: 500;
+        --fs-body: 16px; --lh-body: 1.60; --fw-body: 400;
+        --fs-body-sm: 14px; --lh-body-sm: 1.50; --fw-body-sm: 400;
+        --fs-caption: 12px; --lh-caption: 1.40; --fw-caption: 500;
+        --fs-code: 13px; --lh-code: 1.55; --fw-code: 400;
+        --fs-metric-lg: 36px; --lh-metric-lg: 1.00; --fw-metric-lg: 500;
+        --fs-metric-sm: 20px; --lh-metric-sm: 1.10; --fw-metric-sm: 500;
+        --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+        --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
+        --radius-xs: 4px; --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px;
+        --radius-pill: 999px;
+        --border-light: 1px solid rgba(16, 24, 32, 0.12);
+        --border-dark: 1px solid rgba(248, 244, 236, 0.16);
+        --shadow-card: 0 1px 2px rgba(16, 24, 32, 0.06);
+        --shadow-popover: 0 12px 32px rgba(16, 24, 32, 0.16);
       }
 
       html[data-parapet-theme="dark"] .parapet-ui,
