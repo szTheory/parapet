@@ -150,10 +150,22 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   5. Every page is fully usable on mobile (390px) across all states.
 
 **Plans**: 4 plans
+**Wave 1**
+
 - [ ] 48-01-PLAN.md — RED scaffold: source-string + rendered-state assertions for all FLOW/COPY/A11Y facts (no new test files) [wave 1]
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 48-02-PLAN.md — green (components): not-found panel, incident_summary heading-level prop, empty-state anatomy + uniform skeleton, component microcopy, R1-R7 overflow fixes [wave 2]
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 48-03-PLAN.md — green (shell/service): additive fetch_incident_detail/1, not-found wiring (mount + 6 refresh sites), per-page h1 + :page_title, nav landmark, route-order lock, demo layout patch, flash microcopy [wave 3]
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 48-04-PLAN.md — gate: full lib + demo suite green, audit-matrix flip (+ N/A-by-Design rows), blocking human /parapet/_gallery walkthrough [wave 4]
+
 **UI hint**: yes
 
 ### Phase 49: Stress fixtures & seed coverage
