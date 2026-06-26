@@ -99,10 +99,10 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries; empty states are designed (icon + copy + next action) and carry no hover/pointer affordance; loading/skeleton states are reduced-motion-safe with no layout jumps.
   5. Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), every interactive element is keyboard-reachable with a visible focus indicator, and tab order is logical with no keyboard traps.
 
-**Plans**: 1/4 plans executed
+**Plans**: 2/4 plans executed
 
 - [x] 46-01-PLAN.md — Wave 0 test scaffold: @detail_template_paths + extended NAV/DATA/A11Y red assertions in operator_ui_contrast_test.exs
-- [ ] 46-02-PLAN.md — operator_components.ex.eex + mirror: nav-active border (NAV-01), timeline empty-state + spine CSS (DATA-03), empty-state icons (DATA-04)
+- [x] 46-02-PLAN.md — operator_components.ex.eex + mirror: nav-active border (NAV-01), timeline empty-state + spine CSS (DATA-03), empty-state icons (DATA-04)
 - [ ] 46-03-PLAN.md — operator_live + operator_detail_live + mirrors: skip-link/landmarks (NAV-05), queue-refresh color (NAV-02), skeleton (DATA-06), pagination focus/disabled (A11Y-03)
 - [ ] 46-04-PLAN.md — full-suite gate + human gallery walkthrough: 390px (NAV-02), tab order (A11Y-04), timeline/empty-state/skeleton rendered behaviors
 
@@ -192,7 +192,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
-| 46. Navigation, shell & data-display | v1.6 | 1/4 | In Progress|  |
+| 46. Navigation, shell & data-display | v1.6 | 2/4 | In Progress|  |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |

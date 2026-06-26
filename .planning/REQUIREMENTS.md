@@ -53,11 +53,11 @@
 
 ### Data Display
 
-- [ ] **DATA-01**: Incident list/rows and tables truncate or wrap long fields deliberately — no collapsed or unreadably squished columns.
+- [x] **DATA-01**: Incident list/rows and tables truncate or wrap long fields deliberately — no collapsed or unreadably squished columns.
 - [x] **DATA-02**: Lists/tables with internal scroll regions scroll correctly and are not trapped or broken; the page does not produce nested-scroll dead-ends.
 - [x] **DATA-03**: The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries.
-- [ ] **DATA-04**: Empty states are designed (icon + explanatory copy + next action) and carry no hover/pointer affordance.
-- [ ] **DATA-05**: Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), never by color alone.
+- [x] **DATA-04**: Empty states are designed (icon + explanatory copy + next action) and carry no hover/pointer affordance.
+- [x] **DATA-05**: Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), never by color alone.
 - [x] **DATA-06**: Loading/skeleton states are reduced-motion-safe and do not cause layout jumps.
 
 ### Component Groups (Meta-Components)
@@ -182,11 +182,11 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | NAV-03 | Phase 46 | Pending |
 | NAV-04 | Phase 46 | Pending |
 | NAV-05 | Phase 46 | Complete |
-| DATA-01 | Phase 46 | Pending |
+| DATA-01 | Phase 46 | Complete |
 | DATA-02 | Phase 46 | Complete |
 | DATA-03 | Phase 46 | Complete |
-| DATA-04 | Phase 46 | Pending |
-| DATA-05 | Phase 46 | Pending |
+| DATA-04 | Phase 46 | Complete |
+| DATA-05 | Phase 46 | Complete |
 | DATA-06 | Phase 46 | Complete |
 | A11Y-03 | Phase 46 | Complete |
 | A11Y-04 | Phase 46 | Pending |
