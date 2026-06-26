@@ -583,7 +583,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           <%= if @detail do %>
             <div class="mt-3 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
               <div class="min-w-0">
-                <h2 class="text-3xl font-semibold text-stone-950 text-balance"><%= @detail.incident.title %></h2>
+                <h2 class="text-3xl font-semibold text-stone-950 text-balance break-words"><%= @detail.incident.title %></h2>
                 <p class="mt-2 max-w-3xl text-base leading-7 text-stone-600">
                   <%= @detail.derived.impact || @detail.incident.description || "No impact summary is recorded yet." %>
                 </p>
@@ -846,16 +846,52 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       </div>
       
       <div class="bg-violet-50/50 p-4 rounded-xl mb-6 shadow-sm ring-1 ring-violet-900/5">
-        <h4 class="text-sm font-medium text-violet-900 mb-2">Impact Summary</h4>
+        <h4 class="text-sm font-medium text-violet-900 mb-2">What users are seeing</h4>
         <p class="text-sm text-violet-800">
-          <%= @detail.derived.impact || "No impact summary recorded." %>
+          <%= @detail.derived.impact || "No user-facing impact has been recorded yet." %>
         </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
+          <h4 class="text-sm font-medium text-stone-700 mb-2">Evidence on record</h4>
+          <ul class="text-sm text-stone-600 list-disc pl-5">
+            <li>Created <%= readable_datetime(@detail.incident.inserted_at) %></li>
+            <%= if @detail.derived.fault_plane do %>
+              <li>Likely fault plane: <%= @detail.derived.fault_plane %></li>
+            <% end %>
+            <%= if @detail.derived.next_safe_action do %>
+              <li>Next safe action: <%= @detail.derived.next_safe_action %></li>
+            <% end %>
+          </ul>
+        </div>
+        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
+          <h4 class="text-sm font-medium text-stone-700 mb-2">Where to inspect</h4>
+          <div class="flex flex-col gap-2">
+            <%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
+              <% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
+              <% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
+              <a href={url} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <span>Trace: <span class="tabular-nums font-mono"><%= trace_id %></span></span> &nearr;
+              </a>
+            <% end %>
+            <%= for link <- @detail.external_links do %>
+              <a href={external_link_url(link)} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
+                <span><%= external_link_label(link) %></span> &nearr;
+              </a>
+            <% end %>
+            <%= if Enum.empty?(@detail.external_links) && is_nil(Map.get(@detail.incident, :trace_id)) do %>
+              <span class="text-sm text-stone-500">No trace or external links are attached to this incident yet.</span>
+            <% end %>
+          </div>
+        </div>
       </div>
 
       <div class="shadow-sm ring-1 ring-amber-900/5 bg-amber-50 rounded-xl p-4 mb-6">
         <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div class="min-w-0">
-            <h4 class="text-sm font-semibold text-amber-950">Escalation Status</h4>
+            <h4 class="text-sm font-semibold text-amber-950">Escalation status</h4>
             <p class="text-sm text-amber-900 mt-1">
               <%= escalation_status_copy(@detail.escalation_summary.status) %>
             </p>
@@ -895,7 +931,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             </div>
           <% end %>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
-            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Next Step</dt>
+            <dt class="text-xs font-semibold uppercase tracking-wide text-amber-700">Safe next step</dt>
             <dd class="mt-1 break-words text-amber-950"><%= escalation_next_step_copy(@detail.escalation_summary.next_step) %></dd>
           </div>
           <div class="rounded-lg ring-1 ring-stone-900/5 shadow-sm bg-white p-3">
@@ -911,42 +947,6 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             <dd class="mt-1 break-words text-amber-950"><%= latest_event_copy(@detail.escalation_summary.latest_event) %></dd>
           </div>
         </dl>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
-          <h4 class="text-sm font-medium text-stone-700 mb-2">Top Facts</h4>
-          <ul class="text-sm text-stone-600 list-disc pl-5">
-            <li>Created <%= readable_datetime(@detail.incident.inserted_at) %></li>
-            <%= if @detail.derived.fault_plane do %>
-              <li>Likely fault plane: <%= @detail.derived.fault_plane %></li>
-            <% end %>
-            <%= if @detail.derived.next_safe_action do %>
-              <li>Next safe action: <%= @detail.derived.next_safe_action %></li>
-            <% end %>
-          </ul>
-        </div>
-        <div class="shadow-sm ring-1 ring-stone-900/5 bg-white rounded-xl p-4">
-          <h4 class="text-sm font-medium text-stone-700 mb-2">Observability</h4>
-          <div class="flex flex-col gap-2">
-            <%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
-              <% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
-              <% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
-              <a href={url} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <span>Trace: <span class="tabular-nums font-mono"><%= trace_id %></span></span> &nearr;
-              </a>
-            <% end %>
-            <%= for link <- @detail.external_links do %>
-              <a href={external_link_url(link)} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
-                <span><%= external_link_label(link) %></span> &nearr;
-              </a>
-            <% end %>
-            <%= if Enum.empty?(@detail.external_links) && is_nil(Map.get(@detail.incident, :trace_id)) do %>
-              <span class="text-sm text-stone-500">No external links attached.</span>
-            <% end %>
-          </div>
-        </div>
       </div>
     </div>
     """
@@ -1191,8 +1191,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
   def preview_panel(assigns) do
     ~H"""
     <% preview = @detail.derived.active_preview %>
-    <div class="fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
-      <div class="bg-white ring-1 ring-[color:var(--parapet-border)] rounded-xl shadow-xl overflow-hidden">
+    <div class="po-preview-reveal fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
+      <div role="region" aria-label="Recovery Preview"
+           class="bg-white ring-1 ring-[color:var(--parapet-border)] rounded-xl shadow-xl overflow-hidden">
         <div class="px-4 py-2 flex justify-between items-center" style="background: var(--parapet-accent);">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
           <button type="button" phx-click="cancel_preview" aria-label="Close Recovery Preview" class="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-white hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-white/80">
