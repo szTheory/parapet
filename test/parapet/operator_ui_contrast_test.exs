@@ -169,6 +169,24 @@ defmodule Parapet.OperatorUIContrastTest do
       refute content =~ "text-red-700"
       refute content =~ "text-red-600"
       refute content =~ "ring-amber-300"
+
+      # NAV-01: nav-active border-bottom shape indicator
+      assert content =~ "border-bottom: 2px solid var(--parapet-accent)"
+
+      # DATA-03: timeline empty state copy
+      assert content =~ "No timeline entries yet"
+
+      # DATA-03: po-timeline-list class applied to <ul>
+      assert content =~ "po-timeline-list"
+
+      # DATA-03: spine suppression CSS selector
+      assert content =~ "li:last-child"
+
+      # DATA-06: animate-pulse defined in templates (zeroed by prefers-reduced-motion)
+      assert content =~ "animate-pulse"
+
+      # DATA-02: no overflow-y-auto added
+      refute content =~ "overflow-y-auto"
     end
   end
 
@@ -199,6 +217,23 @@ defmodule Parapet.OperatorUIContrastTest do
       # (bg-stone-950 was the off-palette color that operator_components.ex.eex
       #  migrated in Plan 45-03; the same button in operator_live was a missed residual)
       refute content =~ "bg-stone-950"
+
+      # NAV-02: queue-refresh notification tokenized (no raw teal)
+      refute content =~ "bg-teal-50"
+      refute content =~ "text-teal-950"
+
+      # NAV-05: skip-link + main landmark
+      assert content =~ "Skip to main content"
+      assert content =~ ~S|id="parapet-main"|
+
+      # DATA-06: aria-live on queue list
+      assert content =~ ~S|aria-live="polite"|
+
+      # A11Y-03: disabled pagination aria-disabled
+      assert content =~ "aria-disabled"
+
+      # DATA-02: no overflow-y-auto added
+      refute content =~ "overflow-y-auto"
     end
   end
 
