@@ -406,13 +406,13 @@ defmodule Parapet.OperatorUIIntegrationTest do
     test "detail components render escalation summary before the canonical timeline" do
       content = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
 
-      assert content =~ "Escalation Status"
+      assert content =~ "Escalation status"
       assert content =~ "Escalation Chain"
       assert content =~ "Time Until Next Escalation"
       assert content =~ "@detail.escalation_summary"
       assert content =~ "@detail.timeline_entries"
 
-      assert index_of(content, "Escalation Status") <
+      assert index_of(content, "Escalation status") <
                index_of(content, "def incident_timeline"),
              "Escalation summary should be defined ahead of timeline rendering in the template"
     end
@@ -439,7 +439,7 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert components_content =~
                "Escalation controls are available only while the incident is open."
 
-      assert index_of(components_content, "Escalation Status") <
+      assert index_of(components_content, "Escalation status") <
                index_of(components_content, "Trigger Next Escalation"),
              "Escalation controls should appear after summary context"
 

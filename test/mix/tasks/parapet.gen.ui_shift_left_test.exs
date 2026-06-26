@@ -25,7 +25,7 @@ defmodule Mix.Tasks.Parapet.Gen.UiShiftLeftTest do
         Rewrite.source!(igniter.rewrite, "lib/test_web/live/parapet/operator_detail_live.ex")
         |> Rewrite.Source.get(:content)
 
-      assert components_source =~ "Escalation Status"
+      assert components_source =~ "Escalation status"
       assert components_source =~ "Escalation Chain"
       assert components_source =~ "Time Until Next Escalation"
       assert components_source =~ "def incident_summary(assigns)"
