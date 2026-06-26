@@ -203,3 +203,44 @@ No new threat surface introduced. All changes are static CSS class strings in HE
 - 3bca2e2: feat(45-04): phase-wide off-palette gate clean + audit matrix primitive cells done
 
 ## Self-Check: PASSED
+
+---
+
+## Gap-Closure Note (Post-Phase — 2026-06-26)
+
+The Phase 45 verifier identified 4 off-palette COMP-08 residuals that were NOT in the original 20-item inventory (`45-RESEARCH.md`) and were missed during Phase 45 execution. These were remediated in commit `4547411`.
+
+### Residuals Fixed
+
+| # | File | Location | Before | After |
+|---|------|----------|--------|-------|
+| 1 | operator_live.ex.eex (+ mirror) | line 158 — Return to Response button | `bg-stone-950 text-white hover:bg-stone-800` | `po-button-primary po-focus` |
+| 2 | operator_components.ex.eex (+ mirror) | line 1094 — targeting-hints span | `bg-purple-50 text-purple-700 border border-purple-100` | `po-chip po-chip-info text-xs font-mono` |
+| 3 | operator_components.ex.eex (+ mirror) | lines 1158-1160 — preview_panel warnings block | `bg-red-50 border-red-100 text-red-700 text-red-600` | `var(--po-chip-danger-*)` token expressions |
+| 4 | operator_components.ex.eex (+ mirror) | line 1354 — control_class(:warning_secondary) | `ring-amber-300` | `ring-[color:var(--po-chip-warning-border)]` |
+
+All fixes applied to both template and demo mirror in the same commit (byte-parity verified).
+
+### Gate Strengthening
+
+Added to `test/parapet/operator_ui_contrast_test.exs`:
+
+**In existing `@component_paths` test** (operator_components scope):
+- `refute content =~ "bg-purple-50"`
+- `refute content =~ "bg-red-50"`
+- `refute content =~ "text-red-700"`
+- `refute content =~ "text-red-600"`
+- `refute content =~ "ring-amber-300"`
+
+**New test** (`@live_template_paths` scope — operator_live template + mirror):
+- `refute content =~ "bg-stone-950"` — prevents Return to Response button from regressing
+
+### Test Results After Gap-Closure
+
+```
+mix test test/parapet/operator_ui_contrast_test.exs test/parapet/operator_ui_demo_contract_test.exs
+8 tests, 0 failures  (+1 from new live-template gate)
+
+mix test --exclude unboxed
+548 tests, 0 failures (10 excluded)
+```
