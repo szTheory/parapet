@@ -119,10 +119,16 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     ~H"""
     <.operator_theme_bootstrap />
     <div class="parapet-ui antialiased flex min-h-screen flex-col bg-stone-100 text-stone-900">
+      <a
+        href="#parapet-main"
+        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-semibold bg-[color:var(--parapet-panel)] text-[color:var(--parapet-accent)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus"
+      >
+        Skip to main content
+      </a>
       <.operator_nav active={@page_mode} operator_base_path={@operator_base_path} />
 
       <%= if @page_mode == :actions do %>
-        <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+        <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
           <div class="mx-auto max-w-5xl">
             <.operator_overview
               queue_page={@queue_page}
@@ -136,7 +142,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
         </main>
       <% else %>
         <%= if @page_mode == :history do %>
-          <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+          <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
             <div class="mx-auto max-w-6xl">
               <.operator_overview
                 queue_page={@queue_page}
@@ -193,7 +199,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
             </div>
           </main>
       <% else %>
-          <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+          <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
             <div class="mx-auto max-w-7xl">
               <.response_cockpit
                     detail={@selected_incident}
@@ -203,8 +209,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               />
 
               <%= if @queue_refresh_available? do %>
-                <div class="mt-4 rounded-xl bg-teal-50 px-4 py-3 shadow-sm ring-1 ring-stone-300">
-                  <p class="text-sm font-medium text-teal-950">New incidents or queue changes are available.</p>
+                <div class="mt-4 rounded-xl px-4 py-3 shadow-sm ring-1 bg-[color:var(--parapet-accent-soft)] ring-[color:var(--parapet-border)]">
+                  <p class="text-sm font-medium" style="color: var(--parapet-text);">New incidents or queue changes are available.</p>
                   <button
                     type="button"
                     phx-click="queue_refresh"
@@ -280,6 +286,11 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   <% else %>
                     <div class="flex min-h-[28rem] items-center justify-center p-8 text-stone-500">
                       <div class="max-w-md rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+                        <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
+                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.042 21.672L13.684 16.6m0 0l-2.51 2.225.569-9.47 5.227 7.917-3.286-.672zM12 2.25V4.5m5.834.166l-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243l-1.59-1.59" />
+                        </svg>
                         <p class="text-sm font-semibold text-stone-800">No incident selected</p>
                         <p class="mt-2 text-sm text-stone-500">
                           Active incidents appear in the queue. Select one to review impact, evidence, and the next safe action.
