@@ -468,6 +468,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           --motion-fast: 0ms;
           --motion-base: 0ms;
         }
+        /* DATA-06: animate-pulse skeleton is zeroed here — no new motion rule needed */
         .parapet-ui * {
           animation-duration: 0.01ms !important;
           animation-iteration-count: 1 !important;

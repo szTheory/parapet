@@ -177,6 +177,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                 <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
                   <.link
                     patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
+                    aria-disabled={unless @queue_page.has_previous_page?, do: "true"}
+                    tabindex={unless @queue_page.has_previous_page?, do: "-1"}
                     class={[
                       "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_previous_page?)
@@ -187,6 +189,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Resolved archive</p>
                   <.link
                     patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
+                    aria-disabled={unless @queue_page.has_next_page?, do: "true"}
+                    tabindex={unless @queue_page.has_next_page?, do: "-1"}
                     class={[
                       "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                       pagination_link_class(@queue_page.has_next_page?)
@@ -238,16 +242,28 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       History
                     </.link>
                   </div>
-                  <.incident_list
-                    incidents={@visible_incidents}
-                    selected={selected_queue_incident(@selected_incident)}
-                    queue_params={@queue_params}
-                    page_mode={@page_mode}
-                    operator_base_path={@operator_base_path}
-                  />
+                  <div aria-live="polite" aria-busy={if !connected?(assigns), do: "true", else: "false"}>
+                    <%= if !connected?(assigns) do %>
+                      <div class="animate-pulse space-y-3" aria-hidden="true">
+                        <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                        <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                        <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                      </div>
+                    <% else %>
+                      <.incident_list
+                        incidents={@visible_incidents}
+                        selected={selected_queue_incident(@selected_incident)}
+                        queue_params={@queue_params}
+                        page_mode={@page_mode}
+                        operator_base_path={@operator_base_path}
+                      />
+                    <% end %>
+                  </div>
                   <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
                     <.link
                       patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.previous_cursor, "previous")}
+                      aria-disabled={unless @queue_page.has_previous_page?, do: "true"}
+                      tabindex={unless @queue_page.has_previous_page?, do: "-1"}
                       class={[
                         "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_previous_page?)
@@ -258,6 +274,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                     <p class="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">Operator-paced</p>
                     <.link
                       patch={queue_page_path(@operator_base_path, @queue_params, @queue_page.next_cursor, "next")}
+                      aria-disabled={unless @queue_page.has_next_page?, do: "true"}
+                      tabindex={unless @queue_page.has_next_page?, do: "-1"}
                       class={[
                         "flex min-h-[40px] items-center justify-center rounded-lg px-3 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96]",
                         pagination_link_class(@queue_page.has_next_page?)
@@ -481,7 +499,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
   defp operator_base_path_from_path(_path), do: @default_operator_base_path
 
   defp pagination_link_class(true),
-    do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:text-[color:var(--parapet-accent)] hover:ring-[color:var(--parapet-border)]"
+    do: "ring-1 ring-stone-300 bg-white text-stone-900 hover:text-[color:var(--parapet-accent)] hover:ring-[color:var(--parapet-border)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus"
 
   defp pagination_link_class(false),
     do: "pointer-events-none ring-1 ring-stone-200 bg-stone-100 text-stone-400"
