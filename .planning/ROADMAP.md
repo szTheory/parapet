@@ -31,7 +31,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - [x] **Phase 44: Foundations — token re-skin, fonts & audit apparatus** — Re-base color/type/spacing/radius/shadow/motion/focus on brand tokens, vendor self-hosted IBM Plex woff2, scaffold the demo `/parapet/_gallery` route, create the audit matrix, and re-pin the contrast gate. (completed 2026-06-25)
 - [x] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states. (completed 2026-06-25)
 - [x] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability. (completed 2026-06-26)
-- [ ] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion.
+- [x] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion. (completed 2026-06-26)
 - [ ] **Phase 48: Pages, flows & microcopy** — Response/actions/history tabs + incident detail end-to-end with one h1/landmarks/title, designed empty/loading/error states, brand-voice copy, and full mobile usability.
 - [ ] **Phase 49: Stress fixtures & seed coverage** — Long-string/empty/max-items/mixed-status + combined stress scenarios wired to `PARAPET_DEMO_SCENARIO`, with the gallery covered by screenshot capture and a demo contract test.
 - [ ] **Phase 50: Guardrails, parity & idempotence gate** — Template↔demo byte-parity test, off-palette-hex gate, motion assertion, screenshot baseline manifest, and the `v1.6-MILESTONE-AUDIT.md` proving no API/telemetry/host-ownership regression and forward-only idempotence.
@@ -121,7 +121,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close — verified.
   5. Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 **Wave 1**
 
 - [x] 47-01-PLAN.md — RED test scaffold: additive Phase-47 assertions to operator_ui_contrast_test.exs (D-15)
@@ -132,7 +132,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 47-03-PLAN.md — Gate: full suite + audit-matrix N/A-by-design flip + blocking human gallery walkthrough (D-04/15/16/18)
+- [x] 47-03-PLAN.md — Gate: full suite + audit-matrix N/A-by-design flip + blocking human gallery walkthrough (D-04/15/16/18)
 
 **UI hint**: yes
 
@@ -205,7 +205,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete    | 2026-06-26 |
-| 47. Component groups / meta-components | v1.6 | 2/3 | In Progress|  |
+| 47. Component groups / meta-components | v1.6 | 3/3 | Complete   | 2026-06-26 |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
 | 50. Guardrails, parity & idempotence gate | v1.6 | 0/? | Pending | - |
