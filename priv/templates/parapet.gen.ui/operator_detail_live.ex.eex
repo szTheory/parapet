@@ -204,6 +204,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
     ~H"""
     <.operator_theme_bootstrap />
     <div class="parapet-ui antialiased flex min-h-screen w-full max-w-full flex-col overflow-x-hidden bg-stone-100 text-stone-900">
+      <a
+        href="#parapet-main"
+        class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 flex min-h-[40px] items-center rounded-lg px-4 py-2 text-sm font-semibold bg-[color:var(--parapet-panel)] text-[color:var(--parapet-accent)] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus"
+      >
+        Skip to main content
+      </a>
       <.operator_nav active={detail_nav_active(@incident)} operator_base_path={@operator_base_path} />
 
       <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
@@ -215,7 +221,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         </div>
       </div>
 
-      <main class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+      <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
         <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <section class="min-w-0 space-y-6">
             <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6">
@@ -228,7 +234,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
             </section>
           </section>
 
-          <aside class="min-w-0 space-y-6">
+          <aside class="min-w-0 space-y-6" aria-label="Incident actions">
             <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
 
             <.retrospective_card detail={@incident} />
