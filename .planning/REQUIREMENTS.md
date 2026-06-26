@@ -47,8 +47,8 @@
 
 - [x] **NAV-01**: Tabs and nav items show an unambiguous active state with `aria-current="page"` in both themes.
 - [x] **NAV-02**: The app shell (header / nav / theme switcher) is usable at 390px with no horizontal overflow and no squished controls.
-- [ ] **NAV-03**: The Light/Dark/System switcher retains its `localStorage` + `data-parapet-theme` behavior and meets AA contrast in all three modes.
-- [ ] **NAV-04**: Navigation and IA labels follow least-surprise, plain-language (GOV.UK-style) naming aligned with the domain vocabulary.
+- [x] **NAV-03**: The Light/Dark/System switcher retains its `localStorage` + `data-parapet-theme` behavior and meets AA contrast in all three modes.
+- [x] **NAV-04**: Navigation and IA labels follow least-surprise, plain-language (GOV.UK-style) naming aligned with the domain vocabulary.
 - [x] **NAV-05**: Keyboard users have a logical landmark structure and a working skip-to-content affordance.
 
 ### Data Display
@@ -179,8 +179,8 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | MOTION-02 | Phase 45 | Complete |
 | NAV-01 | Phase 46 | Complete |
 | NAV-02 | Phase 46 | Complete |
-| NAV-03 | Phase 46 | Pending |
-| NAV-04 | Phase 46 | Pending |
+| NAV-03 | Phase 46 | Complete |
+| NAV-04 | Phase 46 | Complete |
 | NAV-05 | Phase 46 | Complete |
 | DATA-01 | Phase 46 | Complete |
 | DATA-02 | Phase 46 | Complete |
