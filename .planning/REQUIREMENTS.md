@@ -45,20 +45,20 @@
 
 ### Navigation & Shell
 
-- [ ] **NAV-01**: Tabs and nav items show an unambiguous active state with `aria-current="page"` in both themes.
-- [ ] **NAV-02**: The app shell (header / nav / theme switcher) is usable at 390px with no horizontal overflow and no squished controls.
+- [x] **NAV-01**: Tabs and nav items show an unambiguous active state with `aria-current="page"` in both themes.
+- [x] **NAV-02**: The app shell (header / nav / theme switcher) is usable at 390px with no horizontal overflow and no squished controls.
 - [ ] **NAV-03**: The Light/Dark/System switcher retains its `localStorage` + `data-parapet-theme` behavior and meets AA contrast in all three modes.
 - [ ] **NAV-04**: Navigation and IA labels follow least-surprise, plain-language (GOV.UK-style) naming aligned with the domain vocabulary.
-- [ ] **NAV-05**: Keyboard users have a logical landmark structure and a working skip-to-content affordance.
+- [x] **NAV-05**: Keyboard users have a logical landmark structure and a working skip-to-content affordance.
 
 ### Data Display
 
 - [ ] **DATA-01**: Incident list/rows and tables truncate or wrap long fields deliberately — no collapsed or unreadably squished columns.
-- [ ] **DATA-02**: Lists/tables with internal scroll regions scroll correctly and are not trapped or broken; the page does not produce nested-scroll dead-ends.
-- [ ] **DATA-03**: The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries.
+- [x] **DATA-02**: Lists/tables with internal scroll regions scroll correctly and are not trapped or broken; the page does not produce nested-scroll dead-ends.
+- [x] **DATA-03**: The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries.
 - [ ] **DATA-04**: Empty states are designed (icon + explanatory copy + next action) and carry no hover/pointer affordance.
 - [ ] **DATA-05**: Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), never by color alone.
-- [ ] **DATA-06**: Loading/skeleton states are reduced-motion-safe and do not cause layout jumps.
+- [x] **DATA-06**: Loading/skeleton states are reduced-motion-safe and do not cause layout jumps.
 
 ### Component Groups (Meta-Components)
 
@@ -81,7 +81,7 @@
 
 - [x] **A11Y-01**: Focus-ring contrast is handled per surface — watch-blue on light, limestone on dark — enforced by the contrast gate, not left to component authors.
 - [x] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
-- [ ] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
+- [x] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
 - [ ] **A11Y-04**: Tab order is logical with no keyboard traps.
 - [ ] **A11Y-05**: Modal/overlay focus management (trap + restore) is correct and verified.
 - [ ] **A11Y-06**: Landmarks, headings, ARIA labels, and page titles are present and correct on every page.
@@ -177,18 +177,18 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | FORM-02 | Phase 45 | Complete |
 | A11Y-02 | Phase 45 | Complete |
 | MOTION-02 | Phase 45 | Complete |
-| NAV-01 | Phase 46 | Pending |
-| NAV-02 | Phase 46 | Pending |
+| NAV-01 | Phase 46 | Complete |
+| NAV-02 | Phase 46 | Complete |
 | NAV-03 | Phase 46 | Pending |
 | NAV-04 | Phase 46 | Pending |
-| NAV-05 | Phase 46 | Pending |
+| NAV-05 | Phase 46 | Complete |
 | DATA-01 | Phase 46 | Pending |
-| DATA-02 | Phase 46 | Pending |
-| DATA-03 | Phase 46 | Pending |
+| DATA-02 | Phase 46 | Complete |
+| DATA-03 | Phase 46 | Complete |
 | DATA-04 | Phase 46 | Pending |
 | DATA-05 | Phase 46 | Pending |
-| DATA-06 | Phase 46 | Pending |
-| A11Y-03 | Phase 46 | Pending |
+| DATA-06 | Phase 46 | Complete |
+| A11Y-03 | Phase 46 | Complete |
 | A11Y-04 | Phase 46 | Pending |
 | GROUP-01 | Phase 47 | Pending |
 | GROUP-02 | Phase 47 | Pending |
