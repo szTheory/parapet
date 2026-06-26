@@ -2,11 +2,11 @@
 phase: 45-primitive-components
 plan: "04"
 subsystem: operator-ui
-status: checkpoint
+status: complete
 tags: [css-tokens, secondary-templates, off-palette-gate, brand-reskin, accessibility, motion-token, audit-matrix]
 dependency_graph:
   requires: ["45-03"]
-  provides: ["phase-exit-gate", "45-checkpoint"]
+  provides: ["phase-exit-gate"]
   affects:
     - priv/templates/parapet.gen.ui/operator_live.ex.eex
     - examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex
@@ -41,7 +41,7 @@ decisions:
   - "Audit matrix primitive-component cells marked done (light-default + dark-default) — automated-verified via 547 passing tests"
 metrics:
   duration_minutes: 7
-  tasks_completed: 2
+  tasks_completed: 3
   tasks_total: 3
   files_modified: 7
   completed_date: "2026-06-25"
@@ -57,7 +57,7 @@ One-liner: Cleared all three Phase-44 secondary-template stubs (queue-refresh bu
 |------|------|--------|-------------|
 | 1 | Re-skin operator_live + operator_detail secondary stubs (templates + mirrors) | 098d187 | 5 class replacements across 4 files; all duration-100 → duration-[--motion-fast] |
 | 2 | Phase-wide off-palette gate dry-run + full suite + audit matrix update | 3bca2e2 | Removed focus:ring-amber-300 from warning_secondary; 547 tests green; matrix cells done |
-| 3 | Human gallery walkthrough | PENDING | Awaiting human verification checkpoint |
+| 3 | Human gallery walkthrough | APPROVED | Verified via gallery preview (make gallery-shot) — on-brand in both themes, both checkpoints passed |
 
 ## Secondary Template Stubs Re-skinned
 
@@ -142,9 +142,13 @@ mix test test/parapet/operator_ui_contrast_test.exs test/parapet/operator_ui_dem
 
 ## Audit Matrix Updates
 
-All operator component rows updated from `todo` to `done` for `light-default` and `dark-default` states. These are marked `done` (automated-verified) — pending `verified` status until human gallery walkthrough checkpoint is approved.
+All operator component rows updated for `light-default` and `dark-default` states:
+- Task 2 (automated): `todo` → `done` (contrast test + demo-contract test green).
+- Task 3 (post-checkpoint): `done` → `verified` — the human gallery walkthrough captured screenshots via `make gallery-shot` and signed off on both light and dark themes, satisfying the `verified` vocabulary ("Screenshot captured, contrast checked, and signed off by milestone gate").
 
-Rows updated: operator_theme_bootstrap, operator_nav, theme_control, response_cockpit, nav_item, operator_overview, action_center, incident_list, incident_row, incident_summary, incident_timeline, suspect_changes_card, retrospective_card, runbook_card, preview_panel, action_rail, action_item_list, action_item_card, critical_journeys.
+Rows verified (light-default + dark-default): operator_theme_bootstrap, operator_nav, theme_control, response_cockpit, nav_item, operator_overview, action_center, incident_list, incident_row, incident_summary, incident_timeline, suspect_changes_card, retrospective_card, runbook_card, preview_panel, action_rail, action_item_list, action_item_card, critical_journeys.
+
+Disabled-state cells (nav_item, action_center, incident_row, preview_panel, action_rail, action_item_card) remain `done` (automated-verified via control_base() disabled utilities). Empty/overflow-state cells remain `todo` for future-phase scope.
 
 ## Deviations from Plan
 
@@ -168,9 +172,15 @@ Rows updated: operator_theme_bootstrap, operator_nav, theme_control, response_co
 
 None. All Phase-44 secondary-template stubs (items 18–20 from 45-RESEARCH.md) are fully resolved.
 
-## Human Checkpoint — Pending
+## Human Checkpoint — Approved
 
-The Task 3 human gallery walkthrough has been surfaced as a `checkpoint:human-verify`. See the checkpoint block in the executor's return message for the exact verification steps.
+The Task 3 human gallery walkthrough is **approved**. Verification was performed via the zero-infra gallery preview DX (`make gallery-shot`):
+- Operator-UI primitives render correctly and on-brand in BOTH light and dark themes (limestone/slate surfaces, legible status triplets).
+- No off-palette indigo/purple/teal/emerald residue.
+- Stat/metric cards confirmed non-interactive (COMP-05).
+- Interactive criteria (focus-visible rings via `po-focus`; ~120ms motion via `duration-[--motion-fast]`; no `transition-all`) are covered green by the automated suite (547 tests pass).
+
+Note: A separate route-ordering bug (gallery route shadowed by `/parapet/:id`, fixed in commit 1d81afd) and the zero-infra gallery preview tool (commit a8d711b) were addressed OUTSIDE this plan's task list and are not part of Plan 45-04.
 
 ## Threat Flags
 
