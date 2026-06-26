@@ -121,14 +121,14 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close — verified.
   5. Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 **Wave 1**
 
 - [x] 47-01-PLAN.md — RED test scaffold: additive Phase-47 assertions to operator_ui_contrast_test.exs (D-15)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 47-02-PLAN.md — Template + demo-mirror markup edits (red→green): incident_summary voice, risk/audit chips, aria-disabled, preview_panel reveal + landmark, cockpit break-words, scroll-pb (D-06/07/08/09/10/11/13/02/03)
+- [x] 47-02-PLAN.md — Template + demo-mirror markup edits (red→green): incident_summary voice, risk/audit chips, aria-disabled, preview_panel reveal + landmark, cockpit break-words, scroll-pb (D-06/07/08/09/10/11/13/02/03)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -205,7 +205,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete    | 2026-06-26 |
-| 47. Component groups / meta-components | v1.6 | 1/3 | In Progress|  |
+| 47. Component groups / meta-components | v1.6 | 2/3 | In Progress|  |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
 | 50. Guardrails, parity & idempotence gate | v1.6 | 0/? | Pending | - |
