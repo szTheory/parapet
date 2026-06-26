@@ -4,8 +4,8 @@ milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
 current_phase: 47
 current_phase_name: Component groups / meta-components
-status: verifying
-stopped_at: Phase 46 planned (4 plans, plan-checker passed) — not yet executed
+status: ready
+stopped_at: Phase 46 complete (4/4 plans, verification passed) — Phase 47 ready to plan
 last_updated: "2026-06-26T08:49:41.722Z"
 last_activity: 2026-06-26
 last_activity_desc: Phase 46 complete, transitioned to Phase 47
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo System milestone completed)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 46 — navigation-shell-data-display
+**Current focus:** Phase 47 — Component groups / meta-components
 
 ## Current Position
 
 Phase: 47 — Component groups / meta-components
 Plan: Not started
-Status: Phase complete — ready for verification
-Next: Phase 46 (Navigation, shell & data-display)
+Status: Ready to plan
+Next: Phase 48 (Pages, flows & microcopy)
 Last activity: 2026-06-26 — Phase 46 complete, transitioned to Phase 47
 
 ## Performance Metrics
