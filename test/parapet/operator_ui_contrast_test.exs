@@ -177,6 +177,20 @@ defmodule Parapet.OperatorUIContrastTest do
     "examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex"
   ]
 
+  @detail_template_paths [
+    "priv/templates/parapet.gen.ui/operator_detail_live.ex.eex",
+    "examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex"
+  ]
+
+  test "operator detail templates have correct landmarks" do
+    for path <- @detail_template_paths do
+      content = File.read!(path)
+      assert content =~ ~S|aria-label="Incident actions"|
+      assert content =~ ~S|id="parapet-main"|
+      assert content =~ "Skip to main content"
+    end
+  end
+
   test "operator live templates use semantic tokens (no raw stone-950 primary button colors)" do
     for path <- @live_template_paths do
       content = File.read!(path)
