@@ -3,7 +3,7 @@ AUTO_ENV := .docker/auto.env
 AUTO_COMPOSE := $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.auto-port.yml
 AUTO_ENV_SHELL := set -a; [ ! -f .env ] || . ./.env; . ./$(AUTO_ENV); set +a;
 
-.PHONY: up up-auto up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario gallery gallery-shot
+.PHONY: up up-auto up-fixed up-monitoring up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario gallery gallery-shot
 
 # Zero-infra component gallery preview — no Docker, no Postgres, free loopback port.
 gallery:
@@ -12,17 +12,34 @@ gallery:
 gallery-shot:
 	@scripts/gallery_preview.sh --shot
 
+# Default launch — conflict-free auto-port so several demo stacks (and your other
+# local projects) never collide. Lean by default (web + db only); add Grafana +
+# Prometheus with `make up-monitoring`. Use `make up-fixed` for classic 4000/3000/9090.
 up:
+	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example."; fi
+	@scripts/prepare_auto_env.sh
+	@$(AUTO_ENV_SHELL) $(AUTO_COMPOSE) up -d --build \
+		|| ( echo "↻ A port was taken since allocation — reselecting free ports and retrying once…"; \
+		     scripts/prepare_auto_env.sh; $(AUTO_ENV_SHELL) $(AUTO_COMPOSE) up -d --build )
+	@$(AUTO_ENV_SHELL) DOCKER_COMPOSE="$(AUTO_COMPOSE)" scripts/print_docker_urls.sh
+
+# Same as `up`, plus the Grafana + Prometheus observability stack (opt-in profile).
+up-monitoring:
+	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example."; fi
+	@scripts/prepare_auto_env.sh
+	@$(AUTO_ENV_SHELL) $(AUTO_COMPOSE) --profile monitoring up -d --build
+	@$(AUTO_ENV_SHELL) DOCKER_COMPOSE="$(AUTO_COMPOSE) --profile monitoring" scripts/print_docker_urls.sh
+
+# Back-compat alias — `up` is already auto-port.
+up-auto: up
+
+# Classic fixed-port launch (web 4000 / grafana 3000 / prometheus 9090, full stack).
+# Collides if another stack already holds those ports — prefer `make up`.
+up-fixed:
 	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example. Edit COMPOSE_PROJECT_NAME or WEB_PORT if you run multiple demo stacks."; fi
 	@rm -f "$(AUTO_ENV)"
-	$(DOCKER_COMPOSE) up -d --build
-	@DOCKER_COMPOSE="$(DOCKER_COMPOSE)" scripts/print_docker_urls.sh
-
-up-auto:
-	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example. Edit COMPOSE_PROJECT_NAME if you run multiple demo stacks."; fi
-	@scripts/prepare_auto_env.sh
-	@$(AUTO_ENV_SHELL) $(AUTO_COMPOSE) up -d --build
-	@$(AUTO_ENV_SHELL) DOCKER_COMPOSE="$(AUTO_COMPOSE)" scripts/print_docker_urls.sh
+	$(DOCKER_COMPOSE) --profile monitoring up -d --build
+	@DOCKER_COMPOSE="$(DOCKER_COMPOSE) --profile monitoring" scripts/print_docker_urls.sh
 
 up-db-port:
 	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example. Edit DB_PORT if 5432 is already in use."; fi
@@ -33,7 +50,7 @@ up-db-port:
 scenario:
 	@if [ -z "$(SCENARIO)" ]; then echo "Usage: make scenario SCENARIO=response|recovery|escalation|history|all"; exit 1; fi
 	$(MAKE) reset
-	PARAPET_DEMO_SCENARIO="$(SCENARIO)" $(MAKE) up-auto
+	PARAPET_DEMO_SCENARIO="$(SCENARIO)" $(MAKE) up-monitoring
 
 up-response:
 	$(MAKE) scenario SCENARIO=response

@@ -48,6 +48,9 @@ services:
 
   prometheus:
     image: prom/prometheus:v2.55.1
+    # Opt-in: started only with `make up-monitoring` (or `--profile monitoring`).
+    # Keeps the default `make up` lean (web + db only) and frees these ports.
+    profiles: ["monitoring"]
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--web.enable-lifecycle"
@@ -61,6 +64,8 @@ services:
 
   grafana:
     image: grafana/grafana:11.5.2
+    # Opt-in: started only with `make up-monitoring` (or `--profile monitoring`).
+    profiles: ["monitoring"]
     ports:
       - "127.0.0.1:${GRAFANA_PORT:-3000}:3000"
     environment:

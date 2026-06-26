@@ -25,9 +25,14 @@ MODE="serve"
 if [[ "${1:-}" == "--shot" ]]; then MODE="shot"; fi
 
 # --- pick a free loopback port (honor PORT if set) -------------------------
+# Probes a wide band and returns the first port nothing is listening on, so the
+# gallery never collides with a full demo stack or another local project — even
+# when several are running at once. The band intentionally has headroom.
+GALLERY_PORT_LO="${GALLERY_PORT_LO:-4750}"
+GALLERY_PORT_HI="${GALLERY_PORT_HI:-4949}"
 find_free_port() {
   local port
-  for port in $(seq 4750 4799); do
+  for port in $(seq "$GALLERY_PORT_LO" "$GALLERY_PORT_HI"); do
     if ! (exec 3<>"/dev/tcp/127.0.0.1/$port") 2>/dev/null; then
       echo "$port"
       return 0
@@ -39,7 +44,7 @@ find_free_port() {
 
 PORT="${PORT:-$(find_free_port || true)}"
 if [[ -z "${PORT}" ]]; then
-  echo "No free port found in 4750-4799. Set PORT=<n> to choose one." >&2
+  echo "No free port found in ${GALLERY_PORT_LO}-${GALLERY_PORT_HI}. Set PORT=<n> to choose one." >&2
   exit 1
 fi
 
