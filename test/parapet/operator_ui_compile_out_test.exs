@@ -34,7 +34,11 @@ defmodule Parapet.OperatorUICompileOutTest do
       assert content =~ "Parapet.Operator.suppress_pending_escalation"
       assert content =~ "Parapet.Operator.resolve_incident"
       assert content =~ "%Parapet.Operator.ActionPayload{"
-      assert content =~ "assign(incident: Parapet.Operator.incident_detail(id))"
+      # 48-03 (D-01): refreshes route through the failure-tolerant public helper
+      # fetch_incident_detail/1 (via the shared refresh_incident_detail/2) so a
+      # stale link degrades to the in-page not-found panel instead of raising.
+      assert content =~ "Parapet.Operator.fetch_incident_detail(id)"
+      assert content =~ "refresh_incident_detail(id)"
       assert content =~ "incident_detail_path(socket.assigns.operator_base_path, id)"
       assert content =~ "defp incident_detail_path(operator_base_path, incident_id)"
       refute content =~ ~S|/parapet/incidents/#{id}|

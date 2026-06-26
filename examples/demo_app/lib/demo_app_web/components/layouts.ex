@@ -9,7 +9,7 @@ defmodule DemoAppWeb.Layouts do
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <.live_title>Demo App</.live_title>
+        <.live_title suffix=" · Parapet">{assigns[:page_title] || "Demo App"}</.live_title>
         <meta name="csrf-token" content={get_csrf_token()} />
         <link rel="stylesheet" href={~p"/assets/app.css"} />
       </head>

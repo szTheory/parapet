@@ -32,7 +32,12 @@ defmodule DemoApp.OperatorSmokeTest do
 
     conn = get(conn, "/parapet/history")
     assert conn.status == 200
-    assert conn.resp_body =~ "resolved history smoke incident"
+
+    # 48-03 (D-09/D-10): the History list now renders behind the connected-keyed
+    # skeleton, so the seeded incident appears on the connected render (not the
+    # disconnected static body, which shows the skeleton-or-nothing affordance).
+    {:ok, _view, connected_html} = live(conn, "/parapet/history")
+    assert connected_html =~ "resolved history smoke incident"
   end
 
   test "GET /ops/parapet/history returns 200", %{conn: conn} do
@@ -44,7 +49,9 @@ defmodule DemoApp.OperatorSmokeTest do
 
     conn = get(conn, "/ops/parapet/history")
     assert conn.status == 200
-    assert conn.resp_body =~ "scoped resolved history smoke incident"
+
+    {:ok, _view, connected_html} = live(conn, "/ops/parapet/history")
+    assert connected_html =~ "scoped resolved history smoke incident"
   end
 
   test "at least one seeded incident exists" do

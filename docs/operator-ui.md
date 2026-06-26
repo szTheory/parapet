@@ -95,6 +95,8 @@ The route map keeps `/parapet` as the active-response overview, `/parapet/action
 
 Generated local links derive from the current LiveView URI through the generated `operator_base_path` helper, so the same editable host-owned files render links for `/parapet` or nested mounts such as `/ops/parapet`. Host app scopes, pipelines, authentication, and authorization remain owner-controlled.
 
+Parapet pages set `:page_title` (for example `Active response`, `Action queue`, `Resolved history`, and `Incident: <title>`); ensure your root layout's `<.live_title>` renders `{assigns[:page_title]}` so the browser title updates on live navigation.
+
 ### Scoped Mount Gotchas
 
 - Stale generated UI files from before scoped route support can still emit local links for `/parapet` instead of deriving them through `operator_base_path`.

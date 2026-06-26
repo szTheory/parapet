@@ -48,6 +48,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
     {:noreply,
      socket
      |> assign(operator_base_path: operator_base_path)
+     |> assign(:page_title, page_title(socket.assigns.live_action))
      |> assign(
        selected_incident: selected,
        selection_source: selection_source,
@@ -56,10 +57,14 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        queue_params: visible_queue_params(queue_params, queue_page),
        page_mode: page_mode,
        queue_refresh_available?: false,
-       socket_connected: true
+       socket_connected: connected?(socket)
      )
      |> stream(:incidents, visible_incidents, reset: true)}
   end
+
+  defp page_title(:actions), do: "Action queue"
+  defp page_title(:history), do: "Resolved history"
+  defp page_title(_live_action), do: "Active response"
 
   def handle_event("queue_refresh", _params, socket) do
     {:noreply,
@@ -82,11 +87,16 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
       {:ok, _result} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Incident acknowledged successfully")
+         |> put_flash(:info, "Incident acknowledged. Audit record and timeline entry written.")
          |> push_patch(to: queue_path(socket, %{"id" => id}))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Acknowledge didn't complete — no audit record was written. The incident is unchanged; refresh the timeline, then retry."
+         )}
     end
   end
 
@@ -105,7 +115,12 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
         {:noreply, push_patch(socket, to: queue_path(socket, %{"id" => id}))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to resolve")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Resolve didn't complete — the incident stays in its current state and no audit record was written. Refresh the timeline, then retry."
+         )}
     end
   end
 
@@ -131,6 +146,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
 
       <%= if @page_mode == :actions do %>
         <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+          <h1 class="mb-4 text-2xl font-semibold text-stone-950 text-balance">Action queue</h1>
           <div class="mx-auto max-w-5xl">
             <.operator_overview
               queue_page={@queue_page}
@@ -139,7 +155,17 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
               journeys={@journeys}
               page_mode={@page_mode}
             />
-            <.action_center items={@action_items} operator_base_path={@operator_base_path} />
+            <div aria-live="polite" aria-busy={if !@socket_connected, do: "true", else: "false"}>
+              <%= if !@socket_connected do %>
+                <div class="animate-pulse space-y-3" aria-hidden="true">
+                  <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                  <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                  <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                </div>
+              <% else %>
+                <.action_center items={@action_items} operator_base_path={@operator_base_path} />
+              <% end %>
+            </div>
           </div>
         </main>
       <% else %>
@@ -158,7 +184,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                 <div class="mb-5 flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
                   <div>
                     <p class="text-sm font-semibold uppercase tracking-[0.16em] text-stone-500">Resolved history</p>
-                    <h2 class="mt-1 text-2xl font-semibold text-stone-950 text-balance">Review resolved incidents</h2>
+                    <h1 class="mt-1 text-2xl font-semibold text-stone-950 text-balance">Review resolved incidents</h1>
                     <p class="mt-2 max-w-2xl text-sm text-stone-600">
                       Use history to inspect completed evidence, retrospective notes, and operator actions without mixing them into the active response queue.
                     </p>
@@ -168,13 +194,23 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                   </.link>
                 </div>
 
-                <.incident_list
-                  incidents={@visible_incidents}
-                  selected={nil}
-                  queue_params={@queue_params}
-                  page_mode={@page_mode}
-                  operator_base_path={@operator_base_path}
-                />
+                <div aria-live="polite" aria-busy={if !@socket_connected, do: "true", else: "false"}>
+                  <%= if !@socket_connected do %>
+                    <div class="animate-pulse space-y-3" aria-hidden="true">
+                      <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                      <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                      <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+                    </div>
+                  <% else %>
+                    <.incident_list
+                      incidents={@visible_incidents}
+                      selected={nil}
+                      queue_params={@queue_params}
+                      page_mode={@page_mode}
+                      operator_base_path={@operator_base_path}
+                    />
+                  <% end %>
+                </div>
 
                 <div class="mt-4 flex items-center justify-between gap-3 border-t border-stone-200 pt-4">
                   <.link
@@ -206,6 +242,7 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
           </main>
       <% else %>
           <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+            <h1 class="sr-only">Active response</h1>
             <div class="mx-auto max-w-7xl">
               <.response_cockpit
                     detail={@selected_incident}

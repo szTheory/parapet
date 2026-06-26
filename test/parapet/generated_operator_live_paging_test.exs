@@ -504,8 +504,18 @@ defmodule Parapet.GeneratedOperatorLivePagingTest do
   end
 
   defp configured_socket(view, host_uri) do
+    # 48-03 (D-09/D-10): the queue/history lists now render behind a
+    # connected?-keyed skeleton, so a disconnected socket would show the
+    # skeleton instead of the list. These tests assert connected-state link
+    # generation, so mark the socket connected via transport_pid (what
+    # Phoenix.LiveView.connected?/1 checks).
     Utils.configure_socket(
-      %Phoenix.LiveView.Socket{view: view, router: TestWeb, endpoint: TestWeb},
+      %Phoenix.LiveView.Socket{
+        view: view,
+        router: TestWeb,
+        endpoint: TestWeb,
+        transport_pid: self()
+      },
       %{
         assign_new: {%{}, []},
         connect_params: %{},

@@ -14,6 +14,10 @@
   #     live "/parapet/actions", <%= inspect(@web_module) %>.Parapet.OperatorLive, :actions
   #     live "/parapet/history", <%= inspect(@web_module) %>.Parapet.OperatorLive, :history
   #     live "/parapet/incidents/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
+  #     # Keep the /parapet/:id catch-all declared LAST. Phoenix matches routes in
+  #     # declaration order, so an earlier :id catch-all would swallow
+  #     # /parapet/actions, /parapet/history (and any future static segment) into
+  #     # the detail LiveView. Declare every static /parapet/* route above it.
   #     live "/parapet/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
   #   end
   # end
@@ -30,6 +34,10 @@
   #     live "/parapet/actions", <%= inspect(@web_module) %>.Parapet.OperatorLive, :actions
   #     live "/parapet/history", <%= inspect(@web_module) %>.Parapet.OperatorLive, :history
   #     live "/parapet/incidents/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
+  #     # Keep the /parapet/:id catch-all declared LAST. Phoenix matches routes in
+  #     # declaration order, so an earlier :id catch-all would swallow
+  #     # /parapet/actions, /parapet/history (and any future static segment) into
+  #     # the detail LiveView. Declare every static /parapet/* route above it.
   #     live "/parapet/:id", <%= inspect(@web_module) %>.Parapet.OperatorDetailLive, :show
   #   end
   # end

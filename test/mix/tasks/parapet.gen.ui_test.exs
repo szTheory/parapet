@@ -172,7 +172,10 @@ defmodule Mix.Tasks.Parapet.Gen.UiTest do
       refute operator_detail_source =~ ~S|push_navigate(socket, to: "/parapet/incidents/#{id}")|
       assert operator_detail_source =~ "Parapet.Operator.acknowledge_incident"
       assert operator_detail_source =~ "Parapet.Operator.resolve_incident"
-      assert operator_detail_source =~ "Parapet.Operator.incident_detail(id)"
+      # 48-03 (D-01): the detail LiveView fetches incident detail through the
+      # failure-tolerant public helper so stale links degrade to the in-page
+      # not-found panel instead of raising.
+      assert operator_detail_source =~ "Parapet.Operator.fetch_incident_detail(id)"
       assert operator_detail_source =~ "detail_nav_active(@incident)"
       assert operator_detail_source =~ "Back to history"
       assert operator_detail_source =~ "Resolved incident review"

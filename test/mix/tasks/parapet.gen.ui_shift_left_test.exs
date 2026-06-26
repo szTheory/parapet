@@ -34,7 +34,9 @@ defmodule Mix.Tasks.Parapet.Gen.UiShiftLeftTest do
       assert index_of(components_source, "def incident_summary(assigns)") <
                index_of(components_source, "def incident_timeline(assigns)")
 
-      assert index_of(detail_live_source, "<.incident_summary detail={@incident} />") <
+      # 48-03 (D-06): the detail page passes heading_level="h1" so the incident
+      # title is the page's single descriptive h1.
+      assert index_of(detail_live_source, ~S|<.incident_summary detail={@incident} heading_level="h1" />|) <
                index_of(detail_live_source, "<.incident_timeline detail={@incident} />")
     end
 
