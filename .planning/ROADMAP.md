@@ -30,7 +30,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 
 - [x] **Phase 44: Foundations — token re-skin, fonts & audit apparatus** — Re-base color/type/spacing/radius/shadow/motion/focus on brand tokens, vendor self-hosted IBM Plex woff2, scaffold the demo `/parapet/_gallery` route, create the audit matrix, and re-pin the contrast gate. (completed 2026-06-25)
 - [x] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states. (completed 2026-06-25)
-- [ ] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability.
+- [x] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability. (completed 2026-06-26)
 - [ ] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion.
 - [ ] **Phase 48: Pages, flows & microcopy** — Response/actions/history tabs + incident detail end-to-end with one h1/landmarks/title, designed empty/loading/error states, brand-voice copy, and full mobile usability.
 - [ ] **Phase 49: Stress fixtures & seed coverage** — Long-string/empty/max-items/mixed-status + combined stress scenarios wired to `PARAPET_DEMO_SCENARIO`, with the gallery covered by screenshot capture and a demo contract test.
@@ -99,12 +99,12 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. The incident timeline renders bounded fields and degrades gracefully with zero, few, and many entries; empty states are designed (icon + copy + next action) and carry no hover/pointer affordance; loading/skeleton states are reduced-motion-safe with no layout jumps.
   5. Status and severity are conveyed by text and/or icon in addition to color (color-blind-safe), every interactive element is keyboard-reachable with a visible focus indicator, and tab order is logical with no keyboard traps.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 - [x] 46-01-PLAN.md — Wave 0 test scaffold: @detail_template_paths + extended NAV/DATA/A11Y red assertions in operator_ui_contrast_test.exs
 - [x] 46-02-PLAN.md — operator_components.ex.eex + mirror: nav-active border (NAV-01), timeline empty-state + spine CSS (DATA-03), empty-state icons (DATA-04)
 - [x] 46-03-PLAN.md — operator_live + operator_detail_live + mirrors: skip-link/landmarks (NAV-05), queue-refresh color (NAV-02), skeleton (DATA-06), pagination focus/disabled (A11Y-03)
-- [ ] 46-04-PLAN.md — full-suite gate + human gallery walkthrough: 390px (NAV-02), tab order (A11Y-04), timeline/empty-state/skeleton rendered behaviors
+- [x] 46-04-PLAN.md — full-suite gate + human gallery walkthrough: 390px (NAV-02), tab order (A11Y-04), timeline/empty-state/skeleton rendered behaviors
 
 **UI hint**: yes
 
@@ -192,7 +192,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
-| 46. Navigation, shell & data-display | v1.6 | 3/4 | In Progress|  |
+| 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete   | 2026-06-26 |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
