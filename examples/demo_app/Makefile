@@ -1,9 +1,10 @@
 DOCKER_COMPOSE := $(shell if docker compose version >/dev/null 2>&1; then echo "docker compose"; else echo "docker-compose"; fi)
 AUTO_ENV := .docker/auto.env
 AUTO_COMPOSE := $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.auto-port.yml
+PROXY_COMPOSE := $(AUTO_COMPOSE) -f docker-compose.proxy.yml
 AUTO_ENV_SHELL := set -a; [ ! -f .env ] || . ./.env; . ./$(AUTO_ENV); set +a;
 
-.PHONY: up up-auto up-fixed up-monitoring up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario gallery gallery-shot
+.PHONY: up up-auto up-fixed up-monitoring up-proxy up-proxy-monitoring up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario gallery gallery-shot
 
 # Zero-infra component gallery preview — no Docker, no Postgres, free loopback port.
 gallery:
@@ -29,6 +30,37 @@ up-monitoring:
 	@scripts/prepare_auto_env.sh
 	@$(AUTO_ENV_SHELL) $(AUTO_COMPOSE) --profile monitoring up -d --build
 	@$(AUTO_ENV_SHELL) DOCKER_COMPOSE="$(AUTO_COMPOSE) --profile monitoring" scripts/print_docker_urls.sh
+
+# Reach the demo at http://parapet.localhost via the shared dev-proxy (no ports
+# to remember). Requires the one-time proxy setup — see dev-proxy/README.md.
+up-proxy:
+	@docker network inspect dev-proxy-net >/dev/null 2>&1 || { \
+		echo "✗ Shared proxy network 'dev-proxy-net' not found. One-time setup:"; \
+		echo "    docker network create dev-proxy-net"; \
+		echo "    (cd dev-proxy && docker compose up -d)"; \
+		echo "  See dev-proxy/README.md."; exit 1; }
+	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example."; fi
+	@scripts/prepare_auto_env.sh
+	@$(AUTO_ENV_SHELL) $(PROXY_COMPOSE) up -d --build
+	@echo ""
+	@echo "Parapet demo is proxied at:"
+	@echo "  Operator UI: http://parapet.localhost/parapet"
+	@echo "  (host-port URLs from the auto-port mapping also still work)"
+
+# Same as up-proxy, plus Grafana at http://grafana.parapet.localhost.
+up-proxy-monitoring:
+	@docker network inspect dev-proxy-net >/dev/null 2>&1 || { \
+		echo "✗ Shared proxy network 'dev-proxy-net' not found. One-time setup:"; \
+		echo "    docker network create dev-proxy-net"; \
+		echo "    (cd dev-proxy && docker compose up -d)"; \
+		echo "  See dev-proxy/README.md."; exit 1; }
+	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example."; fi
+	@scripts/prepare_auto_env.sh
+	@$(AUTO_ENV_SHELL) $(PROXY_COMPOSE) --profile monitoring up -d --build
+	@echo ""
+	@echo "Parapet demo is proxied at:"
+	@echo "  Operator UI: http://parapet.localhost/parapet"
+	@echo "  Grafana:     http://grafana.parapet.localhost"
 
 # Back-compat alias — `up` is already auto-port.
 up-auto: up

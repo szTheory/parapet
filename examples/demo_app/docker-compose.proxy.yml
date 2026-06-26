@@ -1,0 +1,35 @@
+# Opt-in overlay: expose this demo through the shared `dev-proxy` reverse proxy
+# at stable `*.localhost` hostnames (no host port to remember).
+#
+# Prereq (one-time): start the shared proxy — see `dev-proxy/README.md`:
+#   docker network create dev-proxy-net
+#   (cd dev-proxy && docker compose up -d)
+#
+# Usage:
+#   make up-proxy                  # → http://parapet.localhost
+#   make up-proxy-monitoring       # also → http://grafana.parapet.localhost
+#
+# Composes on top of docker-compose.yml (+ auto-port). Host port bindings stay,
+# so you can still reach the app by port too; the proxy is purely additive.
+
+services:
+  web:
+    networks:
+      - default
+      - dev-proxy-net
+    labels:
+      caddy: parapet.localhost
+      caddy.reverse_proxy: "{{upstreams 4000}}"
+
+  # Only routed when the `monitoring` profile is also active (grafana running).
+  grafana:
+    networks:
+      - default
+      - dev-proxy-net
+    labels:
+      caddy: grafana.parapet.localhost
+      caddy.reverse_proxy: "{{upstreams 3000}}"
+
+networks:
+  dev-proxy-net:
+    external: true

@@ -1,0 +1,52 @@
+# Shared local reverse proxy for running many OSS demo stacks at once.
+#
+# One long-running Caddy container (lucaslorentz/caddy-docker-proxy) watches the
+# Docker socket and auto-routes any container that (a) is attached to the shared
+# `dev-proxy-net` network and (b) carries a `caddy` label, to a stable
+# `*.localhost` hostname — so you never memorize or collide on host ports again.
+#
+# This file is a REUSABLE REFERENCE. It is meant to live ONCE on your machine,
+# outside any single library (e.g. `~/dev-proxy/`), and be shared by every OSS
+# demo you run. Copy this directory there, or run it in place — it is not
+# parapet-specific.
+#
+# One-time setup:
+#   docker network create dev-proxy-net
+#   docker compose -f compose.yaml up -d        # (run from this directory)
+#
+# Then launch any project with its proxy overlay (for parapet: `make up-proxy`)
+# and open the printed `http://<project>.localhost` URL. `.localhost` resolves to
+# 127.0.0.1 automatically in Chrome/Edge and modern Firefox — no /etc/hosts edits.
+
+name: dev-proxy
+
+services:
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:2.9-alpine
+    restart: unless-stopped
+    ports:
+      # Loopback-only: the proxy is reachable from this machine, never the LAN.
+      - "127.0.0.1:80:80"
+      - "127.0.0.1:443:443"
+    environment:
+      # Only inspect containers on the shared ingress network.
+      - CADDY_INGRESS_NETWORKS=dev-proxy-net
+    networks:
+      - dev-proxy-net
+    volumes:
+      # Read-only socket: Caddy needs to watch container labels to build routes.
+      # This is a local-dev convenience; do not run this pattern on a shared host.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
+
+networks:
+  # Created once with `docker network create dev-proxy-net` so its lifecycle is
+  # independent of any single project (projects reference it as external too).
+  dev-proxy-net:
+    name: dev-proxy-net
+    external: true
