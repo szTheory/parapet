@@ -16,26 +16,78 @@ This matrix enumerates every operator component × visual/interaction state for 
 | operator_theme_bootstrap | verified | verified | — | — | — | — | — | — | Token values + @font-face — Phase 44 complete; Phase 45 adds button/badge/queue vars |
 | operator_nav | verified | verified | — | — | todo | todo | — | — | Primitive buttons/links tokenized Phase 45 |
 | theme_control | verified | verified | — | — | — | — | — | — | po-theme-option + po-focus wired Phase 44 |
-| response_cockpit | verified | verified | todo | todo | — | — | — | — | |
+| response_cockpit | verified | verified | done | done | — | — | — | — | Phase 47: break-words overflow hardening on cockpit `<h2>` (D-06) |
 | nav_item | verified | verified | — | — | todo | todo | done | done | disabled:opacity-50/cursor-not-allowed via control_base() |
 | operator_overview | verified | verified | todo | todo | — | — | — | — | |
 | action_center | verified | verified | todo | todo | — | — | done | done | control_class(:primary) for Return-to-response; disabled via control_base() |
 | incident_list | verified | verified | todo | todo | todo | todo | — | — | |
 | incident_row | verified | verified | — | — | todo | todo | done | done | po-queue-row-selected; disabled via control_base() |
-| incident_summary | verified | verified | todo | todo | todo | todo | — | — | |
+| incident_summary | verified | verified | done | done | done | done | — | — | Phase 47: brand-voice re-author — formula labels + fallback copy (D-10/D-11) |
 | incident_timeline | verified | verified | todo | todo | todo | todo | — | — | po-timeline-badge-* for actor badges |
 | suspect_changes_card | verified | verified | todo | todo | — | — | — | — | po-chip po-chip-info for icon + scope badges |
 | retrospective_card | verified | verified | todo | todo | — | — | — | — | control_class(:primary) for Copy retrospective |
 | runbook_card | verified | verified | todo | todo | todo | todo | — | — | po-guidance for guidance block |
-| preview_panel | verified | verified | todo | todo | — | — | done | done | style=var(--parapet-accent); po-guidance; hover:opacity-80 |
+| preview_panel | verified | verified | done | done | — | — | done | done | Phase 47: CSS @keyframes reveal + ARIA Disclosure landmark role=region (D-03/D-13); style=var(--parapet-accent); po-guidance; hover:opacity-80 |
 | action_rail | verified | verified | — | — | — | — | done | done | control_class(:primary); disabled via control_base() |
-| action_item_list | verified | verified | todo | todo | todo | todo | — | — | |
-| action_item_card | verified | verified | todo | todo | todo | todo | done | done | |
+| action_item_list | verified | verified | done | done | done | done | — | — | Phase 47: action_item_risk + audit-outcome chips; aria-disabled affordance (D-07/D-08/D-09) |
+| action_item_card | verified | verified | done | done | done | done | done | done | Phase 47: risk chip (color+icon+label, WCAG 1.4.1) + audit-outcome chip derived from state (D-07/D-08) |
 | critical_journeys | verified | verified | todo | todo | — | — | — | — | |
 
 ---
 
 ## Notes / Exceptions
+
+### Phase-47 N/A-by-Design Overlay Exception: GROUP-03, GROUP-05, GROUP-06, A11Y-05
+
+**Decisions:** D-01 / D-04 (Phase 47 `47-CONTEXT.md`)
+
+Requirements GROUP-03 (focus-trap), GROUP-05 (scrim/backdrop), GROUP-06 (drawer/sheet modal), and
+A11Y-05 (overlay a11y — `role="dialog"`, `aria-modal`, Esc handler) are **N/A-by-design** for this
+codebase. They are not `todo` (pending implementation) and are not `done` (implemented). They are
+documented as intentional absences, not gaps.
+
+**Rationale:**
+
+A repo-wide grep for `modal|overlay|drawer|scrim|dialog|aria-modal|role="dialog"` across all
+`.eex` files returns **zero matches**. There are no true modals, overlays, drawers, or scrims in
+the generated Operator UI. The only layered surface is `preview_panel`, which is the **ARIA
+Disclosure pattern** (not the Dialog pattern):
+
+- On mobile: `fixed inset-x-0 bottom-0 z-50` bottom sheet with a working close button
+- On desktop: `md:relative md:inset-auto` inline panel
+- Has `role="region"` + `aria-label="Recovery Preview"` (Disclosure landmark, Phase 47 D-03)
+- Has a close button with `aria-label="Close Recovery Preview"` and visible focus ring (WCAG 2.4.7)
+- `runbook_card` is a plain inline `<div>` with no layering
+
+**Why adding focus-trap / scrim / aria-modal is intentionally NOT done:**
+
+1. Adding a focus-trap to a non-modal Disclosure would **trap keyboard users** in content that is
+   not a dialog — a direct WCAG violation, not a compliance improvement.
+2. Adding `role="dialog"` to a Disclosure misrepresents the widget role to assistive technology
+   and contradicts ARIA APG guidance (Disclosure vs Dialog patterns).
+3. Adding new JS (focus-trap library or `phx-hook`) would break the milestone boundary
+   (`no new Parapet-owned runtime UI/JS dependency` — 44-CONTEXT.md locked).
+
+**ARIA / WCAG citations:**
+
+- **ARIA APG Disclosure vs Dialog:** [Disclosure pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/)
+  does not use `role="dialog"`, `aria-modal`, focus-trap, or Esc. The Dialog pattern does.
+  The preview_panel is a Disclosure; treating it as a Dialog is architecturally incorrect.
+- **WCAG 2.4.3 Focus Order:** Content follows trigger in DOM source order — the
+  `preview_panel` is positioned after its trigger in the page, satisfying focus order natively.
+- **WCAG 2.4.7 Focus Visible:** Satisfied by the close button's `focus:ring-2` and the
+  existing `po-focus` ring system.
+- **WCAG 2.4.11 Focus Not Obscured:** Satisfied by the `scroll-pb-72 md:scroll-pb-0`
+  scroll-padding fix shipped in Phase 47-02 (D-02, WCAG technique C43) — the just-activated
+  trigger is never fully covered by the opened bottom sheet.
+
+**Negative-guard tests (D-16):** `test/parapet/operator_ui_contrast_test.exs` enforces the
+Disclosure shape via `refute role="dialog"`, `refute aria-modal`, `refute class="fixed inset-0"`
+(full-screen scrim guard), and `assert md:relative md:inset-auto` + `assert
+aria-label="Close Recovery Preview"`. These turn red if a future edit accidentally adds modal
+machinery.
+
+---
 
 ### GUARD-04 Off-Palette Exception: operator dark `--po-link` / `--link` = `#7FB4C6`
 
