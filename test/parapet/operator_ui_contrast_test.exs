@@ -187,6 +187,44 @@ defmodule Parapet.OperatorUIContrastTest do
 
       # DATA-02: no overflow-y-auto added
       refute content =~ "overflow-y-auto"
+
+      # GROUP-01: cockpit break-words overflow hardening (D-06)
+      assert content =~ "break-words"
+
+      # GROUP-02: brand-voice formula labels (D-11)
+      assert content =~ "What users are seeing"
+      assert content =~ "Evidence on record"
+      assert content =~ "Where to inspect"
+      assert content =~ "Safe next step"
+      # Updated fallback strings (D-11)
+      assert content =~ "No user-facing impact has been recorded yet."
+      assert content =~ "No trace or external links are attached to this incident yet."
+      # Old label strings must be absent (D-11)
+      refute content =~ "Impact Summary"
+      refute content =~ "Top Facts"
+
+      # GROUP-03/05/06 + A11Y-05: N/A negative-guards (D-16)
+      refute content =~ "role=\"dialog\""
+      refute content =~ "aria-modal"
+      # Guard the four-side scrim pattern ONLY — preview_panel legitimately uses
+      # "fixed inset-x-0 bottom-0", which does NOT contain "fixed inset-0" (D-16, Pitfall 1)
+      refute content =~ ~S|class="fixed inset-0|
+      # Disclosure shape confirmed
+      assert content =~ "md:relative md:inset-auto"
+
+      # A11Y-05: Disclosure landmark (D-03)
+      assert content =~ ~S|role="region"|
+      assert content =~ ~S|aria-label="Recovery Preview"|
+
+      # GROUP-04: risk + audit-outcome + aria-disabled (D-07/D-08/D-09)
+      assert content =~ "action_item_risk"
+      assert content =~ "Resolved · audited"
+      assert content =~ ~S|[aria-disabled="true"]|
+
+      # MOTION-03: keyframe reveal (D-13)
+      assert content =~ "@keyframes po-preview-reveal"
+      assert content =~ "animation: po-preview-reveal var(--motion-base) var(--motion-ease)"
+      # (transition-all refute already present at line 143; reduced-motion assert already at line 124)
     end
   end
 
@@ -206,6 +244,8 @@ defmodule Parapet.OperatorUIContrastTest do
       assert content =~ ~S|aria-label="Incident actions"|
       assert content =~ ~S|id="parapet-main"|
       assert content =~ "Skip to main content"
+      # D-02 (A11Y-05): WCAG 2.4.11 focus-not-obscured scroll-padding-bottom
+      assert content =~ "scroll-pb-72"
     end
   end
 
