@@ -726,14 +726,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           <.action_item_card item={item} />
         <%% end %>
         <%%= if Enum.empty?(@items) do %>
-          <div class="rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+          <div class="rounded-xl border border-dashed border-[color:var(--parapet-border)] bg-white/70 p-6 text-center shadow-sm">
             <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
               <path stroke-linecap="round" stroke-linejoin="round"
                 d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p class="text-sm font-semibold text-stone-800">No pending action items</p>
-            <p class="mt-2 text-sm text-stone-500">Recovery work appears here when an incident has a concrete item to inspect or resolve.</p>
+            <p class="text-sm font-semibold" style="color: var(--parapet-text);">No pending action items</p>
+            <p class="mx-auto mt-2 max-w-md text-sm" style="color: var(--parapet-text-muted);">Recovery work appears here when an incident has a concrete item to inspect or resolve.</p>
           </div>
         <%% end %>
       </div>
@@ -779,16 +779,52 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <%% end %>
 
       <%%= if Enum.empty?(@incidents) do %>
-        <div class="px-4 py-8 text-center">
+        <div class="mx-4 my-6 rounded-xl border border-dashed border-[color:var(--parapet-border)] bg-white/70 p-6 text-center shadow-sm">
           <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round"
               d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
           </svg>
-          <p class="text-sm font-semibold text-stone-800">No active incidents</p>
-          <p class="mt-2 text-sm text-stone-500">
-            Open and investigating incidents will appear here. Use History to review resolved incidents without disrupting the active queue.
-          </p>
+          <%%= if @page_mode == :history do %>
+            <p class="text-sm font-semibold" style="color: var(--parapet-text);">No resolved incidents yet</p>
+            <p class="mx-auto mt-2 max-w-md text-sm" style="color: var(--parapet-text-muted);">
+              Resolved incidents land here with their final timeline and retrospective. Active work stays in the response queue until it closes.
+            </p>
+            <.link navigate={operator_path(@operator_base_path)} class="mt-4 inline-block text-sm font-medium underline" style="color: var(--parapet-accent);">
+              Back to active response
+            </.link>
+          <%% else %>
+            <p class="text-sm font-semibold" style="color: var(--parapet-text);">No active incidents</p>
+            <p class="mx-auto mt-2 max-w-md text-sm" style="color: var(--parapet-text-muted);">
+              Open and investigating incidents will appear here. Use History to review resolved incidents without disrupting the active queue.
+            </p>
+            <.link navigate={operator_path(@operator_base_path, :history)} class="mt-4 inline-block text-sm font-medium underline" style="color: var(--parapet-accent);">
+              View resolved history
+            </.link>
+          <%% end %>
+        </div>
+      <%% end %>
+    </div>
+    """
+  end
+
+  attr(:socket_connected, :boolean, required: true)
+
+  @doc """
+  Uniform disconnected-load skeleton (D-09). Renders three matched `h-16` rows under
+  `aria-live="polite"` + `aria-busy` keyed on `@socket_connected`, so the Actions and
+  History lists share the Response queue's zero-layout-shift loading affordance. The
+  caller wraps its real list in the `aria-busy=false` branch; this component is
+  skeleton-or-nothing only (no literal "Loading" text — ARIA carries the state).
+  """
+  def list_skeleton(assigns) do
+    ~H"""
+    <div aria-live="polite" aria-busy={if !@socket_connected, do: "true", else: "false"}>
+      <%%= if !@socket_connected do %>
+        <div class="animate-pulse space-y-3" aria-hidden="true">
+          <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+          <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
+          <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
         </div>
       <%% end %>
     </div>
@@ -876,9 +912,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <%%= if trace_id = Map.get(@detail.incident, :trace_id) do %>
               <%% template = Application.get_env(:parapet, :trace_url_template) || "#" %>
               <%% url = if is_binary(template), do: String.replace(template, "{trace_id}", trace_id), else: "#" %>
-              <a href={url} class="po-link flex items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                <span>Trace: <span class="tabular-nums font-mono"><%%= trace_id %></span></span> &nearr;
+              <a href={url} class="po-link flex min-w-0 items-center gap-1 text-sm hover:underline" target="_blank" rel="noopener noreferrer">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                <span class="min-w-0">Trace: <span class="break-all min-w-0 tabular-nums font-mono"><%%= trace_id %></span></span> &nearr;
               </a>
             <%% end %>
             <%%= for link <- @detail.external_links do %>
@@ -1078,7 +1114,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                 </div>
                 <div>
                   <p class="text-sm font-medium text-stone-900">
-                    Flag <span class="font-mono text-xs bg-stone-100 px-1 rounded border border-stone-200"><span class="tabular-nums font-mono"><%%= flag %></span></span> updated
+                    Flag <span class="font-mono text-xs bg-stone-100 px-1 rounded border border-stone-200"><span class="break-all min-w-0 tabular-nums font-mono"><%%= flag %></span></span> updated
                   </p>
                   <p class="text-xs text-stone-500 mt-0.5">
                     <%%= actor %> published ruleset
@@ -1162,14 +1198,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <%%= for step <- @detail.derived.runbook_steps do %>
           <div class="ring-1 ring-stone-900/5 bg-stone-50 rounded-lg p-3">
             <div class="flex justify-between items-start">
-              <div class="flex-1">
+              <div class="flex-1 min-w-0">
                 <div class="flex items-center gap-2">
-                  <h4 class="text-sm font-medium text-stone-900"><%%= step.label %></h4>
+                  <h4 class="break-words text-sm font-medium text-stone-900"><%%= step.label %></h4>
                   <%%= if step.state == :executed do %>
                     <span class={chip_class(:execution, :executed)}>Executed</span>
                   <%% end %>
                 </div>
-                <p class="text-xs text-stone-500 mt-1"><%%= step.description %></p>
+                <p class="break-words text-xs text-stone-500 mt-1"><%%= step.description %></p>
                 
                 <%%= if step.state == :guidance && step.guidance do %>
                   <div class="po-guidance mt-2 p-2 rounded text-xs italic">
@@ -1195,7 +1231,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
               </div>
 
               <%%= if @detail.incident.state != "resolved" do %>
-                <div class="ml-4">
+                <div class="ml-4 shrink-0">
                   <%%= case step.state do %>
                     <%% :previewable -> %>
                       <p class="mb-2 max-w-48 text-sm text-stone-500">Preview scoped changes before execution. No recovery action runs until confirm.</p>
@@ -1228,9 +1264,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   def preview_panel(assigns) do
     ~H"""
     <%% preview = @detail.derived.active_preview %>
-    <div class="po-preview-reveal fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6">
+    <div class="po-preview-reveal fixed inset-x-0 bottom-0 z-50 p-4 md:relative md:inset-auto md:p-0 md:mb-6 max-h-[100dvh]">
       <div role="region" aria-label="Recovery Preview"
-           class="bg-white ring-1 ring-[color:var(--parapet-border)] rounded-xl shadow-xl overflow-hidden">
+           class="bg-white ring-1 ring-[color:var(--parapet-border)] rounded-xl shadow-xl overflow-hidden max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain">
         <div class="px-4 py-2 flex justify-between items-center" style="background: var(--parapet-accent);">
           <h3 class="text-sm font-bold text-white uppercase tracking-wider">Recovery Preview</h3>
           <button type="button" phx-click="cancel_preview" aria-label="Close Recovery Preview" class="flex min-h-[40px] min-w-[40px] items-center justify-center rounded-lg text-white hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-white/80">
@@ -1239,14 +1275,14 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         </div>
         
         <div class="p-4">
-          <div class="grid grid-cols-2 gap-4 mb-4">
-            <div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <div class="min-w-0">
               <p class="text-xs text-stone-500 uppercase font-bold">Target Kind</p>
-              <p class="text-sm font-medium text-stone-900"><%%= preview.data["target_kind"] %></p>
+              <p class="text-sm font-medium text-stone-900 min-w-0 break-words"><%%= preview.data["target_kind"] %></p>
             </div>
-            <div>
+            <div class="min-w-0">
               <p class="text-xs text-stone-500 uppercase font-bold">Affected Count</p>
-              <p class="text-sm font-medium text-stone-900"><%%= preview.data["count"] %></p>
+              <p class="text-sm font-medium text-stone-900 min-w-0 break-words"><%%= preview.data["count"] %></p>
             </div>
           </div>
 
@@ -1378,9 +1414,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
 
     ~H"""
     <div class={surface_class(:action_card)}>
-      <div class="flex justify-between items-start mb-2">
-        <h4 class="text-sm font-medium text-stone-900"><%%= @item.title || "Action Item" %></h4>
-        <div class="flex items-center gap-1.5">
+      <div class="flex justify-between items-start mb-2 min-w-0">
+        <h4 class="min-w-0 break-words text-sm font-medium text-stone-900"><%%= @item.title || "Action Item" %></h4>
+        <div class="flex shrink-0 items-center gap-1.5">
           <%#- D-07: risk chip — color + icon + label, never color alone (WCAG 1.4.1) %>
           <span class={["po-chip rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide flex items-center gap-1", risk_chip_class(action_item_risk(Map.get(@item, :kind)))]}>
             <%%= case action_item_risk(Map.get(@item, :kind)) do %>
@@ -1404,7 +1440,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
           </span>
         </div>
       </div>
-      <p class="text-xs text-stone-500 mb-3"><%%= @item.integration %>:<%%= @item.external_id %></p>
+      <p class="min-w-0 break-all text-xs text-stone-500 mb-3"><%%= @item.integration %>:<span class="break-all font-mono"><%%= @item.external_id %></span></p>
       <p class="mb-3 rounded-lg bg-stone-50 px-3 py-2 text-xs text-stone-600 ring-1 ring-stone-900/5">
         Review the linked incident evidence before recovery. Capability confirms write audit records.
       </p>

@@ -185,8 +185,14 @@ defmodule Parapet.OperatorUIContrastTest do
       # DATA-06: animate-pulse defined in templates (zeroed by prefers-reduced-motion)
       assert content =~ "animate-pulse"
 
-      # DATA-02: no overflow-y-auto added
-      refute content =~ "overflow-y-auto"
+      # DATA-02: the "no overflow-y-auto" refute is scoped to @live_template_paths
+      # only (see the live-template loop below). Phase-48 D-16 R1 intentionally adds
+      # `overflow-y-auto overscroll-contain` to the components-layer `preview_panel`
+      # bottom-sheet so its warnings + Confirm/Close can never clip on a short
+      # viewport (a recovery-blocking bug). Because `preview_panel` lives in
+      # @component_paths, the refute cannot also apply here without contradicting R1.
+      # The DATA-02 intent (no scrolling regions baked into the page-level live
+      # templates) is preserved by the @live_template_paths copy of this refute.
 
       # GROUP-01: cockpit break-words overflow hardening (D-06)
       assert content =~ "break-words"
