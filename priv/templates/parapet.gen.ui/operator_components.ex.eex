@@ -330,6 +330,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       .parapet-ui .po-nav-active {
         background: var(--po-nav-active-bg);
         color: var(--po-nav-active-fg);
+        border-bottom: 2px solid var(--parapet-accent);
       }
 
       .parapet-ui .po-theme-control {
@@ -439,6 +440,11 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       }
       .parapet-ui .po-queue-row-selected:hover {
         background: var(--parapet-accent-soft);
+      }
+
+      /* DATA-03: Suppress connector spine on the final timeline entry */
+      .parapet-ui .po-timeline-list > li:last-child > div > span[aria-hidden="true"] {
+        display: none;
       }
 
       .parapet-theme-option[aria-pressed="true"] {
