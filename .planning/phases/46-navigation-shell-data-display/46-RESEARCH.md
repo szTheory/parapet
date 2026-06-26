@@ -780,7 +780,10 @@ These are the verified locations (read from actual template files) that Phase 46
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
+
+> RESOLVED Q1: Use `!connected?(assigns)` to gate the skeleton (idiomatic SSR-only flash; no new assign). Planner may add a `loading?` assign later only if a visible flash is observed.
+> RESOLVED Q2: Planner adds a separate `@detail_template_paths` constant + test in `operator_ui_contrast_test.exs` (Wave 0) so detail-template assertions are cleanly separated from `operator_live` assertions.
 
 1. **Skeleton loading approach: `connected?/1` vs explicit `loading?` assign**
    - What we know: `operator_live.ex.eex` does not currently set a `loading?` assign. Phoenix LiveView's `connected?/1` returns `false` during SSR and `true` after WebSocket mount.
