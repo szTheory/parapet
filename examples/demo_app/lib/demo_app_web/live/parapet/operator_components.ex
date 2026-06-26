@@ -1091,7 +1091,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
                 <%= if length(step.targeting_hints) > 0 do %>
                   <div class="mt-2 flex flex-wrap gap-1">
                     <%= for hint <- step.targeting_hints do %>
-                      <span class="px-1.5 py-0.5 text-xs font-mono rounded bg-purple-50 text-purple-700 border border-purple-100" title={hint.title}>
+                      <span class="po-chip po-chip-info text-xs font-mono" title={hint.title}>
                         <%= hint.kind %>:<span class="tabular-nums font-mono"><%= String.slice(to_string(hint.external_id), 0..7) %></span>
                       </span>
                     <% end %>
@@ -1155,9 +1155,9 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           </div>
 
           <%= if (preview.data["warnings"] || []) != [] do %>
-            <div class="mb-4 p-2 bg-red-50 border border-red-100 rounded">
-              <p class="text-xs text-red-700 uppercase font-bold mb-1">Warnings</p>
-              <ul class="text-xs text-red-600 list-disc pl-4">
+            <div class="mb-4 p-2 rounded border border-[color:var(--po-chip-danger-border)] bg-[color:var(--po-chip-danger-bg)]">
+              <p class="text-xs uppercase font-bold mb-1 text-[color:var(--po-chip-danger-fg)]">Warnings</p>
+              <ul class="text-xs list-disc pl-4 text-[color:var(--po-chip-danger-fg)]">
                 <%= for w <- preview.data["warnings"] do %>
                   <li><%= w %></li>
                 <% end %>
@@ -1351,7 +1351,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       control_width(width) <>
         " " <>
         control_base() <>
-        " bg-white text-amber-900 ring-1 ring-amber-300 hover:bg-amber-50"
+        " bg-white text-amber-900 ring-1 ring-[color:var(--po-chip-warning-border)] hover:bg-amber-50"
 
   defp control_class(:success, width),
     do: control_width(width) <> " " <> control_base() <> " po-button-success"

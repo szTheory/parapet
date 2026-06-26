@@ -161,6 +161,30 @@ defmodule Parapet.OperatorUIContrastTest do
 
       # COMP-04: no raw amber border utilities in escalation-chain markup
       refute content =~ "border-amber-"
+
+      # COMP-08 gap-closure (phase-verifier residuals): off-palette color utilities
+      # that were not in the original 20-item inventory and were found post-phase
+      refute content =~ "bg-purple-50"
+      refute content =~ "bg-red-50"
+      refute content =~ "text-red-700"
+      refute content =~ "text-red-600"
+      refute content =~ "ring-amber-300"
+    end
+  end
+
+  @live_template_paths [
+    "priv/templates/parapet.gen.ui/operator_live.ex.eex",
+    "examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex"
+  ]
+
+  test "operator live templates use semantic tokens (no raw stone-950 primary button colors)" do
+    for path <- @live_template_paths do
+      content = File.read!(path)
+
+      # COMP-08 gap-closure: Return to Response button must use token-based primary
+      # (bg-stone-950 was the off-palette color that operator_components.ex.eex
+      #  migrated in Plan 45-03; the same button in operator_live was a missed residual)
+      refute content =~ "bg-stone-950"
     end
   end
 

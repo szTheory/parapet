@@ -155,7 +155,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorLive do
                       Use history to inspect completed evidence, retrospective notes, and operator actions without mixing them into the active response queue.
                     </p>
                   </div>
-                  <.link navigate={@operator_base_path} class="flex min-h-[40px] items-center justify-center rounded-lg bg-stone-950 px-4 py-2 text-sm font-semibold text-white transition-transform duration-[--motion-fast] ease-out active:scale-[0.96] hover:bg-stone-800">
+                  <.link navigate={@operator_base_path} class="flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-semibold transition-transform duration-[--motion-fast] ease-out active:scale-[0.96] po-button-primary po-focus">
                     Return to Response
                   </.link>
                 </div>
