@@ -664,14 +664,16 @@ defmodule DemoAppWeb.Parapet.GalleryLive do
         title: "Review auth service deployment log",
         state: "pending",
         integration: "linear",
-        external_id: "ENG-4421"
+        external_id: "ENG-4421",
+        kind: "dead_letter"
       },
       %{
         id: "ai-002",
         title: "Validate token endpoint metrics after rollback",
         state: "pending",
         integration: "github",
-        external_id: "parapet#887"
+        external_id: "parapet#887",
+        kind: "stalled_workflow"
       }
     ]
   end
@@ -683,13 +685,21 @@ defmodule DemoAppWeb.Parapet.GalleryLive do
         title: "Rollback auth service to v2.14.1",
         state: "completed",
         integration: "linear",
-        external_id: "ENG-4422"
+        external_id: "ENG-4422",
+        kind: "suppressed_delivery"
       }
     ]
   end
 
   defp action_item_no_title do
-    %{id: "ai-notitle-01", title: nil, state: "pending", integration: "jira", external_id: "OPS-0042"}
+    %{
+      id: "ai-notitle-01",
+      title: nil,
+      state: "pending",
+      integration: "jira",
+      external_id: "OPS-0042",
+      kind: "exact_follow_up"
+    }
   end
 
   defp action_item_long_string do
@@ -698,7 +708,8 @@ defmodule DemoAppWeb.Parapet.GalleryLive do
       title: "A very long action item title that tests text wrapping in the action item card component when it greatly exceeds the normal width",
       state: "pending",
       integration: "linear",
-      external_id: "ENG-99999-long-external-id-overflow-test"
+      external_id: "ENG-99999-long-external-id-overflow-test",
+      kind: "orphaned_callback"
     }
   end
 
