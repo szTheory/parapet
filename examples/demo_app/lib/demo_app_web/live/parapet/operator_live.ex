@@ -29,7 +29,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        queue_params: %{"status" => "active"},
        operator_base_path: @default_operator_base_path,
        selection_source: :none,
-       queue_refresh_available?: false
+       queue_refresh_available?: false,
+       socket_connected: connected?(socket)
      )
      |> stream_configure(:incidents, dom_id: &incident_dom_id/1)
      |> stream(:incidents, [], reset: true)}
@@ -54,7 +55,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
        queue_page: queue_page,
        queue_params: visible_queue_params(queue_params, queue_page),
        page_mode: page_mode,
-       queue_refresh_available?: false
+       queue_refresh_available?: false,
+       socket_connected: true
      )
      |> stream(:incidents, visible_incidents, reset: true)}
   end
@@ -242,8 +244,8 @@ defmodule DemoAppWeb.Parapet.OperatorLive do
                       History
                     </.link>
                   </div>
-                  <div aria-live="polite" aria-busy={if !connected?(assigns), do: "true", else: "false"}>
-                    <%= if !connected?(assigns) do %>
+                  <div aria-live="polite" aria-busy={if !@socket_connected, do: "true", else: "false"}>
+                    <%= if !@socket_connected do %>
                       <div class="animate-pulse space-y-3" aria-hidden="true">
                         <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
                         <div class="h-16 rounded-lg bg-[color:var(--parapet-panel-muted)]"></div>
