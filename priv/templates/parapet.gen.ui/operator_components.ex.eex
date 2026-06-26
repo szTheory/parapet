@@ -701,6 +701,11 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <%% end %>
         <%%= if Enum.empty?(@items) do %>
           <div class="rounded-xl border border-dashed border-stone-300 bg-white/70 p-6 text-center shadow-sm">
+            <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
             <p class="text-sm font-semibold text-stone-800">No pending action items</p>
             <p class="mt-2 text-sm text-stone-500">Recovery work appears here when an incident has a concrete item to inspect or resolve.</p>
           </div>
@@ -748,7 +753,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <%% end %>
 
       <%%= if Enum.empty?(@incidents) do %>
-        <div class="px-4 py-6 text-center">
+        <div class="px-4 py-8 text-center">
+          <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+              d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
+          </svg>
           <p class="text-sm font-semibold text-stone-800">No active incidents</p>
           <p class="mt-2 text-sm text-stone-500">
             Open and investigating incidents will appear here. Use History to review resolved incidents without disrupting the active queue.
@@ -921,47 +931,63 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   def incident_timeline(assigns) do
     ~H"""
     <div class="flow-root">
-      <ul role="list" class="-mb-8">
-        <%% timeline_entries = @detail.timeline_entries || Enum.map(@detail.entries, fn entry -> %{entry: entry, presentation: %{actor_class: :evidence, style_variant: :neutral_evidence, system_action?: false}} end) %>
-        <%%= for item <- timeline_entries do %>
-          <%% entry = item.entry %>
-          <%% presentation = item.presentation %>
-          <li>
-            <div class="relative pb-8">
-              <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-stone-200" aria-hidden="true"></span>
-              <div class="relative flex space-x-3">
-                <div>
-                  <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white text-[11px] font-semibold", timeline_entry_badge_class(presentation)]}>
-                    <%%= timeline_entry_badge_text(presentation) %>
-                  </span>
-                </div>
-                <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+      <%% timeline_entries = @detail.timeline_entries || Enum.map(@detail.entries, fn entry -> %{entry: entry, presentation: %{actor_class: :evidence, style_variant: :neutral_evidence, system_action?: false}} end) %>
+      <%%= if Enum.empty?(timeline_entries) do %>
+        <div class="flex min-h-[12rem] items-center justify-center text-center px-4 py-8">
+          <div>
+            <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p class="text-sm font-semibold" style="color: var(--parapet-text);">No timeline entries yet</p>
+            <p class="mt-1 text-sm" style="color: var(--parapet-text-muted);">
+              Evidence and operator actions will appear here as they are recorded.
+            </p>
+          </div>
+        </div>
+      <%% else %>
+        <ul role="list" class="po-timeline-list -mb-8">
+          <%%= for item <- timeline_entries do %>
+            <%% entry = item.entry %>
+            <%% presentation = item.presentation %>
+            <li>
+              <div class="relative pb-8">
+                <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-stone-200" aria-hidden="true"></span>
+                <div class="relative flex space-x-3">
                   <div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <p class="text-sm font-medium text-stone-900"><%%= timeline_entry_title(entry, presentation) %></p>
-                      <span class={["px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
-                        <%%= timeline_actor_copy(presentation.actor_class) %>
-                      </span>
-                    </div>
-                    <p class="text-sm text-stone-600 mt-1">
-                      <%%= if external_link_entry?(entry) do %>
-                        <a href={external_link_url(entry.payload)} class="po-link inline-flex items-center gap-1 break-all hover:underline" target="_blank" rel="noopener noreferrer">
-                          <span><%%= external_link_label(entry.payload) %></span> &nearr;
-                        </a>
-                      <%% else %>
-                        <%%= timeline_entry_body(entry, presentation) %>
-                      <%% end %>
-                    </p>
+                    <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white text-[11px] font-semibold", timeline_entry_badge_class(presentation)]}>
+                      <%%= timeline_entry_badge_text(presentation) %>
+                    </span>
                   </div>
-                  <div class="whitespace-nowrap text-right text-sm text-stone-500">
-                    <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="tabular-nums"><%%= readable_datetime(entry.inserted_at) %></time>
+                  <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <p class="text-sm font-medium text-stone-900"><%%= timeline_entry_title(entry, presentation) %></p>
+                        <span class={["px-2 py-0.5 text-xs font-semibold uppercase tracking-wide rounded-full border", timeline_entry_actor_class(presentation)]}>
+                          <%%= timeline_actor_copy(presentation.actor_class) %>
+                        </span>
+                      </div>
+                      <p class="text-sm text-stone-600 mt-1">
+                        <%%= if external_link_entry?(entry) do %>
+                          <a href={external_link_url(entry.payload)} class="po-link inline-flex items-center gap-1 break-all hover:underline" target="_blank" rel="noopener noreferrer">
+                            <span><%%= external_link_label(entry.payload) %></span> &nearr;
+                          </a>
+                        <%% else %>
+                          <%%= timeline_entry_body(entry, presentation) %>
+                        <%% end %>
+                      </p>
+                    </div>
+                    <div class="whitespace-nowrap text-right text-sm text-stone-500">
+                      <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="tabular-nums"><%%= readable_datetime(entry.inserted_at) %></time>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </li>
-        <%% end %>
-      </ul>
+            </li>
+          <%% end %>
+        </ul>
+      <%% end %>
     </div>
     """
   end
