@@ -115,6 +115,43 @@ defmodule Parapet.Operator do
     # entries = Evidence.repo().all(from t in TimelineEntry, where: t.incident_id == ^incident_id, order_by: [desc: t.inserted_at])
     # For now, we define the API shape:
     incident = Evidence.repo().get!(Incident, incident_id)
+    build_detail(incident)
+  end
+
+  @doc since: "1.0.0"
+  @doc """
+  Failure-tolerant variant of `incident_detail/1`.
+
+  Returns `{:ok, detail}` for an existing incident, or `{:error, :not_found}` for
+  a stale `/parapet/:id` link. This collapses the two distinct failures that the
+  `:binary_id` primary key produces — a malformed id (which would raise
+  `Ecto.Query.CastError` and surface as an uncaught 500) and a well-formed-but-missing
+  UUID (which would raise `Ecto.NoResultsError`) — into a single `{:error, :not_found}`
+  so the operator UI can render a designed in-page not-found panel instead of crashing.
+
+  Prechecks `Ecto.UUID.cast/1` to collapse the cast-error class, then uses
+  `Evidence.repo().get/2` (not `get!/2`) with a nil-guard to collapse the
+  no-results class. Infrastructure failures (e.g. `DBConnection` errors) are NOT
+  rescued here — those remain the host's 5xx concern (a real outage must not be
+  masked as "incident not found").
+  """
+  @spec fetch_incident_detail(term()) :: {:ok, map()} | {:error, :not_found}
+  def fetch_incident_detail(incident_id) do
+    case Ecto.UUID.cast(incident_id) do
+      {:ok, uuid} ->
+        case Evidence.repo().get(Incident, uuid) do
+          nil -> {:error, :not_found}
+          incident -> {:ok, build_detail(incident)}
+        end
+
+      :error ->
+        {:error, :not_found}
+    end
+  end
+
+  # Shared workbench-ready body for incident_detail/1 and fetch_incident_detail/1.
+  defp build_detail(incident) do
+    incident_id = incident.id
 
     entries =
       Evidence.repo().all(
