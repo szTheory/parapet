@@ -97,4 +97,5 @@ With `--ci`, the doctor exits `1` for any `:warn` or `:error` finding — a stri
 - [SLO Authoring Guide](docs/slo-authoring-guide.md) — learn to author custom SLO slices for your specific journeys
 - [Parapet Sigra Integration](docs/integrations/sigra.md) — wire the login journey slice with real authentication event data
 - [Runnable Demo App](https://github.com/szTheory/parapet/tree/main/examples/demo_app) — start a seeded Operator UI with local Prometheus and Grafana, use the printed URLs and Grafana credentials, and browse focused response, recovery, escalation, and history scenarios before installing Parapet in your own app
+- [Running the Demo](demo-app.md) — one-command quickstart (`make up` / `make gallery`), running several demo stacks at once without port conflicts, hot-reload, and troubleshooting
 - [Recovery Actions Guide](docs/recovery-actions.md) — author host recovery capabilities and wire them to runbook steps

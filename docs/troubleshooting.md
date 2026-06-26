@@ -121,26 +121,21 @@ complete map includes `live "/parapet"`, `live "/parapet/actions"`,
 
 ## Demo app Docker port conflicts
 
-If you are running several Phoenix demos at once and the Parapet demo cannot bind
-to `4000`, `3000`, or `9090`, start it with automatic port selection from the
-demo app directory:
+If you are running several Phoenix demos at once, just use the default launch —
+`make up` is conflict-free: it picks free localhost ports per project and a unique
+Compose project name automatically.
 
 ```bash
 cd examples/demo_app
-make up-auto
+make up
 ```
 
-The command prints the actual `/parapet`, `/parapet/actions`, `/parapet/history`,
-Grafana, and Prometheus URLs. It writes generated settings to
+The command prints the actual `/parapet`, `/parapet/actions`, and
+`/parapet/history` URLs. It writes generated settings to
 `examples/demo_app/.docker/auto.env` so `make urls`, `make down`, and
-`make reset` keep targeting the same generated Compose project.
-
-If another process grabs a generated port between selection and container
-startup, rerun:
-
-```bash
-make up-auto
-```
+`make reset` keep targeting the same generated Compose project. If a port is
+grabbed between selection and container startup, `make up` reselects free ports
+and retries once. (`make up-fixed` forces the classic `4000`/`3000`/`9090`.)
 
 Refresh the URLs after any restart before copying links:
 
@@ -168,12 +163,12 @@ If you switch demo seed scenarios with `make up-response`, `make up-recovery`,
 the demo database first or use a fresh `COMPOSE_PROJECT_NAME`. The entrypoint
 skips seeds once incidents already exist.
 
-Grafana and Prometheus are part of the default demo stack. `make up` binds them
-to `127.0.0.1:${GRAFANA_PORT:-3000}` and
-`127.0.0.1:${PROMETHEUS_PORT:-9090}`. `make up-auto` generates free localhost
-ports for Grafana and Prometheus too, updates the seeded Grafana evidence URL,
-and prints the local demo credentials. Anonymous viewer access is enabled for
-convenience.
+Grafana and Prometheus are opt-in: `make up` is lean (web + Postgres only). Start
+them with `make up-monitoring`, or with any scenario target (`make up-response`,
+`make up-recovery`, …) which include monitoring. Auto-port mode generates free
+localhost ports for Grafana and Prometheus too, updates the seeded Grafana
+evidence URL, and prints the local demo credentials. Anonymous viewer access is
+enabled for convenience.
 
 ## Prometheus target is blank
 

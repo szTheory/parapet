@@ -4,47 +4,34 @@ A runnable Phoenix app for looking at Parapet before wiring it into your own app
 It starts a seeded Operator UI with incidents, timelines, runbook steps, action
 items, history, Prometheus, and Grafana already populated.
 
+> **Full walkthrough:** [docs/demo-app.md](../../docs/demo-app.md) — gallery,
+> full demo, running several stacks at once, hot-reload, macOS gotchas, and
+> troubleshooting. This README is the quick version.
+
 ## Fastest Path
 
-From the repository root, use automatic port selection if you are running other
-Docker UI demos or local admin tools:
+`make up` is **conflict-free by default** — it picks free ports automatically, so
+it's safe to run alongside your other Docker UI demos:
 
 ```bash
 cd examples/demo_app
-make up-auto
+make up               # full seeded demo (web + Postgres), lean
+# …or just the components, no Docker/database, on a free port:
+make gallery
 ```
 
-For the fixed default ports, run:
+When the stack is ready, `make up` prints the URLs to open (Operator UI,
+Actions, History) plus the Compose project name and stop/reset commands.
 
-```bash
-cd examples/demo_app
-make up
-```
+- `make up-monitoring` — also start Grafana + Prometheus (evidence links).
+- `make up-proxy` — reach the demo at `http://parapet.localhost` (no ports to
+  remember); see [docs/demo-app.md](../../docs/demo-app.md).
+- `make up-fixed` — classic fixed `4000` / `3000` / `9090` ports.
+- `make down` — stop.
 
-When the stack is ready, the command prints the URLs to open:
-
-```bash
-http://127.0.0.1:<web-port>/parapet
-http://127.0.0.1:<web-port>/parapet/actions
-http://127.0.0.1:<web-port>/parapet/history
-http://127.0.0.1:<grafana-port>/d/parapet_demo/parapet-demo-operator-evidence
-http://127.0.0.1:<prometheus-port>
-curl -f http://127.0.0.1:<web-port>/parapet
-```
-
-Grafana anonymous viewer access is enabled for the local demo. The command also
-prints the admin login from `.env`; the default is `admin` / `parapet`.
-
-Stop it with:
-
-```bash
-make down
-```
-
-That is enough for a first look. Docker keeps Postgres inside the Compose
-network by default, so this demo should not fight with another local Postgres on
-`5432`. In auto mode, the web UI, Grafana, and Prometheus all get generated
-localhost ports and the command prints the actual URLs.
+Postgres stays inside the Compose network (no host `5432`), so it won't fight a
+local Postgres. Grafana anonymous viewer access is enabled for the demo; the
+printed login defaults to `admin` / `parapet`.
 
 ## What To Look At
 
@@ -90,70 +77,26 @@ because the entrypoint skips seeds once the database already contains incidents.
 
 ## Docker Compose
 
-Use the default fixed web port when `4000` is free:
+| Command | What it does |
+|---------|--------------|
+| `make up` | **Default.** Web + Postgres on auto-selected free ports (conflict-free). Retries once if a port is grabbed mid-launch. |
+| `make up-monitoring` | Adds Prometheus + Grafana (the `monitoring` profile). |
+| `make up-proxy` | Routes through the shared `*.localhost` proxy — see [`dev-proxy/README.md`](dev-proxy/README.md). |
+| `make up-fixed` | Classic fixed `4000` / `3000` / `9090` (full stack). |
+| `make up-db-port` | Expose Postgres on the host for `psql`. |
+| `make urls` | Reprint the running stack's URLs. |
+| `make down` / `make reset` | Stop / stop + drop volumes. |
 
-```bash
-make up
-```
+Auto-port mode writes generated settings to `.docker/auto.env` (reused by `urls`
+/ `down` / `reset`), and the Operator UI seed gets the generated Grafana URL so
+evidence links resolve. Compose resources are scoped by `COMPOSE_PROJECT_NAME`
+— auto mode derives a stable one from your user + repo path, so multiple stacks
+never share volumes or networks. Grafana credentials come from `.env`
+(`GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD`); anonymous viewer access is on
+for the demo only.
 
-The web port is bound to `127.0.0.1` and defaults to `4000`. Grafana defaults to
-`3000`; Prometheus defaults to `9090`. Edit `.env` or pass `WEB_PORT=4001 make up`
-if another project is already using a port in fixed-port mode.
-
-Use automatic port selection when you are running multiple UI demos or another
-project already owns `4000`, `3000`, or `9090`:
-
-```bash
-make up-auto
-```
-
-Then reprint the discovered URLs at any time:
-
-```bash
-make urls
-```
-
-In auto-port mode, Parapet writes generated settings to `.docker/auto.env` and
-uses them for `make urls`, `make down`, and `make reset`. The Operator UI seed
-data receives the generated Grafana URL, so external evidence links point at the
-same local dashboard URL that `make up-auto` prints.
-
-If another process grabs a generated port between selection and container
-startup, rerun `make up-auto`; it will generate a fresh set of ports.
-
-If you need host `psql` access, expose Postgres explicitly:
-
-```bash
-make up-db-port
-```
-
-Then stop the demo:
-
-```bash
-make down
-```
-
-Remove demo volumes when you want a clean database and clean container build
-artifacts:
-
-```bash
-make reset
-```
-
-Compose resources are scoped by `COMPOSE_PROJECT_NAME`, which defaults to
-`parapet_demo` in `.env.example`. Auto mode generates a stable project name from
-your user and repo path unless you provide `COMPOSE_PROJECT_NAME` yourself.
-Changing the project name also changes which named volumes Compose uses.
-
-The printed Grafana credentials come from `GRAFANA_ADMIN_USER` and
-`GRAFANA_ADMIN_PASSWORD` in `.env`. Anonymous viewer access is enabled because
-the stack is local demo infrastructure, not a production recommendation.
-
-For local reverse-proxy setups, keep Traefik optional: attach `web` to your
-shared proxy network, add labels for a `.localhost` hostname, and avoid publishing
-the app or database ports directly. The default demo does not require Traefik
-because a proxy adds another fixed-port service and Docker socket/routing
-configuration; `make up-auto` is the simpler conflict-free path.
+See [docs/demo-app.md](../../docs/demo-app.md) for running several stacks at
+once, the `*.localhost` proxy, hot-reload, macOS gotchas, and troubleshooting.
 
 ## Run Without Docker
 

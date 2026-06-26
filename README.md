@@ -12,7 +12,9 @@ Parapet's philosophy: A Phoenix SaaS team can install Parapet and immediately kn
 
 Want to see it before installing it? The [runnable demo app](examples/demo_app/README.md)
 starts a seeded Operator UI, Prometheus, and Grafana with Docker and prints the
-exact URLs and local Grafana credentials to open.
+exact URLs and local Grafana credentials to open. The [demo guide](docs/demo-app.md)
+has the one-command quickstart (`make up`, or `make gallery` for no-Docker
+components) and how to run several stacks at once without port conflicts.
 
 ## Compatibility
 
@@ -295,6 +297,7 @@ For the full contract, safe metadata rules, and event-family semantics, see [doc
 
 - [Parapet Adopter Flows](docs/adopter-flows.md)
 - [Runnable Demo App](examples/demo_app/README.md)
+- [Running the Demo](docs/demo-app.md)
 - [Operator UI Guide](docs/operator-ui.md)
 - [SLO Reference](docs/slo-reference.md)
 - [Telemetry Contract](docs/telemetry.md)

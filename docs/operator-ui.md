@@ -7,7 +7,8 @@ The workbench remains host-owned and evidence-first: a calm active-response over
 Phase 6 extends that boundary with fault-domain triage for async and delivery incidents. The workbench now treats a compact evidence-backed triage block as the current-state index and the incident chronology as the authoritative source of sequence.
 
 If you want to browse the generated UI before installing it, start the
-[runnable demo app](https://github.com/szTheory/parapet/tree/main/examples/demo_app).
+[runnable demo app](https://github.com/szTheory/parapet/tree/main/examples/demo_app)
+(see the [demo guide](demo-app.md) for the one-command quickstart).
 It opens with seeded incidents, runbooks, actions, history, and the important
 routes printed at startup. The demo also includes focused seed scenarios so you
 can inspect response, recovery, escalation, or history flows without one page
