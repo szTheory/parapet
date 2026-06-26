@@ -121,7 +121,10 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   4. Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close — verified.
   5. Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 47-01-PLAN.md — RED test scaffold: additive Phase-47 assertions to operator_ui_contrast_test.exs (D-15)
+- [ ] 47-02-PLAN.md — Template + demo-mirror markup edits (red→green): incident_summary voice, risk/audit chips, aria-disabled, preview_panel reveal + landmark, cockpit break-words, scroll-pb (D-06/07/08/09/10/11/13/02/03)
+- [ ] 47-03-PLAN.md — Gate: full suite + audit-matrix N/A-by-design flip + blocking human gallery walkthrough (D-04/15/16/18)
 **UI hint**: yes
 
 ### Phase 48: Pages, flows & microcopy
