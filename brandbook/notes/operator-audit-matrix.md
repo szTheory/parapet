@@ -13,25 +13,25 @@ This matrix enumerates every operator component × visual/interaction state for 
 
 | Component | light-default | dark-default | light-empty | dark-empty | light-overflow | dark-overflow | light-disabled | dark-disabled | Notes |
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|-------|
-| operator_theme_bootstrap | done | done | — | — | — | — | — | — | Token values + @font-face — Phase 44 complete; Phase 45 adds button/badge/queue vars |
-| operator_nav | done | done | — | — | todo | todo | — | — | Primitive buttons/links tokenized Phase 45 |
-| theme_control | done | done | — | — | — | — | — | — | po-theme-option + po-focus wired Phase 44 |
-| response_cockpit | done | done | todo | todo | — | — | — | — | |
-| nav_item | done | done | — | — | todo | todo | done | done | disabled:opacity-50/cursor-not-allowed via control_base() |
-| operator_overview | done | done | todo | todo | — | — | — | — | |
-| action_center | done | done | todo | todo | — | — | done | done | control_class(:primary) for Return-to-response; disabled via control_base() |
-| incident_list | done | done | todo | todo | todo | todo | — | — | |
-| incident_row | done | done | — | — | todo | todo | done | done | po-queue-row-selected; disabled via control_base() |
-| incident_summary | done | done | todo | todo | todo | todo | — | — | |
-| incident_timeline | done | done | todo | todo | todo | todo | — | — | po-timeline-badge-* for actor badges |
-| suspect_changes_card | done | done | todo | todo | — | — | — | — | po-chip po-chip-info for icon + scope badges |
-| retrospective_card | done | done | todo | todo | — | — | — | — | control_class(:primary) for Copy retrospective |
-| runbook_card | done | done | todo | todo | todo | todo | — | — | po-guidance for guidance block |
-| preview_panel | done | done | todo | todo | — | — | done | done | style=var(--parapet-accent); po-guidance; hover:opacity-80 |
-| action_rail | done | done | — | — | — | — | done | done | control_class(:primary); disabled via control_base() |
-| action_item_list | done | done | todo | todo | todo | todo | — | — | |
-| action_item_card | done | done | todo | todo | todo | todo | done | done | |
-| critical_journeys | done | done | todo | todo | — | — | — | — | |
+| operator_theme_bootstrap | verified | verified | — | — | — | — | — | — | Token values + @font-face — Phase 44 complete; Phase 45 adds button/badge/queue vars |
+| operator_nav | verified | verified | — | — | todo | todo | — | — | Primitive buttons/links tokenized Phase 45 |
+| theme_control | verified | verified | — | — | — | — | — | — | po-theme-option + po-focus wired Phase 44 |
+| response_cockpit | verified | verified | todo | todo | — | — | — | — | |
+| nav_item | verified | verified | — | — | todo | todo | done | done | disabled:opacity-50/cursor-not-allowed via control_base() |
+| operator_overview | verified | verified | todo | todo | — | — | — | — | |
+| action_center | verified | verified | todo | todo | — | — | done | done | control_class(:primary) for Return-to-response; disabled via control_base() |
+| incident_list | verified | verified | todo | todo | todo | todo | — | — | |
+| incident_row | verified | verified | — | — | todo | todo | done | done | po-queue-row-selected; disabled via control_base() |
+| incident_summary | verified | verified | todo | todo | todo | todo | — | — | |
+| incident_timeline | verified | verified | todo | todo | todo | todo | — | — | po-timeline-badge-* for actor badges |
+| suspect_changes_card | verified | verified | todo | todo | — | — | — | — | po-chip po-chip-info for icon + scope badges |
+| retrospective_card | verified | verified | todo | todo | — | — | — | — | control_class(:primary) for Copy retrospective |
+| runbook_card | verified | verified | todo | todo | todo | todo | — | — | po-guidance for guidance block |
+| preview_panel | verified | verified | todo | todo | — | — | done | done | style=var(--parapet-accent); po-guidance; hover:opacity-80 |
+| action_rail | verified | verified | — | — | — | — | done | done | control_class(:primary); disabled via control_base() |
+| action_item_list | verified | verified | todo | todo | todo | todo | — | — | |
+| action_item_card | verified | verified | todo | todo | todo | todo | done | done | |
+| critical_journeys | verified | verified | todo | todo | — | — | — | — | |
 
 ---
 
