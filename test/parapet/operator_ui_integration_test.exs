@@ -449,6 +449,249 @@ defmodule Parapet.OperatorUIIntegrationTest do
     end
   end
 
+  # ---------------------------------------------------------------------------
+  # Phase 48 — RED source-string gate set (FLOW/COPY/A11Y).
+  #
+  # Wave-1 scaffold (48-01): these assertions pin the exact source-string facts
+  # wave-2/3 must satisfy. They are EXPECTED to fail RED against unchanged
+  # sources until 48-02/48-03 land. Routing per D-18: template-text facts live
+  # here (source-string), rendered-state facts live in the demo smoke test.
+  # ---------------------------------------------------------------------------
+  describe "Phase 48 source-string gates (RED until wave-2/3)" do
+    @router_snippet_path "priv/templates/parapet.gen.ui/router_snippet.ex.eex"
+    @demo_router_path "examples/demo_app/lib/demo_app_web/router.ex"
+
+    @operator_live_paths [
+      "priv/templates/parapet.gen.ui/operator_live.ex.eex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_live.ex"
+    ]
+
+    @operator_detail_paths [
+      "priv/templates/parapet.gen.ui/operator_detail_live.ex.eex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_detail_live.ex"
+    ]
+
+    @operator_components_paths [
+      "priv/templates/parapet.gen.ui/operator_components.ex.eex",
+      "examples/demo_app/lib/demo_app_web/live/parapet/operator_components.ex"
+    ]
+
+    # COPY-04 bounded refutes scope: every operator-copy-bearing source surface.
+    @all_operator_paths @operator_live_paths ++
+                          @operator_detail_paths ++ @operator_components_paths
+
+    test "FLOW-04: /parapet/incidents/:id route declared before /parapet/:id catch-all (D-04)" do
+      for path <- [@router_snippet_path, @demo_router_path] do
+        content = File.read!(path)
+
+        # Scope ordering to the OperatorDetailLive route DECLARATION lines only.
+        # A bare /parapet/:id substring also appears inside explanatory comments
+        # (e.g. the demo gallery's "declare before the /parapet/:id catch-all"
+        # note), which must NOT count as a declaration. A declaration line names
+        # OperatorDetailLive AND carries a `live` macro for the route.
+        decl_lines =
+          content
+          |> String.split("\n")
+          |> Enum.filter(fn line ->
+            line =~ "OperatorDetailLive" and line =~ ~r/\blive[\s(]/ and line =~ "/parapet/"
+          end)
+
+        incidents_decl =
+          Enum.find(decl_lines, fn line -> line =~ "/parapet/incidents/:id" end)
+
+        catch_all_decl =
+          Enum.find(decl_lines, fn line ->
+            line =~ "/parapet/:id" and not (line =~ "/parapet/incidents/:id")
+          end)
+
+        assert is_binary(incidents_decl),
+               "#{path} must declare the /parapet/incidents/:id route on an OperatorDetailLive live line"
+
+        assert is_binary(catch_all_decl),
+               "#{path} must declare the /parapet/:id catch-all route on an OperatorDetailLive live line"
+
+        incidents_idx = index_of(content, incidents_decl)
+        catch_all_idx = index_of(content, catch_all_decl)
+
+        assert incidents_idx < catch_all_idx,
+               "#{path}: /parapet/incidents/:id must be declared before the /parapet/:id catch-all (D-04)"
+      end
+    end
+
+    test "FLOW-04: route map keeps the explanatory catch-all-last comment (D-04)" do
+      router_content = File.read!(@router_snippet_path)
+      demo_router_content = File.read!(@demo_router_path)
+
+      # Catch-all-last intent must be documented so a reorder doesn't silently
+      # swallow /parapet/actions|history into the detail LiveView.
+      assert router_content =~ ~r/:id.*(catch-all|catch all).*(last|LAST)/is or
+               router_content =~ ~r/(last|LAST).*:id catch-all/is,
+             "router_snippet must document the :id catch-all-last ordering rule"
+
+      assert demo_router_content =~ ~r/(catch-all|catch all)/i,
+             "demo router must document the catch-all ordering rule"
+    end
+
+    test "FLOW-02: operator_live + operator_detail templates assign :page_title via a page_title/ helper (D-07)" do
+      for path <- @operator_live_paths ++ @operator_detail_paths do
+        content = File.read!(path)
+
+        assert content =~ ":page_title",
+               "#{path} must assign :page_title for the host <.live_title> to consume (FLOW-02/D-07)"
+
+        assert content =~ "page_title(",
+               "#{path} must define/use a page_title/ helper that derives the per-page title (FLOW-02/D-07)"
+      end
+    end
+
+    test "COPY-01: nav labels Respond / Actions / History kept verbatim (D-14)" do
+      for path <- @operator_components_paths do
+        content = File.read!(path)
+
+        assert content =~ "Respond"
+        assert content =~ "Actions"
+        assert content =~ "History"
+      end
+    end
+
+    test "COPY-02/COPY-05: pinned Phase-47 action-rail / preview strings survive (voice-consistency check 6, D-15)" do
+      for path <- @operator_components_paths do
+        content = File.read!(path)
+
+        assert content =~
+                 "Preview scoped changes before execution. No recovery action runs until confirm."
+
+        assert content =~
+                 "Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome."
+
+        assert content =~
+                 "Request the next escalation only after reviewing current status and the canonical timeline. Every request is audited."
+
+        assert content =~
+                 "Suppress pending escalation for the displayed bounded window. Every request is audited."
+      end
+    end
+
+    test "COPY-03: the 10+1 re-authored microcopy strings are pinned verbatim (D-13)" do
+      components = File.read!("priv/templates/parapet.gen.ui/operator_components.ex.eex")
+      detail = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
+
+      # runbook_card + preview_panel strings live in operator_components.
+      assert components =~ "Untitled runbook"
+
+      assert components =~
+               "No runbook description was recorded. Follow the steps below; each one previews before it runs."
+
+      assert components =~
+               "This preview reflects scoped changes only — nothing has run. Confirm to execute, or close to discard."
+
+      # Flash + validation strings live in operator_detail_live.
+      assert detail =~
+               "Incident acknowledged. Audit record and timeline entry written."
+
+      assert detail =~
+               "Acknowledge didn't complete — no audit record was written. The incident is unchanged; refresh the timeline, then retry."
+
+      assert detail =~
+               "Resolve didn't complete — the incident stays in its current state and no audit record was written. Refresh the timeline, then retry."
+
+      assert detail =~
+               "Couldn't record the escalation request — no escalation was triggered. Refresh to confirm current status, then retry."
+
+      assert detail =~
+               "Couldn't record the suppression — pending escalation is unchanged. Refresh current status, then retry."
+
+      assert detail =~
+               "Suppression window must be a whole number of minutes greater than zero."
+
+      assert detail =~
+               "Preview couldn't be generated — nothing has run and the incident is unchanged. Refresh the timeline, then retry."
+
+      assert detail =~
+               "Recovery did not execute — nothing was changed and no audit record was written. Refresh the timeline to confirm current state before retrying."
+    end
+
+    test "COPY-03: not-found heading + body copy pinned verbatim (D-02)" do
+      for path <- @operator_components_paths do
+        content = File.read!(path)
+
+        assert content =~ "This incident isn't in the evidence store"
+
+        assert content =~
+                 "No durable incident matches this link. It may have been pruned by retention, or the link is stale. Active incidents stay in the response queue until resolved."
+      end
+    end
+
+    test "COPY-04: bounded-regex refutes — no TODO/FIXME/lorem/placeholder-text leaks (D-18)" do
+      for path <- @all_operator_paths do
+        content = File.read!(path)
+
+        # Word-boundary placeholder markers. Bounded so the refute does not trip
+        # on legitimate substrings (e.g. "today" must NOT match a bare /todo/i).
+        refute content =~ ~r/\b(TODO|FIXME|XXX|HACK)\b/,
+               "#{path} must not contain TODO/FIXME/XXX/HACK placeholder markers (COPY-04)"
+
+        refute content =~ ~r/\blorem ipsum\b/i,
+               "#{path} must not contain lorem ipsum filler (COPY-04)"
+
+        # "placeholder text" only — must NOT match a placeholder= HTML attribute.
+        refute content =~ ~r/placeholder text/i,
+               "#{path} must not contain literal placeholder text (COPY-04)"
+      end
+    end
+
+    test "COPY-04: bounded refutes do not match a placeholder= attribute or the word today (D-18)" do
+      # Self-check the regex bounds the plan mandates: these legitimate strings
+      # must survive the COPY-04 refutes so the gate cannot false-positive.
+      legit = ~s(<input placeholder="Search" /> Updated today.)
+
+      refute legit =~ ~r/placeholder text/i
+      refute legit =~ ~r/\b(TODO|FIXME|XXX|HACK)\b/
+    end
+
+    test "COPY/voice: no inspect( inside user-facing flash strings; no banned constructions (D-15)" do
+      detail = File.read!("priv/templates/parapet.gen.ui/operator_detail_live.ex.eex")
+
+      # D-13/D-15 check 1: drop every #{inspect(reason)} from user-facing flashes
+      # (Logger.error(inspect(...)) is still allowed server-side).
+      refute detail =~ ~r/put_flash\([^)]*inspect\(/s,
+             "operator_detail_live must not interpolate inspect(...) into a put_flash user-facing string (D-15)"
+
+      # D-15 check 2: banned tone/bare-verb constructions in operator copy surfaces.
+      for path <- @all_operator_paths do
+        content = File.read!(path)
+
+        refute content =~ ~r/\bOops\b/i, "#{path}: banned tone word 'Oops' (D-15)"
+        refute content =~ ~r/\bSorry\b/i, "#{path}: banned tone word 'Sorry' (D-15)"
+        refute content =~ "successfully", "#{path}: filler 'successfully' is banned (D-15)"
+        refute content =~ ~r/something went wrong/i, "#{path}: banned phrase (D-15)"
+        refute content =~ ~r/\bFailed to\b/, "#{path}: bare 'Failed to' construction banned (D-15)"
+      end
+    end
+
+    test "A11Y-06: main id + nav landmarks + aria-current + Incident context nav present (source)" do
+      for path <- @operator_detail_paths do
+        content = File.read!(path)
+
+        assert content =~ ~S|id="parapet-main"|,
+               "#{path} must keep the #parapet-main landmark target (A11Y-06)"
+
+        assert content =~ "aria-label",
+               "#{path} must keep a labeled nav landmark (A11Y-06)"
+
+        assert content =~ ~S|aria-label="Incident context"|,
+               "#{path} must wrap the detail context strip in nav[aria-label=\"Incident context\"] (D-08/A11Y-06)"
+      end
+
+      for path <- @operator_components_paths do
+        content = File.read!(path)
+
+        assert content =~ ~S|aria-current={if @active, do: "page", else: nil}|,
+               "#{path} must keep aria-current on the active nav item (A11Y-06)"
+      end
+    end
+  end
+
   defp generated_and_demo_operator_sources do
     [
       "priv/templates/parapet.gen.ui/operator_live.ex.eex",
