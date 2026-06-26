@@ -60,7 +60,11 @@ defmodule Parapet.OperatorUIIntegrationTest do
       assert content =~ "operator_base_path_from_path"
       assert content =~ "Parapet.Operator.acknowledge_incident"
       assert content =~ "Parapet.Operator.resolve_incident"
-      assert content =~ "Parapet.Operator.incident_detail(id)"
+      # 48-03 (D-01): the detail LiveView now fetches via the failure-tolerant
+      # fetch_incident_detail/1 (mount/handle_params/refresh) so a stale link
+      # degrades to the in-page not-found panel instead of raising. The detail
+      # template no longer calls the raising incident_detail/1 directly.
+      assert content =~ "Parapet.Operator.fetch_incident_detail(id)"
     end
 
     test "generated router guidance pins the active-response route map" do

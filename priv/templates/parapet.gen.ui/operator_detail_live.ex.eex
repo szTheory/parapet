@@ -7,16 +7,32 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
   @default_operator_base_path "/parapet"
 
   def mount(%{"id" => id}, _session, socket) do
-    selected = Parapet.Operator.incident_detail(id)
-
-    {:ok, assign(socket, incident: selected, operator_base_path: @default_operator_base_path)}
+    {:ok,
+     socket
+     |> assign(operator_base_path: @default_operator_base_path)
+     |> assign_incident_detail(id)}
   end
 
   def handle_params(%{"id" => id}, uri, socket) do
-    {:noreply,
-     socket
-     |> assign(operator_base_path: operator_base_path(uri))
-     |> assign(incident: Parapet.Operator.incident_detail(id))}
+    socket =
+      socket
+      |> assign(operator_base_path: operator_base_path(uri))
+      |> assign_incident_detail(id)
+
+    {:noreply, assign(socket, :page_title, page_title(socket.assigns.live_action, socket.assigns))}
+  end
+
+  # Wires fetch_incident_detail/1 into the not-found-aware assigns. On {:ok, detail}
+  # the page renders normally; on {:error, :not_found} it degrades to the in-page
+  # not-found panel (no push_navigate) while keeping requested_id for the panel.
+  defp assign_incident_detail(socket, id) do
+    case Parapet.Operator.fetch_incident_detail(id) do
+      {:ok, detail} ->
+        assign(socket, incident: detail, incident_not_found: false, requested_id: id)
+
+      {:error, :not_found} ->
+        assign(socket, incident: nil, incident_not_found: true, requested_id: id)
+    end
   end
 
   def handle_event("acknowledge", %{"id" => id}, socket) do
@@ -33,11 +49,16 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       {:ok, _result} ->
         {:noreply,
          socket
-         |> put_flash(:info, "Incident acknowledged successfully")
+         |> put_flash(:info, "Incident acknowledged. Audit record and timeline entry written.")
          |> push_navigate(to: incident_detail_path(socket.assigns.operator_base_path, id))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to acknowledge")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Acknowledge didn't complete — no audit record was written. The incident is unchanged; refresh the timeline, then retry."
+         )}
     end
   end
 
@@ -56,7 +77,12 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply, push_navigate(socket, to: incident_detail_path(socket.assigns.operator_base_path, id))}
 
       {:error, _reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to resolve")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Resolve didn't complete — the incident stays in its current state and no audit record was written. Refresh the timeline, then retry."
+         )}
     end
   end
 
@@ -75,10 +101,18 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:info, "Escalation request recorded")
-         |> assign(incident: Parapet.Operator.incident_detail(id))}
+         |> refresh_incident_detail(id)}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Failed to request escalation: #{inspect(reason)}")}
+        require Logger
+        Logger.error("trigger_next_escalation failed: #{inspect(reason)}")
+
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Couldn't record the escalation request — no escalation was triggered. Refresh to confirm current status, then retry."
+         )}
     end
   end
 
@@ -104,15 +138,27 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
           {:noreply,
            socket
            |> put_flash(:info, "Escalation suppression recorded")
-           |> assign(incident: Parapet.Operator.incident_detail(id))}
+           |> refresh_incident_detail(id)}
 
         {:error, reason} ->
+          require Logger
+          Logger.error("suppress_pending_escalation failed: #{inspect(reason)}")
+
           {:noreply,
-           put_flash(socket, :error, "Failed to suppress escalation: #{inspect(reason)}")}
+           put_flash(
+             socket,
+             :error,
+             "Couldn't record the suppression — pending escalation is unchanged. Refresh current status, then retry."
+           )}
       end
     else
       _ ->
-        {:noreply, put_flash(socket, :error, "Invalid suppression window")}
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Suppression window must be a whole number of minutes greater than zero."
+         )}
     end
   end
 
@@ -131,10 +177,18 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:info, "Preview generated")
-         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+         |> refresh_incident_detail(incident_id)}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Preview failed: #{inspect(reason)}")}
+        require Logger
+        Logger.error("preview_runbook_step failed: #{inspect(reason)}")
+
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Preview couldn't be generated — nothing has run and the incident is unchanged. Refresh the timeline, then retry."
+         )}
     end
   end
 
@@ -158,7 +212,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:info, "Mitigation confirmed and executed")
-         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+         |> refresh_incident_detail(incident_id)}
 
       {:short_circuited, reason} ->
         {level, message} = Parapet.Operator.UI.short_circuit_flash(reason)
@@ -166,7 +220,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(level, message)
-         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+         |> refresh_incident_detail(incident_id)}
 
       {:conflicted, _claim_id} ->
         {:noreply,
@@ -175,10 +229,18 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
            :warning,
            "Another node is executing this recovery — refresh to see the outcome"
          )
-         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+         |> refresh_incident_detail(incident_id)}
 
       {:error, reason} ->
-        {:noreply, put_flash(socket, :error, "Confirmation failed: #{inspect(reason)}")}
+        require Logger
+        Logger.error("confirm_runbook_step failed: #{inspect(reason)}")
+
+        {:noreply,
+         put_flash(
+           socket,
+           :error,
+           "Recovery did not execute — nothing was changed and no audit record was written. Refresh the timeline to confirm current state before retrying."
+         )}
 
       # Forward-compatibility: a future additive return variant degrades to a
       # refresh instead of crashing this (possibly older) generated LiveView.
@@ -189,7 +251,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
         {:noreply,
          socket
          |> put_flash(:warning, "Recovery returned an unexpected result — refresh to review")
-         |> assign(incident: Parapet.Operator.incident_detail(incident_id))}
+         |> refresh_incident_detail(incident_id)}
     end
   end
 
@@ -212,48 +274,74 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorDetailLive do
       </a>
       <.operator_nav active={detail_nav_active(@incident)} operator_base_path={@operator_base_path} />
 
-      <div class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
+      <nav aria-label="Incident context" class="border-b border-stone-200 bg-white px-4 py-3 md:px-6">
         <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <.link navigate={detail_back_path(@operator_base_path, @incident)} class="inline-flex min-h-[40px] items-center rounded-lg text-sm font-semibold underline decoration-stone-300 underline-offset-4 po-link">
             <span>&larr; <%%= detail_back_label(@incident) %></span>
           </.link>
           <p class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500"><%%= detail_context_label(@incident) %></p>
         </div>
-      </div>
+      </nav>
 
-      <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8 scroll-pb-72 md:scroll-pb-0">
-        <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-          <section class="min-w-0 space-y-6">
-            <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6">
-              <.incident_summary detail={@incident} />
-            </div>
+      <%%= if @incident_not_found do %>
+        <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8">
+          <div class="mx-auto max-w-2xl">
+            <.incident_not_found operator_base_path={@operator_base_path} requested_id={@requested_id} />
+          </div>
+        </main>
+      <%% else %>
+        <main id="parapet-main" tabindex="-1" class="flex-1 bg-stone-50 px-4 py-6 md:px-8 scroll-pb-72 md:scroll-pb-0">
+          <div class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+            <section class="min-w-0 space-y-6">
+              <div class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6">
+                <.incident_summary detail={@incident} heading_level="h1" />
+              </div>
 
-            <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6" aria-label="Incident timeline">
-              <h3 class="mb-4 text-lg font-semibold text-stone-950">Timeline</h3>
-              <.incident_timeline detail={@incident} />
+              <section class="rounded-xl bg-white p-4 shadow-sm ring-1 ring-stone-900/5 md:p-6" aria-label="Incident timeline">
+                <h3 class="mb-4 text-lg font-semibold text-stone-950">Timeline</h3>
+                <.incident_timeline detail={@incident} />
+              </section>
             </section>
-          </section>
 
-          <aside class="min-w-0 space-y-6" aria-label="Incident actions">
-            <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
+            <aside class="min-w-0 space-y-6" aria-label="Incident actions">
+              <.suspect_changes_card entries={Enum.filter(@incident.entries, &(&1.type == "rulestead_flag_change"))} />
 
-            <.retrospective_card detail={@incident} />
+              <.retrospective_card detail={@incident} />
 
-            <%%= if @incident.derived.runbook_steps != [] do %>
-              <.runbook_card detail={@incident} />
-            <%% end %>
+              <%%= if @incident.derived.runbook_steps != [] do %>
+                <.runbook_card detail={@incident} />
+              <%% end %>
 
-            <%%= if @incident.incident.state != "resolved" && @incident.derived.active_preview do %>
-              <.preview_panel detail={@incident} />
-            <%% end %>
+              <%%= if @incident.incident.state != "resolved" && @incident.derived.active_preview do %>
+                <.preview_panel detail={@incident} />
+              <%% end %>
 
-            <.action_rail detail={@incident} operator_base_path={@operator_base_path} />
-          </aside>
-        </div>
-      </main>
+              <.action_rail detail={@incident} operator_base_path={@operator_base_path} />
+            </aside>
+          </div>
+        </main>
+      <%% end %>
     </div>
     """
   end
+
+  # Refreshes after a mutating action. If the incident vanished mid-action
+  # (concurrent resolve/prune), degrade to the in-page not-found panel instead
+  # of crashing — keeping the operator oriented (D-01/D-02).
+  defp refresh_incident_detail(socket, id) do
+    case Parapet.Operator.fetch_incident_detail(id) do
+      {:ok, detail} ->
+        assign(socket, incident: detail, incident_not_found: false, requested_id: id)
+
+      {:error, :not_found} ->
+        assign(socket, incident: nil, incident_not_found: true, requested_id: id)
+    end
+  end
+
+  defp page_title(:show, %{incident: %{incident: %{title: title}}}) when is_binary(title),
+    do: "Incident: #{title}"
+
+  defp page_title(_action, _assigns), do: "Incident detail"
 
   defp detail_nav_active(%{incident: %{state: "resolved"}}), do: :history
   defp detail_nav_active(_incident), do: :response

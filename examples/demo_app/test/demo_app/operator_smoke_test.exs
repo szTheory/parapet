@@ -135,7 +135,10 @@ defmodule DemoApp.OperatorSmokeTest do
   # lazy_html, element/2 raises on >1 match) and NOT a source grep (two legit
   # h1 definitions compose onto one page).
   # ---------------------------------------------------------------------------
-  @not_found_copy "This incident isn't in the evidence store"
+  # The apostrophe is HTML-escaped to &#39; in the rendered LiveView output, so
+  # the rendered-state assertion must match the escaped form (48-03 Rule 1 fix —
+  # a literal-apostrophe match can never pass against render/1 HTML output).
+  @not_found_copy "This incident isn&#39;t in the evidence store"
 
   describe "Phase 48 rendered-state gates (RED until wave-2/3)" do
     test "FLOW-02: each operator page renders exactly one h1", %{conn: conn} do
