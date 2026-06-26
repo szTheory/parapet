@@ -763,19 +763,22 @@ defp audit_outcome_label(_state),     do: "Pending"
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Exact `scroll-padding-bottom` value (Claude's Discretion per D-02)**
+   - **Resolution:** Claude's Discretion per CONTEXT.md D-02 — start with `scroll-pb-72` and tune during the gallery walkthrough. No further decision needed.
    - What we know: `preview_panel` outer container has `p-4` (16px) padding. The tallest sheet depends on content. `scroll-pb-72` = 288px is a conservative estimate.
    - What's unclear: The rendered height of the tallest preview panel content (warnings, idempotency caveats, targeting hints all affect height).
    - Recommendation: Start with `scroll-pb-72`. Tune during gallery walkthrough. If the tallest fixture scenario overflows, increase to `scroll-pb-80` (320px).
 
 2. **Whether optional Esc-to-cancel improves the mobile experience (Claude's Discretion)**
+   - **Resolution:** Claude's Discretion per CONTEXT.md D-02/Discretion list — Esc-to-cancel is an optional DX improvement, not a conformance requirement; the separate shell wave was folded into 47-02, so add it there if trivial, otherwise skip. No blocker.
    - What we know: `phx-window-keydown="cancel_preview" phx-key="escape"` on the `operator_detail_live` LiveView (not on the stateless component) would add keyboard dismiss parity.
    - What's unclear: Whether the current `phx-click="cancel_preview"` close button is sufficient for WCAG 2.2 AA (yes — SC 2.4.7 focus visible + SC 2.1.1 keyboard are already met by the close button).
-   - Recommendation: The Esc handler is a DX improvement, not a conformance requirement. Fold it into Wave 47-03 if the shell edit is added. If Wave 47-03 is omitted, skip it.
+   - Recommendation: The Esc handler is a DX improvement, not a conformance requirement. Fold it into Wave 47-02 if the shell edit is added. If skipped, the close button already satisfies dismissibility.
 
 3. **Card ordering in `incident_summary/1` rewrite (D-10 intent)**
+   - **Resolution:** Claude's Discretion per CONTEXT.md D-02 (D-10 says "re-author only the body"). The shell-wave question is decided: shell edits fold into 47-02, so no separate ordering wave is needed. Planner chooses the card sequence that best traces the formula.
    - What we know: Current order: (1) header/impact, (2) escalation amber card, (3) two-column top-facts/observability. Formula order: symptom → evidence → correlation → safe next action → where to inspect.
    - What's unclear: Whether the planner should reorder so "Evidence on record" (top-facts) appears BEFORE "Escalation status" to match the formula sequence.
    - Recommendation: The formula has `evidence` before `safe next action`. Moving the evidence card above the escalation card would better match the formula reading order. However, the escalation card is visually prominent (amber); moving it after may reduce urgency. The planner should keep the structure that best serves the tired-Phoenix-developer reader. This is within Claude's Discretion (D-10 says "re-author only the body").
