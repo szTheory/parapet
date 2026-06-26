@@ -7,3 +7,6 @@ erl_crash.dump
 *.ez
 demo_app-*.tar
 /priv/static/assets/
+
+# Generated gallery preview screenshots (repo-lean: no rasters committed)
+/tmp/

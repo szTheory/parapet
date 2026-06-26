@@ -3,7 +3,14 @@ AUTO_ENV := .docker/auto.env
 AUTO_COMPOSE := $(DOCKER_COMPOSE) -f docker-compose.yml -f docker-compose.auto-port.yml
 AUTO_ENV_SHELL := set -a; [ ! -f .env ] || . ./.env; . ./$(AUTO_ENV); set +a;
 
-.PHONY: up up-auto up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario
+.PHONY: up up-auto up-db-port up-response up-recovery up-escalation up-history urls down reset rebuild scenario gallery gallery-shot
+
+# Zero-infra component gallery preview — no Docker, no Postgres, free loopback port.
+gallery:
+	@scripts/gallery_preview.sh
+
+gallery-shot:
+	@scripts/gallery_preview.sh --shot
 
 up:
 	@if [ ! -f .env ]; then cp .env.example .env; echo "Created .env from .env.example. Edit COMPOSE_PROJECT_NAME or WEB_PORT if you run multiple demo stacks."; fi

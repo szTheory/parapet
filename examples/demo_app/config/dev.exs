@@ -1,7 +1,9 @@
 import Config
 
 config :demo_app, DemoAppWeb.Endpoint,
-  http: [ip: {0, 0, 0, 0}, port: 4000],
+  # Port is env-overridable (default 4000) so the gallery preview can bind a free
+  # loopback port without clashing with other local stacks. Bound to 127.0.0.1.
+  http: [ip: {127, 0, 0, 1}, port: String.to_integer(System.get_env("PORT") || "4000")],
   check_origin: false,
   code_reloader: false,
   debug_errors: true,
