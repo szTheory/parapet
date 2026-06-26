@@ -476,6 +476,31 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           transition-duration: 0.01ms !important;
         }
       }
+
+      @keyframes po-preview-reveal {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* MOTION-03: preview_panel reveal — compositor-only props; auto-fires on LiveView DOM insert.
+         prefers-reduced-motion block above sets animation-duration: 0.01ms !important — no new rule needed. */
+      .parapet-ui .po-preview-reveal {
+        animation: po-preview-reveal var(--motion-base) var(--motion-ease) both;
+      }
+
+      /* D-09: shown-but-unavailable controls — matches control_base() disabled visual,
+         keeps element in tab order so AT users can discover and hear the reason. */
+      .parapet-ui [aria-disabled="true"] {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
+      }
     </style>
     <script>
       (() => {
