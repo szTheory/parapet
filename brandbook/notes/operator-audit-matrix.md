@@ -14,24 +14,25 @@ This matrix enumerates every operator component × visual/interaction state for 
 | Component | light-default | dark-default | light-empty | dark-empty | light-overflow | dark-overflow | light-disabled | dark-disabled | Notes |
 |-----------|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|-------|
 | operator_theme_bootstrap | verified | verified | — | — | — | — | — | — | Token values + @font-face — Phase 44 complete; Phase 45 adds button/badge/queue vars |
-| operator_nav | verified | verified | — | — | todo | todo | — | — | Primitive buttons/links tokenized Phase 45 |
+| operator_nav | verified | verified | — | — | verified | verified | — | — | Phase 48: banner `<h1>`→`<p class="po-operator-title">` demotion (D-05), single-h1 per page (FLOW-02), keyboard focus-visibility human-verified (A11Y-06). Evidence: contrast `text-white">Active response workbench` refute + demo smoke `FLOW-02: each operator page renders exactly one h1` |
 | theme_control | verified | verified | — | — | — | — | — | — | po-theme-option + po-focus wired Phase 44 |
-| response_cockpit | verified | verified | done | done | — | — | — | — | Phase 47: break-words overflow hardening on cockpit `<h2>` (D-06) |
-| nav_item | verified | verified | — | — | todo | todo | done | done | disabled:opacity-50/cursor-not-allowed via control_base() |
-| operator_overview | verified | verified | todo | todo | — | — | — | — | |
-| action_center | verified | verified | todo | todo | — | — | done | done | control_class(:primary) for Return-to-response; disabled via control_base() |
-| incident_list | verified | verified | todo | todo | todo | todo | — | — | |
-| incident_row | verified | verified | — | — | todo | todo | done | done | po-queue-row-selected; disabled via control_base() |
-| incident_summary | verified | verified | done | done | done | done | — | — | Phase 47: brand-voice re-author — formula labels + fallback copy (D-10/D-11) |
-| incident_timeline | verified | verified | todo | todo | todo | todo | — | — | po-timeline-badge-* for actor badges |
-| suspect_changes_card | verified | verified | todo | todo | — | — | — | — | po-chip po-chip-info for icon + scope badges |
-| retrospective_card | verified | verified | todo | todo | — | — | — | — | control_class(:primary) for Copy retrospective |
-| runbook_card | verified | verified | todo | todo | todo | todo | — | — | po-guidance for guidance block |
-| preview_panel | verified | verified | done | done | — | — | done | done | Phase 47: CSS @keyframes reveal + ARIA Disclosure landmark role=region (D-03/D-13); style=var(--parapet-accent); po-guidance; hover:opacity-80 |
-| action_rail | verified | verified | — | — | — | — | done | done | control_class(:primary); disabled via control_base() |
+| response_cockpit | verified | verified | verified | verified | — | — | — | — | Phase 48: single-h1 (Response sr-only h1, FLOW-02) + empty-during-load gate (`@socket_connected and Enum.empty?`, FLOW-03) human-verified empty-state design. Evidence: demo smoke `FLOW-03: empty state renders only on the connected render, not during disconnected load` |
+| nav_item | verified | verified | — | — | verified | verified | done | done | Phase 48: 390px overflow discipline (min-w-0/break-all/break-words, D-16/D-17, FLOW-05) human-verified zero-horizontal-scroll at 390px |
+| operator_overview | verified | verified | verified | verified | — | — | — | — | Phase 48: page semantics (single h1 + :page_title + landmarks, FLOW-02/A11Y-06) + standardized empty-state anatomy (FLOW-03). Evidence: lib integration `FLOW-02: ...assign :page_title via a page_title/ helper`, `A11Y-06: main id + nav landmarks...`; demo smoke `A11Y-06: connected detail mount exposes the main + nav landmarks` |
+| action_center | verified | verified | verified | verified | — | — | done | done | Phase 48: Action queue `<h1>` (FLOW-02) + uniform `list_skeleton/1` + designed Actions-empty (FLOW-03). Evidence: demo smoke `FLOW-03: disconnected static render carries the uniform skeleton on all list pages` |
+| incident_list | verified | verified | verified | verified | verified | verified | — | — | Phase 48: token-driven standardized empty-state anatomy migrated off bare `text-stone-*` + page_mode-aware History-empty (D-11, FLOW-03); 390px overflow (FLOW-05). Human-verified empty-state feels designed not broken |
+| incident_row | verified | verified | — | — | verified | verified | done | done | Phase 48: `truncate` retained (R6, full value reachable on detail page), 390px discipline confirmed (D-16/D-17, FLOW-05) |
+| incident_summary | verified | verified | done | done | verified | verified | — | — | Phase 48: additive `heading_level` prop (default h2; detail passes h1 — single-h1, FLOW-02); trace span `break-all min-w-0` (R7, FLOW-05). Phase 47: brand-voice re-author (D-10/D-11) |
+| incident_timeline | verified | verified | verified | verified | verified | verified | — | — | Phase 48: empty/loading states gated on connected render (FLOW-03) + 390px overflow discipline (FLOW-05). po-timeline-badge-* for actor badges |
+| suspect_changes_card | verified | verified | verified | verified | — | — | — | — | Phase 48: flag chip `break-all min-w-0` (R4, FLOW-05) + standardized empty anatomy (FLOW-03) |
+| retrospective_card | verified | verified | verified | verified | — | — | — | — | Phase 48: empty-state anatomy + microcopy on-voice (COPY, FLOW-03). control_class(:primary) for Copy retrospective |
+| runbook_card | verified | verified | verified | verified | verified | verified | — | — | Phase 48: D-13 microcopy — `Untitled runbook` title + `No runbook description was recorded...` body fallbacks (COPY-03); step wrapper `flex-1 min-w-0` + `break-words` (R5, FLOW-05). Evidence: lib integration `COPY-03: the 10+1 re-authored microcopy strings are pinned verbatim (D-13)` |
+| preview_panel | verified | verified | done | done | verified | verified | done | done | Phase 48: D-13 microcopy line (`This preview reflects scoped changes only...`, COPY-03) + R1 height-bound bottom sheet `max-h-[100dvh]`/`overflow-y-auto overscroll-contain` + R3 `grid-cols-1 sm:grid-cols-2` (FLOW-05). Phase 47: Disclosure landmark (D-03/D-13) |
+| action_rail | verified | verified | — | — | — | — | done | done | control_class(:primary); disabled via control_base() — COPY-05 action-side (risk + safe next step) pinned, kept verbatim Phase 48 |
 | action_item_list | verified | verified | done | done | done | done | — | — | Phase 47: action_item_risk + audit-outcome chips; aria-disabled affordance (D-07/D-08/D-09) |
-| action_item_card | verified | verified | done | done | done | done | done | done | Phase 47: risk chip (color+icon+label, WCAG 1.4.1) + audit-outcome chip derived from state (D-07/D-08) |
-| critical_journeys | verified | verified | todo | todo | — | — | — | — | |
+| action_item_card | verified | verified | done | done | verified | verified | done | done | Phase 48: id value `break-all font-mono` + header `min-w-0` (R2, FLOW-05). Phase 47: risk chip + audit-outcome chip (D-07/D-08) |
+| incident_not_found | verified | verified | verified | verified | verified | verified | — | — | Phase 48 NEW (D-02, FLOW-03/COPY-03): designed in-page not-found panel (heading + body + back/history links + escaped `@requested_id`); absorbs both stale-link classes (unknown-UUID `NoResultsError` + malformed-id `CastError`/500) via `fetch_incident_detail/1`. Human-verified empty-state design + keyboard focus. Evidence: lib integration `COPY-03: not-found heading + body copy pinned verbatim (D-02)`; demo smoke `FLOW-03: detail with unknown UUID renders the not-found panel in-page` + `...malformed id...(not a 500)` |
+| critical_journeys | verified | verified | verified | verified | — | — | — | — | Phase 48: end-to-end flow navigable (response→actions→history→detail, FLOW-01) with page titles + monotonic heading order (FLOW-02). Human-verified heading-hierarchy legibility after the h1 demotion |
 
 ---
 
@@ -86,6 +87,45 @@ Disclosure shape via `refute role="dialog"`, `refute aria-modal`, `refute class=
 (full-screen scrim guard), and `assert md:relative md:inset-auto` + `assert
 aria-label="Close Recovery Preview"`. These turn red if a future edit accidentally adds modal
 machinery.
+
+---
+
+### Phase-48 N/A-by-Design Exception: FLOW-03 `unavailable` (infra) + `permission-denied`
+
+**Decisions:** D-03 / D-12 (Phase 48 `48-CONTEXT.md`)
+
+FLOW-03 enumerates three not-found/no-data conditions. Phase 48 ships the **no-data** condition as
+the designed in-page `incident_not_found` panel (see the matrix row above). The other two are
+**N/A-by-design** for this codebase — intentional absences with grep proof, **never stubbed panes**,
+reusing the Phase-47 GROUP-03/05/06 N/A convention.
+
+**Row 1 — `unavailable` (infra failure) → N/A-by-Design.**
+
+All Parapet operator data loads **synchronously in `mount`/`handle_params`** — there is no
+`assign_async`, `Task.async`, or `start_async` anywhere in the operator templates. A DB/process
+outage is therefore genuinely the **host's 5xx concern**, not an in-page "incident not found" state;
+rescuing `DBConnection` errors into the not-found panel would dishonestly mask an outage as a missing
+incident (D-03). No pane is rendered for this condition.
+
+- **Grep proof:** `grep -rEn "assign_async|Task\.(async|start)|start_async"
+  priv/templates/parapet.gen.ui/operator_live.ex.eex
+  priv/templates/parapet.gen.ui/operator_detail_live.ex.eex
+  priv/templates/parapet.gen.ui/operator_components.ex.eex` → **zero matches** (synchronous in-node
+  repo reads confirmed; infra failure is the host's 5xx, not an operator-UI state).
+
+**Row 2 — `permission-denied` → N/A-by-Design.**
+
+Authorization is **host-owned at the router**. Parapet ships no auth of its own; the route snippet
+instructs the host to place operator routes inside an authenticated scope/pipeline
+(`pipe_through [:browser, :require_authenticated_user]`, `on_mount {…UserAuth, :ensure_authenticated}`).
+LiveViews are only reached **post-authorization**, so a permission-denied state inside the operator UI
+would be unreachable — and the not-found panel must not imply authz (D-03). No pane is rendered.
+
+- **Grep proof:** `grep -nE "pipe_through|require_authenticated|on_mount|auth"
+  priv/templates/parapet.gen.ui/router_snippet.ex.eex` → the auth pipeline guidance
+  (`# Parapet does not provide its own auth.`, `pipe_through [:browser, :require_authenticated_user]`,
+  `on_mount: [{…UserAuth, :ensure_authenticated}]`) confirms host-owned authz at the router seam
+  (`router_snippet.ex.eex:1-3, 8, 11, 28, 31`).
 
 ---
 
