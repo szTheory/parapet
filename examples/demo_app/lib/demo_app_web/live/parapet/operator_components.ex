@@ -540,7 +540,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
       <div class="flex flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:justify-between md:px-6">
         <div>
           <p class="po-operator-brand text-xs font-semibold uppercase tracking-[0.18em]">Parapet Operator</p>
-          <h1 class="po-operator-title mt-1 text-lg font-semibold">Active response workbench</h1>
+          <p class="po-operator-title mt-1 text-lg font-semibold">Active response workbench</p>
         </div>
         <nav aria-label="Parapet operator sections" class="flex flex-wrap gap-2">
           <.nav_item href={operator_path(@operator_base_path)} active={@active == :response}>Respond</.nav_item>
@@ -831,13 +831,18 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   attr(:detail, :map, required: true)
   attr(:operator_base_path, :string, default: "/parapet")
+  attr(:heading_level, :string, default: "h2")
 
   def incident_summary(assigns) do
     ~H"""
     <div class="min-w-0 overflow-hidden">
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div class="min-w-0">
-          <h1 class="max-w-xs whitespace-normal break-words text-2xl font-bold text-stone-900 sm:max-w-none sm:text-balance"><%= @detail.incident.title %></h1>
+          <%= if @heading_level == "h1" do %>
+            <h1 class="max-w-xs whitespace-normal break-words text-2xl font-bold text-stone-900 sm:max-w-none sm:text-balance"><%= @detail.incident.title %></h1>
+          <% else %>
+            <h2 class="max-w-xs whitespace-normal break-words text-2xl font-bold text-stone-900 sm:max-w-none sm:text-balance"><%= @detail.incident.title %></h2>
+          <% end %>
           <p class="text-sm text-stone-500 mt-1"><span class="break-all tabular-nums font-mono"><%= @detail.incident.id %></span></p>
         </div>
         <span class={["self-start px-3 py-1 text-sm font-medium rounded-full", state_color(@detail.incident.state)]}>
@@ -948,6 +953,38 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
           </div>
         </dl>
       </div>
+    </div>
+    """
+  end
+
+  attr(:operator_base_path, :string, default: "/parapet")
+  attr(:requested_id, :string, required: true)
+
+  def incident_not_found(assigns) do
+    ~H"""
+    <div class="rounded-xl border border-dashed border-[color:var(--parapet-border)] bg-white/70 p-8 text-center shadow-sm">
+      <svg aria-hidden="true" class="mx-auto mb-3 h-8 w-8" style="color: var(--parapet-text-muted);"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+      </svg>
+      <h1 class="mt-3 text-sm font-semibold" style="color: var(--parapet-text);">
+        This incident isn't in the evidence store
+      </h1>
+      <p class="mx-auto mt-2 max-w-md text-sm" style="color: var(--parapet-text-muted);">
+        No durable incident matches this link. It may have been pruned by retention, or the link is stale. Active incidents stay in the response queue until resolved.
+      </p>
+      <div class="mt-6 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+        <.link navigate={operator_path(@operator_base_path)} class={[control_class(:primary)]}>
+          Back to active response
+        </.link>
+        <.link navigate={operator_path(@operator_base_path, :history)} class={[control_class(:secondary)]}>
+          View resolved history
+        </.link>
+      </div>
+      <p class="mt-4 text-xs font-mono" style="color: var(--parapet-text-muted);">
+        Requested id: <%= @requested_id %>
+      </p>
     </div>
     """
   end
@@ -1115,10 +1152,10 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
     ~H"""
     <div class={surface_class(:runbook_card)}>
       <h3 class="text-lg font-semibold text-stone-900 mb-1">
-        <%= @detail.derived.runbook_title || "Runbook" %>
+        <%= @detail.derived.runbook_title || "Untitled runbook" %>
       </h3>
       <p class="text-sm text-stone-600 mb-4">
-        <%= @detail.derived.runbook_description || "No description provided." %>
+        <%= @detail.derived.runbook_description || "No runbook description was recorded. Follow the steps below; each one previews before it runs." %>
       </p>
 
       <div class="flex flex-col gap-3">
@@ -1246,7 +1283,7 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
             </button>
           </div>
           <p class="text-xs text-center text-stone-400 mt-2 italic">
-            Preview is active.
+            This preview reflects scoped changes only — nothing has run. Confirm to execute, or close to discard.
           </p>
         </div>
       </div>
@@ -1462,6 +1499,13 @@ defmodule DemoAppWeb.Parapet.OperatorComponents do
 
   defp control_class(:success, width),
     do: control_width(width) <> " " <> control_base() <> " po-button-success"
+
+  defp control_class(:secondary, width),
+    do:
+      control_width(width) <>
+        " " <>
+        control_base() <>
+        " bg-white text-stone-700 ring-1 ring-[color:var(--parapet-border)] hover:bg-stone-50"
 
   defp control_base do
     "flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-medium transition-transform duration-[--motion-fast] ease-out active:scale-[0.96] focus:outline-none focus:ring-2 focus:ring-offset-2 po-focus disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none"
