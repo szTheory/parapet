@@ -62,12 +62,12 @@
 
 ### Component Groups (Meta-Components)
 
-- [ ] **GROUP-01**: The response cockpit composes header/summary/actions coherently across all breakpoints.
-- [ ] **GROUP-02**: Incident summary copy follows the brand voice formula (symptom → evidence → correlation → safe next action → where to inspect).
-- [ ] **GROUP-03**: The runbook card and preview panel render fully above their scrim and are never clipped or hidden.
-- [ ] **GROUP-04**: The action rail and action-item cards communicate risk and audit outcome; disabled actions are clearly disabled.
-- [ ] **GROUP-05**: Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close.
-- [ ] **GROUP-06**: Overlays have correct stacking order (modal above scrim above content) — no modal hidden behind its own scrim.
+- [x] **GROUP-01**: The response cockpit composes header/summary/actions coherently across all breakpoints.
+- [x] **GROUP-02**: Incident summary copy follows the brand voice formula (symptom → evidence → correlation → safe next action → where to inspect).
+- [x] **GROUP-03**: The runbook card and preview panel render fully above their scrim and are never clipped or hidden.
+- [x] **GROUP-04**: The action rail and action-item cards communicate risk and audit outcome; disabled actions are clearly disabled.
+- [x] **GROUP-05**: Every overlay/modal/drawer traps focus, is dismissible via Esc + close button + scrim click, and restores focus to its trigger on close.
+- [x] **GROUP-06**: Overlays have correct stacking order (modal above scrim above content) — no modal hidden behind its own scrim.
 
 ### Pages & Flows
 
@@ -83,14 +83,14 @@
 - [x] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
 - [x] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
 - [x] **A11Y-04**: Tab order is logical with no keyboard traps.
-- [ ] **A11Y-05**: Modal/overlay focus management (trap + restore) is correct and verified.
+- [x] **A11Y-05**: Modal/overlay focus management (trap + restore) is correct and verified.
 - [ ] **A11Y-06**: Landmarks, headings, ARIA labels, and page titles are present and correct on every page.
 
 ### Motion
 
 - [x] **MOTION-01**: Motion tokens are wired and fully zeroed under `prefers-reduced-motion`.
 - [x] **MOTION-02**: Hover/press micro-interactions are fast (≈120ms) and purposeful, not decorative; no `transition-all` thrash.
-- [ ] **MOTION-03**: Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
+- [x] **MOTION-03**: Reveal/confirm/orient transitions (preview panel, overlays) use the brand easing, are interruptible, and are reduced-motion-safe.
 
 ### Microcopy
 
@@ -190,14 +190,14 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | DATA-06 | Phase 46 | Complete |
 | A11Y-03 | Phase 46 | Complete |
 | A11Y-04 | Phase 46 | Complete |
-| GROUP-01 | Phase 47 | Pending |
-| GROUP-02 | Phase 47 | Pending |
-| GROUP-03 | Phase 47 | Pending |
-| GROUP-04 | Phase 47 | Pending |
-| GROUP-05 | Phase 47 | Pending |
-| GROUP-06 | Phase 47 | Pending |
-| A11Y-05 | Phase 47 | Pending |
-| MOTION-03 | Phase 47 | Pending |
+| GROUP-01 | Phase 47 | Complete |
+| GROUP-02 | Phase 47 | Complete |
+| GROUP-03 | Phase 47 | Complete |
+| GROUP-04 | Phase 47 | Complete |
+| GROUP-05 | Phase 47 | Complete |
+| GROUP-06 | Phase 47 | Complete |
+| A11Y-05 | Phase 47 | Complete |
+| MOTION-03 | Phase 47 | Complete |
 | FLOW-01 | Phase 48 | Pending |
 | FLOW-02 | Phase 48 | Pending |
 | FLOW-03 | Phase 48 | Pending |
