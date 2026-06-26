@@ -82,7 +82,7 @@
 - [x] **A11Y-01**: Focus-ring contrast is handled per surface — watch-blue on light, limestone on dark — enforced by the contrast gate, not left to component authors.
 - [x] **A11Y-02**: All text meets 4.5:1 (3:1 for large text) and UI components/graphics meet 3:1 in both themes.
 - [x] **A11Y-03**: Every interactive element is keyboard-reachable with a visible focus indicator.
-- [ ] **A11Y-04**: Tab order is logical with no keyboard traps.
+- [x] **A11Y-04**: Tab order is logical with no keyboard traps.
 - [ ] **A11Y-05**: Modal/overlay focus management (trap + restore) is correct and verified.
 - [ ] **A11Y-06**: Landmarks, headings, ARIA labels, and page titles are present and correct on every page.
 
@@ -189,7 +189,7 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | DATA-05 | Phase 46 | Complete |
 | DATA-06 | Phase 46 | Complete |
 | A11Y-03 | Phase 46 | Complete |
-| A11Y-04 | Phase 46 | Pending |
+| A11Y-04 | Phase 46 | Complete |
 | GROUP-01 | Phase 47 | Pending |
 | GROUP-02 | Phase 47 | Pending |
 | GROUP-03 | Phase 47 | Pending |

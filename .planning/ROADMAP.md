@@ -192,7 +192,7 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 43. Collateral, Wiring & QA/Audit Gate | v1.5 | 3/3 | Complete | 2026-06-24 |
 | 44. Foundations — token re-skin, fonts & audit apparatus | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
-| 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete   | 2026-06-26 |
+| 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete    | 2026-06-26 |
 | 47. Component groups / meta-components | v1.6 | 0/? | Pending | - |
 | 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
