@@ -180,10 +180,12 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   3. The combined stress scenario is covered by the screenshot capture script across desktop + mobile and light + dark.
   4. The `/parapet/_gallery` route is covered by the screenshot capture script and asserted by a demo contract test.
 
-**Plans**: 3 plans
-- [ ] 49-01-PLAN.md — RED scaffold: gallery render contract test + fixture-existence pins + static script grep pin in operator_smoke_test.exs
+**Plans**: 1/3 plans executed
+
+- [x] 49-01-PLAN.md — RED scaffold: gallery render contract test + fixture-existence pins + static script grep pin in operator_smoke_test.exs
 - [ ] 49-02-PLAN.md — Seed work: extend demo_seed_scenarios.exs with long_string/empty/max_items/mixed_status/stress scenarios
 - [ ] 49-03-PLAN.md — Capture-script: add four /parapet/_gallery captures (desktop+mobile, light+dark) to the canonical audit script
+
 **UI hint**: yes
 
 ### Phase 50: Guardrails, parity & idempotence gate
@@ -226,5 +228,5 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete    | 2026-06-26 |
 | 47. Component groups / meta-components | v1.6 | 3/3 | Complete   | 2026-06-26 |
 | 48. Pages, flows & microcopy | v1.6 | 4/4 | Complete   | 2026-06-28 |
-| 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
+| 49. Stress fixtures & seed coverage | v1.6 | 1/3 | In Progress|  |
 | 50. Guardrails, parity & idempotence gate | v1.6 | 0/? | Pending | - |
