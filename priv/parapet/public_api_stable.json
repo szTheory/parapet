@@ -82,6 +82,7 @@
       "capabilities/1",
       "confirm_runbook_step/4",
       "execute_runbook_step/3",
+      "fetch_incident_detail/1",
       "incident_detail/1",
       "list_incident_queue/0",
       "list_incident_queue/1",
