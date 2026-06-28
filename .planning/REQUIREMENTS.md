@@ -102,11 +102,11 @@
 
 ### Stress Fixtures
 
-- [ ] **FIXTURE-01**: A long-string/overflow demo scenario (long titles, IDs, module names, URLs) exists.
-- [ ] **FIXTURE-02**: An empty-collection demo scenario (no incidents / empty timeline / no actions) exists.
-- [ ] **FIXTURE-03**: A max-items / dense-list demo scenario exists.
-- [ ] **FIXTURE-04**: A mixed-status demo scenario surfacing all six status triplets at once exists.
-- [ ] **FIXTURE-05**: A combined "stress" scenario is wired to `PARAPET_DEMO_SCENARIO` and covered by the screenshot capture script (desktop + mobile, light + dark).
+- [x] **FIXTURE-01**: A long-string/overflow demo scenario (long titles, IDs, module names, URLs) exists.
+- [x] **FIXTURE-02**: An empty-collection demo scenario (no incidents / empty timeline / no actions) exists.
+- [x] **FIXTURE-03**: A max-items / dense-list demo scenario exists.
+- [x] **FIXTURE-04**: A mixed-status demo scenario surfacing all six status triplets at once exists.
+- [x] **FIXTURE-05**: A combined "stress" scenario is wired to `PARAPET_DEMO_SCENARIO` and covered by the screenshot capture script (desktop + mobile, light + dark).
 
 ### Component Gallery (Demo-Only)
 
@@ -209,11 +209,11 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | COPY-04 | Phase 48 | Pending |
 | COPY-05 | Phase 48 | Pending |
 | A11Y-06 | Phase 48 | Pending |
-| FIXTURE-01 | Phase 49 | Pending |
-| FIXTURE-02 | Phase 49 | Pending |
-| FIXTURE-03 | Phase 49 | Pending |
-| FIXTURE-04 | Phase 49 | Pending |
-| FIXTURE-05 | Phase 49 | Pending |
+| FIXTURE-01 | Phase 49 | Complete |
+| FIXTURE-02 | Phase 49 | Complete |
+| FIXTURE-03 | Phase 49 | Complete |
+| FIXTURE-04 | Phase 49 | Complete |
+| FIXTURE-05 | Phase 49 | Complete |
 | GALLERY-02 | Phase 49 | Pending |
 | GUARD-03 | Phase 50 | Pending |
 | GUARD-04 | Phase 50 | Pending |

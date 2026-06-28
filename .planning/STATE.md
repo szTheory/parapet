@@ -6,14 +6,14 @@ current_phase: 49
 current_phase_name: stress-fixtures-seed-coverage
 status: executing
 stopped_at: Completed 49-01 RED scaffold
-last_updated: "2026-06-28T19:42:59.294Z"
+last_updated: "2026-06-28T19:50:58.895Z"
 last_activity: 2026-06-28
 last_activity_desc: Phase 49 execution started
 progress:
   total_phases: 7
   completed_phases: 5
   total_plans: 22
-  completed_plans: 20
+  completed_plans: 21
   percent: 71
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 ## Current Position
 
 Phase: 49 (stress-fixtures-seed-coverage) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Next: Phase 48 (Pages, flows & microcopy)
 Last activity: 2026-06-28 — Phase 49 execution started
@@ -74,6 +74,7 @@ Last activity: 2026-06-28 — Phase 49 execution started
 | Phase 47 P02 | 5m | 3 tasks | 4 files |
 | Phase 47-component-groups-meta-components P03 | 210 | 3 tasks | 1 files |
 | Phase 49 P01 | 2m | 3 tasks | 1 files |
+| Phase 49 P02 | 4min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,7 @@ Recent decisions affecting current work:
 - [Phase ?]: 47-02
 - [Phase ?]: .planning/phases/47-component-groups-meta-components/47-03-SUMMARY.md
 - [Phase ?]: 49-01: D-12 RED scaffold — gallery contract GREEN; fixture pins + grep pin RED until 49-02/49-03
+- [Phase ?]: Move DemoSeedScenarios to compiled lib module for test sandbox (49-02)
 
 ### Pending Todos
 
@@ -139,7 +141,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-28T19:42:59.287Z
+Last session: 2026-06-28T19:50:51.161Z
 Stopped at: Completed 49-01 RED scaffold
 Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
