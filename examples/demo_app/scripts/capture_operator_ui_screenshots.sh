@@ -79,4 +79,12 @@ capture "operator-history-mobile" "390,844" "/parapet/history" "light"
 capture "operator-detail-mobile" "390,844" "/parapet/incidents/$DETAIL_ID" "light"
 capture "operator-response-dark-mobile" "390,844" "/parapet" "dark"
 
+# GALLERY-02: /parapet/_gallery — four captures (desktop+mobile, light+dark).
+# Tall window sizes so the long scrolling gallery is not clipped (Pitfall 6).
+# The gallery renders from hardcoded fixtures (no DB seed required — server-up only).
+capture "gallery-desktop-light" "1440,5200" "/parapet/_gallery" "light"
+capture "gallery-desktop-dark"  "1440,5200" "/parapet/_gallery" "dark"
+capture "gallery-mobile-light"  "414,7600"  "/parapet/_gallery" "light"
+capture "gallery-mobile-dark"   "414,7600"  "/parapet/_gallery" "dark"
+
 ls -1 "$OUTPUT_DIR"/*.png
