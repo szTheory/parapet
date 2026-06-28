@@ -158,6 +158,38 @@ The Phase-50 off-palette-hex gate **must admit `#7FB4C6` as an explicit operator
 
 ---
 
+### GUARD-04 Off-Palette Exception: dark link-hover / accent-strong = `#A8D0DE`
+
+**Decision:** D-07 (Phase 50, same a11y refinement direction as `#7FB4C6`)
+
+`#A8D0DE` is used as `--po-link-hover`, `--parapet-accent-strong`, and `--parapet-accent-text` in dark mode. It is a further lightening from the brand hover token, ensuring sufficient contrast on dark operator panel surfaces (`#2E3A42`). Documented as an operator-UI-scoped a11y refinement — brand tokens remain untouched.
+
+---
+
+### GUARD-04 Off-Palette Exception: light link-hover / accent-strong = `#1A5066`
+
+**Decision:** D-07 (Phase 50)
+
+`#1A5066` is used as `--parapet-accent-strong` and `--po-link-hover` in light mode. It is a darkened derivative of Watch Blue (`#256C82`) that achieves ≥ 4.5:1 contrast on the limestone background (`#F8F4EC`) and mortar panel surfaces, satisfying WCAG AA for interactive states where the base link color would be insufficient. Operator-UI-scoped a11y refinement — brand tokens remain untouched.
+
+---
+
+### GUARD-04 Off-Palette Exception: dark chip-neutral border = `#556B77`
+
+**Decision:** D-07 (Phase 50)
+
+`#556B77` is used as `--po-chip-neutral-border` in dark mode. It is a mid-tone wall-slate derivative that provides sufficient border contrast for neutral status chips against the dark panel surface (`#2E3A42`). Operator-UI-scoped structural color — brand tokens remain untouched.
+
+---
+
+### GUARD-04 Off-Palette Exception: destructive-hover (dark) = `#8C2E27`
+
+**Decision:** D-07 (Phase 50)
+
+`#8C2E27` is used as `--po-button-destructive-hover` in light mode. It is a darkened derivative of Incident Red (`#B13A32`), used for the destructive button hover state to achieve a visible active-state contrast shift without leaving the red family. Operator-UI-scoped interaction refinement — brand tokens remain untouched.
+
+---
+
 ## Column Definitions
 
 | Column | Meaning |
