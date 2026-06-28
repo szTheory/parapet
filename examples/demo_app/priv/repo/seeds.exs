@@ -2,7 +2,8 @@
 # so `mix run priv/repo/seeds.exs` works standalone without full config load.
 Application.put_env(:parapet, :repo, DemoApp.Repo)
 
-Code.require_file("demo_seed_scenarios.exs", __DIR__)
+# DemoApp.DemoSeedScenarios is compiled from lib/demo_app/demo_seed_scenarios.ex
+# (not loaded via Code.require_file — the module is part of the compiled app).
 
 scenario = System.get_env("PARAPET_DEMO_SCENARIO", "all")
 DemoApp.DemoSeedScenarios.seed(scenario)

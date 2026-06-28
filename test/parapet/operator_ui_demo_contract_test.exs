@@ -2,7 +2,7 @@ defmodule Parapet.OperatorUIDemoContractTest do
   use ExUnit.Case, async: true
 
   @seed_path "examples/demo_app/priv/repo/seeds.exs"
-  @seed_scenarios_path "examples/demo_app/priv/repo/demo_seed_scenarios.exs"
+  @seed_scenarios_path "examples/demo_app/lib/demo_app/demo_seed_scenarios.ex"
   @router_path "examples/demo_app/lib/demo_app_web/router.ex"
   @smoke_path "examples/demo_app/test/demo_app/operator_smoke_test.exs"
   @browser_script_path "examples/demo_app/scripts/capture_operator_ui_screenshots.sh"
