@@ -122,6 +122,14 @@ No new network endpoints, auth paths, file access patterns, or schema changes in
 - Phase 50: operator can run the extended script against a PARAPET_DEMO_SCENARIO=stress-seeded DB to produce 15 PNGs (11 operator pages + 4 gallery) into tmp; committed baselines/manifest are Phase 50 scope (D-09)
 - No blockers
 
+## Self-Check: PASSED
+
+- FOUND: `.planning/phases/49-stress-fixtures-seed-coverage/49-03-SUMMARY.md`
+- FOUND: `examples/demo_app/scripts/capture_operator_ui_screenshots.sh`
+- FOUND commit `3d5167d` (feat: gallery captures)
+- FOUND commit `412721f` (docs: plan complete)
+- `mix test test/demo_app/operator_smoke_test.exs`: 25 tests, 0 failures
+
 ---
 *Phase: 49-stress-fixtures-seed-coverage*
 *Completed: 2026-06-28*
