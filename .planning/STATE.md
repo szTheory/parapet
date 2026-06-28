@@ -5,8 +5,8 @@ milestone_name: Operator UI Brand & Design-System Audit
 current_phase: 50
 current_phase_name: Guardrails, parity & idempotence gate
 status: verifying
-stopped_at: Completed 49-03 capture script gallery extension
-last_updated: "2026-06-28T21:00:04.690Z"
+stopped_at: Phase 50 context gathered (assumptions mode + advisor research)
+last_updated: "2026-06-28T21:48:26.729Z"
 last_activity: 2026-06-28
 last_activity_desc: Phase 49 complete, transitioned to Phase 50
 progress:
@@ -144,9 +144,9 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-28T20:53:24.988Z
-Stopped at: Completed 49-03 capture script gallery extension
-Resume file: None
+Last session: 2026-06-28T21:48:26.721Z
+Stopped at: Phase 50 context gathered (assumptions mode + advisor research)
+Resume file: .planning/phases/50-guardrails-parity-idempotence-gate/50-CONTEXT.md
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 
 ## Operator Next Steps
