@@ -1425,7 +1425,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <div class="flex justify-between items-start mb-2 min-w-0">
         <h4 class="min-w-0 break-words text-sm font-medium text-stone-900"><%%= @item.title || "Action Item" %></h4>
         <div class="flex shrink-0 items-center gap-2">
-          <%#- D-07: risk chip — color + icon + label, never color alone (WCAG 1.4.1) %>
+          <%%# D-07: risk chip — color + icon + label, never color alone (WCAG 1.4.1) %>
           <span class={["po-chip rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide flex items-center gap-1", risk_chip_class(action_item_risk(Map.get(@item, :kind)))]}>
             <%%= case action_item_risk(Map.get(@item, :kind)) do %>
               <%% :danger -> %>
@@ -1439,7 +1439,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <%% end %>
             <%%= risk_label(action_item_risk(Map.get(@item, :kind))) %>
           </span>
-          <%#- D-08: single status chip — audit outcome derived honestly from state, color via state_color (no redundant raw-state pill) %>
+          <%%# D-08: single status chip — audit outcome derived honestly from state, color via state_color (no redundant raw-state pill) %>
           <span class={["rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wide", state_color(@item.state)]}>
             <%%= audit_outcome_label(@item.state) %>
           </span>
