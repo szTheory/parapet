@@ -111,7 +111,7 @@
 ### Component Gallery (Demo-Only)
 
 - [x] **GALLERY-01**: A demo-only `/parapet/_gallery` route (never shipped into generated host UI) renders every component across {light, dark, empty, overflow, disabled, long-string} states for manual + screenshot audit.
-- [ ] **GALLERY-02**: The gallery route is covered by the screenshot capture script and asserted by a demo contract test.
+- [x] **GALLERY-02**: The gallery route is covered by the screenshot capture script and asserted by a demo contract test.
 
 ### Forward-Only Guardrails
 
@@ -214,7 +214,7 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | FIXTURE-03 | Phase 49 | Complete |
 | FIXTURE-04 | Phase 49 | Complete |
 | FIXTURE-05 | Phase 49 | Complete |
-| GALLERY-02 | Phase 49 | Pending |
+| GALLERY-02 | Phase 49 | Complete |
 | GUARD-03 | Phase 50 | Pending |
 | GUARD-04 | Phase 50 | Pending |
 | GUARD-05 | Phase 50 | Pending |
