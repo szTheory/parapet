@@ -54,6 +54,11 @@ jobs:
         run: mix dialyzer
       - name: Verify Public API
         run: mix verify.public_api
+      - name: Operator UI manifest drift
+        run: |
+          diff \
+            <(bash examples/demo_app/scripts/capture_operator_ui_screenshots.sh --manifest) \
+            <(sed -n '/^| name /,/^Total: /p' examples/demo_app/scripts/operator-ui-baseline.md)
 
   test:
     runs-on: ubuntu-latest
