@@ -200,7 +200,10 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   3. The screenshot capture script covers the stress scenario and the gallery, and a committed baseline manifest plus a documented re-run/compare procedure exists (no rasters committed — repo-lean).
   4. `v1.6-MILESTONE-AUDIT.md` records per-requirement evidence and proves no public-API/telemetry/host-ownership regression, the font package-size delta, and that the audit is forward-only/idempotent.
 
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 50-01-PLAN.md — GUARD-03/04/05 test apparatus + shared OperatorUIPaths helper + D-03 template fix
+- [ ] 50-02-PLAN.md — GUARD-06 --manifest mode + committed baseline manifest + CI drift check
+- [ ] 50-03-PLAN.md — GUARD-07 v1.6-MILESTONE-AUDIT.md (evidence-binding audit)
 
 ---
 
