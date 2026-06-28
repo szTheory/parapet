@@ -180,7 +180,10 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   3. The combined stress scenario is covered by the screenshot capture script across desktop + mobile and light + dark.
   4. The `/parapet/_gallery` route is covered by the screenshot capture script and asserted by a demo contract test.
 
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 49-01-PLAN.md — RED scaffold: gallery render contract test + fixture-existence pins + static script grep pin in operator_smoke_test.exs
+- [ ] 49-02-PLAN.md — Seed work: extend demo_seed_scenarios.exs with long_string/empty/max_items/mixed_status/stress scenarios
+- [ ] 49-03-PLAN.md — Capture-script: add four /parapet/_gallery captures (desktop+mobile, light+dark) to the canonical audit script
 **UI hint**: yes
 
 ### Phase 50: Guardrails, parity & idempotence gate
