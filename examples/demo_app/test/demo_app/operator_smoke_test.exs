@@ -270,4 +270,167 @@ defmodule DemoApp.OperatorSmokeTest do
              "Detail page must expose a labeled nav landmark (A11Y-06)"
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # Phase 49 — gallery render contract + fixture-existence pins (GALLERY-02,
+  # FIXTURE-01..05).
+  #
+  # D-12 RED cadence: Task 1 (gallery route test) is expected to pass GREEN
+  # immediately — the route already exists. Tasks 2 and 3 are RED scaffold
+  # assertions written BEFORE the seed scenarios are implemented (49-02) or
+  # the capture script is updated (49-03). The aggregate non-zero exit at the
+  # end of 49-01 is the intended RED state.
+  # ---------------------------------------------------------------------------
+
+  describe "Phase 49 gallery + fixture coverage" do
+    # ── Task 1: GALLERY-02 route render contract ──────────────────────────────
+    # Asserts GET /parapet/_gallery returns 200 with operator-component markers
+    # against an empty (unseeded) sandbox — proving the route is DB-independent
+    # and is NOT swallowed by the /parapet/:id catch-all.  This test passes
+    # green immediately (the route and GalleryLive already exist).
+    test "GET /parapet/_gallery returns 200 with operator-component markers (GALLERY-02)", %{conn: conn} do
+      conn = get(conn, "/parapet/_gallery")
+
+      assert conn.status == 200,
+             "GET /parapet/_gallery must return 200 — route must not be swallowed by /parapet/:id catch-all (GALLERY-02)"
+
+      assert conn.resp_body =~ "parapet-ui",
+             "/parapet/_gallery must render the .parapet-ui wrapper class (GALLERY-02)"
+
+      assert conn.resp_body =~ "Parapet Operator UI Gallery",
+             "/parapet/_gallery must render the gallery heading text (GALLERY-02)"
+
+      assert conn.resp_body =~ "po-operator-title",
+             "/parapet/_gallery must render the po-operator-title nav class (GALLERY-02)"
+
+      assert conn.resp_body =~ "po-chip",
+             "/parapet/_gallery must render the po-chip status-chip class (GALLERY-02)"
+    end
+
+    # ── Task 2: FIXTURE-01..05 fixture-existence pins (RED until 49-02) ──────
+    # Each test self-seeds inside the Ecto sandbox (rolled back after the test)
+    # and asserts the expected shape.  All five will fail RED with an
+    # ArgumentError until plan 49-02 adds the seed clauses.
+
+    # FIXTURE-05 registry: every new scenario name must be registered in
+    # DemoSeedScenarios.scenarios/0 so the typo-guard clause cannot fire.
+    test "FIXTURE-05: all five new scenario names are registered in DemoSeedScenarios.scenarios/0" do
+      registered = DemoApp.DemoSeedScenarios.scenarios()
+
+      for name <- ~w(long_string empty max_items mixed_status stress) do
+        assert name in registered,
+               "scenario #{inspect(name)} must appear in DemoSeedScenarios.scenarios/0 (FIXTURE-05)"
+      end
+    end
+
+    # FIXTURE-02: empty scenario seeds zero incidents and zero action items.
+    test "FIXTURE-02: seed('empty') produces 0 incidents and 0 action items" do
+      DemoApp.DemoSeedScenarios.seed("empty")
+
+      assert DemoApp.Repo.aggregate(Parapet.Spine.Incident, :count) == 0,
+             "seed('empty') must leave Incident table empty (FIXTURE-02)"
+
+      assert DemoApp.Repo.aggregate(Parapet.Spine.ActionItem, :count) == 0,
+             "seed('empty') must leave ActionItem table empty (FIXTURE-02)"
+    end
+
+    # FIXTURE-03: max_items scenario seeds more than 30 active (open/investigating)
+    # incidents so the default queue page boundary is crossed.
+    test "FIXTURE-03: seed('max_items') seeds >30 active incidents (crosses page boundary)" do
+      import Ecto.Query
+
+      DemoApp.DemoSeedScenarios.seed("max_items")
+
+      active_count =
+        DemoApp.Repo.aggregate(
+          from(i in Parapet.Spine.Incident, where: i.state in ["open", "investigating"]),
+          :count
+        )
+
+      assert active_count > 30,
+             "seed('max_items') must produce >30 active (open/investigating) incidents for page-boundary crossing (FIXTURE-03); got #{active_count}"
+    end
+
+    # FIXTURE-04: mixed_status scenario seeds incidents covering all three states
+    # (open, investigating, resolved) and at least one open action item.
+    test "FIXTURE-04: seed('mixed_status') covers all three incident states and has open action items" do
+      import Ecto.Query
+
+      DemoApp.DemoSeedScenarios.seed("mixed_status")
+
+      seeded_states =
+        DemoApp.Repo.all(from(i in Parapet.Spine.Incident, select: i.state))
+        |> MapSet.new()
+
+      required_states = MapSet.new(["open", "investigating", "resolved"])
+
+      assert MapSet.subset?(required_states, seeded_states),
+             "seed('mixed_status') must seed incidents covering open, investigating, AND resolved states (FIXTURE-04); got #{inspect(seeded_states)}"
+
+      open_item_count =
+        DemoApp.Repo.aggregate(
+          from(ai in Parapet.Spine.ActionItem, where: ai.state == "open"),
+          :count
+        )
+
+      assert open_item_count >= 1,
+             "seed('mixed_status') must seed at least one open action item (FIXTURE-04); got #{open_item_count}"
+    end
+
+    # FIXTURE-01: long_string scenario seeds at least one incident with a title
+    # longer than 60 characters confirming machine-shaped long-string fields.
+    test "FIXTURE-01: seed('long_string') seeds at least one incident with a title >60 chars" do
+      DemoApp.DemoSeedScenarios.seed("long_string")
+
+      total = DemoApp.Repo.aggregate(Parapet.Spine.Incident, :count)
+
+      assert total >= 1,
+             "seed('long_string') must seed at least one incident (FIXTURE-01)"
+
+      titles = DemoApp.Repo.all(Parapet.Spine.Incident) |> Enum.map(& &1.title)
+
+      long_title_exists = Enum.any?(titles, fn t -> is_binary(t) and String.length(t) > 60 end)
+
+      assert long_title_exists,
+             "seed('long_string') must seed at least one incident whose title exceeds 60 chars (FIXTURE-01); longest was #{titles |> Enum.map(&String.length/1) |> Enum.max(fn -> 0 end)}"
+    end
+
+    # FIXTURE-05: stress scenario seeds at least one active (open/investigating)
+    # incident — the precondition for the capture-script DETAIL_ID query.
+    test "FIXTURE-05: seed('stress') seeds at least one active (open/investigating) incident" do
+      import Ecto.Query
+
+      DemoApp.DemoSeedScenarios.seed("stress")
+
+      active_count =
+        DemoApp.Repo.aggregate(
+          from(i in Parapet.Spine.Incident, where: i.state in ["open", "investigating"]),
+          :count
+        )
+
+      assert active_count >= 1,
+             "seed('stress') must produce at least one active incident for DETAIL_ID capture (FIXTURE-05); got #{active_count}"
+    end
+
+    # ── Task 3: GALLERY-02 capture-script static grep pin (RED until 49-03) ──
+    # Reads the capture script from disk and counts lines that contain both
+    # "capture" and "_gallery" (plain `_gallery` comments excluded).
+    # Fails RED until plan 49-03 adds the four gallery capture lines.
+    test "GALLERY-02 script: capture_operator_ui_screenshots.sh covers /parapet/_gallery 4 times (desktop+mobile, light+dark)" do
+      script_path =
+        Path.join([File.cwd!(), "scripts", "capture_operator_ui_screenshots.sh"])
+
+      assert File.exists?(script_path),
+             "capture_operator_ui_screenshots.sh not found at #{script_path}"
+
+      gallery_capture_lines =
+        script_path
+        |> File.read!()
+        |> String.split("\n")
+        |> Enum.count(fn line -> String.contains?(line, "capture") and String.contains?(line, "_gallery") end)
+
+      assert gallery_capture_lines >= 4,
+             "capture_operator_ui_screenshots.sh must contain at least 4 lines with both 'capture' and '_gallery' (desktop-light, desktop-dark, mobile-light, mobile-dark); found #{gallery_capture_lines} (GALLERY-02 script coverage)"
+    end
+  end
 end
