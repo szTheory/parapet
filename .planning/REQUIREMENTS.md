@@ -120,7 +120,7 @@
 - [x] **GUARD-03**: A normalized template↔demo byte-parity test reproduces the generator transform and fails if any `.eex` template and its demo mirror diverge.
 - [x] **GUARD-04**: An off-palette-hex gate over the templates fails if any non-token color hex appears (mirrors the v1.5 `brandbook/` palette gate).
 - [x] **GUARD-05**: A motion / reduced-motion assertion test verifies the brand easing is used and motion is zeroed under `prefers-reduced-motion`.
-- [ ] **GUARD-06**: The screenshot capture script covers the stress scenario and the gallery; a committed baseline manifest + documented re-run/compare procedure exists (no rasters committed — repo-lean).
+- [x] **GUARD-06**: The screenshot capture script covers the stress scenario and the gallery; a committed baseline manifest + documented re-run/compare procedure exists (no rasters committed — repo-lean).
 - [ ] **GUARD-07**: `v1.6-MILESTONE-AUDIT.md` records per-requirement evidence and proves no public-API/telemetry/host-ownership regression, the font package-size delta, and that the audit is forward-only/idempotent.
 
 ## Future Requirements
@@ -218,7 +218,7 @@ Each requirement maps to exactly one phase (Phases 44–50).
 | GUARD-03 | Phase 50 | Complete |
 | GUARD-04 | Phase 50 | Complete |
 | GUARD-05 | Phase 50 | Complete |
-| GUARD-06 | Phase 50 | Pending |
+| GUARD-06 | Phase 50 | Complete |
 | GUARD-07 | Phase 50 | Pending |
 
 **Coverage:**

@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
-current_phase: 50
-current_phase_name: guardrails-parity-idempotence-gate
 status: executing
 stopped_at: Phase 50 context gathered (assumptions mode + advisor research)
-last_updated: "2026-06-28T22:20:16.028Z"
+last_updated: "2026-06-28T22:25:29.252Z"
 last_activity: 2026-06-28
-last_activity_desc: Phase 50 execution started
 progress:
   total_phases: 7
   completed_phases: 6
   total_plans: 25
-  completed_plans: 23
+  completed_plans: 24
   percent: 86
 ---
 
@@ -29,10 +26,10 @@ See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo Syste
 ## Current Position
 
 Phase: 50 (guardrails-parity-idempotence-gate) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Next: Phase 48 (Pages, flows & microcopy)
-Last activity: 2026-06-28 -- Phase 50 execution started
+Last activity: 2026-06-28
 
 ## Performance Metrics
 
@@ -78,6 +75,7 @@ Last activity: 2026-06-28 -- Phase 50 execution started
 | Phase 49 P02 | 4min | 3 tasks | 4 files |
 | Phase 49 P03 | 5min | 2 tasks | 1 files |
 | Phase 50 P01 | 3m | 3 tasks | 6 files |
+| Phase 50 P02 | 114 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -128,6 +126,8 @@ Recent decisions affecting current work:
 - [Phase ?]: GUARD-04: Fail-closed allowlist sourced live from tokens.css + 5 documented exceptions in audit-matrix (no bare inline literals)
 - [Phase ?]: GUARD-05: Tolerant easing regex handles template vs tokens.css leading-zero disagreement; both motion tokens zeroed
 - [Phase ?]: D-03 fix: <%#- (build-time, renders to empty) replaced with <%%# (EEx escape, renders to <%#) at operator_components.ex.eex:1428/1442
+- [Phase 50]: GUARD-06: --manifest exits before Chrome/server/DB; :detail_id placeholder in CAPTURES array keeps manifest DB-free (D-14)
+- [Phase 50]: Manifest-drift CI step added to lint job (no Postgres); diff --manifest vs sed-extracted baseline enforces D-17 without new infra
 
 ### Pending Todos
 
@@ -149,9 +149,9 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-28T22:19:31.056Z
+Last session: 2026-06-28T22:25:24.258Z
 Stopped at: Phase 50 context gathered (assumptions mode + advisor research)
-Resume file: .planning/phases/50-guardrails-parity-idempotence-gate/50-CONTEXT.md
+Resume file: None
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
 
 ## Operator Next Steps
