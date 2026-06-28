@@ -7,6 +7,43 @@ OUTPUT_DIR="${1:-$ROOT_DIR/.planning/phases/36-demo-state-coverage-browser-verif
 BASE_URL="${PARAPET_DEMO_URL:-http://127.0.0.1:4000}"
 CHROME_BIN="${CHROME_BIN:-}"
 
+MANIFEST_MODE=false
+[[ "${1:-}" == "--manifest" ]] && MANIFEST_MODE=true
+
+# Shared capture list — single source of truth for both capture mode and --manifest mode.
+# Format: name|size|path|theme
+# Detail routes use :detail_id as a DB-free placeholder; capture mode substitutes the
+# resolved $DETAIL_ID at dispatch time.
+CAPTURES=(
+  "operator-response-desktop|1440,1100|/parapet|light"
+  "operator-actions-desktop|1440,1100|/parapet/actions|light"
+  "operator-history-desktop|1440,1100|/parapet/history|light"
+  "operator-detail-desktop|1440,1100|/parapet/incidents/:detail_id|light"
+  "operator-response-dark-desktop|1440,1100|/parapet|dark"
+  "operator-detail-dark-desktop|1440,1100|/parapet/incidents/:detail_id|dark"
+  "operator-response-mobile|390,844|/parapet|light"
+  "operator-actions-mobile|390,844|/parapet/actions|light"
+  "operator-history-mobile|390,844|/parapet/history|light"
+  "operator-detail-mobile|390,844|/parapet/incidents/:detail_id|light"
+  "operator-response-dark-mobile|390,844|/parapet|dark"
+  "gallery-desktop-light|1440,5200|/parapet/_gallery|light"
+  "gallery-desktop-dark|1440,5200|/parapet/_gallery|dark"
+  "gallery-mobile-light|414,7600|/parapet/_gallery|light"
+  "gallery-mobile-dark|414,7600|/parapet/_gallery|dark"
+)
+
+if $MANIFEST_MODE; then
+  echo "| name | route | viewport | theme | scenario |"
+  echo "|---|---|---|---|---|"
+  for entry in "${CAPTURES[@]}"; do
+    IFS='|' read -r name size path theme <<< "$entry"
+    echo "| $name | $path | ${size/,/×} | $theme | stress |"
+  done
+  echo ""
+  echo "Total: ${#CAPTURES[@]} captures"
+  exit 0
+fi
+
 if [[ -z "$CHROME_BIN" ]]; then
   for candidate in "$(command -v chromium || true)" "$(command -v google-chrome || true)" "$(command -v chromium-browser || true)"; do
     if [[ -n "$candidate" && -x "$candidate" ]] && "$candidate" --version >/dev/null 2>&1; then
@@ -66,25 +103,12 @@ capture() {
     "$BASE_URL$themed_path" >/dev/null
 }
 
-capture "operator-response-desktop" "1440,1100" "/parapet" "light"
-capture "operator-actions-desktop" "1440,1100" "/parapet/actions" "light"
-capture "operator-history-desktop" "1440,1100" "/parapet/history" "light"
-capture "operator-detail-desktop" "1440,1100" "/parapet/incidents/$DETAIL_ID" "light"
-capture "operator-response-dark-desktop" "1440,1100" "/parapet" "dark"
-capture "operator-detail-dark-desktop" "1440,1100" "/parapet/incidents/$DETAIL_ID" "dark"
-
-capture "operator-response-mobile" "390,844" "/parapet" "light"
-capture "operator-actions-mobile" "390,844" "/parapet/actions" "light"
-capture "operator-history-mobile" "390,844" "/parapet/history" "light"
-capture "operator-detail-mobile" "390,844" "/parapet/incidents/$DETAIL_ID" "light"
-capture "operator-response-dark-mobile" "390,844" "/parapet" "dark"
-
-# GALLERY-02: /parapet/_gallery — four captures (desktop+mobile, light+dark).
-# Tall window sizes so the long scrolling gallery is not clipped (Pitfall 6).
-# The gallery renders from hardcoded fixtures (no DB seed required — server-up only).
-capture "gallery-desktop-light" "1440,5200" "/parapet/_gallery" "light"
-capture "gallery-desktop-dark"  "1440,5200" "/parapet/_gallery" "dark"
-capture "gallery-mobile-light"  "414,7600"  "/parapet/_gallery" "light"
-capture "gallery-mobile-dark"   "414,7600"  "/parapet/_gallery" "dark"
+# Dispatch loop — iterates the shared CAPTURES array.
+# Detail routes have :detail_id substituted with the resolved $DETAIL_ID.
+for entry in "${CAPTURES[@]}"; do
+  IFS='|' read -r name size path theme <<< "$entry"
+  path="${path/:detail_id/$DETAIL_ID}"
+  capture "$name" "$size" "$path" "$theme"
+done
 
 ls -1 "$OUTPUT_DIR"/*.png
