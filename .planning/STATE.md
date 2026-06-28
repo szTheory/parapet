@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
 current_phase: 50
-current_phase_name: Guardrails, parity & idempotence gate
-status: verifying
+current_phase_name: guardrails-parity-idempotence-gate
+status: executing
 stopped_at: Phase 50 context gathered (assumptions mode + advisor research)
-last_updated: "2026-06-28T21:48:26.729Z"
+last_updated: "2026-06-28T22:20:16.028Z"
 last_activity: 2026-06-28
-last_activity_desc: Phase 49 complete, transitioned to Phase 50
+last_activity_desc: Phase 50 execution started
 progress:
   total_phases: 7
   completed_phases: 6
-  total_plans: 22
-  completed_plans: 22
+  total_plans: 25
+  completed_plans: 23
   percent: 86
 ---
 
@@ -24,15 +24,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo System milestone completed)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 49 — stress-fixtures-seed-coverage
+**Current focus:** Phase 50 — guardrails-parity-idempotence-gate
 
 ## Current Position
 
-Phase: 50 — Guardrails, parity & idempotence gate
-Plan: Not started
-Status: Phase complete — ready for verification
+Phase: 50 (guardrails-parity-idempotence-gate) — EXECUTING
+Plan: 2 of 3
+Status: Ready to execute
 Next: Phase 48 (Pages, flows & microcopy)
-Last activity: 2026-06-28 — Phase 49 complete, transitioned to Phase 50
+Last activity: 2026-06-28 -- Phase 50 execution started
 
 ## Performance Metrics
 
@@ -77,6 +77,7 @@ Last activity: 2026-06-28 — Phase 49 complete, transitioned to Phase 50
 | Phase 49 P01 | 2m | 3 tasks | 1 files |
 | Phase 49 P02 | 4min | 3 tasks | 4 files |
 | Phase 49 P03 | 5min | 2 tasks | 1 files |
+| Phase 50 P01 | 3m | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -123,6 +124,10 @@ Recent decisions affecting current work:
 - [Phase ?]: 49-01: D-12 RED scaffold — gallery contract GREEN; fixture pins + grep pin RED until 49-02/49-03
 - [Phase ?]: Move DemoSeedScenarios to compiled lib module for test sandbox (49-02)
 - [Phase ?]: 49-03: Four /parapet/_gallery capture lines (desktop+mobile, light+dark) added to capture_operator_ui_screenshots.sh using tall window sizes 1440,5200/414,7600; GALLERY-02 static grep pin GREEN
+- [Phase ?]: GUARD-03 normalization via Code.format_string! (not AST-compare) preserves comments, catches D-03 drift
+- [Phase ?]: GUARD-04: Fail-closed allowlist sourced live from tokens.css + 5 documented exceptions in audit-matrix (no bare inline literals)
+- [Phase ?]: GUARD-05: Tolerant easing regex handles template vs tokens.css leading-zero disagreement; both motion tokens zeroed
+- [Phase ?]: D-03 fix: <%#- (build-time, renders to empty) replaced with <%%# (EEx escape, renders to <%#) at operator_components.ex.eex:1428/1442
 
 ### Pending Todos
 
@@ -144,7 +149,7 @@ None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-
 
 ## Session Continuity
 
-Last session: 2026-06-28T21:48:26.721Z
+Last session: 2026-06-28T22:19:31.056Z
 Stopped at: Phase 50 context gathered (assumptions mode + advisor research)
 Resume file: .planning/phases/50-guardrails-parity-idempotence-gate/50-CONTEXT.md
 Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute

@@ -200,8 +200,9 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
   3. The screenshot capture script covers the stress scenario and the gallery, and a committed baseline manifest plus a documented re-run/compare procedure exists (no rasters committed — repo-lean).
   4. `v1.6-MILESTONE-AUDIT.md` records per-requirement evidence and proves no public-API/telemetry/host-ownership regression, the font package-size delta, and that the audit is forward-only/idempotent.
 
-**Plans**: 3 plans
-- [ ] 50-01-PLAN.md — GUARD-03/04/05 test apparatus + shared OperatorUIPaths helper + D-03 template fix
+**Plans**: 1/3 plans executed
+
+- [x] 50-01-PLAN.md — GUARD-03/04/05 test apparatus + shared OperatorUIPaths helper + D-03 template fix
 - [ ] 50-02-PLAN.md — GUARD-06 --manifest mode + committed baseline manifest + CI drift check
 - [ ] 50-03-PLAN.md — GUARD-07 v1.6-MILESTONE-AUDIT.md (evidence-binding audit)
 
@@ -232,4 +233,4 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 47. Component groups / meta-components | v1.6 | 3/3 | Complete   | 2026-06-26 |
 | 48. Pages, flows & microcopy | v1.6 | 4/4 | Complete   | 2026-06-28 |
 | 49. Stress fixtures & seed coverage | v1.6 | 3/3 | Complete    | 2026-06-28 |
-| 50. Guardrails, parity & idempotence gate | v1.6 | 0/? | Pending | - |
+| 50. Guardrails, parity & idempotence gate | v1.6 | 1/3 | In Progress|  |
