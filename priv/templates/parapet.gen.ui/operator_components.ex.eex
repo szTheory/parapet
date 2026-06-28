@@ -1053,13 +1053,13 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <li>
               <div class="relative pb-8">
                 <span class="absolute top-4 left-4 -ml-px h-full w-0.5 bg-stone-200" aria-hidden="true"></span>
-                <div class="relative flex space-x-3">
+                <div class="relative flex space-x-4">
                   <div>
                     <span class={["h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white text-white text-[11px] font-semibold", timeline_entry_badge_class(presentation)]}>
                       <%%= timeline_entry_badge_text(presentation) %>
                     </span>
                   </div>
-                  <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                  <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1">
                     <div>
                       <div class="flex items-center gap-2 flex-wrap">
                         <p class="text-sm font-medium text-stone-900"><%%= timeline_entry_title(entry, presentation) %></p>
@@ -1067,7 +1067,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                           <%%= timeline_actor_copy(presentation.actor_class) %>
                         </span>
                       </div>
-                      <p class="text-sm text-stone-600 mt-1">
+                      <p class="text-sm md:text-[15px] text-stone-600 mt-1">
                         <%%= if external_link_entry?(entry) do %>
                           <a href={external_link_url(entry.payload)} class="po-link inline-flex items-center gap-1 break-all hover:underline" target="_blank" rel="noopener noreferrer">
                             <span><%%= external_link_label(entry.payload) %></span> &nearr;
@@ -1114,7 +1114,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                 </div>
                 <div>
                   <p class="text-sm font-medium text-stone-900">
-                    Flag <span class="font-mono text-xs bg-stone-100 px-1 rounded border border-stone-200"><span class="break-all min-w-0 tabular-nums font-mono"><%%= flag %></span></span> updated
+                    Flag <span class="font-mono text-xs bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200"><span class="break-all min-w-0 tabular-nums font-mono"><%%= flag %></span></span> updated
                   </p>
                   <p class="text-xs text-stone-500 mt-0.5">
                     <%%= actor %> published ruleset
@@ -1122,7 +1122,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
                 </div>
               </div>
               <div class="flex flex-col items-end gap-1">
-                <span class="po-chip po-chip-info">
+                <span class="po-chip po-chip-info px-2 py-0.5 rounded text-xs">
                   <%%= inspect(scope) %>
                 </span>
                 <time datetime={exact_datetime(entry.inserted_at)} title={exact_datetime(entry.inserted_at)} class="text-sm text-stone-500"><%%= readable_datetime(entry.inserted_at) %></time>
@@ -1170,10 +1170,18 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
         <div class="space-y-3 rounded-lg bg-stone-50 p-4 ring-1 ring-stone-900/5">
           <%%= for block <- retrospective_blocks(@retrospective) do %>
             <%%= case block do %>
-              <%% {:heading, text} -> %>
+              <%% {:heading, level, text} when level <= 2 -> %>
                 <h4 class="text-base font-semibold text-stone-950"><%%= text %></h4>
+              <%% {:heading, _level, text} -> %>
+                <h4 class="text-sm font-semibold text-stone-800"><%%= text %></h4>
+              <%% {:list, items} -> %>
+                <ul class="list-disc space-y-1 pl-5 text-sm md:text-[15px] leading-6 text-stone-700">
+                  <%%= for item <- items do %>
+                    <li><%%= item %></li>
+                  <%% end %>
+                </ul>
               <%% {:paragraph, text} -> %>
-                <p class="text-sm leading-6 text-stone-700"><%%= text %></p>
+                <p class="text-sm md:text-[15px] leading-6 text-stone-700"><%%= text %></p>
             <%% end %>
           <%% end %>
         </div>
@@ -1190,7 +1198,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
       <h3 class="text-lg font-semibold text-stone-900 mb-1">
         <%%= @detail.derived.runbook_title || "Untitled runbook" %>
       </h3>
-      <p class="text-sm text-stone-600 mb-4">
+      <p class="text-sm md:text-[15px] text-stone-600 mb-4">
         <%%= @detail.derived.runbook_description || "No runbook description was recorded. Follow the steps below; each one previews before it runs." %>
       </p>
 
@@ -1282,7 +1290,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             </div>
             <div class="min-w-0">
               <p class="text-xs text-stone-500 uppercase font-bold">Affected Count</p>
-              <p class="text-sm font-medium text-stone-900 min-w-0 break-words"><%%= preview.data["count"] %></p>
+              <p class="text-xl font-semibold tabular-nums text-stone-900 min-w-0 break-words"><%%= preview.data["count"] %></p>
             </div>
           </div>
 
@@ -1304,8 +1312,8 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             </div>
           <%% end %>
 
-          <div class="flex gap-2">
-            <p class="po-guidance mb-3 rounded-lg px-3 py-2 text-xs ring-1">
+          <div class="flex flex-col gap-3">
+            <p class="po-guidance rounded-lg px-3 py-2 text-xs ring-1">
               Execute bounded recovery. Writes a durable audit record with actor, reason, correlation id, and outcome.
             </p>
             <button 
@@ -1313,7 +1321,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
               phx-value-step={preview.step_id} 
               phx-value-incident_id={@detail.incident.id}
               phx-value-token={preview.preview_token}
-              class={["flex-1", control_class(:recovery)]}
+              class={["w-full", control_class(:recovery)]}
             >
               Confirm Recovery
             </button>
@@ -1416,7 +1424,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
     <div class={surface_class(:action_card)}>
       <div class="flex justify-between items-start mb-2 min-w-0">
         <h4 class="min-w-0 break-words text-sm font-medium text-stone-900"><%%= @item.title || "Action Item" %></h4>
-        <div class="flex shrink-0 items-center gap-1.5">
+        <div class="flex shrink-0 items-center gap-2">
           <%#- D-07: risk chip — color + icon + label, never color alone (WCAG 1.4.1) %>
           <span class={["po-chip rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide flex items-center gap-1", risk_chip_class(action_item_risk(Map.get(@item, :kind)))]}>
             <%%= case action_item_risk(Map.get(@item, :kind)) do %>
@@ -1431,12 +1439,9 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
             <%% end %>
             <%%= risk_label(action_item_risk(Map.get(@item, :kind))) %>
           </span>
-          <%#- D-08: audit-outcome chip — derived honestly from state %>
-          <span class={audit_outcome_chip_class(@item.state)}>
+          <%#- D-08: single status chip — audit outcome derived honestly from state, color via state_color (no redundant raw-state pill) %>
+          <span class={["rounded px-2 py-0.5 text-xs font-semibold uppercase tracking-wide", state_color(@item.state)]}>
             <%%= audit_outcome_label(@item.state) %>
-          </span>
-          <span class={["rounded-full px-2.5 py-1 text-xs font-semibold", state_color(@item.state)]}>
-            <%%= @item.state %>
           </span>
         </div>
       </div>
@@ -1474,12 +1479,6 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp risk_label(_),        do: "Routine"
 
   # D-08: audit outcome derived from state — no "failed" state fabricated (open → "Pending" only)
-  defp audit_outcome_chip_class("resolved"),
-    do: chip_class(:execution, :executed)
-
-  defp audit_outcome_chip_class(_state),
-    do: "po-chip rounded px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide"
-
   defp audit_outcome_label("resolved"), do: "Resolved · audited"
   defp audit_outcome_label(_state),     do: "Pending"
 
@@ -1879,19 +1878,44 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
 
   defp retrospective_blocks(markdown) when is_binary(markdown) do
     markdown
-    |> String.split("\n", trim: true)
+    |> String.split("\n")
     |> Enum.map(&String.trim/1)
     |> Enum.reject(&(&1 == ""))
-    |> Enum.map(fn
-      "# " <> heading -> {:heading, heading}
-      "## " <> heading -> {:heading, heading}
-      paragraph -> {:paragraph, paragraph}
+    |> Enum.reduce([], fn line, acc ->
+      cond do
+        heading = retrospective_heading(line) ->
+          [heading | acc]
+
+        bullet = retrospective_bullet(line) ->
+          case acc do
+            [{:list, items} | rest] -> [{:list, items ++ [bullet]} | rest]
+            _ -> [{:list, [bullet]} | acc]
+          end
+
+        true ->
+          [{:paragraph, line} | acc]
+      end
     end)
+    |> Enum.reverse()
   end
 
   defp retrospective_blocks(_markdown), do: []
 
+  defp retrospective_heading("#### " <> rest), do: {:heading, 4, String.trim(rest)}
+  defp retrospective_heading("### " <> rest), do: {:heading, 3, String.trim(rest)}
+  defp retrospective_heading("## " <> rest), do: {:heading, 2, String.trim(rest)}
+  defp retrospective_heading("# " <> rest), do: {:heading, 1, String.trim(rest)}
+  defp retrospective_heading(_), do: nil
+
+  defp retrospective_bullet("- " <> rest), do: String.trim(rest)
+  defp retrospective_bullet("* " <> rest), do: String.trim(rest)
+  defp retrospective_bullet(_), do: nil
+
   defp readable_datetime(%DateTime{} = datetime) do
+    Calendar.strftime(datetime, "%b %d, %Y, %H:%M UTC")
+  end
+
+  defp readable_datetime(%NaiveDateTime{} = datetime) do
     Calendar.strftime(datetime, "%b %d, %Y, %H:%M UTC")
   end
 
@@ -1899,6 +1923,7 @@ defmodule <%= inspect(@web_module) %>.Parapet.OperatorComponents do
   defp readable_datetime(other), do: to_string(other)
 
   defp exact_datetime(%DateTime{} = datetime), do: DateTime.to_iso8601(datetime)
+  defp exact_datetime(%NaiveDateTime{} = datetime), do: NaiveDateTime.to_iso8601(datetime)
   defp exact_datetime(other), do: to_string(other)
 
   defp humanize_seconds(seconds) when seconds < 60, do: "#{seconds}s"
