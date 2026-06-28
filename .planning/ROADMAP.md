@@ -32,7 +32,7 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 - [x] **Phase 45: Primitive components** — Buttons/links/badges/chips/status pills/stat cards/icons/dividers/focus + theme-switcher controls with distinct, accessible, color-blind-safe states. (completed 2026-06-25)
 - [x] **Phase 46: Navigation, shell & data-display** — Nav/tabs/theme switcher/cockpit header + incident list/row/timeline/tables with active states, responsive 390px layout, deliberate truncation, working scroll, and keyboard reachability. (completed 2026-06-26)
 - [x] **Phase 47: Component groups / meta-components** — Response cockpit, incident summary, runbook card, preview panel, action rail, action-item cards, overlays/modals with correct stacking, focus trap/restore, and brand-eased motion. (completed 2026-06-26)
-- [ ] **Phase 48: Pages, flows & microcopy** — Response/actions/history tabs + incident detail end-to-end with one h1/landmarks/title, designed empty/loading/error states, brand-voice copy, and full mobile usability.
+- [x] **Phase 48: Pages, flows & microcopy** — Response/actions/history tabs + incident detail end-to-end with one h1/landmarks/title, designed empty/loading/error states, brand-voice copy, and full mobile usability. (completed 2026-06-28)
 - [ ] **Phase 49: Stress fixtures & seed coverage** — Long-string/empty/max-items/mixed-status + combined stress scenarios wired to `PARAPET_DEMO_SCENARIO`, with the gallery covered by screenshot capture and a demo contract test.
 - [ ] **Phase 50: Guardrails, parity & idempotence gate** — Template↔demo byte-parity test, off-palette-hex gate, motion assertion, screenshot baseline manifest, and the `v1.6-MILESTONE-AUDIT.md` proving no API/telemetry/host-ownership regression and forward-only idempotence.
 
@@ -152,19 +152,19 @@ Full detail: [milestones/v1.5-ROADMAP.md](milestones/v1.5-ROADMAP.md)
 **Plans**: 4 plans
 **Wave 1**
 
-- [ ] 48-01-PLAN.md — RED scaffold: source-string + rendered-state assertions for all FLOW/COPY/A11Y facts (no new test files) [wave 1]
+- [x] 48-01-PLAN.md — RED scaffold: source-string + rendered-state assertions for all FLOW/COPY/A11Y facts (no new test files) [wave 1]
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 48-02-PLAN.md — green (components): not-found panel, incident_summary heading-level prop, empty-state anatomy + uniform skeleton, component microcopy, R1-R7 overflow fixes [wave 2]
+- [x] 48-02-PLAN.md — green (components): not-found panel, incident_summary heading-level prop, empty-state anatomy + uniform skeleton, component microcopy, R1-R7 overflow fixes [wave 2]
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 48-03-PLAN.md — green (shell/service): additive fetch_incident_detail/1, not-found wiring (mount + 6 refresh sites), per-page h1 + :page_title, nav landmark, route-order lock, demo layout patch, flash microcopy [wave 3]
+- [x] 48-03-PLAN.md — green (shell/service): additive fetch_incident_detail/1, not-found wiring (mount + 6 refresh sites), per-page h1 + :page_title, nav landmark, route-order lock, demo layout patch, flash microcopy [wave 3]
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 48-04-PLAN.md — gate: full lib + demo suite green, audit-matrix flip (+ N/A-by-Design rows), blocking human /parapet/_gallery walkthrough [wave 4]
+- [x] 48-04-PLAN.md — gate: full lib + demo suite green, audit-matrix flip (+ N/A-by-Design rows), blocking human /parapet/_gallery walkthrough [wave 4]
 
 **UI hint**: yes
 
@@ -222,6 +222,6 @@ After v1.6 ships, candidate follow-up work (deferred from v1.5/v1.6):
 | 45. Primitive components | v1.6 | 4/4 | Complete   | 2026-06-25 |
 | 46. Navigation, shell & data-display | v1.6 | 4/4 | Complete    | 2026-06-26 |
 | 47. Component groups / meta-components | v1.6 | 3/3 | Complete   | 2026-06-26 |
-| 48. Pages, flows & microcopy | v1.6 | 0/? | Pending | - |
+| 48. Pages, flows & microcopy | v1.6 | 4/4 | Complete   | 2026-06-28 |
 | 49. Stress fixtures & seed coverage | v1.6 | 0/? | Pending | - |
 | 50. Guardrails, parity & idempotence gate | v1.6 | 0/? | Pending | - |
