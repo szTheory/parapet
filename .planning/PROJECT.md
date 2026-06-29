@@ -8,6 +8,19 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
+## Current Milestone: v1.7 Postgres Schema Isolation & Upgrade Path
+
+**Goal:** Parapet's six spine tables live in a dedicated, configurable `parapet` Postgres schema by default; existing adopters get a documented, tested, opt-in upgrade path; `public` stays a one-line opt-out. Closes the audited #1 quality weakness (no adopter-facing DB-schema upgrade story).
+
+**Target features:**
+- Compile-time `@schema_prefix` via a shared `use Parapet.Spine.Schema` macro reading `Application.compile_env(:parapet, :schema_prefix, "parapet")` — not a runtime `prefix:` option (avoids the read/write precedence-asymmetry split-brain footgun). `nil`/`"public"` ⇒ unprefixed.
+- Generators emit `CREATE SCHEMA IF NOT EXISTS parapet` (with a `create_schema: false` least-privilege hatch) + `prefix:` on every table/reference/index, and write `config :parapet, :schema_prefix`.
+- Two opt-in upgrade tracks for existing adopters — Track A: stay on `public` (`schema_prefix: nil` + recompile, tables untouched); Track B: a generated reversible `ALTER TABLE … SET SCHEMA` move-migration (all six move as a unit so FKs stay valid). No forced migration on upgrade.
+- Raw-SQL test infra hand-qualified for sites that don't inherit `@schema_prefix`; demo app updated end-to-end as the real-host smoke proof.
+- New `docs/upgrade-1.x.md` (default inversion, `deps.compile --force` recompile note, Track A vs B, rollback) plus deployment/README updates.
+
+**Key context:** Telemetry + public API stay frozen — the prefix is an internal DB detail; `mix verify.public_api` and the telemetry contract test remaining green is a milestone done-criterion. Locked decisions: default schema name `parapet`; existing adopters opt-in only; compile-time `@schema_prefix` (runtime `prefix:` banned); `create_schema: false` escape hatch. Seed design research lives in `.planning/research/V1.7-SCHEMA-ISOLATION.md`. This is the first of the approved v1.7→v1.9 roadmap (v1.8 CI/CD performance & DX, v1.9 quality hardening).
+
 ## Current State
 
 **Shipped:** v1.6 Operator UI Brand & Design-System Audit (2026-06-29) — Re-skinned the generated, host-owned Operator UI to the v1.5 brand book via values-only edits to `operator_theme_bootstrap/1` (brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings) with zero public-API/telemetry/host-ownership change, vendored five subsetted IBM Plex woff2 faces (52.2 KB), ran a layer-by-layer WCAG 2.2 AA design-system audit fixing real usability bugs, and installed forward-only regression guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest, evidence-binding audit). 7/7 phases, 61/68 requirements (7 shipped+human-verified but not yet ExUnit-pinned); audit passed (see `.planning/milestones/v1.6-MILESTONE-AUDIT.md`).
@@ -184,6 +197,13 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 
 ### Active
 
+**v1.7 Postgres Schema Isolation & Upgrade Path** (current milestone — see Current Milestone section; detailed REQ-IDs in `.planning/REQUIREMENTS.md`):
+
+- [ ] Configurable compile-time schema prefix (`PREFIX-CORE`, `PREFIX-PROP`) — shared macro, default `parapet`, `nil`/`public` opt-out, propagation across joins/Multi/`insert_all`, runtime `prefix:` banned.
+- [ ] Schema-aware generators & library migrations (`GEN-MIGRATIONS`) — `CREATE SCHEMA` + `prefix:` + config write + updated fixtures.
+- [ ] Tested opt-in upgrade path (`UPGRADE-PATH`) — Track A stay-on-public + Track B `SET SCHEMA` move-migration with round-trip tests.
+- [ ] Test infra & demo app under prefix (`TEST-INFRA`) + docs (`DOCS`) + frozen-contract regression gate (`CONTRACT-SAFETY`).
+
 **v1.6 automated-coverage gaps** (shipped + human-verified in the live UI; gap is in ExUnit coverage, not the console — close in a future milestone):
 
 - [ ] **TOKEN-04** — type-scale / spacing / radius applied without layout shift; functional via Tailwind brand-scale utilities, not yet systematized as explicit `--radius-*` custom properties. Visual layout-shift check is manual-only per `48-VALIDATION.md`.
@@ -323,4 +343,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-29 after v1.6 Operator UI Brand & Design-System Audit milestone (Phases 44–50)*
+*Last updated: 2026-06-29 after starting milestone v1.7 Postgres Schema Isolation & Upgrade Path*
