@@ -2,10 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.6
 milestone_name: Operator UI Brand & Design-System Audit
-status: milestone_complete
-stopped_at: Milestone complete (Phase 50 was final phase)
-last_updated: 2026-06-28T22:42:16.038Z
-last_activity: 2026-06-28
+current_phase: 6
+status: Awaiting next milestone
+stopped_at: Phase 50 context gathered (assumptions mode + advisor research)
+last_updated: "2026-06-29T16:48:50.537Z"
+last_activity: 2026-06-29
+last_activity_desc: Milestone v1.6 completed and archived
 progress:
   total_phases: 7
   completed_phases: 7
@@ -18,18 +20,29 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-24 after v1.5 Brand Book & Logo System milestone completed)
+See: .planning/PROJECT.md (updated 2026-06-29 after v1.6 Operator UI Brand & Design-System Audit milestone completed)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Milestone complete
+**Current focus:** Planning next milestone (`/gsd-new-milestone`)
 
 ## Current Position
 
-Phase: 50
-Plan: Not started
-Status: Milestone complete
-Next: Phase 48 (Pages, flows & microcopy)
-Last activity: 2026-06-28
+Phase: Milestone v1.6 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-06-29 — Milestone v1.6 completed and archived
+
+## Deferred Items
+
+Items acknowledged and deferred at milestone close on 2026-06-29 (`override_closeout`):
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | phase-44 44-UAT.md (TOKEN-04 manual visual check) | testing — 1 pending scenario |
+| verification_gap | phase-44 44-VERIFICATION.md (TOKEN-04 layout-shift, manual-only) | human_needed |
+| verification_gap | phase-48 no 48-VERIFICATION.md (never ran /gsd-verify-work) | covered by milestone audit (Nyquist phase-48 compliant) |
+
+All three trace to requirements that shipped and were human-verified in the live UI; the gap is in automated (ExUnit) coverage. See MILESTONES.md v1.6 → Known Gaps / Known Verification Overrides.
 
 ## Performance Metrics
 
@@ -158,6 +171,4 @@ Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → the
 
 ## Operator Next Steps
 
-- New context: read `.planning/phases/43-collateral-wiring/43-CONTEXT.md`, then execute Phase 43.
-- Build collateral (`brandbook/examples/`), swap `docs/assets/parapet-logo.svg`+`favicon.svg`, verify `mix docs`, trim exploration HTMLs, write `v1.5-MILESTONE-AUDIT.md`.
-- Do NOT re-open the logo — it is locked (decision-log.md D-003).
+- Start the next milestone with /gsd-new-milestone

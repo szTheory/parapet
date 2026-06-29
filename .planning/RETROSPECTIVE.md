@@ -157,6 +157,39 @@
 - Sessions: spread across 2 days (2026-06-23 → 2026-06-24).
 - Notable: 28 commits, +4,044/−7,012 lines — net deletion, driven by trimming exploration HTMLs after the logo locked; final `brandbook/` footprint 192 KB.
 
+## Milestone: v1.6 — Operator UI Brand & Design-System Audit
+
+**Shipped:** 2026-06-29
+**Phases:** 7 (44–50) | **Plans:** 25
+
+### What Was Built
+The v1.5 brand book, applied to the generated, host-owned Operator UI: a values-only retheme of `operator_theme_bootstrap/1` across all three EEx templates (+ byte-parity demo mirrors), five subsetted IBM Plex woff2 faces (52.2 KB), a layer-by-layer WCAG 2.2 AA usability audit fixing real bugs (scrim/modal stacking, focus trap/restore, fake-disabled controls, dark-mode legibility, 390px overflow, designed empty/loading/error states, brand-voice microcopy), a demo-only `/parapet/_gallery` stress lab with five `PARAPET_DEMO_SCENARIO` fixtures, and forward-only guardrails (byte-parity, off-palette-hex gate, motion assertion, screenshot manifest + CI drift gate, evidence-binding audit).
+
+### What Worked
+- **RED-scaffold-first per phase.** Each phase opened with a failing-assertion test (string/contrast) pinning the exact done-bar before any markup shipped, so "done" was a gate flip, not a judgment call.
+- **Values-only discipline.** Re-pointing existing CSS vars (no class/selector/JS/markup change) kept every diff reviewable and the switcher/contrast test intact — and made the "no public-API/telemetry drift" claim trivially true.
+- **Byte-parity demo mirrors in lockstep.** Editing template + demo mirror in the same commit, enforced by a `Code.format_string!`-normalized parity test, prevented the two from silently diverging.
+- **Evidence-binding audit (GUARD-07).** A 68-row table where every cell is a command/file:line made the milestone audit verifiable rather than asserted.
+
+### What Was Inefficient
+- **Phase 48 never got a `/gsd-verify-work` pass**, so it had no `48-VERIFICATION.md` and showed as `complete=false` at close despite all 4 plans being done and human-verified — forcing an `override_closeout`. A verify pass at phase close would have avoided the readiness-check noise.
+- **TOKEN-04 straddled automatable and manual** — radius/type-scale layout-shift can't be asserted from string/contrast tests, so it lingered as a pending UAT/verification item across the whole milestone instead of being scoped out early as manual-only.
+
+### Patterns Established
+- **Layer-by-layer audit order** (foundations → primitives → nav/shell/data → groups → pages → fixtures → guardrails) as an idempotent, dependency-ordered sequence — each layer builds only on already-locked layers.
+- **Fail-closed palette gate sourced live from `tokens.css`** + a small set of documented exceptions, rather than a hand-maintained allowlist that drifts.
+- **DB-less, free-port demo gallery** for component stress review without standing up Postgres.
+
+### Key Lessons
+- Run `/gsd-verify-work` at every phase close, even when the work is visually obvious — the verification artifact is what keeps milestone readiness clean.
+- Classify manual-only acceptance criteria (visual layout-shift, pixel fidelity) as such up front so they don't masquerade as pending automated work for the life of the milestone.
+- A re-skin scoped to "values-only, no markup change" is the cheapest possible way to guarantee a frozen public/telemetry contract while still shipping a full visual overhaul.
+
+### Cost Observations
+- Model mix: predominantly opus (design iteration, adversarial judging, research).
+- Sessions: spread across 5 days (2026-06-24 → 2026-06-28).
+- Notable: 137 commits (34 `feat`), 136 files, +23,802/−1,512; font delta 52.2 KB / 262 KB tarball; closed `override_closeout` with 3 documented overrides.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -173,6 +206,7 @@
 | v1.3 | 3 / 4 | 1 | ~29632 | 4 plans / 1 day (UI polish/browser proof) |
 | v1.4 | 3 / 8 | 1 | - | 8 plans / 1 day (trust hardening/docs proof) |
 | v1.5 | 4 / 11 | 2 | - | 11 plans / 2 days (brand/design assets; +4044/−7012, brandbook 192 KB) |
+| v1.6 | 7 / 25 | 5 | - | 25 plans / 5 days (UI re-skin + design-system audit; +23802/−1512, 137 commits, fonts 52.2 KB) |
 
 ## Milestone: v0.10 — Adopter Success
 

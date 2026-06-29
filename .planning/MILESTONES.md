@@ -1,5 +1,42 @@
 # Milestones
 
+## v1.6 Operator UI Brand & Design-System Audit (Shipped: 2026-06-29)
+
+**Phases completed:** 7 phases (44–50), 25 plans, 50 tasks
+**Git range:** 137 commits (34 `feat`) over 5 days (2026-06-24 → 2026-06-28), 136 files changed (+23,802 / −1,512)
+
+**Key accomplishments:**
+
+- Re-skinned the generated, host-owned Operator UI to the v1.5 brand book — values-only edits to `operator_theme_bootstrap/1` across all three EEx templates (+ byte-parity demo mirrors): brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, and per-surface focus rings — with zero public-API, telemetry, class, selector, JS, or markup-color change.
+- Vendored five subsetted IBM Plex latin woff2 faces (52.2 KB total), served from the host static path with `font-display: swap` and a clean system-stack fallback and wired by the generator — the single, scoped relaxation of v1.5's "no font binaries" rule (`brandbook/` stays binary-free).
+- Ran a layer-by-layer, JTBD-focused design-system audit (foundations → primitives → nav/shell/data-display → component groups → pages/flows) fixing real usability bugs — scrim/modal stacking, focus trap/restore, fake-disabled controls, dark-mode legibility, 390px overflow, empty/loading/error states, brand-voice microcopy — each decision researched, adversarially judged, and pinned by ExUnit string/contrast assertions.
+- Brought the console to WCAG 2.2 AA on both themes: re-pinned `operator_ui_contrast_test.exs` to brand hexes (six status triplets, dark links `#7FB4C6`, focus rings at the 3:1 UI floor) and fixed the dark warning button from 2.9:1 to 5.62:1.
+- Shipped a demo-only `/parapet/_gallery` component-stress lab (DB-less, free-port), five reproducible stress seed scenarios (long-string/empty/max-items/mixed-status/combined) wired to `PARAPET_DEMO_SCENARIO`, and screenshot capture across desktop+mobile / light+dark.
+- Installed forward-only regression guardrails: template↔demo byte-parity (`Code.format_string!`-normalized), a fail-closed off-palette-hex gate (live `tokens.css` allowlist + 5 documented exceptions), a motion / reduced-motion assertion, a committed screenshot baseline manifest with a Postgres-free CI drift gate, and the GUARD-07 `v1.6-MILESTONE-AUDIT.md` binding every requirement to a command/file:line.
+
+**Audit:** Passed 2026-06-28: 61/68 requirements, 7/7 phases, 5/5 integration checks, 5/5 E2E flows. See [`milestones/v1.6-MILESTONE-AUDIT.md`](milestones/v1.6-MILESTONE-AUDIT.md).
+
+**Closeout type:** `override_closeout` — milestone closed with known, audit-reviewed verification overrides (3).
+
+### Known Gaps
+
+The 7 non-satisfied requirements were all shipped and human-verified in the live UI; the gap is in *automated* (ExUnit) coverage, not the shipped console:
+
+- **TOKEN-04** (type-scale / spacing / radius system-font fallback) — functional via Tailwind brand-scale utilities; not yet systematized as explicit `--radius-*` custom properties. Visual layout-shift correctness is manual-only per `48-VALIDATION.md`.
+- **FLOW-01..05, COPY-01..05, A11Y-06** (Phase 48 pages/flows/microcopy/landmarks) — shipped and human-verified via the `/parapet/_gallery` walkthrough; not yet pinned by ExUnit string assertions for the rendered states.
+
+### Known Verification Overrides (3)
+
+Acknowledged and deferred at close (see STATE.md → Deferred Items):
+
+- Phase 44 `44-UAT.md` — 1 pending scenario (TOKEN-04 manual visual check).
+- Phase 44 `44-VERIFICATION.md` — `human_needed` (TOKEN-04 radius/type-scale layout-shift, manual-only).
+- Phase 48 — fully executed (4/4 plan SUMMARYs) but never had a `/gsd-verify-work` pass, so no `48-VERIFICATION.md`; the milestone audit (Nyquist phase-48 compliant) is the standing verification evidence.
+
+**Tech debt carried forward:** Stable telemetry manifest (`telemetry_stable.json` + drift gate) — the durable WR-01 fix, deferred to a future telemetry/contract-hardening phase per D-21 (current `telemetry_contract_test.exs` proves no regression for this milestone).
+
+---
+
 ## v1.5 Brand Book & Logo System (Shipped: 2026-06-24)
 
 **Phases completed:** 4 phases (40–43), 11 plans, 16 tasks
