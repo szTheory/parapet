@@ -42,7 +42,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 
 **Milestone Goal:** Parapet's six spine tables live in a dedicated, configurable `parapet` Postgres schema by default (compile-time `@schema_prefix`, no runtime `prefix:`), existing adopters get a documented, tested, opt-in upgrade path (stay-on-`public` or a reversible `SET SCHEMA` move), and both the public API and telemetry contracts stay provably frozen. Closes the audited #1 quality weakness: no adopter-facing DB-schema upgrade story.
 
-- [ ] **Phase 51: Prefix Core & Test Seam** - Shared `use Parapet.Spine.Schema` compile-time `@schema_prefix` macro across all six spine schemas, single-sourced normalization, the `config/config.exs` env seam, and the hand-qualified concurrency bootstrap so the suite can run under the prefix at all.
+- [x] **Phase 51: Prefix Core & Test Seam** - Shared `use Parapet.Spine.Schema` compile-time `@schema_prefix` macro across all six spine schemas, single-sourced normalization, the `config/config.exs` env seam, and the hand-qualified concurrency bootstrap so the suite can run under the prefix at all. (completed 2026-06-30)
 - [ ] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value.
 - [ ] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`.
 - [ ] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check.
@@ -63,11 +63,11 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   3. `config/config.exs` reads `PARAPET_SCHEMA_PREFIX` (default-on `parapet`) so `compile_env` has a real source, and `config/` is confirmed excluded from the Hex `package.files` whitelist.
   4. `test/support/concurrency_bootstrap.ex` is hand-qualified — `CREATE SCHEMA IF NOT EXISTS`, every `CREATE TABLE`/`REFERENCES`/`ON`/`TRUNCATE` qualified to the prefixed schema (index *targets*, not names), `schema_migrations` left in `public` — and the full suite is green under `schema_prefix: parapet`.
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans complete
 
 - [x] 51-01-PLAN.md — Prefix core seam: `Parapet.Spine.Schema` macro + `config/config.exs` + `Evidence.schema_prefix/0` + Wave 0 test scaffold
 - [x] 51-02-PLAN.md — Switch all six spine schemas to `use Parapet.Spine.Schema` (pure subtraction); `__schema__(:prefix) == "parapet"`
-- [ ] 51-03-PLAN.md — Hand-qualify the concurrency bootstrap; full suite green under `schema_prefix: parapet`
+- [x] 51-03-PLAN.md — Hand-qualify the concurrency bootstrap; full suite green under `schema_prefix: parapet`
 
 ### Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix
 
@@ -149,7 +149,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 51. Prefix Core & Test Seam | v1.7 | 2/3 | In Progress|  |
+| 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete   | 2026-06-30 |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 0/TBD | Not started | - |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
