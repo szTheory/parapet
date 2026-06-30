@@ -2,15 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
+current_phase: 51
+current_phase_name: prefix-core-test-seam
 status: executing
 stopped_at: Phase 51 context gathered (assumptions mode)
-last_updated: "2026-06-30T03:19:01.036Z"
-last_activity: 2026-06-30 -- Phase 51 planning complete
+last_updated: "2026-06-30T04:29:44.871Z"
+last_activity: 2026-06-30
+last_activity_desc: Phase 51 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-29 after starting milestone v1.7 Postgres Schema Isolation & Upgrade Path)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** v1.7 Phase 51 — Prefix Core & Test Seam (ready to plan)
+**Current focus:** Phase 51 — prefix-core-test-seam
 
 ## Current Position
 
-Phase: 51 of 56 (Prefix Core & Test Seam) — first v1.7 phase
-Plan: — (not yet planned)
+Phase: 51 (prefix-core-test-seam) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-06-30 -- Phase 51 planning complete
+Last activity: 2026-06-30 — Phase 51 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -63,6 +66,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 - Trend: —
 
 *Updated after each plan completion*
+| Phase 51 P01 | 6min | - tasks | - files |
 
 ## Accumulated Context
 
@@ -77,6 +81,8 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - Two prerequisites the requirements assumed away: the library has NO `config/` dir (add an env-driven `config/config.exs` so `compile_env` resolves), and the main suite uses hand-written DDL (`ConcurrencyBootstrap`) that must be hand-qualified.
 - TEST-02 can't be proven at runtime (`@schema_prefix` is compile-time) — the dual-prefix CI matrix must namespace the `_build` cache key by prefix + `mix compile --force`, or the `public` leg false-greens.
 - Frozen-contract regression (`verify.public_api` + telemetry + compile-out, no new events) is a milestone done-criterion (Phase 56), not a feature.
+- [Phase ?]: Application.compile_env/3 must be read at module attribute level (not inside def body); normalize via @prefix module attribute at compile time (Parapet.Spine.Schema v1.7 pattern)
+- [Phase ?]: __prefix__/0 kept public (@doc false but callable) so Phase 54 doctor can read compiled prefix without future edit (D-01 discretion clause)
 
 ### Pending Todos
 
@@ -100,7 +106,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T02:55:35.759Z
+Last session: 2026-06-30T04:28:48.530Z
 Stopped at: Phase 51 context gathered (assumptions mode)
 Resume file: .planning/phases/51-prefix-core-test-seam/51-CONTEXT.md
 Next step: Plan Phase 51 with `/gsd-plan-phase 51` (Prefix Core & Test Seam)

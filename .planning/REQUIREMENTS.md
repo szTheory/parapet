@@ -10,10 +10,10 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Schema Prefix Core (`PREFIX`)
 
-- [ ] **PREFIX-01**: All six spine schemas use a shared `use Parapet.Spine.Schema` macro that sets a compile-time `@schema_prefix` (also dedups the repeated `@primary_key`/`@foreign_key_type` declarations).
-- [ ] **PREFIX-02**: The prefix defaults to `parapet`, read via `Application.compile_env(:parapet, :schema_prefix, "parapet")`.
-- [ ] **PREFIX-03**: `nil`, `""`, and `"public"` all normalize to unprefixed (byte-identical legacy SQL), via a single shared normalization helper used by the macro; a unit test asserts the macro's copy and the `config/config.exs` copy agree on `["parapet","","public",nil,"custom"]`.
-- [ ] **PREFIX-04**: A runtime resolution helper (`schema_prefix/0`, colocated with `Parapet.Evidence.repo/0`) supplies the prefix to runtime-only sites (generators, raw SQL).
+- [x] **PREFIX-01**: All six spine schemas use a shared `use Parapet.Spine.Schema` macro that sets a compile-time `@schema_prefix` (also dedups the repeated `@primary_key`/`@foreign_key_type` declarations).
+- [x] **PREFIX-02**: The prefix defaults to `parapet`, read via `Application.compile_env(:parapet, :schema_prefix, "parapet")`.
+- [x] **PREFIX-03**: `nil`, `""`, and `"public"` all normalize to unprefixed (byte-identical legacy SQL), via a single shared normalization helper used by the macro; a unit test asserts the macro's copy and the `config/config.exs` copy agree on `["parapet","","public",nil,"custom"]`.
+- [x] **PREFIX-04**: A runtime resolution helper (`schema_prefix/0`, colocated with `Parapet.Evidence.repo/0`) supplies the prefix to runtime-only sites (generators, raw SQL).
 
 ### Prefix Propagation (`PROP`)
 
@@ -45,7 +45,7 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Test Infrastructure (`TEST`)
 
-- [ ] **TEST-01**: Add an env-driven `config/config.exs` (reading `PARAPET_SCHEMA_PREFIX`, default-on `parapet`) so `compile_env` has a source; confirm `config/` is excluded from the Hex `package.files`.
+- [x] **TEST-01**: Add an env-driven `config/config.exs` (reading `PARAPET_SCHEMA_PREFIX`, default-on `parapet`) so `compile_env` has a source; confirm `config/` is excluded from the Hex `package.files`.
 - [ ] **TEST-02**: Hand-qualify `test/support/concurrency_bootstrap.ex` — add `CREATE SCHEMA IF NOT EXISTS`, qualify every `CREATE TABLE`/`REFERENCES`/`ON`/`TRUNCATE` to the prefixed schema (index *targets*, not index *names*); keep `schema_migrations` in `public`.
 - [ ] **TEST-03**: A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix to prevent a silent false-green. This is the honest proof of "green under `parapet` AND under `nil`."
 
@@ -96,11 +96,11 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 
 | Requirement | Phase | Status |
 |-------------|----------|---------|
-| PREFIX-01 | Phase 51 | Pending |
-| PREFIX-02 | Phase 51 | Pending |
-| PREFIX-03 | Phase 51 | Pending |
-| PREFIX-04 | Phase 51 | Pending |
-| TEST-01 | Phase 51 | Pending |
+| PREFIX-01 | Phase 51 | Complete |
+| PREFIX-02 | Phase 51 | Complete |
+| PREFIX-03 | Phase 51 | Complete |
+| PREFIX-04 | Phase 51 | Complete |
+| TEST-01 | Phase 51 | Complete |
 | TEST-02 | Phase 51 | Pending |
 | PROP-01 | Phase 52 | Pending |
 | PROP-02 | Phase 52 | Pending |
@@ -127,6 +127,7 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | SAFE-04 | Phase 56 | Pending |
 
 **Coverage:**
+
 - v1.7 requirements: 29 total
 - Mapped to phases: 29 ✓ (Phases 51–56)
 - Unmapped: 0 ✓
