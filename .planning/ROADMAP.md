@@ -81,7 +81,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   3. A static guard test over `lib/` fails the build with a structured, actionable message if any runtime `prefix:` is threaded into a repo call, any `insert_all`/`update_all`/`delete_all` uses a string-literal table name, or any `search_path`/raw `parapet_` SQL appears — green from day one (zero offenders today).
   4. A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix so the `public` leg cannot silently reuse the `parapet` build (no false-green).
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 
 Plans:
 **Wave 1**
@@ -91,7 +91,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 52-03-PLAN.md — Extract mcp/server.ex timeline join + PROP-01/PROP-03 propagation proof (to_sql joins + get_meta insert_all/Multi) (Wave 2)
+- [x] 52-03-PLAN.md — Extract mcp/server.ex timeline join + PROP-01/PROP-03 propagation proof (to_sql joins + get_meta insert_all/Multi) (Wave 2)
 - [ ] 52-04-PLAN.md — TEST-03 CI dual-prefix matrix + prefix-namespaced _build cache + in-suite leg-guard tripwire (Wave 2)
 
 ### Phase 53: Generators & Library Migrations
@@ -161,7 +161,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
-| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 2/4 | In Progress|  |
+| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 3/4 | In Progress|  |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
