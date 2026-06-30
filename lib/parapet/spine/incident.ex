@@ -8,8 +8,7 @@ defmodule Parapet.Spine.Incident do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Parapet.Spine.Schema
 
   @triage_fields ~w(
     integration
@@ -23,9 +22,6 @@ defmodule Parapet.Spine.Incident do
     next_safe_action
     confidence
   )
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   @type t :: %__MODULE__{
           id: Ecto.UUID.t() | nil,
           title: String.t() | nil,

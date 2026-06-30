@@ -8,8 +8,7 @@ defmodule Parapet.Spine.ActionClaim do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Parapet.Spine.Schema
 
   alias Parapet.Spine.Incident
 
@@ -23,9 +22,6 @@ defmodule Parapet.Spine.ActionClaim do
     "abandoned",
     "expired"
   ]
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "parapet_action_claims" do
     field(:action_kind, :string)
     field(:action_key, :string)

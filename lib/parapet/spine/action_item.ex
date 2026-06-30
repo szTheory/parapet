@@ -8,8 +8,7 @@ defmodule Parapet.Spine.ActionItem do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Parapet.Spine.Schema
 
   alias Parapet.Spine.Incident
 
@@ -20,9 +19,6 @@ defmodule Parapet.Spine.ActionItem do
     "orphaned_callback",
     "dead_letter"
   ]
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "parapet_action_items" do
     field(:title, :string)
     field(:integration, :string)
