@@ -4,15 +4,11 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
   alias Ecto.Adapters.SQL
   alias Parapet.TestSupport.ConcurrencyRepo
 
-  # Resolve the prefix at compile time — same normalization the macro uses (D-04).
-  # Reading compile_env here (not a literal) keeps the public/unprefixed leg unchanged
-  # for Phase 52 (Anti-Pattern: "Hardcoding parapet").
+  # Resolve the prefix at compile time — routes through the single normalization source
+  # (Parapet.Spine.Schema.normalize/1) so this bootstrap shares the canonical path
+  # rather than duplicating the normalization logic (WR-01/D-15).
   @raw_prefix Application.compile_env(:parapet, :schema_prefix, "parapet")
-  @prefix (case @raw_prefix do
-             p when p in [nil, "", "public"] -> nil
-             other when is_binary(other) -> other
-             other when is_atom(other) -> Atom.to_string(other)
-           end)
+  @prefix Parapet.Spine.Schema.normalize(@raw_prefix)
 
   @tables [
     "parapet_action_claims",
