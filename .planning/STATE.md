@@ -2,13 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
-current_phase: 52
-current_phase_name: Propagation Proof, Guards & CI Dual-Prefix Matrix
-status: ready_to_plan
-stopped_at: Phase 51 complete and verified (8/8 must-haves); ready to plan Phase 52
-last_updated: "2026-06-30T04:47:31.979Z"
-last_activity: 2026-06-30
-last_activity_desc: Phase 51 complete, transitioned to Phase 52
+status: planning
+stopped_at: Phase 52 context gathered (assumptions mode + deep research)
+last_updated: "2026-06-30T13:54:37.947Z"
+last_activity: 2026-06-30 — Phase 51 complete and verified, transitioned to Phase 52
 progress:
   total_phases: 6
   completed_phases: 1
@@ -97,6 +94,7 @@ None.
 v1.7's dual-prefix CI matrix interacts with the v1.8 pipeline reshape (CI-01) — sequence accordingly when v1.8 starts.
 
 Phase 51 code review (advisory, `51-REVIEW.md`) surfaced 4 warnings that map onto Phase 52's guard/CI-matrix scope — fold into Phase 52 planning:
+
 - ⚠️ [Phase 52] WR-01: the D-05 "agreement test" compares two test-local mirror copies, not the production normalizers (`config.exs` / `Schema.__prefix__/0`) — it cannot detect the drift it claims to guard. The dual-prefix CI matrix (TEST-03) is the real cross-leg proof.
 - ⚠️ [Phase 52] WR-02: `nil` normalizes asymmetrically across the three real copies (unset env → `"parapet"`; resolver/runtime `nil → nil`) — the matrix should pin both legs explicitly.
 - ⚠️ [Phase 52] WR-03: runtime `Evidence.schema_prefix/0` reads mutable app-env while schemas freeze at compile time — runtime/compile split-brain; the runtime-`prefix:` ban guard (PROP) + Phase-54 doctor are the intended mitigations.
@@ -116,9 +114,9 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30
-Stopped at: Phase 51 complete and verified (8/8 must-haves); transitioned to Phase 52
-Resume file: None
+Last session: 2026-06-30T13:54:37.942Z
+Stopped at: Phase 52 context gathered (assumptions mode + deep research)
+Resume file: .planning/phases/52-propagation-proof-guards-ci-dual-prefix-matrix/52-CONTEXT.md
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
 ## Operator Next Steps
