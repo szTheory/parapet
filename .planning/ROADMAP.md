@@ -60,7 +60,10 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   2. The shared normalization helper maps `["parapet","","public",nil,"custom"]` identically in the macro's `__prefix__/0` and the `config/config.exs` copy — a unit test asserts the two copies agree; `nil`/`""`/`"public"` all yield byte-identical legacy (unprefixed) SQL.
   3. `config/config.exs` reads `PARAPET_SCHEMA_PREFIX` (default-on `parapet`) so `compile_env` has a real source, and `config/` is confirmed excluded from the Hex `package.files` whitelist.
   4. `test/support/concurrency_bootstrap.ex` is hand-qualified — `CREATE SCHEMA IF NOT EXISTS`, every `CREATE TABLE`/`REFERENCES`/`ON`/`TRUNCATE` qualified to the prefixed schema (index *targets*, not names), `schema_migrations` left in `public` — and the full suite is green under `schema_prefix: parapet`.
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 51-01-PLAN.md — Prefix core seam: `Parapet.Spine.Schema` macro + `config/config.exs` + `Evidence.schema_prefix/0` + Wave 0 test scaffold
+- [ ] 51-02-PLAN.md — Switch all six spine schemas to `use Parapet.Spine.Schema` (pure subtraction); `__schema__(:prefix) == "parapet"`
+- [ ] 51-03-PLAN.md — Hand-qualify the concurrency bootstrap; full suite green under `schema_prefix: parapet`
 
 ### Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix
 **Goal**: Prove the compiled prefix propagates across every read/write path with zero call-site changes, make runtime `prefix:` and prefix-dropping writes impossible to reintroduce, and validate both `parapet` and `public` legs honestly in CI.
