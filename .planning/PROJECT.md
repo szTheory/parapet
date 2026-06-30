@@ -23,6 +23,8 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Current State
 
+**In progress:** v1.7 Postgres Schema Isolation & Upgrade Path — **Phase 51 (Prefix Core & Test Seam) complete & verified (2026-06-30, 8/8 must-haves).** Shipped the `Parapet.Spine.Schema` compile-time `@schema_prefix` macro (default `"parapet"`; `nil`/`""`/`"public"` ⇒ unprefixed) adopted by all six spine schemas, the library's first `config/config.exs` env seam (`PARAPET_SCHEMA_PREFIX`, kept out of the Hex `package.files`), the runtime `Evidence.schema_prefix/0` mirror, and hand-qualified `concurrency_bootstrap` DDL so the suite runs under the prefix (596 tests green, SQL confirmed hitting `"parapet"."parapet_*"`). Advisory code review (`51-REVIEW.md`) logged 4 warnings folded into Phase 52 planning (see STATE Blockers). Next: Phase 52 propagation proof, runtime-`prefix:` ban guard, dual-prefix CI matrix.
+
 **Shipped:** v1.6 Operator UI Brand & Design-System Audit (2026-06-29) — Re-skinned the generated, host-owned Operator UI to the v1.5 brand book via values-only edits to `operator_theme_bootstrap/1` (brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings) with zero public-API/telemetry/host-ownership change, vendored five subsetted IBM Plex woff2 faces (52.2 KB), ran a layer-by-layer WCAG 2.2 AA design-system audit fixing real usability bugs, and installed forward-only regression guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest, evidence-binding audit). 7/7 phases, 61/68 requirements (7 shipped+human-verified but not yet ExUnit-pinned); audit passed (see `.planning/milestones/v1.6-MILESTONE-AUDIT.md`).
 
 <details>
@@ -80,6 +82,7 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 
 ### Validated
 
+- ✓ Compile-time schema-prefix core: `use Parapet.Spine.Schema` macro (default `parapet`, `nil`/`""`/`"public"` opt-out) across all six spine schemas + `config/config.exs` env seam + `Evidence.schema_prefix/0` runtime mirror + prefix-qualified test bootstrap — v1.7 Phase 51 (PREFIX-01..04, TEST-01, TEST-02). Propagation/guards/CI-matrix proof still pending (Phase 52).
 - ✓ Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist — v0.1
 - ✓ Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default — v0.1
 - ✓ Add `lease_until` column to `parapet_action_claims` — v1.1 (FND-01)
@@ -343,4 +346,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-29 after starting milestone v1.7 Postgres Schema Isolation & Upgrade Path*
+*Last updated: 2026-06-30 after Phase 51 (Prefix Core & Test Seam) complete*

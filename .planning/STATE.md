@@ -4,8 +4,8 @@ milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 52
 current_phase_name: Propagation Proof, Guards & CI Dual-Prefix Matrix
-status: verifying
-stopped_at: Completed 51-03-PLAN.md
+status: ready_to_plan
+stopped_at: Phase 51 complete and verified (8/8 must-haves); ready to plan Phase 52
 last_updated: "2026-06-30T04:47:31.979Z"
 last_activity: 2026-06-30
 last_activity_desc: Phase 51 complete, transitioned to Phase 52
@@ -21,25 +21,25 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-29 after starting milestone v1.7 Postgres Schema Isolation & Upgrade Path)
+See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 51 — prefix-core-test-seam
+**Current focus:** Phase 52 — Propagation Proof, Guards & CI Dual-Prefix Matrix
 
 ## Current Position
 
 Phase: 52 — Propagation Proof, Guards & CI Dual-Prefix Matrix
 Plan: Not started
-Status: Phase complete — ready for verification
-Last activity: 2026-06-30 — Phase 51 complete, transitioned to Phase 52
+Status: Ready to plan
+Last activity: 2026-06-30 — Phase 51 complete and verified, transitioned to Phase 52
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] 1/6 phases (17%)
 
 ## Milestone Roadmap (v1.7)
 
 Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain: the config seam + bootstrap qualification (Phase 51) must land before propagation/guards can run under the prefix; the dual-prefix CI matrix (Phase 52) is the honest proof; generators → upgrade path+doctor → demo+docs → release hardening follow.
 
-- [ ] **51 Prefix Core & Test Seam** — PREFIX-01..04, TEST-01, TEST-02
+- [x] **51 Prefix Core & Test Seam** — PREFIX-01..04, TEST-01, TEST-02 ✓ 2026-06-30
 - [ ] **52 Propagation Proof, Guards & CI Dual-Prefix Matrix** — PROP-01..03, TEST-03
 - [ ] **53 Generators & Library Migrations** — GEN-01..07
 - [ ] **54 Upgrade Path & Doctor** — UPG-01..05, DOCTOR-01
@@ -83,10 +83,10 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - Two prerequisites the requirements assumed away: the library has NO `config/` dir (add an env-driven `config/config.exs` so `compile_env` resolves), and the main suite uses hand-written DDL (`ConcurrencyBootstrap`) that must be hand-qualified.
 - TEST-02 can't be proven at runtime (`@schema_prefix` is compile-time) — the dual-prefix CI matrix must namespace the `_build` cache key by prefix + `mix compile --force`, or the `public` leg false-greens.
 - Frozen-contract regression (`verify.public_api` + telemetry + compile-out, no new events) is a milestone done-criterion (Phase 56), not a feature.
-- [Phase ?]: Application.compile_env/3 must be read at module attribute level (not inside def body); normalize via @prefix module attribute at compile time (Parapet.Spine.Schema v1.7 pattern)
-- [Phase ?]: __prefix__/0 kept public (@doc false but callable) so Phase 54 doctor can read compiled prefix without future edit (D-01 discretion clause)
-- [Phase ?]: Pure subtraction: six spine schemas switched from use Ecto.Schema to use Parapet.Spine.Schema; macro re-injects identical boilerplate plus @schema_prefix at compile time (PREFIX-01/02 done)
-- [Phase ?]: Bootstrap reads Application.compile_env(:parapet, :schema_prefix) at module attribute level; q/1 qualifies ON/TABLE/REFERENCES targets only (not index names — Postgres invalid)
+- [Phase 51]: Application.compile_env/3 must be read at module attribute level (not inside def body); normalize via @prefix module attribute at compile time (Parapet.Spine.Schema v1.7 pattern)
+- [Phase 51]: __prefix__/0 kept public (@doc false but callable) so Phase 54 doctor can read compiled prefix without future edit (D-01 discretion clause)
+- [Phase 51]: Pure subtraction: six spine schemas switched from use Ecto.Schema to use Parapet.Spine.Schema; macro re-injects identical boilerplate plus @schema_prefix at compile time (PREFIX-01/02 done)
+- [Phase 51]: Bootstrap reads Application.compile_env(:parapet, :schema_prefix) at module attribute level; q/1 qualifies ON/TABLE/REFERENCES targets only (not index names — Postgres invalid)
 
 ### Pending Todos
 
@@ -94,7 +94,13 @@ None.
 
 ### Blockers/Concerns
 
-None. v1.7's dual-prefix CI matrix interacts with the v1.8 pipeline reshape (CI-01) — sequence accordingly when v1.8 starts.
+v1.7's dual-prefix CI matrix interacts with the v1.8 pipeline reshape (CI-01) — sequence accordingly when v1.8 starts.
+
+Phase 51 code review (advisory, `51-REVIEW.md`) surfaced 4 warnings that map onto Phase 52's guard/CI-matrix scope — fold into Phase 52 planning:
+- ⚠️ [Phase 52] WR-01: the D-05 "agreement test" compares two test-local mirror copies, not the production normalizers (`config.exs` / `Schema.__prefix__/0`) — it cannot detect the drift it claims to guard. The dual-prefix CI matrix (TEST-03) is the real cross-leg proof.
+- ⚠️ [Phase 52] WR-02: `nil` normalizes asymmetrically across the three real copies (unset env → `"parapet"`; resolver/runtime `nil → nil`) — the matrix should pin both legs explicitly.
+- ⚠️ [Phase 52] WR-03: runtime `Evidence.schema_prefix/0` reads mutable app-env while schemas freeze at compile time — runtime/compile split-brain; the runtime-`prefix:` ban guard (PROP) + Phase-54 doctor are the intended mitigations.
+- ⚠️ [Phase 52→53] WR-04: prefix interpolated into raw DDL identifiers without quoting (`concurrency_bootstrap.ex`) — the template a production generator (Phase 53 GEN) will copy; quote/validate before it propagates.
 
 ## Deferred Items
 
@@ -110,11 +116,11 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T04:40:23.489Z
-Stopped at: Completed 51-03-PLAN.md
+Last session: 2026-06-30
+Stopped at: Phase 51 complete and verified (8/8 must-haves); transitioned to Phase 52
 Resume file: None
-Next step: Plan Phase 51 with `/gsd-plan-phase 51` (Prefix Core & Test Seam)
+Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
 ## Operator Next Steps
 
-- Plan the first v1.7 phase: `/gsd-plan-phase 51`
+- Discuss the next v1.7 phase: `/gsd-discuss-phase 52` (then `/gsd-plan-phase 52`)
