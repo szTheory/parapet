@@ -25,6 +25,28 @@ defmodule Parapet.Evidence do
             "Parapet requires a :repo to be configured. Please set `config :parapet, repo: MyApp.Repo`."
   end
 
+  @doc since: "1.7.0"
+  @doc """
+  Returns the runtime Postgres schema prefix for Parapet spine tables.
+
+  This is the runtime mirror of the compile-time `Parapet.Spine.Schema.__prefix__/0`.
+  Both must agree on the normalization input set `["parapet","","public",nil,"custom"]`
+  → `["parapet", nil, nil, nil, "custom"]`; the Phase-54 doctor check verifies this
+  agreement at runtime.
+
+  Returns `"parapet"` by default (when `:schema_prefix` is not configured at runtime).
+  Returns `nil` for `""`, `"public"`, and `nil` values (unprefixed / legacy public-schema behavior).
+  Runtime `prefix:` threaded into Repo calls is BANNED — this helper is for introspection
+  and generator use only, not for query-time prefix threading.
+  """
+  def schema_prefix do
+    case Application.get_env(:parapet, :schema_prefix, "parapet") do
+      p when p in [nil, "", "public"] -> nil
+      other when is_binary(other) -> other
+      other when is_atom(other) -> Atom.to_string(other)
+    end
+  end
+
   @doc since: "1.0.0"
   @doc """
   Creates a new ActionItem.
