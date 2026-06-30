@@ -42,7 +42,8 @@
       "log_tool_audit/1",
       "repo/0",
       "resolve_action_item/1",
-      "run_operator_command/1"
+      "run_operator_command/1",
+      "schema_prefix/0"
     ],
     "module": "Parapet.Evidence",
     "callbacks": [],
