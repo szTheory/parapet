@@ -198,6 +198,38 @@ defmodule Parapet.EvidenceTest do
     end
   end
 
+  describe "schema_prefix/0" do
+    test "returns \"parapet\" by default (no runtime config set)" do
+      # ensure no runtime override is set
+      Application.delete_env(:parapet, :schema_prefix)
+      assert Parapet.Evidence.schema_prefix() == "parapet"
+    end
+
+    test "returns nil when runtime config is empty string" do
+      Application.put_env(:parapet, :schema_prefix, "")
+      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
+      assert Parapet.Evidence.schema_prefix() == nil
+    end
+
+    test "returns nil when runtime config is \"public\"" do
+      Application.put_env(:parapet, :schema_prefix, "public")
+      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
+      assert Parapet.Evidence.schema_prefix() == nil
+    end
+
+    test "returns nil when runtime config is nil" do
+      Application.put_env(:parapet, :schema_prefix, nil)
+      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
+      assert Parapet.Evidence.schema_prefix() == nil
+    end
+
+    test "returns the custom prefix when runtime config is a custom binary" do
+      Application.put_env(:parapet, :schema_prefix, "myapp")
+      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
+      assert Parapet.Evidence.schema_prefix() == "myapp"
+    end
+  end
+
   describe "run_operator_command/1" do
     setup do
       # Attach a telemetry handler to track events
