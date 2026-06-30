@@ -8,13 +8,9 @@ defmodule Parapet.Spine.ToolAudit do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Parapet.Spine.Schema
 
   alias Parapet.Spine.TimelineEntry
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "parapet_tool_audits" do
     field(:tool_name, :string)
     field(:input, :map)

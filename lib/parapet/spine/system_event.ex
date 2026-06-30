@@ -9,11 +9,7 @@ defmodule Parapet.Spine.SystemEvent do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
+  use Parapet.Spine.Schema
   schema "parapet_system_events" do
     field(:type, :string)
     field(:payload, :map, default: %{})

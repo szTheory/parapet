@@ -8,8 +8,7 @@ defmodule Parapet.Spine.TimelineEntry do
   > single-version notice in CHANGELOG.md. See
   > [Stability & Deprecation Policy](stability.html) for details.
   """
-  use Ecto.Schema
-  import Ecto.Changeset
+  use Parapet.Spine.Schema
 
   alias Parapet.Spine.Incident
 
@@ -26,9 +25,6 @@ defmodule Parapet.Spine.TimelineEntry do
     confidence
     evidence_facts
   )
-
-  @primary_key {:id, :binary_id, autogenerate: true}
-  @foreign_key_type :binary_id
   schema "parapet_timeline_entries" do
     field(:type, :string)
     field(:payload, :map)
