@@ -63,10 +63,10 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   3. `config/config.exs` reads `PARAPET_SCHEMA_PREFIX` (default-on `parapet`) so `compile_env` has a real source, and `config/` is confirmed excluded from the Hex `package.files` whitelist.
   4. `test/support/concurrency_bootstrap.ex` is hand-qualified — `CREATE SCHEMA IF NOT EXISTS`, every `CREATE TABLE`/`REFERENCES`/`ON`/`TRUNCATE` qualified to the prefixed schema (index *targets*, not names), `schema_migrations` left in `public` — and the full suite is green under `schema_prefix: parapet`.
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 
 - [x] 51-01-PLAN.md — Prefix core seam: `Parapet.Spine.Schema` macro + `config/config.exs` + `Evidence.schema_prefix/0` + Wave 0 test scaffold
-- [ ] 51-02-PLAN.md — Switch all six spine schemas to `use Parapet.Spine.Schema` (pure subtraction); `__schema__(:prefix) == "parapet"`
+- [x] 51-02-PLAN.md — Switch all six spine schemas to `use Parapet.Spine.Schema` (pure subtraction); `__schema__(:prefix) == "parapet"`
 - [ ] 51-03-PLAN.md — Hand-qualify the concurrency bootstrap; full suite green under `schema_prefix: parapet`
 
 ### Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix
@@ -149,7 +149,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 51. Prefix Core & Test Seam | v1.7 | 1/3 | In Progress|  |
+| 51. Prefix Core & Test Seam | v1.7 | 2/3 | In Progress|  |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 0/TBD | Not started | - |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |

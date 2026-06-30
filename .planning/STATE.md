@@ -5,15 +5,15 @@ milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 51
 current_phase_name: prefix-core-test-seam
 status: executing
-stopped_at: Phase 51 context gathered (assumptions mode)
-last_updated: "2026-06-30T04:29:44.871Z"
+stopped_at: Completed 51-02-PLAN.md
+last_updated: "2026-06-30T04:34:04.996Z"
 last_activity: 2026-06-30
 last_activity_desc: Phase 51 execution started
 progress:
   total_phases: 6
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-29 after starting milestone v1.7 Post
 ## Current Position
 
 Phase: 51 (prefix-core-test-seam) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-30 — Phase 51 execution started
 
@@ -67,6 +67,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 
 *Updated after each plan completion*
 | Phase 51 P01 | 6min | - tasks | - files |
+| Phase 51 P02 | 4min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,7 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - Frozen-contract regression (`verify.public_api` + telemetry + compile-out, no new events) is a milestone done-criterion (Phase 56), not a feature.
 - [Phase ?]: Application.compile_env/3 must be read at module attribute level (not inside def body); normalize via @prefix module attribute at compile time (Parapet.Spine.Schema v1.7 pattern)
 - [Phase ?]: __prefix__/0 kept public (@doc false but callable) so Phase 54 doctor can read compiled prefix without future edit (D-01 discretion clause)
+- [Phase ?]: Pure subtraction: six spine schemas switched from use Ecto.Schema to use Parapet.Spine.Schema; macro re-injects identical boilerplate plus @schema_prefix at compile time (PREFIX-01/02 done)
 
 ### Pending Todos
 
@@ -106,9 +108,9 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T04:28:48.530Z
-Stopped at: Phase 51 context gathered (assumptions mode)
-Resume file: .planning/phases/51-prefix-core-test-seam/51-CONTEXT.md
+Last session: 2026-06-30T04:34:04.992Z
+Stopped at: Completed 51-02-PLAN.md
+Resume file: None
 Next step: Plan Phase 51 with `/gsd-plan-phase 51` (Prefix Core & Test Seam)
 
 ## Operator Next Steps
