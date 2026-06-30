@@ -55,9 +55,14 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
   end
 
   defp ddl_statements do
+    # Every CREATE TABLE target, every REFERENCES target, and every CREATE INDEX ON target
+    # flows through q/1 so that the correct schema is used under the compiled @prefix.
+    # Index NAMES are left bare — qualifying an index name is invalid Postgres (Pitfall 1).
+    # Under @prefix nil every q/1 call returns a bare "table" identifier, preserving the
+    # public/legacy leg byte-for-byte (Phase 52 unprefixed axis).
     [
       """
-      CREATE TABLE IF NOT EXISTS parapet_incidents (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_incidents")} (
         id uuid PRIMARY KEY,
         title varchar(255) NOT NULL,
         description text,
@@ -71,73 +76,73 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
       """,
       """
       CREATE UNIQUE INDEX IF NOT EXISTS parapet_incidents_correlation_key_open_index
-      ON parapet_incidents (correlation_key)
+      ON #{q("parapet_incidents")} (correlation_key)
       WHERE state = 'open'
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_incidents_open_updated_at_id_index
-      ON parapet_incidents (updated_at, id)
+      ON #{q("parapet_incidents")} (updated_at, id)
       WHERE state IN ('open', 'investigating')
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_incidents_resolved_updated_at_id_index
-      ON parapet_incidents (updated_at, id)
+      ON #{q("parapet_incidents")} (updated_at, id)
       WHERE state = 'resolved'
       """,
       """
-      CREATE TABLE IF NOT EXISTS parapet_action_items (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_action_items")} (
         id uuid PRIMARY KEY,
         title varchar(255) NOT NULL,
         integration varchar(255) NOT NULL,
         external_id varchar(255) NOT NULL,
         kind varchar(255) NOT NULL DEFAULT 'exact_follow_up',
         state varchar(255) NOT NULL DEFAULT 'open',
-        incident_id uuid REFERENCES parapet_incidents(id) ON DELETE SET NULL,
+        incident_id uuid REFERENCES #{q("parapet_incidents")}(id) ON DELETE SET NULL,
         inserted_at timestamp(6) without time zone NOT NULL,
         updated_at timestamp(6) without time zone NOT NULL
       )
       """,
       """
-      CREATE TABLE IF NOT EXISTS parapet_timeline_entries (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_timeline_entries")} (
         id uuid PRIMARY KEY,
         type varchar(255) NOT NULL,
         payload jsonb NOT NULL DEFAULT '{}'::jsonb,
-        incident_id uuid NOT NULL REFERENCES parapet_incidents(id) ON DELETE CASCADE,
+        incident_id uuid NOT NULL REFERENCES #{q("parapet_incidents")}(id) ON DELETE CASCADE,
         inserted_at timestamp(6) without time zone NOT NULL,
         updated_at timestamp(6) without time zone NOT NULL
       )
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_timeline_entries_incident_id_index
-      ON parapet_timeline_entries (incident_id)
+      ON #{q("parapet_timeline_entries")} (incident_id)
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_timeline_entries_incident_id_inserted_at_index
-      ON parapet_timeline_entries (incident_id, inserted_at)
+      ON #{q("parapet_timeline_entries")} (incident_id, inserted_at)
       """,
       """
-      CREATE TABLE IF NOT EXISTS parapet_tool_audits (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_tool_audits")} (
         id uuid PRIMARY KEY,
         tool_name varchar(255) NOT NULL,
         input jsonb NOT NULL DEFAULT '{}'::jsonb,
         output jsonb NOT NULL DEFAULT '{}'::jsonb,
         success boolean NOT NULL DEFAULT false,
         duration_ms integer,
-        timeline_entry_id uuid REFERENCES parapet_timeline_entries(id) ON DELETE CASCADE,
+        timeline_entry_id uuid REFERENCES #{q("parapet_timeline_entries")}(id) ON DELETE CASCADE,
         inserted_at timestamp(6) without time zone NOT NULL,
         updated_at timestamp(6) without time zone NOT NULL
       )
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_tool_audits_timeline_entry_id_index
-      ON parapet_tool_audits (timeline_entry_id)
+      ON #{q("parapet_tool_audits")} (timeline_entry_id)
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_tool_audits_timeline_entry_id_inserted_at_index
-      ON parapet_tool_audits (timeline_entry_id, inserted_at)
+      ON #{q("parapet_tool_audits")} (timeline_entry_id, inserted_at)
       """,
       """
-      CREATE TABLE IF NOT EXISTS parapet_system_events (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_system_events")} (
         id uuid PRIMARY KEY,
         type varchar(255) NOT NULL,
         payload jsonb NOT NULL DEFAULT '{}'::jsonb,
@@ -147,12 +152,12 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_system_events_inserted_at_index
-      ON parapet_system_events (inserted_at)
+      ON #{q("parapet_system_events")} (inserted_at)
       """,
       """
-      CREATE TABLE IF NOT EXISTS parapet_action_claims (
+      CREATE TABLE IF NOT EXISTS #{q("parapet_action_claims")} (
         id uuid PRIMARY KEY,
-        incident_id uuid NOT NULL REFERENCES parapet_incidents(id) ON DELETE CASCADE,
+        incident_id uuid NOT NULL REFERENCES #{q("parapet_incidents")}(id) ON DELETE CASCADE,
         action_kind varchar(255) NOT NULL,
         action_key varchar(255) NOT NULL,
         status varchar(255) NOT NULL DEFAULT 'claimed',
@@ -171,20 +176,20 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
       """,
       """
       CREATE UNIQUE INDEX IF NOT EXISTS parapet_action_claims_incident_id_action_kind_action_key_index
-      ON parapet_action_claims (incident_id, action_kind, action_key)
+      ON #{q("parapet_action_claims")} (incident_id, action_kind, action_key)
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_action_claims_status_claimed_at_index
-      ON parapet_action_claims (status, claimed_at)
+      ON #{q("parapet_action_claims")} (status, claimed_at)
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_action_claims_lease_until_claimed_index
-      ON parapet_action_claims (lease_until)
+      ON #{q("parapet_action_claims")} (lease_until)
       WHERE status = 'claimed'
       """,
       """
       CREATE INDEX IF NOT EXISTS parapet_action_claims_incident_id_inserted_at_index
-      ON parapet_action_claims (incident_id, inserted_at)
+      ON #{q("parapet_action_claims")} (incident_id, inserted_at)
       """
     ]
   end
