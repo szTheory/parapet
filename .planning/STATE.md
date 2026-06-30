@@ -2,15 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
+current_phase: 52
+current_phase_name: propagation-proof-guards-ci-dual-prefix-matrix
 status: executing
 stopped_at: "Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)"
-last_updated: "2026-06-30T15:22:20.679Z"
+last_updated: "2026-06-30T15:28:31.231Z"
 last_activity: 2026-06-30
 progress:
   total_phases: 6
   completed_phases: 1
   total_plans: 7
-  completed_plans: 4
+  completed_plans: 5
   percent: 17
 ---
 
@@ -26,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 ## Current Position
 
 Phase: 52 (propagation-proof-guards-ci-dual-prefix-matrix) — EXECUTING
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Ready to execute
 Last activity: 2026-06-30
 
@@ -67,6 +69,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 51 P02 | 4min | 3 tasks | 6 files |
 | Phase 51 P03 | 4min | 3 tasks | 1 files |
 | Phase 52 P01 | 12 | 3 tasks | 7 files |
+| Phase 52 P02 | 2 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -88,6 +91,7 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: Parapet.Spine.Schema.Normalizer private submodule: Elixir cannot call same-module functions from compile-time module attributes — submodule-first approach is the idiomatic solution
 - [Phase ?]: Evidence.schema_prefix/0 delegation to Schema.__prefix__(): frozen compile-time value eliminates runtime/compile split-brain by construction (WR-03)
 - [Phase ?]: safe_ident!/1 allowlist (^[a-z_][a-z0-9_]*$ + 63-byte limit) folded into normalize/1: every prefix resolution path guarded before DDL interpolation (WR-04, T-52-01 threat)
+- [Phase ?]: PROP-02 backtick lookbehind: excluded doc-string prefix: mentions added by Plan 01 from the guard fingerprint
 
 ### Pending Todos
 
@@ -118,7 +122,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T15:22:20.675Z
+Last session: 2026-06-30T15:27:57.973Z
 Stopped at: Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)
 Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
