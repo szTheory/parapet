@@ -81,7 +81,13 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   3. A static guard test over `lib/` fails the build with a structured, actionable message if any runtime `prefix:` is threaded into a repo call, any `insert_all`/`update_all`/`delete_all` uses a string-literal table name, or any `search_path`/raw `parapet_` SQL appears — green from day one (zero offenders today).
   4. A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix so the `public` leg cannot silently reuse the `parapet` build (no false-green).
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 52-01-PLAN.md — Seal the four WR-01..04 leaks into a single normalize/1 + safe_ident!/1 source; delegate Evidence.schema_prefix/0; rewrite agreement + invert evidence tests (Wave 1)
+- [ ] 52-02-PLAN.md — PROP-02 static guard fitness function (green from day one, zero offenders) (Wave 1)
+- [ ] 52-03-PLAN.md — Extract mcp/server.ex timeline join + PROP-01/PROP-03 propagation proof (to_sql joins + get_meta insert_all/Multi) (Wave 2)
+- [ ] 52-04-PLAN.md — TEST-03 CI dual-prefix matrix + prefix-namespaced _build cache + in-suite leg-guard tripwire (Wave 2)
 
 ### Phase 53: Generators & Library Migrations
 
