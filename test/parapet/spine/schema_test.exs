@@ -4,6 +4,76 @@ defmodule Parapet.Spine.SchemaTest do
   alias Parapet.Spine.{Incident, ActionItem, SystemEvent, ToolAudit, TimelineEntry, ActionClaim}
 
   # ---------------------------------------------------------------------------
+  # normalize/1 unit tests (TDD RED — will pass once normalize/1 is defined)
+  # ---------------------------------------------------------------------------
+  describe "normalize/1" do
+    test "maps nil to nil" do
+      assert Parapet.Spine.Schema.normalize(nil) == nil
+    end
+
+    test "maps empty string to nil" do
+      assert Parapet.Spine.Schema.normalize("") == nil
+    end
+
+    test "maps \"public\" to nil" do
+      assert Parapet.Spine.Schema.normalize("public") == nil
+    end
+
+    test "maps :public atom to nil" do
+      assert Parapet.Spine.Schema.normalize(:public) == nil
+    end
+
+    test "maps \"parapet\" to \"parapet\"" do
+      assert Parapet.Spine.Schema.normalize("parapet") == "parapet"
+    end
+
+    test "maps \"custom\" to \"custom\"" do
+      assert Parapet.Spine.Schema.normalize("custom") == "custom"
+    end
+
+    test "maps :custom atom to \"custom\"" do
+      assert Parapet.Spine.Schema.normalize(:custom) == "custom"
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # safe_ident!/1 unit tests (TDD RED — will pass once safe_ident!/1 is defined)
+  # ---------------------------------------------------------------------------
+  describe "safe_ident!/1" do
+    test "accepts valid lowercase identifier" do
+      assert Parapet.Spine.Schema.safe_ident!("parapet") == "parapet"
+    end
+
+    test "accepts identifier starting with underscore" do
+      assert Parapet.Spine.Schema.safe_ident!("_parapet") == "_parapet"
+    end
+
+    test "raises for uppercase identifier" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Parapet.Spine.Schema.safe_ident!("Parapet")
+      end
+    end
+
+    test "raises for leading digit" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Parapet.Spine.Schema.safe_ident!("1bad")
+      end
+    end
+
+    test "raises for identifier exceeding 63 bytes" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Parapet.Spine.Schema.safe_ident!(String.duplicate("a", 64))
+      end
+    end
+
+    test "raises for hyphen in identifier" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Parapet.Spine.Schema.safe_ident!("a-b")
+      end
+    end
+  end
+
+  # ---------------------------------------------------------------------------
   # compiled-prefix-across-six
   # Asserts all six spine schemas carry @schema_prefix "parapet" (the default).
   # Stays RED until Plan 02 switches the six schemas to `use Parapet.Spine.Schema`.
