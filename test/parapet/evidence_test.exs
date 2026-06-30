@@ -199,34 +199,23 @@ defmodule Parapet.EvidenceTest do
   end
 
   describe "schema_prefix/0" do
-    test "returns \"parapet\" by default (no runtime config set)" do
-      # ensure no runtime override is set
-      Application.delete_env(:parapet, :schema_prefix)
-      assert Parapet.Evidence.schema_prefix() == "parapet"
+    @compiled_prefix Parapet.Spine.Schema.__prefix__()
+
+    test "returns the compiled-time prefix value" do
+      assert Parapet.Evidence.schema_prefix() == @compiled_prefix
     end
 
-    test "returns nil when runtime config is empty string" do
-      Application.put_env(:parapet, :schema_prefix, "")
+    test "is frozen to the compiled value — ignores Application.put_env at runtime" do
+      original = Parapet.Evidence.schema_prefix()
+      Application.put_env(:parapet, :schema_prefix, "should_be_ignored")
       on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
-      assert Parapet.Evidence.schema_prefix() == nil
+
+      assert Parapet.Evidence.schema_prefix() == original,
+             "schema_prefix/0 must not read mutable app env; delegate to Schema.__prefix__()"
     end
 
-    test "returns nil when runtime config is \"public\"" do
-      Application.put_env(:parapet, :schema_prefix, "public")
-      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
-      assert Parapet.Evidence.schema_prefix() == nil
-    end
-
-    test "returns nil when runtime config is nil" do
-      Application.put_env(:parapet, :schema_prefix, nil)
-      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
-      assert Parapet.Evidence.schema_prefix() == nil
-    end
-
-    test "returns the custom prefix when runtime config is a custom binary" do
-      Application.put_env(:parapet, :schema_prefix, "myapp")
-      on_exit(fn -> Application.delete_env(:parapet, :schema_prefix) end)
-      assert Parapet.Evidence.schema_prefix() == "myapp"
+    test "agrees with Parapet.Spine.Schema.__prefix__()" do
+      assert Parapet.Evidence.schema_prefix() == Parapet.Spine.Schema.__prefix__()
     end
   end
 
