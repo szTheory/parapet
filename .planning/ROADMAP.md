@@ -43,7 +43,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 **Milestone Goal:** Parapet's six spine tables live in a dedicated, configurable `parapet` Postgres schema by default (compile-time `@schema_prefix`, no runtime `prefix:`), existing adopters get a documented, tested, opt-in upgrade path (stay-on-`public` or a reversible `SET SCHEMA` move), and both the public API and telemetry contracts stay provably frozen. Closes the audited #1 quality weakness: no adopter-facing DB-schema upgrade story.
 
 - [x] **Phase 51: Prefix Core & Test Seam** - Shared `use Parapet.Spine.Schema` compile-time `@schema_prefix` macro across all six spine schemas, single-sourced normalization, the `config/config.exs` env seam, and the hand-qualified concurrency bootstrap so the suite can run under the prefix at all. (completed 2026-06-30)
-- [ ] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value.
+- [x] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value. (completed 2026-06-30)
 - [ ] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`.
 - [ ] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check.
 - [ ] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story.
@@ -81,7 +81,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
   3. A static guard test over `lib/` fails the build with a structured, actionable message if any runtime `prefix:` is threaded into a repo call, any `insert_all`/`update_all`/`delete_all` uses a string-literal table name, or any `search_path`/raw `parapet_` SQL appears — green from day one (zero offenders today).
   4. A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix so the `public` leg cannot silently reuse the `parapet` build (no false-green).
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 Plans:
 **Wave 1**
@@ -92,7 +92,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 52-03-PLAN.md — Extract mcp/server.ex timeline join + PROP-01/PROP-03 propagation proof (to_sql joins + get_meta insert_all/Multi) (Wave 2)
-- [ ] 52-04-PLAN.md — TEST-03 CI dual-prefix matrix + prefix-namespaced _build cache + in-suite leg-guard tripwire (Wave 2)
+- [x] 52-04-PLAN.md — TEST-03 CI dual-prefix matrix + prefix-namespaced _build cache + in-suite leg-guard tripwire (Wave 2)
 
 ### Phase 53: Generators & Library Migrations
 
@@ -161,7 +161,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
-| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 3/4 | In Progress|  |
+| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete   | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |

@@ -47,7 +47,7 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 - [x] **TEST-01**: Add an env-driven `config/config.exs` (reading `PARAPET_SCHEMA_PREFIX`, default-on `parapet`) so `compile_env` has a source; confirm `config/` is excluded from the Hex `package.files`.
 - [x] **TEST-02**: Hand-qualify `test/support/concurrency_bootstrap.ex` — add `CREATE SCHEMA IF NOT EXISTS`, qualify every `CREATE TABLE`/`REFERENCES`/`ON`/`TRUNCATE` to the prefixed schema (index *targets*, not index *names*); keep `schema_migrations` in `public`.
-- [ ] **TEST-03**: A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix to prevent a silent false-green. This is the honest proof of "green under `parapet` AND under `nil`."
+- [x] **TEST-03**: A CI matrix axis `schema_prefix: ['parapet','public']` recompiles (`mix compile --force`) and reruns the full suite per value, with the `_build` cache key namespaced by prefix to prevent a silent false-green. This is the honest proof of "green under `parapet` AND under `nil`."
 
 ### Documentation (`DOC`)
 
@@ -105,7 +105,7 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | PROP-01 | Phase 52 | Complete |
 | PROP-02 | Phase 52 | Complete |
 | PROP-03 | Phase 52 | Complete |
-| TEST-03 | Phase 52 | Pending |
+| TEST-03 | Phase 52 | Complete |
 | GEN-01 | Phase 53 | Pending |
 | GEN-02 | Phase 53 | Pending |
 | GEN-03 | Phase 53 | Pending |

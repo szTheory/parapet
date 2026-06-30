@@ -4,16 +4,16 @@ milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 52
 current_phase_name: propagation-proof-guards-ci-dual-prefix-matrix
-status: executing
-stopped_at: "Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)"
-last_updated: "2026-06-30T15:38:42.946Z"
+status: verifying
+stopped_at: "Completed 52-04-PLAN.md: TEST-03 CI dual-prefix matrix + compiled_prefix_leg_test.exs (D-11..D-14)"
+last_updated: "2026-06-30T15:49:09.658Z"
 last_activity: 2026-06-30
 progress:
   total_phases: 6
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 7
-  completed_plans: 6
-  percent: 17
+  completed_plans: 7
+  percent: 33
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 Phase: 52 (propagation-proof-guards-ci-dual-prefix-matrix) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-06-30
 
 Progress: [██████░░░░] 57%
@@ -71,6 +71,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 52 P01 | 12 | 3 tasks | 7 files |
 | Phase 52 P02 | 2 | 1 tasks | 1 files |
 | Phase 52 P03 | 6 minutes | 2 tasks | 3 files |
+| Phase 52 P04 | 10 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -93,6 +94,7 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: Evidence.schema_prefix/0 delegation to Schema.__prefix__(): frozen compile-time value eliminates runtime/compile split-brain by construction (WR-03)
 - [Phase ?]: safe_ident!/1 allowlist (^[a-z_][a-z0-9_]*$ + 63-byte limit) folded into normalize/1: every prefix resolution path guarded before DDL interpolation (WR-04, T-52-01 threat)
 - [Phase ?]: PROP-02 backtick lookbehind: excluded doc-string prefix: mentions added by Plan 01 from the guard fingerprint
+- [Phase ?]: D-11: pruned matrix.include for CI schema_prefix axis (+1 cell 3→4); D-13: only _build namespaced; D-14: leg guard reuses Schema.normalize/1
 
 ### Pending Todos
 
@@ -123,8 +125,8 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T15:38:42.934Z
-Stopped at: Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)
+Last session: 2026-06-30T15:49:09.652Z
+Stopped at: Completed 52-04-PLAN.md: TEST-03 CI dual-prefix matrix + compiled_prefix_leg_test.exs (D-11..D-14)
 Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
