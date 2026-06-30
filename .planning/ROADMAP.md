@@ -84,8 +84,13 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 **Plans**: 4 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 52-01-PLAN.md — Seal the four WR-01..04 leaks into a single normalize/1 + safe_ident!/1 source; delegate Evidence.schema_prefix/0; rewrite agreement + invert evidence tests (Wave 1)
 - [ ] 52-02-PLAN.md — PROP-02 static guard fitness function (green from day one, zero offenders) (Wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 52-03-PLAN.md — Extract mcp/server.ex timeline join + PROP-01/PROP-03 propagation proof (to_sql joins + get_meta insert_all/Multi) (Wave 2)
 - [ ] 52-04-PLAN.md — TEST-03 CI dual-prefix matrix + prefix-namespaced _build cache + in-suite leg-guard tripwire (Wave 2)
 
