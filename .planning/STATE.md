@@ -2,18 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
-current_phase: 52
-current_phase_name: Propagation Proof, Guards & CI Dual-Prefix Matrix
 status: executing
-stopped_at: Phase 52 context gathered (assumptions mode + deep research)
-last_updated: "2026-06-30T14:58:49.103Z"
+stopped_at: "Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)"
+last_updated: "2026-06-30T15:22:20.679Z"
 last_activity: 2026-06-30
-last_activity_desc: Phase 51 complete and verified, transitioned to Phase 52
 progress:
   total_phases: 6
   completed_phases: 1
-  total_plans: 3
-  completed_plans: 3
+  total_plans: 7
+  completed_plans: 4
   percent: 17
 ---
 
@@ -24,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 52 — Propagation Proof, Guards & CI Dual-Prefix Matrix
+**Current focus:** Phase 52 — propagation-proof-guards-ci-dual-prefix-matrix
 
 ## Current Position
 
-Phase: 52 — Propagation Proof, Guards & CI Dual-Prefix Matrix
-Plan: Not started
+Phase: 52 (propagation-proof-guards-ci-dual-prefix-matrix) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-06-30 — Phase 51 complete and verified, transitioned to Phase 52
+Last activity: 2026-06-30
 
-Progress: [███░░░░░░░] 1/6 phases (17%)
+Progress: [██████░░░░] 57%
 
 ## Milestone Roadmap (v1.7)
 
@@ -69,6 +66,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 51 P01 | 6min | - tasks | - files |
 | Phase 51 P02 | 4min | 3 tasks | 6 files |
 | Phase 51 P03 | 4min | 3 tasks | 1 files |
+| Phase 52 P01 | 12 | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -87,6 +85,9 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase 51]: __prefix__/0 kept public (@doc false but callable) so Phase 54 doctor can read compiled prefix without future edit (D-01 discretion clause)
 - [Phase 51]: Pure subtraction: six spine schemas switched from use Ecto.Schema to use Parapet.Spine.Schema; macro re-injects identical boilerplate plus @schema_prefix at compile time (PREFIX-01/02 done)
 - [Phase 51]: Bootstrap reads Application.compile_env(:parapet, :schema_prefix) at module attribute level; q/1 qualifies ON/TABLE/REFERENCES targets only (not index names — Postgres invalid)
+- [Phase ?]: Parapet.Spine.Schema.Normalizer private submodule: Elixir cannot call same-module functions from compile-time module attributes — submodule-first approach is the idiomatic solution
+- [Phase ?]: Evidence.schema_prefix/0 delegation to Schema.__prefix__(): frozen compile-time value eliminates runtime/compile split-brain by construction (WR-03)
+- [Phase ?]: safe_ident!/1 allowlist (^[a-z_][a-z0-9_]*$ + 63-byte limit) folded into normalize/1: every prefix resolution path guarded before DDL interpolation (WR-04, T-52-01 threat)
 
 ### Pending Todos
 
@@ -117,9 +118,9 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-06-30T13:54:37.942Z
-Stopped at: Phase 52 context gathered (assumptions mode + deep research)
-Resume file: .planning/phases/52-propagation-proof-guards-ci-dual-prefix-matrix/52-CONTEXT.md
+Last session: 2026-06-30T15:22:20.675Z
+Stopped at: Completed 52-01-PLAN.md: sealed WR-01..04 (normalize/1, safe_ident!/1, Evidence delegation, test rewrite)
+Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
 ## Operator Next Steps

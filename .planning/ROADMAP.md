@@ -86,7 +86,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 Plans:
 **Wave 1**
 
-- [ ] 52-01-PLAN.md — Seal the four WR-01..04 leaks into a single normalize/1 + safe_ident!/1 source; delegate Evidence.schema_prefix/0; rewrite agreement + invert evidence tests (Wave 1)
+- [x] 52-01-PLAN.md — Seal the four WR-01..04 leaks into a single normalize/1 + safe_ident!/1 source; delegate Evidence.schema_prefix/0; rewrite agreement + invert evidence tests (Wave 1)
 - [ ] 52-02-PLAN.md — PROP-02 static guard fitness function (green from day one, zero offenders) (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -161,7 +161,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
-| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 0/TBD | Not started | - |
+| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 1/4 | In Progress|  |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |

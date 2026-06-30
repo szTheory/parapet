@@ -17,9 +17,9 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Prefix Propagation (`PROP`)
 
-- [ ] **PROP-01**: The prefix auto-propagates with zero call-site changes across `Repo.*`, `insert_all(SchemaModule, …)`, `Ecto.Multi`, and the two spine↔spine joins (`mcp/server.ex`, `circuit_breaker.ex`) — pinned by regression tests on those join sites, the `claim_service` `insert_all`, and the `evidence.ex` Multi.
-- [ ] **PROP-02**: Runtime `prefix:` is banned by a static guard test over `lib/` that also flags string-literal-table `insert_all`/`update_all`/`delete_all`, `search_path` usage, and raw SQL naming a `parapet_` table; if a runtime `prefix:` is ever introduced it fails the build with a structured, actionable message.
-- [ ] **PROP-03**: `to_sql`/`Ecto.get_meta(struct, :prefix)` assertions ride every test leg, proving the compiled prefix appears on selects/joins/`insert_all`/Multi (with a negative "no bare `parapet_incidents`" assertion under the prefixed leg) and `__schema__(:prefix)` matches across all six schemas.
+- [x] **PROP-01**: The prefix auto-propagates with zero call-site changes across `Repo.*`, `insert_all(SchemaModule, …)`, `Ecto.Multi`, and the two spine↔spine joins (`mcp/server.ex`, `circuit_breaker.ex`) — pinned by regression tests on those join sites, the `claim_service` `insert_all`, and the `evidence.ex` Multi.
+- [x] **PROP-02**: Runtime `prefix:` is banned by a static guard test over `lib/` that also flags string-literal-table `insert_all`/`update_all`/`delete_all`, `search_path` usage, and raw SQL naming a `parapet_` table; if a runtime `prefix:` is ever introduced it fails the build with a structured, actionable message.
+- [x] **PROP-03**: `to_sql`/`Ecto.get_meta(struct, :prefix)` assertions ride every test leg, proving the compiled prefix appears on selects/joins/`insert_all`/Multi (with a negative "no bare `parapet_incidents`" assertion under the prefixed leg) and `__schema__(:prefix)` matches across all six schemas.
 
 ### Generators & Library Migrations (`GEN`)
 
@@ -102,9 +102,9 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | PREFIX-04 | Phase 51 | Complete |
 | TEST-01 | Phase 51 | Complete |
 | TEST-02 | Phase 51 | Complete |
-| PROP-01 | Phase 52 | Pending |
-| PROP-02 | Phase 52 | Pending |
-| PROP-03 | Phase 52 | Pending |
+| PROP-01 | Phase 52 | Complete |
+| PROP-02 | Phase 52 | Complete |
+| PROP-03 | Phase 52 | Complete |
 | TEST-03 | Phase 52 | Pending |
 | GEN-01 | Phase 53 | Pending |
 | GEN-02 | Phase 53 | Pending |
