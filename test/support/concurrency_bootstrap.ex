@@ -4,6 +4,16 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
   alias Ecto.Adapters.SQL
   alias Parapet.TestSupport.ConcurrencyRepo
 
+  # Resolve the prefix at compile time — same normalization the macro uses (D-04).
+  # Reading compile_env here (not a literal) keeps the public/unprefixed leg unchanged
+  # for Phase 52 (Anti-Pattern: "Hardcoding parapet").
+  @raw_prefix Application.compile_env(:parapet, :schema_prefix, "parapet")
+  @prefix (case @raw_prefix do
+             p when p in [nil, "", "public"] -> nil
+             other when is_binary(other) -> other
+             other when is_atom(other) -> Atom.to_string(other)
+           end)
+
   @tables [
     "parapet_action_claims",
     "parapet_tool_audits",
@@ -14,18 +24,35 @@ defmodule Parapet.TestSupport.ConcurrencyBootstrap do
   ]
 
   def bootstrap! do
+    if @prefix do
+      SQL.query!(ConcurrencyRepo, ~s(CREATE SCHEMA IF NOT EXISTS "#{@prefix}"), [])
+    end
+
     Enum.each(ddl_statements(), &SQL.query!(ConcurrencyRepo, &1, []))
   end
 
   def reset! do
+    qualified_tables = Enum.map(@tables, &q/1)
+
     SQL.query!(
       ConcurrencyRepo,
-      "TRUNCATE #{Enum.join(@tables, ", ")} RESTART IDENTITY CASCADE",
+      "TRUNCATE #{Enum.join(qualified_tables, ", ")} RESTART IDENTITY CASCADE",
       []
     )
   end
 
   def table_names, do: @tables
+
+  # Qualifies a bare table name with the resolved prefix.
+  # When @prefix is non-nil: returns ~s("prefix"."table")
+  # When @prefix is nil: returns ~s("table") (public leg — byte-identical to legacy)
+  defp q(table) do
+    if @prefix do
+      ~s("#{@prefix}"."#{table}")
+    else
+      ~s("#{table}")
+    end
+  end
 
   defp ddl_statements do
     [
