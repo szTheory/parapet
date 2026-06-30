@@ -63,11 +63,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         elixir: ['1.19.0']
         otp: ['26.x', '27.x', '28.x']
+        schema_prefix: ['parapet']
+      include:
+        - elixir: '1.19.0'
+          otp: '28.x'
+          schema_prefix: 'public'
     env:
       MIX_ENV: test
+      PARAPET_SCHEMA_PREFIX: ${{ matrix.schema_prefix }}
     services:
       postgres:
         image: postgres:16-alpine
@@ -99,10 +106,12 @@ jobs:
         uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: _build
-          key: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-
+          key: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ matrix.schema_prefix }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ matrix.schema_prefix }}-
       - name: Install dependencies
         run: mix deps.get
+      - name: Compile (force recompile under this prefix leg)
+        run: mix compile --force
       - name: Test
         run: mix test
 
