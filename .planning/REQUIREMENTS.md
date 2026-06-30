@@ -92,17 +92,45 @@ Explicitly excluded for v1.7. Documented to prevent scope creep.
 
 ## Traceability
 
-Populated during roadmap creation (one phase per requirement).
+One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 50), so v1.7 spans Phases 51–56.
 
 | Requirement | Phase | Status |
-|-------------|-------|--------|
-| (to be filled by roadmapper) | — | Pending |
+|-------------|----------|---------|
+| PREFIX-01 | Phase 51 | Pending |
+| PREFIX-02 | Phase 51 | Pending |
+| PREFIX-03 | Phase 51 | Pending |
+| PREFIX-04 | Phase 51 | Pending |
+| TEST-01 | Phase 51 | Pending |
+| TEST-02 | Phase 51 | Pending |
+| PROP-01 | Phase 52 | Pending |
+| PROP-02 | Phase 52 | Pending |
+| PROP-03 | Phase 52 | Pending |
+| TEST-03 | Phase 52 | Pending |
+| GEN-01 | Phase 53 | Pending |
+| GEN-02 | Phase 53 | Pending |
+| GEN-03 | Phase 53 | Pending |
+| GEN-04 | Phase 53 | Pending |
+| GEN-05 | Phase 53 | Pending |
+| GEN-06 | Phase 53 | Pending |
+| GEN-07 | Phase 53 | Pending |
+| UPG-01 | Phase 54 | Pending |
+| UPG-02 | Phase 54 | Pending |
+| UPG-03 | Phase 54 | Pending |
+| UPG-04 | Phase 54 | Pending |
+| UPG-05 | Phase 54 | Pending |
+| DOCTOR-01 | Phase 54 | Pending |
+| DOC-01 | Phase 55 | Pending |
+| DOC-02 | Phase 55 | Pending |
+| SAFE-03 | Phase 55 | Pending |
+| SAFE-01 | Phase 56 | Pending |
+| SAFE-02 | Phase 56 | Pending |
+| SAFE-04 | Phase 56 | Pending |
 
 **Coverage:**
 - v1.7 requirements: 29 total
-- Mapped to phases: 0 ⚠️ (pending roadmap)
-- Unmapped: 29 ⚠️
+- Mapped to phases: 29 ✓ (Phases 51–56)
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-06-29*
-*Last updated: 2026-06-29 after 5-dimension design research synthesis*
+*Last updated: 2026-06-29 after roadmap creation (Phases 51–56, 29/29 mapped)*

@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 status: planning
-last_updated: "2026-06-29T21:12:20.719Z"
+last_updated: "2026-06-29T21:30:00.000Z"
 last_activity: 2026-06-29
 progress:
-  total_phases: 0
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -17,35 +17,36 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-29 after v1.6 Operator UI Brand & Design-System Audit milestone completed)
+See: .planning/PROJECT.md (updated 2026-06-29 after starting milestone v1.7 Postgres Schema Isolation & Upgrade Path)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Planning next milestone (`/gsd-new-milestone`)
+**Current focus:** v1.7 Phase 51 — Prefix Core & Test Seam (ready to plan)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-06-29 — Milestone v1.7 started
+Phase: 51 of 56 (Prefix Core & Test Seam) — first v1.7 phase
+Plan: — (not yet planned)
+Status: Ready to plan
+Last activity: 2026-06-29 — v1.7 roadmap created (Phases 51–56, 29/29 requirements mapped)
 
-## Deferred Items
+Progress: [░░░░░░░░░░] 0%
 
-Items acknowledged and deferred at milestone close on 2026-06-29 (`override_closeout`):
+## Milestone Roadmap (v1.7)
 
-| Category | Item | Status |
-|----------|------|--------|
-| uat_gap | phase-44 44-UAT.md (TOKEN-04 manual visual check) | testing — 1 pending scenario |
-| verification_gap | phase-44 44-VERIFICATION.md (TOKEN-04 layout-shift, manual-only) | human_needed |
-| verification_gap | phase-48 no 48-VERIFICATION.md (never ran /gsd-verify-work) | covered by milestone audit (Nyquist phase-48 compliant) |
+Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain: the config seam + bootstrap qualification (Phase 51) must land before propagation/guards can run under the prefix; the dual-prefix CI matrix (Phase 52) is the honest proof; generators → upgrade path+doctor → demo+docs → release hardening follow.
 
-All three trace to requirements that shipped and were human-verified in the live UI; the gap is in automated (ExUnit) coverage. See MILESTONES.md v1.6 → Known Gaps / Known Verification Overrides.
+- [ ] **51 Prefix Core & Test Seam** — PREFIX-01..04, TEST-01, TEST-02
+- [ ] **52 Propagation Proof, Guards & CI Dual-Prefix Matrix** — PROP-01..03, TEST-03
+- [ ] **53 Generators & Library Migrations** — GEN-01..07
+- [ ] **54 Upgrade Path & Doctor** — UPG-01..05, DOCTOR-01
+- [ ] **55 Demo App & Upgrade Docs** — DOC-01, DOC-02, SAFE-03
+- [ ] **56 Contract & Release Hardening** — SAFE-01, SAFE-02, SAFE-04
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 13 (v1.3)
+- Total plans completed (this milestone): 0
 - Average duration: — min
 - Total execution time: 0.0 hours
 
@@ -53,13 +54,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 40 | 0 | — | — |
-| 41 | 0 | — | — |
-| 42 | 0 | — | — |
-| 43 | 3 | - | - |
-| 46 | 4 | - | - |
-| 49 | 3 | - | - |
-| 50 | 3 | - | - |
+| 51 | 0 | — | — |
 
 **Recent Trend:**
 
@@ -67,79 +62,20 @@ All three trace to requirements that shipped and were human-verified in the live
 - Trend: —
 
 *Updated after each plan completion*
-| Phase 43 P01 | 268 | - tasks | - files |
-| Phase 43 P02 | 180 | 2 tasks | 7 files |
-| Phase 43 P03 | 225 | 3 tasks | 4 files |
-| Phase 44 P03 | 22m | 2 tasks | 3 files |
-| Phase 44 P04 | 5m45s | 2 tasks | 4 files |
-| Phase 45 P02 | 6 | 2 tasks | 2 files |
-| Phase 45 P03 | 5 | 2 tasks | 2 files |
-| Phase 45 P04 | 7 | 3 tasks | 7 files |
-| Phase 46 P01 | 7 | 2 tasks | 1 files |
-| Phase 46 P02 | 5 | 2 tasks | 2 files |
-| Phase 46 P03 | 15 | 3 tasks | 6 files |
-| Phase 46 P04 | 6 | 2 tasks | 0 files |
-| Phase 47 P01 | 1m | 2 tasks | 1 files |
-| Phase 47 P02 | 5m | 3 tasks | 4 files |
-| Phase 47-component-groups-meta-components P03 | 210 | 3 tasks | 1 files |
-| Phase 49 P01 | 2m | 3 tasks | 1 files |
-| Phase 49 P02 | 4min | 3 tasks | 4 files |
-| Phase 49 P03 | 5min | 2 tasks | 1 files |
-| Phase 50 P01 | 3m | 3 tasks | 6 files |
-| Phase 50 P02 | 114 | 3 tasks | 3 files |
 
 ## Accumulated Context
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
+Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decisions (see `.planning/research/v1.7/00-SYNTHESIS.md` §1):
 
-- v1.5 scope: brand book and logo system only. No new runtime deps, public API changes, or library behavior changes — this milestone touches docs/brand assets only; the public surface stays frozen.
-- Logo constraints (user-stated, non-negotiable): no rectangular background cage; unified mark+type (never icon-left-of-plain-text); no subtitle on the primary lockup (separate optional tagline lockup); ≥1 fully-integrated typemark; hand-authored SVG.
-- Repo-lean constraint: SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. Size budget ≤ ~250 KB for `brandbook/`.
-- Phase 41 ends with a hard human gate (LOGO-04): user selects one direction before any downstream phase runs. Phases 42 and 43 are blocked on this selection.
-- Source of truth: `prompts/parapet-brand-identity-deep-research.md` (1,874-line brand research). No re-derivation or re-litigating of brand strategy — operationalize only.
-- HexDocs swap is zero-config path-stable: `docs/assets/parapet-logo.svg` and `docs/assets/favicon.svg` paths unchanged so `mix.exs` doc block requires no edits.
-- [Phase 38]: Keep scoped route ownership in generated host-owned LiveView/component code rather than adding a Parapet router abstraction. — Preserves host auth/router ownership and Parapet core compile-out boundary. (carried from v1.4)
-- [Phase 39]: Plan 02 preserved the original quality evaluation as a historical audit snapshot and appended a dated v1.4 closeout instead of rewriting prior findings. (carried from v1.4)
-- [Phase ?]: Codeblock tint hex excluded from examples/ to pass palette gate; use var(--stone) spans
-- [Phase ?]: readme-header.svg tagline as <text> element (IBM Plex Mono) — practical for README banner, palette-clean
-- [Phase ?]: parapet-mark.svg chosen for ExDoc sidebar logo — most compact 32x52 viewBox, mix docs clean
-- [Phase ?]: Zero-config path-stable HexDocs swap complete: mix.exs unchanged, five exploration HTMLs deleted
-- [Phase ?]: Use File.cp! for woff2 binary copy to avoid Igniter string-encoding corruption
-- [Phase ?]: IBM Plex latin woff2 vendored via python3 fontTools.subset: 53 KB total, 65% under 150 KB ceiling
-- [Phase ?]: Gallery route isolated to demo router only (live_session :parapet_gallery, D-13)
-- [Phase ?]: Audit matrix initialized with todo status; #7FB4C6 dark-link operator exception documented for Phase-50 GUARD-04 (D-07/D-08)
-- [Phase ?]: Dark warning button fg corrected to #101820 (parapet-black) on #D97706 bg: 5.62:1 WCAG AA pass; original plan specified #F8F4EC which yielded 2.9:1
-- [Phase ?]: @themes re-pinned to brand token hexes: six status triplets, dark links on surface+bg (#7FB4C6 D-07), focus rings at 3:1 floor
-- [Phase ?]: Applied all CSS/function edits identically to template and demo mirror in same commit
-- [Phase ?]: Added --po-button-success dark overrides to both dark blocks; primary/recovery/destructive derive from already-overridden base vars (no dark override needed)
-- [Phase ?]: disabled:opacity-50/cursor-not-allowed/pointer-events-none wired into control_base() so every button variant automatically handles COMP-02
-- [Phase ?]: Plan 45-03: completed inline markup re-skin
-- [Phase ?]: Three always-active navigation anchors use control_class(:primary) without aria-disabled (COMP-02: no disabled branch needed)
-- [Phase ?]: COMP-05 confirmed zero cursor-pointer on stat/metric containers in operator_components
-- [Phase ?]: Plan 45-04 complete: secondary template stubs cleared; phase-wide off-palette gate passes (one CSS-interceptor false-positive documented)
-- [Phase ?]: operator_live.ex.eex queue-refresh button uses inline bg-[color:var(--parapet-accent)] since it does not call control_class/2 (per 45-RESEARCH.md Open Question 3)
-- [Phase ?]: bg-indigo-50 at operator_components.ex.eex line 280 is a CSS interceptor SELECTOR not a violation — Phase-50 GUARD-04 gate must exclude CSS style block from grep scan
-- [Phase ?]: Plan 46-01: Used ~S sigil for assertion strings with double quotes; extended existing test loops additively
-- [Phase ?]: Used replace_all=true on operator_live <main class= string to update all three branches atomically
-- [Phase ?]: Added DATA-06 animate-pulse comment to operator_components prefers-reduced-motion block to satisfy @component_paths test assertion
-- [Phase ?]: socket_connected set true in handle_params (not mount) — ensures skeleton transitions to content list as soon as data is loaded
-- [Phase ?]: Human gallery walkthrough APPROVED — all 7 NAV/A11Y/DATA visual checks confirmed for Phase 46
-- [Phase ?]: 47-01: RED scaffold — ~S sigil for embedded-quote assertions; inset-0 scrim guard scoped to full-screen pattern only (not inset-x-0 Disclosure positioning)
-- [Phase ?]: 47-02
-- [Phase ?]: .planning/phases/47-component-groups-meta-components/47-03-SUMMARY.md
-- [Phase ?]: 49-01: D-12 RED scaffold — gallery contract GREEN; fixture pins + grep pin RED until 49-02/49-03
-- [Phase ?]: Move DemoSeedScenarios to compiled lib module for test sandbox (49-02)
-- [Phase ?]: 49-03: Four /parapet/_gallery capture lines (desktop+mobile, light+dark) added to capture_operator_ui_screenshots.sh using tall window sizes 1440,5200/414,7600; GALLERY-02 static grep pin GREEN
-- [Phase ?]: GUARD-03 normalization via Code.format_string! (not AST-compare) preserves comments, catches D-03 drift
-- [Phase ?]: GUARD-04: Fail-closed allowlist sourced live from tokens.css + 5 documented exceptions in audit-matrix (no bare inline literals)
-- [Phase ?]: GUARD-05: Tolerant easing regex handles template vs tokens.css leading-zero disagreement; both motion tokens zeroed
-- [Phase ?]: D-03 fix: <%#- (build-time, renders to empty) replaced with <%%# (EEx escape, renders to <%#) at operator_components.ex.eex:1428/1442
-- [Phase 50]: GUARD-06: --manifest exits before Chrome/server/DB; :detail_id placeholder in CAPTURES array keeps manifest DB-free (D-14)
-- [Phase 50]: Manifest-drift CI step added to lint job (no Postgres); diff --manifest vs sed-extracted baseline enforces D-17 without new infra
-- [Phase ?]: GUARD-07 complete: milestone audit bound every v1.6 regression claim to a command/file:line
+- Config key is `:schema_prefix` (never bare `:prefix` — collides with frozen telemetry "event prefix"); default `"parapet"`; `nil`/`""`/`"public"` ⇒ unprefixed.
+- Mechanism is compile-time `@schema_prefix` via a shared `use Parapet.Spine.Schema` macro; runtime `prefix:` is BANNED (split-brain) and enforced by a static guard test.
+- No `search_path` switching (keeps `public`-resident extensions resolving).
+- Existing adopters are opt-in only — the default flips for new installs; no forced migration on upgrade.
+- Two prerequisites the requirements assumed away: the library has NO `config/` dir (add an env-driven `config/config.exs` so `compile_env` resolves), and the main suite uses hand-written DDL (`ConcurrencyBootstrap`) that must be hand-qualified.
+- TEST-02 can't be proven at runtime (`@schema_prefix` is compile-time) — the dual-prefix CI matrix must namespace the `_build` cache key by prefix + `mix compile --force`, or the `public` leg false-greens.
+- Frozen-contract regression (`verify.public_api` + telemetry + compile-out, no new events) is a milestone done-criterion (Phase 56), not a feature.
 
 ### Pending Todos
 
@@ -147,25 +83,27 @@ None.
 
 ### Blockers/Concerns
 
-None. The Phase 41 human gate (LOGO-04) is RESOLVED — user locked the stacked-emblem identity (decision-log.md D-003). Phase 43's only outward-facing change is the HexDocs logo/favicon swap (user pre-approved; zero-config, path-stable).
+None. v1.7's dual-prefix CI matrix interacts with the v1.8 pipeline reshape (CI-01) — sequence accordingly when v1.8 starts.
 
-## Candidate Work
+## Deferred Items
 
-| Category | Item | Target | Status | Notes |
-|----------|------|--------|--------|-------|
-| Brand | Self-hosted webfont bundle (`@font-face` IBM Plex woff2) | v1.6+ | deferred | Requires font binary — excluded from repo-lean constraint |
-| Brand | Raster exports (PNG/ICO favicons, OpenGraph social-card images) | v1.6+ | deferred | Raster-free constraint for this milestone |
-| Brand | Token → Tailwind/daisyUI theme generator and HEEx snippets | v1.6+ | deferred | Separate milestone scope |
-| Brand | Retheme generated Operator LiveView UI to new tokens | v1.6+ | deferred | Host-owned; separate milestone |
-| Brand | Animated/motion logo, Figma source-of-truth, multi-page PDF brand book | future | deferred | Out of scope for v1.5 |
+Items acknowledged and deferred at v1.6 milestone close on 2026-06-29 (`override_closeout`):
+
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | phase-44 44-UAT.md (TOKEN-04 manual visual check) | testing — 1 pending scenario |
+| verification_gap | phase-44 44-VERIFICATION.md (TOKEN-04 layout-shift, manual-only) | human_needed |
+| verification_gap | phase-48 no 48-VERIFICATION.md (never ran /gsd-verify-work) | covered by milestone audit (Nyquist phase-48 compliant) |
+
+All three trace to requirements that shipped and were human-verified in the live UI; the gap is in automated (ExUnit) coverage. v1.9 A11Y-01 is slated to ExUnit-pin them. See MILESTONES.md v1.6 → Known Gaps.
 
 ## Session Continuity
 
-Last session: 2026-06-28T22:36:37.950Z
-Stopped at: Phase 50 context gathered (assumptions mode + advisor research)
+Last session: 2026-06-29T21:30:00.000Z
+Stopped at: v1.7 roadmap created (ROADMAP.md Phases 51–56, REQUIREMENTS.md traceability filled 29/29)
 Resume file: None
-Next step: Plan Phase 43 (collateral + HexDocs wiring + cleanup + audit) → then execute
+Next step: Plan Phase 51 with `/gsd-plan-phase 51` (Prefix Core & Test Seam)
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Plan the first v1.7 phase: `/gsd-plan-phase 51`
