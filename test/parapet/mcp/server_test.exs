@@ -110,4 +110,19 @@ defmodule Parapet.MCP.ServerTest do
       assert {:error, :unknown_tool} = Server.execute_tool("delete_database", %{})
     end
   end
+
+  describe "timeline_for_correlation_query/1 (D-07 extraction)" do
+    test "returns an Ecto.Query struct (not yet implemented — TDD RED)" do
+      query = Server.timeline_for_correlation_query("key-123")
+      assert %Ecto.Query{} = query
+    end
+
+    test "execute_tool delegates to timeline_for_correlation_query (TDD RED)" do
+      entries = [%TimelineEntry{id: "entry-1", type: "note", payload: %{}}]
+      Process.put(:mock_repo_all, entries)
+
+      assert {:ok, ^entries} =
+               Server.execute_tool("get_incident_timeline", %{"correlation_key" => "corr-1"})
+    end
+  end
 end
