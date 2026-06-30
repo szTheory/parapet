@@ -32,15 +32,7 @@ defmodule Parapet.MCP.Server do
 
   def execute_tool("get_incident_timeline", %{"correlation_key" => correlation_key}) do
     repo = Evidence.repo()
-
-    query =
-      from(t in TimelineEntry,
-        join: i in Incident,
-        on: t.incident_id == i.id,
-        where: i.correlation_key == ^correlation_key
-      )
-
-    {:ok, repo.all(query)}
+    {:ok, repo.all(timeline_for_correlation_query(correlation_key))}
   end
 
   def execute_tool("read_runbook", %{"alertname" => alertname}) do
@@ -68,6 +60,15 @@ defmodule Parapet.MCP.Server do
 
   def execute_tool(_tool_name, _args) do
     {:error, :unknown_tool}
+  end
+
+  @doc false
+  def timeline_for_correlation_query(correlation_key) do
+    from(t in TimelineEntry,
+      join: i in Incident,
+      on: t.incident_id == i.id,
+      where: i.correlation_key == ^correlation_key
+    )
   end
 
   defp get_runbook_module(runbook) when is_atom(runbook), do: runbook
