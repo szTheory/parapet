@@ -161,7 +161,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
-| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete   | 2026-06-30 |
+| 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
