@@ -1,11 +1,14 @@
 defmodule Parapet.Repo.Migrations.CreateParapetActionClaims do
   use Ecto.Migration
 
+  @prefix Parapet.Spine.Schema.__prefix__()
+
   def change do
-    create table(:parapet_action_claims, primary_key: false) do
+    create table(:parapet_action_claims, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
-      add :incident_id, references(:parapet_incidents, type: :binary_id, on_delete: :delete_all),
-        null: false
+      add :incident_id,
+          references(:parapet_incidents, type: :binary_id, on_delete: :delete_all, prefix: @prefix),
+          null: false
 
       add :action_kind, :string, null: false
       add :action_key, :string, null: false
@@ -22,8 +25,10 @@ defmodule Parapet.Repo.Migrations.CreateParapetActionClaims do
       timestamps(type: :utc_datetime_usec)
     end
 
-    create unique_index(:parapet_action_claims, [:incident_id, :action_kind, :action_key])
-    create index(:parapet_action_claims, [:status, :claimed_at])
-    create index(:parapet_action_claims, [:incident_id, :inserted_at])
+    create unique_index(:parapet_action_claims, [:incident_id, :action_kind, :action_key],
+             prefix: @prefix)
+
+    create index(:parapet_action_claims, [:status, :claimed_at], prefix: @prefix)
+    create index(:parapet_action_claims, [:incident_id, :inserted_at], prefix: @prefix)
   end
 end

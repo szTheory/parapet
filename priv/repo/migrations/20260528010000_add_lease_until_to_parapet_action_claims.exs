@@ -31,23 +31,27 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilToParapetActionClaims do
 
   use Ecto.Migration
 
+  @prefix Parapet.Spine.Schema.__prefix__()
+  @table if @prefix, do: ~s("#{@prefix}"."parapet_action_claims"), else: "parapet_action_claims"
+
   def change do
-    alter table(:parapet_action_claims) do
+    alter table(:parapet_action_claims, prefix: @prefix) do
       add :lease_until, :utc_datetime_usec, null: true
     end
 
     execute(
-      "UPDATE parapet_action_claims SET lease_until = claimed_at + INTERVAL '5 minutes'",
+      "UPDATE #{@table} SET lease_until = claimed_at + INTERVAL '5 minutes'",
       ""
     )
 
-    alter table(:parapet_action_claims) do
+    alter table(:parapet_action_claims, prefix: @prefix) do
       modify :lease_until, :utc_datetime_usec, null: false, from: {:utc_datetime_usec, null: true}
     end
 
     create index(:parapet_action_claims, [:lease_until],
              where: "status = 'claimed'",
-             name: :parapet_action_claims_lease_until_claimed_index
+             name: :parapet_action_claims_lease_until_claimed_index,
+             prefix: @prefix
            )
   end
 end
