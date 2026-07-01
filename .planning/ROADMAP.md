@@ -44,7 +44,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 
 - [x] **Phase 51: Prefix Core & Test Seam** - Shared `use Parapet.Spine.Schema` compile-time `@schema_prefix` macro across all six spine schemas, single-sourced normalization, the `config/config.exs` env seam, and the hand-qualified concurrency bootstrap so the suite can run under the prefix at all. (completed 2026-06-30)
 - [x] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value. (completed 2026-06-30)
-- [ ] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`.
+- [x] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`. (completed 2026-07-01)
 - [ ] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check.
 - [ ] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story.
 - [ ] **Phase 56: Contract & Release Hardening** - Assert the frozen-contract regression gate (`verify.public_api` + telemetry + compile-out all green, no new events), ship the `feat` "No action required for existing installs" CHANGELOG/release-note framing, and close the milestone done-criteria.
@@ -112,13 +112,13 @@ Plans:
 
 **Wave 1**
 
-- [ ] 53-01-PLAN.md — Shared generate-time resolver `Parapet.Spine.Schema.resolve_prefix/2` (pure core + Igniter arity) + conflict-warns-not-crashes; pure-core tests (GEN-05, GEN-03)
+- [x] 53-01-PLAN.md — Shared generate-time resolver `Parapet.Spine.Schema.resolve_prefix/2` (pure core + Igniter arity) + conflict-warns-not-crashes; pure-core tests (GEN-05, GEN-03)
 
 **Wave 2** *(blocked on Wave 1; three parallel plans, zero file overlap)*
 
-- [ ] 53-02-PLAN.md — Generators `gen.spine`/`gen.archive_indexes`: flags, generate-time literal prefix stamping, first-ordered sentinel schema migration, no-clobber config write, DBA notice + D-16 generator-output tests (GEN-01/02/03/04/05/07)
-- [ ] 53-03-PLAN.md — `parapet.install` orchestrator: `--schema`/`--no-create-schema` + `group: :parapet` forwarding to composed `gen.spine`; routing test (GEN-05, GEN-04)
-- [ ] 53-04-PLAN.md — Committed migrations (5 lib + 3 demo) edited in place to bind via compile-time `__prefix__()`, incl. the raw-SQL UPDATE landmine; both-legs-green (GEN-06)
+- [x] 53-02-PLAN.md — Generators `gen.spine`/`gen.archive_indexes`: flags, generate-time literal prefix stamping, first-ordered sentinel schema migration, no-clobber config write, DBA notice + D-16 generator-output tests (GEN-01/02/03/04/05/07)
+- [x] 53-03-PLAN.md — `parapet.install` orchestrator: `--schema`/`--no-create-schema` + `group: :parapet` forwarding to composed `gen.spine`; routing test (GEN-05, GEN-04)
+- [x] 53-04-PLAN.md — Committed migrations (5 lib + 3 demo) edited in place to bind via compile-time `__prefix__()`, incl. the raw-SQL UPDATE landmine; both-legs-green (GEN-06)
 
 ### Phase 54: Upgrade Path & Doctor
 
@@ -174,7 +174,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
-| 53. Generators & Library Migrations | v1.7 | 0/4 | Not started | - |
+| 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |

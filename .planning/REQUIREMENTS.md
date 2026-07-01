@@ -23,13 +23,13 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Generators & Library Migrations (`GEN`)
 
-- [ ] **GEN-01**: A dedicated, first-ordered `*_create_parapet_schema` migration emits reversible `CREATE SCHEMA IF NOT EXISTS parapet` / `DROP SCHEMA IF EXISTS parapet` (non-cascading).
-- [ ] **GEN-02**: `mix parapet.gen.spine` and `gen.archive_indexes` stamp a literal `prefix:` on every `create table`, each `references/2` (its own prefix), and every index; FK constraint names stay unchanged (asserted).
-- [ ] **GEN-03**: Generators write `config :parapet, :schema_prefix, "parapet"` via Igniter `configure_new/5` (never clobber an adopter's value); a `--schema` vs existing-config conflict warns rather than crashes.
-- [ ] **GEN-04**: `--schema parapet` and `--no-create-schema` flags (Oban-verbatim); `--no-create-schema` omits the schema migration, keeps tables prefixed, and prints the exact `CREATE SCHEMA` + `GRANT` remediation for the DBA.
-- [ ] **GEN-05**: One shared prefix resolver (precedence `flag > existing config > default`) is used by `gen.spine`, `gen.archive_indexes`, and the `install` orchestrator.
-- [ ] **GEN-06**: Parapet's five committed library migrations and the demo migrations create their tables under the schema; the demo's plain `mix ecto.migrate` self-creates the schema (no `--prefix` needed).
-- [ ] **GEN-07**: Generator-output tests extend the AST substring asserts with a `prefix:` count-guard, add one small golden file for the schema migration only, and cover the `--no-create-schema` / existing-config branches.
+- [x] **GEN-01**: A dedicated, first-ordered `*_create_parapet_schema` migration emits reversible `CREATE SCHEMA IF NOT EXISTS parapet` / `DROP SCHEMA IF EXISTS parapet` (non-cascading).
+- [x] **GEN-02**: `mix parapet.gen.spine` and `gen.archive_indexes` stamp a literal `prefix:` on every `create table`, each `references/2` (its own prefix), and every index; FK constraint names stay unchanged (asserted).
+- [x] **GEN-03**: Generators write `config :parapet, :schema_prefix, "parapet"` via Igniter `configure_new/5` (never clobber an adopter's value); a `--schema` vs existing-config conflict warns rather than crashes.
+- [x] **GEN-04**: `--schema parapet` and `--no-create-schema` flags (Oban-verbatim); `--no-create-schema` omits the schema migration, keeps tables prefixed, and prints the exact `CREATE SCHEMA` + `GRANT` remediation for the DBA.
+- [x] **GEN-05**: One shared prefix resolver (precedence `flag > existing config > default`) is used by `gen.spine`, `gen.archive_indexes`, and the `install` orchestrator.
+- [x] **GEN-06**: Parapet's five committed library migrations and the demo migrations create their tables under the schema; the demo's plain `mix ecto.migrate` self-creates the schema (no `--prefix` needed).
+- [x] **GEN-07**: Generator-output tests extend the AST substring asserts with a `prefix:` count-guard, add one small golden file for the schema migration only, and cover the `--no-create-schema` / existing-config branches.
 
 ### Upgrade Path (`UPG`)
 
@@ -106,13 +106,13 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | PROP-02 | Phase 52 | Complete |
 | PROP-03 | Phase 52 | Complete |
 | TEST-03 | Phase 52 | Complete |
-| GEN-01 | Phase 53 | Pending |
-| GEN-02 | Phase 53 | Pending |
-| GEN-03 | Phase 53 | Pending |
-| GEN-04 | Phase 53 | Pending |
-| GEN-05 | Phase 53 | Pending |
-| GEN-06 | Phase 53 | Pending |
-| GEN-07 | Phase 53 | Pending |
+| GEN-01 | Phase 53 | Complete |
+| GEN-02 | Phase 53 | Complete |
+| GEN-03 | Phase 53 | Complete |
+| GEN-04 | Phase 53 | Complete |
+| GEN-05 | Phase 53 | Complete |
+| GEN-06 | Phase 53 | Complete |
+| GEN-07 | Phase 53 | Complete |
 | UPG-01 | Phase 54 | Pending |
 | UPG-02 | Phase 54 | Pending |
 | UPG-03 | Phase 54 | Pending |
