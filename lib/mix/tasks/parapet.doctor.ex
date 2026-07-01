@@ -520,7 +520,10 @@ defmodule Mix.Tasks.Parapet.Doctor do
   #   (2) Existence — is the configured schema present in the live repo?
   # Both sides of the drift comparison go through normalize/1 (D-02) so nil/""/
   # "public" collapse equal and Track A apps never false-positive.
-  defp check_schema do
+  #
+  # @doc false: public only for unit-testing; the public API is `mix parapet.doctor schema`.
+  @doc false
+  def check_schema do
     compiled = Parapet.Spine.Schema.__prefix__()
     runtime = Parapet.Spine.Schema.normalize(Application.get_env(:parapet, :schema_prefix))
     repo = Application.get_env(:parapet, :repo)
