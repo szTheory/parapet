@@ -45,7 +45,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 - [x] **Phase 51: Prefix Core & Test Seam** - Shared `use Parapet.Spine.Schema` compile-time `@schema_prefix` macro across all six spine schemas, single-sourced normalization, the `config/config.exs` env seam, and the hand-qualified concurrency bootstrap so the suite can run under the prefix at all. (completed 2026-06-30)
 - [x] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value. (completed 2026-06-30)
 - [x] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`. (completed 2026-07-01)
-- [ ] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check.
+- [x] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check. (completed 2026-07-01)
 - [ ] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story.
 - [ ] **Phase 56: Contract & Release Hardening** - Assert the frozen-contract regression gate (`verify.public_api` + telemetry + compile-out all green, no new events), ship the `feat` "No action required for existing installs" CHANGELOG/release-note framing, and close the milestone done-criteria.
 
@@ -132,7 +132,7 @@ Plans:
   3. A Track B round-trip test against a throwaway DB proves: created in `public` → up → resolves under `parapet` with FK cascade + partial indexes intact → down → restored to `public`.
   4. A `mix parapet.doctor` check compares runtime `:schema_prefix` against the compiled `@schema_prefix`, fails (CI-grade under `--ci`) on drift with the `mix deps.compile parapet --force` remediation, and verifies the configured schema exists.
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 
 **Wave 1** *(three independent parallel plans, zero file overlap)*
 
@@ -142,7 +142,7 @@ Plans:
 
 **Wave 2** *(blocked on 54-02: `Code.require_file`s its committed fixture)*
 
-- [ ] 54-03-PLAN.md — Track B round-trip DB test against throwaway DB `parapet_schema_move_roundtrip_test` (clone of `add_lease_until_backfill_test.exs`): public → up → parapet (FK cascade + partial index) → down → public (schema empty, not dropped) + abort leg (UPG-04, UPG-03; D-13..D-16)
+- [x] 54-03-PLAN.md — Track B round-trip DB test against throwaway DB `parapet_schema_move_roundtrip_test` (clone of `add_lease_until_backfill_test.exs`): public → up → parapet (FK cascade + partial index) → down → public (schema empty, not dropped) + abort leg (UPG-04, UPG-03; D-13..D-16)
 
 ### Phase 55: Demo App & Upgrade Docs
 
@@ -185,6 +185,6 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
-| 54. Upgrade Path & Doctor | v1.7 | 3/4 | In Progress|  |
+| 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete   | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |

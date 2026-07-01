@@ -4,16 +4,16 @@ milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 54
 current_phase_name: upgrade-path-doctor
-status: executing
+status: verifying
 stopped_at: Completed Phase 54 Plan 04 — UPG-01 Track A pin + UPG-05 fitness function
-last_updated: "2026-07-01T18:35:58.305Z"
+last_updated: "2026-07-01T18:43:57.112Z"
 last_activity: 2026-07-01
 progress:
   total_phases: 6
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 15
-  completed_plans: 14
-  percent: 50
+  completed_plans: 15
+  percent: 67
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 Phase: 54 (upgrade-path-doctor) — EXECUTING
 Plan: 4 of 4
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-01
 
 Progress: [████████░░] 80%
@@ -78,6 +78,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 54 P02 | 9 | 3 tasks | 6 files |
 | Phase 54 P04 | 300 | - tasks | - files |
 | Phase 54 P04 | 434 | 2 tasks | 2 files |
+| Phase 54 P03 | 3 | 1 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,8 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: resolve_prefix/2 always defaults to {:ok, parapet} when both flag and config normalize to nil; nil-leg in gen.schema.move is reachable only when resolver explicitly returns nil (not via --schema public CLI)
 - [Phase ?]: Track A nil-leg guard: if is_nil(@prefix) do / describe block at module level (D-19)
 - [Phase ?]: UPG-05 fitness fn: explicit file list excludes move task itself; dual forbidden patterns catch both invocation and alias forms (D-20)
+- [Phase ?]: Six tables required in fixture for round-trip test
+- [Phase ?]: Postgrex.Error is correct type for abort leg assertions
 
 ### Pending Todos
 
@@ -137,7 +140,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-01T18:35:58.299Z
+Last session: 2026-07-01T18:43:50.844Z
 Stopped at: Completed Phase 54 Plan 04 — UPG-01 Track A pin + UPG-05 fitness function
 Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
