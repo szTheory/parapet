@@ -132,7 +132,17 @@ Plans:
   3. A Track B round-trip test against a throwaway DB proves: created in `public` → up → resolves under `parapet` with FK cascade + partial indexes intact → down → restored to `public`.
   4. A `mix parapet.doctor` check compares runtime `:schema_prefix` against the compiled `@schema_prefix`, fails (CI-grade under `--ci`) on drift with the `mix deps.compile parapet --force` remediation, and verifies the configured schema exists.
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+**Wave 1** *(three independent parallel plans, zero file overlap)*
+
+- [ ] 54-01-PLAN.md — Doctor `schema` static check: drift (normalize both sides) + existence (`to_regnamespace($1)` probe, degrade-to-`:skip`) folded into one finding + unit test (DOCTOR-01; D-01..D-05)
+- [ ] 54-02-PLAN.md — `mix parapet.gen.schema.move` Igniter task + emitted reversible `SET SCHEMA` migration (after_begin lock_timeout, migrate-time abort guard, six explicit up/down ALTERs, never `DROP SCHEMA`, second-move refusal, `--no-create-schema`), shared DBA-notice helper, committed fixture + golden/on_exists tests (UPG-02, UPG-03; D-06..D-13)
+- [ ] 54-04-PLAN.md — Track A pin (`to_sql` bare-name + `get_meta` nil round-trip on the nil leg) + UPG-05 regex fitness function + `resolve_prefix(nil,nil)=={:ok,"parapet"}` default pin (UPG-01, UPG-05; D-17, D-19, D-20)
+
+**Wave 2** *(blocked on 54-02: `Code.require_file`s its committed fixture)*
+
+- [ ] 54-03-PLAN.md — Track B round-trip DB test against throwaway DB `parapet_schema_move_roundtrip_test` (clone of `add_lease_until_backfill_test.exs`): public → up → parapet (FK cascade + partial index) → down → public (schema empty, not dropped) + abort leg (UPG-04, UPG-03; D-13..D-16)
 
 ### Phase 55: Demo App & Upgrade Docs
 
