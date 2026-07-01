@@ -81,7 +81,7 @@ defmodule Mix.Tasks.Parapet.Install do
       |> maybe_add(with_chimeway?, @chimeway_provider)
 
     igniter
-    |> Igniter.compose_task("parapet.gen.spine", [])
+    |> Igniter.compose_task("parapet.gen.spine")
     |> write_instrumenter(instrumenter_module, adapters, with_sigra?)
     |> Config.configure("config.exs", :parapet, [:instrumenter], instrumenter_module)
     |> maybe_configure_providers(providers)
