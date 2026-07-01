@@ -3,6 +3,8 @@ defmodule Parapet.Spine.PrefixPropagationTest do
 
   use Parapet.TestSupport.ConcurrencyCase, async: false
 
+  import Ecto.Query
+
   alias Parapet.Automation.CircuitBreaker
   alias Parapet.Automation.ClaimService
   alias Parapet.Evidence
@@ -99,6 +101,46 @@ defmodule Parapet.Spine.PrefixPropagationTest do
       assert Ecto.get_meta(claim, :prefix) == @prefix,
              "ClaimService insert_all: expected prefix #{inspect(@prefix)}, " <>
                "got #{inspect(Ecto.get_meta(claim, :prefix))}"
+    end
+  end
+
+  # ----------------------------------------------------------------
+  # UPG-01 Track A: schema_prefix nil emits unprefixed SQL (D-19)
+  # Guarded by if is_nil(@prefix) — no-op on the parapet leg,
+  # load-bearing proof on the nil leg.
+  # ----------------------------------------------------------------
+
+  if is_nil(@prefix) do
+    describe "UPG-01 Track A: schema_prefix nil emits unprefixed SQL" do
+      @describetag :track_a
+
+      # to_sql bare-name proof (D-19):
+      # Legible "proving unprefixed" artifact — the green suite alone is not
+      # proof that the schema qualifier is absent (green queries could still
+      # be going to the wrong schema). This assertion is the load-bearing
+      # textual artifact UPG-01 demands.
+      test "to_sql carries a bare unqualified table name and no schema qualifier" do
+        query = from(i in Incident, select: i.id)
+        {sql, _} = Ecto.Adapters.SQL.to_sql(:all, ConcurrencyRepo, query)
+
+        refute sql =~ ~s("parapet".),
+               "public leg must not carry a schema qualifier: #{sql}"
+
+        assert sql =~ "parapet_incidents",
+               "Expected bare unqualified parapet_incidents in SQL: #{sql}"
+      end
+
+      # write-path round-trip (D-19):
+      # Covers Multi/insert_all paths that to_sql structurally cannot reach.
+      test "write-path round-trip: get_meta prefix is nil + read-back succeeds" do
+        {:ok, incident} = Evidence.create_incident(%{title: "track-a", state: "open"})
+
+        assert Ecto.get_meta(incident, :prefix) == nil,
+               "Expected nil prefix on Track A leg, got: #{inspect(Ecto.get_meta(incident, :prefix))}"
+
+        assert ConcurrencyRepo.get(Incident, incident.id),
+               "Expected read-back to succeed on Track A (nil prefix) leg"
+      end
     end
   end
 
