@@ -34,8 +34,8 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 ### Upgrade Path (`UPG`)
 
 - [ ] **UPG-01**: Track A (stay on `public`) is documented and pinned by a test proving `schema_prefix: nil` emits unprefixed SQL with green queries.
-- [ ] **UPG-02**: `mix parapet.gen.schema.move` generates a reversible migration: `SET LOCAL lock_timeout = '5s'`, `CREATE SCHEMA IF NOT EXISTS parapet` (omitted under `--no-create-schema`), and `ALTER TABLE … SET SCHEMA` for all six tables in one transaction; `down` restores `public` and never `DROP SCHEMA`.
-- [ ] **UPG-03**: The move task runs pre-flight catalog detections — abort on missing/renamed spine tables, warn on inbound app FKs/views, and refuse to emit a second move migration if one exists.
+- [x] **UPG-02**: `mix parapet.gen.schema.move` generates a reversible migration: `SET LOCAL lock_timeout = '5s'`, `CREATE SCHEMA IF NOT EXISTS parapet` (omitted under `--no-create-schema`), and `ALTER TABLE … SET SCHEMA` for all six tables in one transaction; `down` restores `public` and never `DROP SCHEMA`.
+- [x] **UPG-03**: The move task runs pre-flight catalog detections — abort on missing/renamed spine tables, warn on inbound app FKs/views, and refuse to emit a second move migration if one exists.
 - [ ] **UPG-04**: A Track B round-trip test (against a throwaway DB, cloning the `add_lease_until_backfill_test.exs` pattern) proves: created in `public` → up → resolves under `parapet` with FK cascade + partial indexes intact → down → restored to `public`.
 - [ ] **UPG-05**: Upgrading an existing adopter never forces a schema migration — the default flips for new installs only.
 
@@ -114,8 +114,8 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | GEN-06 | Phase 53 | Complete |
 | GEN-07 | Phase 53 | Complete |
 | UPG-01 | Phase 54 | Pending |
-| UPG-02 | Phase 54 | Pending |
-| UPG-03 | Phase 54 | Pending |
+| UPG-02 | Phase 54 | Complete |
+| UPG-03 | Phase 54 | Complete |
 | UPG-04 | Phase 54 | Pending |
 | UPG-05 | Phase 54 | Pending |
 | DOCTOR-01 | Phase 54 | Complete |
