@@ -136,7 +136,7 @@ Plans:
 
 **Wave 1** *(three independent parallel plans, zero file overlap)*
 
-- [ ] 54-01-PLAN.md — Doctor `schema` static check: drift (normalize both sides) + existence (`to_regnamespace($1)` probe, degrade-to-`:skip`) folded into one finding + unit test (DOCTOR-01; D-01..D-05)
+- [x] 54-01-PLAN.md — Doctor `schema` static check: drift (normalize both sides) + existence (`to_regnamespace($1)` probe, degrade-to-`:skip`) folded into one finding + unit test (DOCTOR-01; D-01..D-05)
 - [ ] 54-02-PLAN.md — `mix parapet.gen.schema.move` Igniter task + emitted reversible `SET SCHEMA` migration (after_begin lock_timeout, migrate-time abort guard, six explicit up/down ALTERs, never `DROP SCHEMA`, second-move refusal, `--no-create-schema`), shared DBA-notice helper, committed fixture + golden/on_exists tests (UPG-02, UPG-03; D-06..D-13)
 - [ ] 54-04-PLAN.md — Track A pin (`to_sql` bare-name + `get_meta` nil round-trip on the nil leg) + UPG-05 regex fitness function + `resolve_prefix(nil,nil)=={:ok,"parapet"}` default pin (UPG-01, UPG-05; D-17, D-19, D-20)
 
@@ -185,6 +185,6 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
-| 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
+| 54. Upgrade Path & Doctor | v1.7 | 1/4 | In Progress|  |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |

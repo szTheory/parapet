@@ -41,7 +41,7 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Doctor / Diagnostics (`DOCTOR`)
 
-- [ ] **DOCTOR-01**: A `mix parapet.doctor` check compares the runtime `:schema_prefix` config against the compiled `@schema_prefix` and fails (CI-grade under `--ci`) on drift with the `mix deps.compile parapet --force` remediation; it also verifies the configured schema exists.
+- [x] **DOCTOR-01**: A `mix parapet.doctor` check compares the runtime `:schema_prefix` config against the compiled `@schema_prefix` and fails (CI-grade under `--ci`) on drift with the `mix deps.compile parapet --force` remediation; it also verifies the configured schema exists.
 
 ### Test Infrastructure (`TEST`)
 
@@ -118,7 +118,7 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | UPG-03 | Phase 54 | Pending |
 | UPG-04 | Phase 54 | Pending |
 | UPG-05 | Phase 54 | Pending |
-| DOCTOR-01 | Phase 54 | Pending |
+| DOCTOR-01 | Phase 54 | Complete |
 | DOC-01 | Phase 55 | Pending |
 | DOC-02 | Phase 55 | Pending |
 | SAFE-03 | Phase 55 | Pending |

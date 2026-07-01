@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
-status: planning
-stopped_at: Phase 54 context gathered (assumptions mode)
-last_updated: "2026-07-01T17:37:19.922Z"
+status: executing
+stopped_at: Completed Phase 54 Plan 01 — schema static check in mix parapet.doctor
+last_updated: "2026-07-01T18:12:00.600Z"
 last_activity: 2026-07-01
 progress:
   total_phases: 6
   completed_phases: 3
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 15
+  completed_plans: 12
   percent: 50
 ---
 
@@ -21,16 +21,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 54 — upgrade path & doctor
+**Current focus:** Phase 54 — upgrade-path-doctor
 
 ## Current Position
 
-Phase: 54
-Plan: Not started
-Status: Ready to plan
+Phase: 54 (upgrade-path-doctor) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-07-01
 
-Progress: [██████░░░░] 57%
+Progress: [████████░░] 80%
 
 ## Milestone Roadmap (v1.7)
 
@@ -72,6 +72,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 52 P02 | 2 | 1 tasks | 1 files |
 | Phase 52 P03 | 6 minutes | 2 tasks | 3 files |
 | Phase 52 P04 | 10 | 2 tasks | 2 files |
+| Phase 54 P01 | 4 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -95,6 +96,8 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: safe_ident!/1 allowlist (^[a-z_][a-z0-9_]*$ + 63-byte limit) folded into normalize/1: every prefix resolution path guarded before DDL interpolation (WR-04, T-52-01 threat)
 - [Phase ?]: PROP-02 backtick lookbehind: excluded doc-string prefix: mentions added by Plan 01 from the guard fingerprint
 - [Phase ?]: D-11: pruned matrix.include for CI schema_prefix axis (+1 cell 3→4); D-13: only _build namespaced; D-14: leg guard reuses Schema.normalize/1
+- [Phase ?]: check_schema/0 made @doc false public (not private defp) to enable direct unit-test invocation — mirrors __prefix__/0 pattern (DOCTOR-01 testability)
+- [Phase ?]: Drift cond branch ordered first in check_schema/0 so DB-less mix parapet.doctor --ci always catches stale-compile drift without a live repo (D-01/D-05)
 
 ### Pending Todos
 
@@ -125,9 +128,9 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-01T17:37:19.917Z
-Stopped at: Phase 54 context gathered (assumptions mode)
-Resume file: .planning/phases/54-upgrade-path-doctor/54-CONTEXT.md
+Last session: 2026-07-01T18:12:00.596Z
+Stopped at: Completed Phase 54 Plan 01 — schema static check in mix parapet.doctor
+Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
 ## Operator Next Steps
