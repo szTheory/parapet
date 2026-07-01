@@ -169,6 +169,7 @@ defmodule Parapet.EvidenceTest do
 
     test "logs a tool audit to DB and emits telemetry in :dual_write mode (default)" do
       Application.put_env(:parapet, :audit_mode, :dual_write)
+      on_exit(fn -> Application.delete_env(:parapet, :audit_mode) end)
 
       attrs = %{tool_name: "test_tool", input: %{"a" => 1}, success: true}
       assert {:ok, audit} = Parapet.Evidence.log_tool_audit(attrs)
@@ -237,6 +238,7 @@ defmodule Parapet.EvidenceTest do
 
     test "inserts TimelineEntry and ToolAudit, and emits telemetry in :dual_write mode" do
       Application.put_env(:parapet, :audit_mode, :dual_write)
+      on_exit(fn -> Application.delete_env(:parapet, :audit_mode) end)
 
       incident = %Parapet.Spine.Incident{id: Ecto.UUID.generate(), state: "open"}
       incident_changeset = Ecto.Changeset.change(incident, %{state: "resolved"})
