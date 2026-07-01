@@ -29,7 +29,33 @@ mix compile --warnings-as-errors
 
 If you are upgrading from an older source checkout rather than a Hex release, review [CHANGELOG.md](../CHANGELOG.md) and [Parapet Milestone History](HISTORY.md) for the historical path. Do not copy old setup snippets forward blindly; use [Parapet Getting Started](getting-started.md) as the current install reference.
 
-## Step 3: Move custom SLOs to providers
+## Step 3: Choose your schema location (v1.7+)
+
+Parapet 1.7 changed the default schema for evidence tables from `public` to `parapet`. Your
+data never moves automatically — nothing runs behind your back. But existing adopters must
+choose, or the first spine query fails with `relation "parapet.parapet_incidents" does not exist`.
+
+**Track A — stay on `public`:** Add to `config/config.exs`:
+
+```elixir
+config :parapet, schema_prefix: nil
+```
+
+Then recompile:
+
+```bash
+mix deps.compile parapet --force
+```
+
+**Track B — move to `parapet`:** See [Upgrade Guide (1.x)](upgrade-1.x.md) for the reversible
+`mix parapet.gen.schema.move` migration.
+
+Either way, run `mix parapet.doctor` after your change to confirm the prefix resolves correctly.
+
+For full copy-paste blocks, GRANTs, rollback instructions, and the FAQ, see
+[Upgrade Guide (1.x)](upgrade-1.x.md).
+
+## Step 4: Move custom SLOs to providers
 
 `Parapet.SLO.define/2` is hard-deprecated in 1.x. Replace call-site definitions with a module that implements `Parapet.SLO.Provider`, then register that provider through `Parapet.attach/1`.
 
@@ -64,7 +90,7 @@ during boot and generator runs.
 
 The old function remains available for the deprecation window, but it emits compile-time warnings. Treat those warnings as upgrade blockers now so a future major release is uneventful.
 
-## Step 4: Re-check generated host surfaces
+## Step 5: Re-check generated host surfaces
 
 Run the installer or generators in a branch and review the diff. Parapet's generated files remain host-owned, so the upgrade is not an instruction to overwrite local endpoint, router, or LiveView customizations.
 
@@ -81,13 +107,13 @@ Confirm these surfaces still match your application:
 - Operator UI routes, if present, live inside your authenticated Phoenix scope.
 - Deploy marker hooks still call `Parapet.Deploy.mark/1`.
 
-## Step 5: Review recovery and operator surfaces
+## Step 6: Review recovery and operator surfaces
 
 Recovery capabilities use the Stable `Parapet.Recovery` four-callback contract: `id/0`, `label/0`, `preview/2`, and `execute/2`. If you adopted recovery actions before 1.0, verify each capability still uses the allowlisted capability id atoms and still returns preview data that operators can understand before confirming a mutation.
 
 Operator action return values are additive in the 1.x line. If your code pattern-matches `Parapet.Operator.confirm_runbook_step/4`, handle `{:ok, result}`, `{:error, reason}`, `{:short_circuited, reason}`, and `{:conflicted, claim_id}`.
 
-## Step 6: Run the safe-upgrade checklist
+## Step 7: Run the safe-upgrade checklist
 
 Run these checks before merging the upgrade:
 
