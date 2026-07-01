@@ -172,4 +172,127 @@ defmodule Parapet.Spine.SchemaTest do
       assert Parapet.Spine.Schema.normalize(nil) == nil
     end
   end
+
+  # ---------------------------------------------------------------------------
+  # resolve_prefix/2 (pure core) — GEN-05 one shared resolver, GEN-03 conflict contract
+  #
+  # Tests call the pure core (flag, config) → {:ok, normalized} | {:conflict, nf, nc}
+  # directly. No Igniter scaffolding, no Application.put_env — per D-05 and Pitfall 5.
+  # ---------------------------------------------------------------------------
+  describe "resolve_prefix/2 (pure core)" do
+    alias Parapet.Spine.Schema
+
+    # ── Precedence: default (both absent) ──────────────────────────────────
+    test "nil flag + nil config → {:ok, \"parapet\"} (default)" do
+      assert Schema.resolve_prefix(nil, nil) == {:ok, "parapet"}
+    end
+
+    # ── Precedence: flag wins over absent config ────────────────────────────
+    test "flag only → {:ok, normalized_flag}" do
+      assert Schema.resolve_prefix("custom", nil) == {:ok, "custom"}
+    end
+
+    # ── Precedence: config fallback when flag absent ────────────────────────
+    test "nil flag + existing config → {:ok, config}" do
+      assert Schema.resolve_prefix(nil, "custom") == {:ok, "custom"}
+    end
+
+    # ── Precedence: agreement → {:ok, value} ───────────────────────────────
+    test "flag == config → {:ok, flag} (agreement, no conflict)" do
+      assert Schema.resolve_prefix("parapet", "parapet") == {:ok, "parapet"}
+    end
+
+    # ── Nil/legacy leg: normalize maps \"public\"/\"\"/nil → nil ──────────────
+    test "\"public\" flag normalizes to nil → {:ok, nil} (treats as absent)" do
+      # normalize("public") == nil, treated as absent flag; config is also nil
+      assert Schema.resolve_prefix("public", nil) == {:ok, "parapet"}
+    end
+
+    test "\"\" (empty string) flag normalizes to nil → default when config absent" do
+      assert Schema.resolve_prefix("", nil) == {:ok, "parapet"}
+    end
+
+    test "nil flag + \"public\" config normalizes config to nil → default" do
+      assert Schema.resolve_prefix(nil, "public") == {:ok, "parapet"}
+    end
+
+    test "nil flag + \"\" config normalizes config to nil → default" do
+      assert Schema.resolve_prefix(nil, "") == {:ok, "parapet"}
+    end
+
+    test "\"public\" in flag position normalizes to nil, treated as absent" do
+      # Both normalize to nil → default
+      assert Schema.resolve_prefix("public", "public") == {:ok, "parapet"}
+    end
+
+    # ── Conflict path: flag ≠ config, both non-nil ─────────────────────────
+    test "non-nil flag ≠ non-nil config → {:conflict, flag, config} (GEN-03: warns, does not crash)" do
+      result = Schema.resolve_prefix("alpha", "beta")
+      # Must return a conflict tuple, not raise
+      assert result == {:conflict, "alpha", "beta"}
+    end
+
+    test "conflict path does not raise — explicit non-raising assertion" do
+      result =
+        try do
+          Schema.resolve_prefix("alpha", "beta")
+        rescue
+          e -> {:raised, e}
+        end
+
+      assert match?({:conflict, _, _}, result),
+             "Expected {:conflict, _, _}, got #{inspect(result)}"
+    end
+
+    test "conflict returns flag as first element (flag wins)" do
+      {:conflict, normalized_flag, _normalized_config} = Schema.resolve_prefix("alpha", "beta")
+      assert normalized_flag == "alpha"
+    end
+
+    test "conflict returns config as second element" do
+      {:conflict, _normalized_flag, normalized_config} = Schema.resolve_prefix("alpha", "beta")
+      assert normalized_config == "beta"
+    end
+
+    # ── safe_ident!/1 rejection: malformed identifiers raise ArgumentError ──
+    test "malformed flag \"Bad-Name\" (hyphen + uppercase) raises ArgumentError" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Schema.resolve_prefix("Bad-Name", nil)
+      end
+    end
+
+    test "leading-digit flag \"1abc\" raises ArgumentError" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Schema.resolve_prefix("1abc", nil)
+      end
+    end
+
+    test "64-byte flag raises ArgumentError (exceeds 63 byte limit)" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Schema.resolve_prefix(String.duplicate("a", 64), nil)
+      end
+    end
+
+    test "malformed config raises ArgumentError before returning any result" do
+      assert_raise ArgumentError, ~r/Invalid Postgres schema identifier/, fn ->
+        Schema.resolve_prefix(nil, "Bad-Name")
+      end
+    end
+
+    # ── Full precedence matrix scan ─────────────────────────────────────────
+    # Covers the D-06 precedence table: flag > existing config > default "parapet"
+    # "public", "", nil all normalize to nil (absent); "parapet", "custom" stay.
+    test "precedence matrix: flag wins when both non-nil and disagree" do
+      assert Schema.resolve_prefix("parapet", "custom") == {:conflict, "parapet", "custom"}
+      assert Schema.resolve_prefix("custom", "parapet") == {:conflict, "custom", "parapet"}
+    end
+
+    test "precedence matrix: flag \"parapet\" with nil config → {:ok, \"parapet\"}" do
+      assert Schema.resolve_prefix("parapet", nil) == {:ok, "parapet"}
+    end
+
+    test "precedence matrix: nil flag + \"parapet\" config → {:ok, \"parapet\"}" do
+      assert Schema.resolve_prefix(nil, "parapet") == {:ok, "parapet"}
+    end
+  end
 end
