@@ -100,4 +100,108 @@ defmodule Parapet.Spine.Schema do
   def __prefix__ do
     @prefix
   end
+
+  @doc """
+  Generate-time prefix resolver — reads the `--schema` flag and adopter config to
+  produce the prefix literal that generators interpolate into migration heredocs.
+
+  This is the generate-time counterpart to `__prefix__/0`:
+
+  - `__prefix__/0` is the **compile-time** reader: it resolves `compile_env` once when
+    the library is compiled and returns a frozen value. It is the correct tool for Ecto
+    schema `@schema_prefix` and any code that runs inside the compiled library.
+
+  - `resolve_prefix/2` is the **generate-time** reader: it reads the operator's live
+    `Application.get_env/3` config (which may differ from what the library was last
+    compiled with) and the `--schema` CLI flag, applies precedence
+    `flag > existing config > default "parapet"` (D-06), and returns either
+    `{:ok, normalized}` or `{:conflict, normalized_flag, normalized_config}`.
+
+  **Do not cross the streams.** `resolve_prefix/2` must never call `__prefix__/0`,
+  read `@prefix`, or use `Application.compile_env/3`. Generators use `resolve_prefix/2`
+  to produce a literal prefix that is baked into the emitted migration source; that
+  literal is what gets compiled later by the adopter's app.
+
+  ## Arguments
+
+  - `flag` — the `--schema` option value from the mix task CLI args, or `nil` if absent.
+  - `existing_config` — the current value of `Application.get_env(:parapet, :schema_prefix)`,
+    or `nil` if unset.
+
+  Both arguments are normalized through `normalize/1` → `safe_ident!/1` before any
+  comparison or return. A malformed identifier raises `ArgumentError` before the function
+  can produce a result (ASVS V5 / T-53-01 mitigation).
+
+  ## Return values
+
+  - `{:ok, normalized}` — a single agreed-upon prefix string, or `nil` for the legacy/
+    public-schema leg (when both normalize to nil, the default `"parapet"` is returned).
+  - `{:conflict, normalized_flag, normalized_config}` — the flag and config disagree;
+    `normalized_flag` wins for this generate run, but the caller should emit an
+    `Igniter.add_warning/2` instructing the operator to reconcile `config/config.exs`
+    and re-compile. This function never clobbers config and never crashes on a conflict.
+
+  ## Precedence
+
+  `flag > existing config > default "parapet"` — once both values are normalized, the
+  flag takes priority. Agreement and single-source cases collapse to `{:ok, _}`. Only a
+  genuinely divergent non-nil pair produces `{:conflict, _, _}`.
+  """
+  def resolve_prefix(flag, existing_config) do
+    # Both paths run through normalize/1 → safe_ident!/1.
+    # A malformed identifier raises ArgumentError here, before any return.
+    normalized_flag = if flag, do: normalize(flag), else: nil
+    normalized_config = if existing_config, do: normalize(existing_config), else: nil
+
+    cond do
+      # Both absent: return the default. Calling normalize("parapet") ensures the default
+      # itself is allowlist-checked and that D-00 (single normalization source) holds.
+      is_nil(normalized_flag) and is_nil(normalized_config) ->
+        {:ok, normalize("parapet")}
+
+      # Flag absent: use the existing config value.
+      is_nil(normalized_flag) ->
+        {:ok, normalized_config}
+
+      # Config absent: use the flag value.
+      is_nil(normalized_config) ->
+        {:ok, normalized_flag}
+
+      # Both present and equal: agreement.
+      normalized_flag == normalized_config ->
+        {:ok, normalized_flag}
+
+      # Both present and different: conflict. Flag wins for this run; the caller warns.
+      # This function never clobbers config and never raises on a conflict.
+      true ->
+        {:conflict, normalized_flag, normalized_config}
+    end
+  end
+
+  @doc """
+  Igniter-aware arity of `resolve_prefix/2`. Extracts the `--schema` flag from
+  `igniter.args.options[:schema]` and the existing config from
+  `Application.get_env(:parapet, :schema_prefix)`, then delegates to the pure core.
+
+  Callers that need to emit a warning on conflict should pattern-match the return value:
+
+      case Parapet.Spine.Schema.resolve_prefix(igniter) do
+        {:ok, prefix} -> ...
+        {:conflict, prefix, existing} ->
+          igniter
+          |> Igniter.add_warning(
+               "--schema <flag> conflicts with config :parapet, :schema_prefix <existing>. " <>
+               "The flag value will be used for this run. To reconcile, update config/config.exs and " <>
+               "run: mix deps.compile parapet --force")
+          |> then(fn igniter -> {igniter, prefix} end)
+      end
+
+  This arity is intentionally a thin reader. The `Igniter.add_warning/2` call belongs
+  in the mix task that has an `igniter` struct to thread.
+  """
+  def resolve_prefix(igniter) do
+    flag = igniter.args.options[:schema]
+    existing_config = Application.get_env(:parapet, :schema_prefix)
+    resolve_prefix(flag, existing_config)
+  end
 end
