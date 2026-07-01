@@ -25,6 +25,7 @@ defmodule Parapet.MCP.ServerTest do
   end
 
   setup do
+    Parapet.SLO.Registry.checkout()
     Application.put_env(:parapet, :repo, DummyRepo)
     Application.put_env(:parapet, :prometheus_client, DummyPrometheusClient)
 
@@ -86,12 +87,6 @@ defmodule Parapet.MCP.ServerTest do
 
       assert {:ok, result} = Server.execute_tool("read_runbook", %{"alertname" => "RunbookAlert"})
       assert result == %{module: "MockRunbook", title: "Test", description: "Desc", steps: []}
-
-      Application.put_env(
-        :parapet,
-        :slos,
-        Enum.reject(Parapet.SLO.all(), &(&1.name == :RunbookAlert))
-      )
     end
 
     test "Test 3.1: read_runbook returns error if SLO not found" do
