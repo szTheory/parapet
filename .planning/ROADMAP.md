@@ -155,10 +155,11 @@ Plans:
   2. `docs/upgrade-1.x.md` exists and leads with "your data does not move unless you choose", with copy-paste Track A/B blocks (each config block followed by the `--force` recompile line), least-privilege GRANTs, recompile-order guidance, rollback incl. half-migrated recovery, and an FAQ.
   3. `docs/deployment.md` has a schema subsection, `README.md` carries a note, and `docs/migration-v1.md` routes to the new upgrade doc (the audited #1 gap).
 
-**Plans**: 2 plans
+**Plans**: 1/2 plans executed
 
 Plans:
-- [ ] 55-01-PLAN.md — SAFE-03: sentinel schema migration + demo smoke assertions (six-table + get_meta round-trip) + demo compile-out-clean CI step
+
+- [x] 55-01-PLAN.md — SAFE-03: sentinel schema migration + demo smoke assertions (six-table + get_meta round-trip) + demo compile-out-clean CI step
 - [ ] 55-02-PLAN.md — DOC-01/DOC-02: create docs/upgrade-1.x.md (single-source Track A/B) + mix.exs registration + migration-v1.md Step 3 + deployment.md subsection + README note
 
 **UI hint**: yes
@@ -191,5 +192,5 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete    | 2026-07-01 |
-| 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
+| 55. Demo App & Upgrade Docs | v1.7 | 1/2 | In Progress|  |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |

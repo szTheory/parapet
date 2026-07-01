@@ -2,15 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
-status: planning
-stopped_at: Phase 55 context gathered (assumptions mode)
-last_updated: "2026-07-01T19:52:47.454Z"
+current_phase: 55
+current_phase_name: demo-app-upgrade-docs
+status: executing
+stopped_at: Completed 55-01-PLAN.md
+last_updated: "2026-07-01T20:25:22.896Z"
 last_activity: 2026-07-01
+last_activity_desc: Phase 55 execution started
 progress:
   total_phases: 6
   completed_phases: 4
-  total_plans: 15
-  completed_plans: 15
+  total_plans: 17
+  completed_plans: 16
   percent: 67
 ---
 
@@ -21,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 55 — demo app & upgrade docs
+**Current focus:** Phase 55 — demo-app-upgrade-docs
 
 ## Current Position
 
-Phase: 55
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-07-01
+Phase: 55 (demo-app-upgrade-docs) — EXECUTING
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-07-01 — Phase 55 execution started
 
 Progress: [████████░░] 80%
 
@@ -78,6 +81,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 54 P04 | 300 | - tasks | - files |
 | Phase 54 P04 | 434 | 2 tasks | 2 files |
 | Phase 54 P03 | 3 | 1 tasks | 1 files |
+| Phase 55-demo-app-upgrade-docs P01 | 7 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -109,6 +113,9 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: UPG-05 fitness fn: explicit file list excludes move task itself; dual forbidden patterns catch both invocation and alias forms (D-20)
 - [Phase ?]: Six tables required in fixture for round-trip test
 - [Phase ?]: Postgrex.Error is correct type for abort leg assertions
+- [Phase ?]: Sentinel migration version 0 sorts before all spine migrations; down/0 non-cascading prevents silent schema deletion
+- [Phase ?]: SAFE-03 smoke assertions use schema_prefix() not literal parapet for leg-agnostic correctness
+- [Phase ?]: Demo CI compile step in existing demo job (not new job) keeps release_gate needs list unchanged
 
 ### Pending Todos
 
@@ -139,8 +146,8 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-01T19:52:47.448Z
-Stopped at: Phase 55 context gathered (assumptions mode)
+Last session: 2026-07-01T20:25:22.890Z
+Stopped at: Completed 55-01-PLAN.md
 Resume file: .planning/phases/55-demo-app-upgrade-docs/55-CONTEXT.md
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
