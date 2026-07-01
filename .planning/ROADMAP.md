@@ -46,7 +46,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 - [x] **Phase 52: Propagation Proof, Guards & CI Dual-Prefix Matrix** - Prove the compiled prefix rides every read/write (selects, joins, `insert_all`, Multi) with zero call-site edits, ban runtime `prefix:`/string-table writes via a static guard, and validate both legs with a `schema_prefix: ['parapet','public']` CI matrix that recompiles per value. (completed 2026-06-30)
 - [x] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`. (completed 2026-07-01)
 - [x] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check. (completed 2026-07-01)
-- [ ] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story.
+- [x] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story. (completed 2026-07-01)
 - [ ] **Phase 56: Contract & Release Hardening** - Assert the frozen-contract regression gate (`verify.public_api` + telemetry + compile-out all green, no new events), ship the `feat` "No action required for existing installs" CHANGELOG/release-note framing, and close the milestone done-criteria.
 
 ## Phase Details
@@ -155,12 +155,12 @@ Plans:
   2. `docs/upgrade-1.x.md` exists and leads with "your data does not move unless you choose", with copy-paste Track A/B blocks (each config block followed by the `--force` recompile line), least-privilege GRANTs, recompile-order guidance, rollback incl. half-migrated recovery, and an FAQ.
   3. `docs/deployment.md` has a schema subsection, `README.md` carries a note, and `docs/migration-v1.md` routes to the new upgrade doc (the audited #1 gap).
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 Plans:
 
 - [x] 55-01-PLAN.md — SAFE-03: sentinel schema migration + demo smoke assertions (six-table + get_meta round-trip) + demo compile-out-clean CI step
-- [ ] 55-02-PLAN.md — DOC-01/DOC-02: create docs/upgrade-1.x.md (single-source Track A/B) + mix.exs registration + migration-v1.md Step 3 + deployment.md subsection + README note
+- [x] 55-02-PLAN.md — DOC-01/DOC-02: create docs/upgrade-1.x.md (single-source Track A/B) + mix.exs registration + migration-v1.md Step 3 + deployment.md subsection + README note
 
 **UI hint**: yes
 
@@ -192,5 +192,5 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete    | 2026-07-01 |
-| 55. Demo App & Upgrade Docs | v1.7 | 1/2 | In Progress|  |
+| 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete   | 2026-07-01 |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |

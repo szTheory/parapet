@@ -51,8 +51,8 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 
 ### Documentation (`DOC`)
 
-- [ ] **DOC-01**: New `docs/upgrade-1.x.md` — TL;DR "your data does not move unless you choose", Track A/B copy-paste (each config block followed by the `--force` recompile line), least-privilege GRANTs, recompile-order, rollback incl. half-migrated recovery, FAQ.
-- [ ] **DOC-02**: `docs/deployment.md` schema subsection, a `README.md` note, and a routing pointer from `docs/migration-v1.md` (the audited #1 gap).
+- [x] **DOC-01**: New `docs/upgrade-1.x.md` — TL;DR "your data does not move unless you choose", Track A/B copy-paste (each config block followed by the `--force` recompile line), least-privilege GRANTs, recompile-order, rollback incl. half-migrated recovery, FAQ.
+- [x] **DOC-02**: `docs/deployment.md` schema subsection, a `README.md` note, and a routing pointer from `docs/migration-v1.md` (the audited #1 gap).
 
 ### Contract Safety (`SAFE`)
 
@@ -119,8 +119,8 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | UPG-04 | Phase 54 | Complete |
 | UPG-05 | Phase 54 | Complete |
 | DOCTOR-01 | Phase 54 | Complete |
-| DOC-01 | Phase 55 | Pending |
-| DOC-02 | Phase 55 | Pending |
+| DOC-01 | Phase 55 | Complete |
+| DOC-02 | Phase 55 | Complete |
 | SAFE-03 | Phase 55 | Complete |
 | SAFE-01 | Phase 56 | Pending |
 | SAFE-02 | Phase 56 | Pending |

@@ -4,17 +4,17 @@ milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 55
 current_phase_name: demo-app-upgrade-docs
-status: executing
+status: verifying
 stopped_at: Completed 55-01-PLAN.md
-last_updated: "2026-07-01T20:25:22.896Z"
+last_updated: "2026-07-01T20:35:20.572Z"
 last_activity: 2026-07-01
 last_activity_desc: Phase 55 execution started
 progress:
   total_phases: 6
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 17
-  completed_plans: 16
-  percent: 67
+  completed_plans: 17
+  percent: 83
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 Phase: 55 (demo-app-upgrade-docs) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-01 — Phase 55 execution started
 
 Progress: [████████░░] 80%
@@ -82,6 +82,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 54 P04 | 434 | 2 tasks | 2 files |
 | Phase 54 P03 | 3 | 1 tasks | 1 files |
 | Phase 55-demo-app-upgrade-docs P01 | 7 | 3 tasks | 4 files |
+| Phase 55-demo-app-upgrade-docs P02 | 6 | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,9 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: Sentinel migration version 0 sorts before all spine migrations; down/0 non-cascading prevents silent schema deletion
 - [Phase ?]: SAFE-03 smoke assertions use schema_prefix() not literal parapet for leg-agnostic correctness
 - [Phase ?]: Demo CI compile step in existing demo job (not new job) keeps release_gate needs list unchanged
+- [Phase ?]: Single-source rule (D-05): upgrade-1.x.md is sole home for Track A/B mechanics
+- [Phase ?]: HexDocs double-registration: upgrade-1.x.md added to both mix.exs extras: AND groups_for_extras Guides: (D-08 / Landmine 3)
+- [Phase ?]: migration-v1.md Step 3 is a first-class step (not checklist bullet) so do-nothing upgrader sees schema choice before first spine query fails (D-09 C2-refined)
 
 ### Pending Todos
 
@@ -146,7 +150,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-01T20:25:22.890Z
+Last session: 2026-07-01T20:35:20.568Z
 Stopped at: Completed 55-01-PLAN.md
 Resume file: .planning/phases/55-demo-app-upgrade-docs/55-CONTEXT.md
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
