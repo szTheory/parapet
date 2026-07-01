@@ -25,7 +25,7 @@ defmodule Parapet.Evidence do
             "Parapet requires a :repo to be configured. Please set `config :parapet, repo: MyApp.Repo`."
   end
 
-  @doc since: "1.7.0"
+  @doc since: "1.0.3"
   @doc """
   Returns the compiled Postgres schema prefix for Parapet spine tables.
 
