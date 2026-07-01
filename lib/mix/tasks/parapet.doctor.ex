@@ -19,7 +19,7 @@ defmodule Mix.Tasks.Parapet.Doctor do
   """
   use Mix.Task
 
-  @static_checks ~w(runbooks router operator_ui endpoint cardinality cluster_static recovery)
+  @static_checks ~w(runbooks router operator_ui endpoint cardinality cluster_static recovery schema)
   @severity_order %{skip: 0, info: 0, warn: 1, error: 2}
 
   @impl Mix.Task
@@ -93,6 +93,7 @@ defmodule Mix.Tasks.Parapet.Doctor do
   defp run_static_check("cardinality"), do: check_cardinality()
   defp run_static_check("cluster_static"), do: check_cluster_static()
   defp run_static_check("recovery"), do: check_recovery()
+  defp run_static_check("schema"), do: check_schema()
 
   defp check_runbooks do
     slos = Parapet.SLO.all()
@@ -511,6 +512,68 @@ defmodule Mix.Tasks.Parapet.Doctor do
 
         %{status: status, messages: messages}
     end
+  end
+
+  # DOCTOR-01: Schema prefix drift + existence check (D-01..D-05).
+  # Folds two signals into one finding (status = max severity, cond rollup):
+  #   (1) Drift — compile-time @schema_prefix vs runtime :schema_prefix config.
+  #   (2) Existence — is the configured schema present in the live repo?
+  # Both sides of the drift comparison go through normalize/1 (D-02) so nil/""/
+  # "public" collapse equal and Track A apps never false-positive.
+  defp check_schema do
+    compiled = Parapet.Spine.Schema.__prefix__()
+    runtime = Parapet.Spine.Schema.normalize(Application.get_env(:parapet, :schema_prefix))
+    repo = Application.get_env(:parapet, :repo)
+
+    drift? = runtime != compiled
+
+    # Existence half — degrade to :skip when repo not running (D-03).
+    # Guard mirrors check_recovery:357 (Process.whereis == nil -> :skip). Wrap probe
+    # in try/rescue so a mid-run DB error also degrades to :skip, never :error (D-03).
+    existence =
+      if is_nil(repo) or Process.whereis(repo) == nil do
+        :skip
+      else
+        try do
+          target = compiled || "public"
+          %{rows: [[present]]} = repo.query!("SELECT to_regnamespace($1) IS NOT NULL", [target])
+          if present, do: :ok, else: :absent
+        rescue
+          _ -> :skip
+        end
+      end
+
+    # Cond rollup — drift first, status = max severity (clone of check_cluster_static shape).
+    cond do
+      drift? ->
+        %{status: :error, messages: [schema_drift_msg(runtime, compiled)]}
+
+      existence == :absent ->
+        %{status: :error, messages: [schema_missing_msg(compiled, repo)]}
+
+      existence == :skip ->
+        %{status: :skip, messages: [schema_skip_msg(compiled)]}
+
+      true ->
+        %{status: :info, messages: ["schema_prefix in sync and target schema exists."]}
+    end
+  end
+
+  # D-04 remediation microcopy — verbatim from CONTEXT.md / RESEARCH.md § Code Examples.
+  defp schema_drift_msg(runtime, compiled) do
+    "Config drift: runtime :schema_prefix is #{inspect(runtime)} but Parapet was compiled with " <>
+      "#{inspect(compiled)}. Spine reads/writes may target the wrong schema. Recompile the library: " <>
+      "mix deps.compile parapet --force"
+  end
+
+  defp schema_missing_msg(compiled, repo) do
+    "Schema #{inspect(compiled)} does not exist in the configured repo (#{inspect(repo)}). Create it " <>
+      "before migrating: run the CREATE SCHEMA step from mix parapet.gen.spine, then mix ecto.migrate"
+  end
+
+  defp schema_skip_msg(compiled) do
+    "Schema-existence check skipped: the Parapet repo is not running. Start the OTP app (or run " <>
+      "mix parapet.doctor cluster) to verify schema #{inspect(compiled)} exists."
   end
 
   defp findings_exit_code(results, threshold) do
