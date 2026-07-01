@@ -5,14 +5,14 @@ milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 54
 current_phase_name: upgrade-path-doctor
 status: executing
-stopped_at: Completed Phase 54 Plan 01 — schema static check in mix parapet.doctor
-last_updated: "2026-07-01T18:26:30.590Z"
+stopped_at: Completed Phase 54 Plan 04 — UPG-01 Track A pin + UPG-05 fitness function
+last_updated: "2026-07-01T18:35:58.305Z"
 last_activity: 2026-07-01
 progress:
   total_phases: 6
   completed_phases: 3
   total_plans: 15
-  completed_plans: 13
+  completed_plans: 14
   percent: 50
 ---
 
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 ## Current Position
 
 Phase: 54 (upgrade-path-doctor) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 Status: Ready to execute
 Last activity: 2026-07-01
 
@@ -76,6 +76,8 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 52 P04 | 10 | 2 tasks | 2 files |
 | Phase 54 P01 | 4 | 2 tasks | 2 files |
 | Phase 54 P02 | 9 | 3 tasks | 6 files |
+| Phase 54 P04 | 300 | - tasks | - files |
+| Phase 54 P04 | 434 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -103,6 +105,8 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: Drift cond branch ordered first in check_schema/0 so DB-less mix parapet.doctor --ci always catches stale-compile drift without a live repo (D-01/D-05)
 - [Phase ?]: Parapet.Spine.SchemaMoveNotice shared helper: emit_for_spine/3 preserves gen.spine DBA notice wording byte-for-byte; emit_for_move/3 adds move-context trailing instruction (D-12b single-source)
 - [Phase ?]: resolve_prefix/2 always defaults to {:ok, parapet} when both flag and config normalize to nil; nil-leg in gen.schema.move is reachable only when resolver explicitly returns nil (not via --schema public CLI)
+- [Phase ?]: Track A nil-leg guard: if is_nil(@prefix) do / describe block at module level (D-19)
+- [Phase ?]: UPG-05 fitness fn: explicit file list excludes move task itself; dual forbidden patterns catch both invocation and alias forms (D-20)
 
 ### Pending Todos
 
@@ -133,8 +137,8 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-01T18:26:25.508Z
-Stopped at: Completed Phase 54 Plan 01 — schema static check in mix parapet.doctor
+Last session: 2026-07-01T18:35:58.299Z
+Stopped at: Completed Phase 54 Plan 04 — UPG-01 Track A pin + UPG-05 fitness function
 Resume file: None
 Next step: Discuss Phase 52 with `/gsd-discuss-phase 52` (Propagation Proof, Guards & CI Dual-Prefix Matrix) — no CONTEXT.md yet
 
