@@ -106,7 +106,19 @@ Plans:
   3. `--schema parapet` and `--no-create-schema` flags work Oban-verbatim: `--no-create-schema` omits the schema migration, keeps tables fully prefixed, and prints the exact `CREATE SCHEMA` + `GRANT` remediation for the DBA; one shared resolver (`flag > existing config > default`) drives `gen.spine`, `gen.archive_indexes`, and `install`.
   4. Parapet's five committed library migrations and the demo migrations create their tables under the schema (demo's plain `mix ecto.migrate` self-creates it), and generator-output tests pass: AST substring asserts plus a `prefix:` count-guard, one small golden for the schema migration only, and `--no-create-schema`/existing-config branch coverage.
 
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+
+**Wave 1**
+
+- [ ] 53-01-PLAN.md — Shared generate-time resolver `Parapet.Spine.Schema.resolve_prefix/2` (pure core + Igniter arity) + conflict-warns-not-crashes; pure-core tests (GEN-05, GEN-03)
+
+**Wave 2** *(blocked on Wave 1; three parallel plans, zero file overlap)*
+
+- [ ] 53-02-PLAN.md — Generators `gen.spine`/`gen.archive_indexes`: flags, generate-time literal prefix stamping, first-ordered sentinel schema migration, no-clobber config write, DBA notice + D-16 generator-output tests (GEN-01/02/03/04/05/07)
+- [ ] 53-03-PLAN.md — `parapet.install` orchestrator: `--schema`/`--no-create-schema` + `group: :parapet` forwarding to composed `gen.spine`; routing test (GEN-05, GEN-04)
+- [ ] 53-04-PLAN.md — Committed migrations (5 lib + 3 demo) edited in place to bind via compile-time `__prefix__()`, incl. the raw-SQL UPDATE landmine; both-legs-green (GEN-06)
 
 ### Phase 54: Upgrade Path & Doctor
 
@@ -162,7 +174,7 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 |-------|-----------|----------------|--------|-----------|
 | 51. Prefix Core & Test Seam | v1.7 | 3/3 | Complete    | 2026-06-30 |
 | 52. Propagation Proof, Guards & CI Dual-Prefix Matrix | v1.7 | 4/4 | Complete    | 2026-06-30 |
-| 53. Generators & Library Migrations | v1.7 | 0/TBD | Not started | - |
+| 53. Generators & Library Migrations | v1.7 | 0/4 | Not started | - |
 | 54. Upgrade Path & Doctor | v1.7 | 0/TBD | Not started | - |
 | 55. Demo App & Upgrade Docs | v1.7 | 0/TBD | Not started | - |
 | 56. Contract & Release Hardening | v1.7 | 0/TBD | Not started | - |
