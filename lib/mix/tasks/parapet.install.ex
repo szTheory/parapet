@@ -24,6 +24,8 @@ defmodule Mix.Tasks.Parapet.Install do
   def info(_argv, _composing_task) do
     %Igniter.Mix.Task.Info{
       schema: [
+        schema: :string,
+        create_schema: :boolean,
         with_ui: :boolean,
         skip_ui: :boolean,
         with_mailglass: :boolean,
@@ -32,6 +34,8 @@ defmodule Mix.Tasks.Parapet.Install do
         with_scoria: :boolean
       ],
       defaults: [
+        schema: "parapet",
+        create_schema: true,
         with_ui: false,
         skip_ui: false,
         with_mailglass: false,
@@ -39,6 +43,8 @@ defmodule Mix.Tasks.Parapet.Install do
         with_sigra: false,
         with_scoria: false
       ],
+      aliases: [s: :schema],
+      group: :parapet,
       composes: [
         "parapet.gen.spine",
         "parapet.gen.prometheus",
@@ -61,6 +67,7 @@ defmodule Mix.Tasks.Parapet.Install do
     with_chimeway? = igniter.args.options[:with_chimeway] || false
     with_sigra? = igniter.args.options[:with_sigra] || false
     with_scoria? = igniter.args.options[:with_scoria] || false
+    no_create_schema? = igniter.args.options[:create_schema] == false
     live_view_available? = Code.ensure_loaded?(Phoenix.LiveView)
 
     adapters =
@@ -90,7 +97,8 @@ defmodule Mix.Tasks.Parapet.Install do
         with_ui?: with_ui?,
         skip_ui?: skip_ui?,
         live_view_available?: live_view_available?,
-        with_scoria?: with_scoria?
+        with_scoria?: with_scoria?,
+        no_create_schema?: no_create_schema?
       )
     )
   end
@@ -219,6 +227,14 @@ defmodule Mix.Tasks.Parapet.Install do
         providers -> "Host-owned providers: #{Enum.map_join(providers, ", ", &inspect/1)}"
       end
 
+    no_create_schema_note =
+      if opts[:no_create_schema?] do
+        "- Schema not created automatically (--no-create-schema): `gen.spine` printed the exact " <>
+          "CREATE SCHEMA and GRANT SQL — run those once as a privileged role before `mix ecto.migrate`.\n"
+      else
+        ""
+      end
+
     """
     Parapet install summary
 
@@ -233,7 +249,7 @@ defmodule Mix.Tasks.Parapet.Install do
 
     #{provider_line}
     Host follow-up:
-    - Review the generated instrumenter module and keep `Parapet.attach(adapters: [...])` host-owned.
+    #{no_create_schema_note}- Review the generated instrumenter module and keep `Parapet.attach(adapters: [...])` host-owned.
     - If you enabled the UI, mount it inside an authenticated scope; Parapet does not provide its own auth.
     - Run `mix parapet.doctor` next.
     """
