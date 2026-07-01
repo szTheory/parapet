@@ -129,6 +129,53 @@ defmodule DemoApp.OperatorSmokeTest do
   end
 
   # ---------------------------------------------------------------------------
+  # Phase 55 — SAFE-03 smoke assertions: schema-prefix round-trip + six-table
+  # existence. These tests are top-level (not inside a describe block) so the
+  # module @moduletag :smoke applies and mix test --only smoke picks them up.
+  # ---------------------------------------------------------------------------
+
+  test "schema prefix: evidence round-trip carries compiled prefix on returned struct" do
+    {:ok, incident} =
+      Parapet.Evidence.create_incident(%{
+        title: "schema prefix smoke proof",
+        state: "open"
+      })
+
+    assert Ecto.get_meta(incident, :prefix) == Parapet.Evidence.schema_prefix(),
+           "create_incident round-trip: expected prefix #{inspect(Parapet.Evidence.schema_prefix())}, " <>
+             "got #{inspect(Ecto.get_meta(incident, :prefix))}"
+  end
+
+  test "schema existence: all six spine tables exist in the configured schema" do
+    prefix = Parapet.Evidence.schema_prefix() || "public"
+
+    result =
+      Ecto.Adapters.SQL.query!(
+        DemoApp.Repo,
+        "SELECT table_name FROM information_schema.tables WHERE table_schema = $1",
+        [prefix]
+      )
+
+    found = result.rows |> Enum.map(fn [name] -> name end) |> MapSet.new()
+
+    expected =
+      MapSet.new([
+        "parapet_action_items",
+        "parapet_incidents",
+        "parapet_timeline_entries",
+        "parapet_tool_audits",
+        "parapet_system_events",
+        "parapet_action_claims"
+      ])
+
+    missing = MapSet.difference(expected, found)
+
+    assert MapSet.size(missing) == 0,
+           "Expected all six Parapet spine tables in schema #{inspect(prefix)}, " <>
+             "missing: #{inspect(MapSet.to_list(missing))}"
+  end
+
+  # ---------------------------------------------------------------------------
   # Phase 48 — RED rendered-state gate set (FLOW-02/03, A11Y-06).
   #
   # Wave-1 scaffold (48-01): rendered-state facts that source greps are
