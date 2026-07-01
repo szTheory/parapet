@@ -1,8 +1,10 @@
 defmodule DemoApp.Repo.Migrations.AddParapetSpineTables do
   use Ecto.Migration
 
+  @prefix Parapet.Spine.Schema.__prefix__()
+
   def change do
-    create table(:parapet_action_items, primary_key: false) do
+    create table(:parapet_action_items, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
       add :title, :string, null: false
       add :integration, :string, null: false
@@ -12,7 +14,7 @@ defmodule DemoApp.Repo.Migrations.AddParapetSpineTables do
       timestamps()
     end
 
-    create table(:parapet_incidents, primary_key: false) do
+    create table(:parapet_incidents, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
       add :state, :string, default: "open", null: false
       add :title, :string, null: false
@@ -24,44 +26,52 @@ defmodule DemoApp.Repo.Migrations.AddParapetSpineTables do
       timestamps()
     end
 
-    create unique_index(:parapet_incidents, [:correlation_key], where: "state = 'open'")
+    create unique_index(:parapet_incidents, [:correlation_key],
+             where: "state = 'open'",
+             prefix: @prefix)
+
     create index(:parapet_incidents, [:updated_at, :id],
       where: "state in ('open', 'investigating')",
-      name: :parapet_incidents_queue_cursor_index
+      name: :parapet_incidents_queue_cursor_index,
+      prefix: @prefix
     )
     create index(:parapet_incidents, [:updated_at, :id],
       where: "state = 'resolved'",
-      name: :parapet_incidents_history_cursor_index
+      name: :parapet_incidents_history_cursor_index,
+      prefix: @prefix
     )
 
-    create table(:parapet_timeline_entries, primary_key: false) do
+    create table(:parapet_timeline_entries, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
       add :type, :string, null: false
       add :payload, :map, default: %{}
-      add :incident_id, references(:parapet_incidents, type: :binary_id, on_delete: :delete_all), null: false
+      add :incident_id,
+          references(:parapet_incidents, type: :binary_id, on_delete: :delete_all, prefix: @prefix),
+          null: false
 
       timestamps()
     end
 
-    create index(:parapet_timeline_entries, [:incident_id])
-    create index(:parapet_timeline_entries, [:incident_id, :inserted_at])
+    create index(:parapet_timeline_entries, [:incident_id], prefix: @prefix)
+    create index(:parapet_timeline_entries, [:incident_id, :inserted_at], prefix: @prefix)
 
-    create table(:parapet_tool_audits, primary_key: false) do
+    create table(:parapet_tool_audits, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
       add :tool_name, :string, null: false
       add :input, :map, default: %{}
       add :output, :map, default: %{}
       add :success, :boolean, default: false, null: false
       add :duration_ms, :integer
-      add :timeline_entry_id, references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all)
+      add :timeline_entry_id,
+          references(:parapet_timeline_entries, type: :binary_id, on_delete: :delete_all, prefix: @prefix)
 
       timestamps()
     end
 
-    create index(:parapet_tool_audits, [:timeline_entry_id])
-    create index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at])
+    create index(:parapet_tool_audits, [:timeline_entry_id], prefix: @prefix)
+    create index(:parapet_tool_audits, [:timeline_entry_id, :inserted_at], prefix: @prefix)
 
-    create table(:parapet_system_events, primary_key: false) do
+    create table(:parapet_system_events, primary_key: false, prefix: @prefix) do
       add :id, :binary_id, primary_key: true
       add :type, :string, null: false
       add :payload, :map, default: %{}
@@ -69,6 +79,6 @@ defmodule DemoApp.Repo.Migrations.AddParapetSpineTables do
       timestamps()
     end
 
-    create index(:parapet_system_events, [:inserted_at])
+    create index(:parapet_system_events, [:inserted_at], prefix: @prefix)
   end
 end
