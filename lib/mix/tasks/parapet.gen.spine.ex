@@ -203,33 +203,11 @@ defmodule Mix.Tasks.Parapet.Gen.Spine do
     )
   end
 
-  # Emit the DBA remediation notice under --no-create-schema (GEN-04, D-15).
+  # Emit the DBA remediation notice under --no-create-schema (GEN-04, D-15, D-12b).
   # Only emits when create_schema is false AND resolved is non-nil.
   # nil means "default not explicitly set" — treat as true (create_schema default).
-  defp maybe_emit_dba_notice(igniter, _resolved, create_schema) when create_schema != false,
-    do: igniter
-
-  defp maybe_emit_dba_notice(igniter, nil, _create_schema), do: igniter
-
-  defp maybe_emit_dba_notice(igniter, resolved, false) do
-    Igniter.add_notice(
-      igniter,
-      """
-      Parapet schema setup (--no-create-schema): run once as a privileged role (DBA / schema owner):
-
-        -- Happy path — schema owned by the app role:
-        CREATE SCHEMA IF NOT EXISTS #{resolved} AUTHORIZATION your_app_role;
-
-        -- Split-role fallback (schema owned by a separate role):
-        GRANT USAGE  ON SCHEMA #{resolved} TO your_app_role;   -- resolve the schema
-        GRANT CREATE ON SCHEMA #{resolved} TO your_app_role;   -- create tables/indexes during migrate
-
-        -- Optional: narrow runtime role permissions (recommended for production)
-        ALTER DEFAULT PRIVILEGES IN SCHEMA #{resolved}
-          GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_app_runtime_role;
-
-      Then run: mix ecto.migrate  (no CREATE SCHEMA migration was generated)
-      """
-    )
-  end
+  # Delegates to the shared single-source helper (Parapet.Spine.SchemaMoveNotice)
+  # so the SQL body is not duplicated between gen.spine and gen.schema.move.
+  defp maybe_emit_dba_notice(igniter, resolved, create_schema),
+    do: Parapet.Spine.SchemaMoveNotice.emit_for_spine(igniter, resolved, create_schema)
 end
