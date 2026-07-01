@@ -59,6 +59,10 @@ mix deps.get
 mix parapet.install
 ```
 
+New installations default to the `parapet` database schema for evidence tables. Existing adopters
+upgrading from an earlier release should follow [Migrating to Parapet 1.x](docs/migration-v1.md)
+Step 3 to choose their schema migration path before running `mix ecto.migrate`.
+
 `mix parapet.install` composes the core paved road in order:
 
 1. Generates the Parapet evidence spine

@@ -61,6 +61,16 @@ mix ecto.migrate
 
 For releases, run the equivalent release task or remote migration command used by your Phoenix deployment platform. Do not start a release that can emit incidents before the evidence tables exist.
 
+### Schema location
+
+By default, `mix ecto.migrate` creates and uses the `parapet` schema for all evidence tables.
+New host applications inherit this default with no additional configuration.
+
+Existing adopters upgrading from an earlier Parapet release must choose a migration path before
+running `mix ecto.migrate` in production. See [Upgrade Guide (1.x)](upgrade-1.x.md) for the
+Track A (stay on `public`) and Track B (move to `parapet`) options, copy-paste blocks, and
+rollback instructions.
+
 ## Step 5: Check optional dependency compile-out
 
 Parapet keeps several integrations optional. If a sibling library is absent, the related module compiles out instead of forcing the dependency into your app. Common examples include Oban-backed workers, integration adapters, and optional telemetry bridges.
