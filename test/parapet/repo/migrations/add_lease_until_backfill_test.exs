@@ -15,6 +15,27 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
 
   alias Parapet.TestSupport.ConcurrencyRepo
 
+  # Schema-prefix-aware table qualification — mirrors ConcurrencyBootstrap.q/1 so this
+  # integration test targets the SAME schema the bootstrap and the migration use under
+  # the active prefix leg. The bare Postgrex connection below sets no search_path, so
+  # unqualified names resolve to `public`; under the `parapet` leg the bootstrap creates
+  # tables in the `parapet` schema, so unqualified DDL/DML would miss them entirely
+  # (Phase 52 dual-prefix matrix). Under the `public`/nil leg every qualifier is bare,
+  # preserving the legacy behavior byte-for-byte.
+  @raw_prefix Application.compile_env(:parapet, :schema_prefix, "parapet")
+  @prefix Parapet.Spine.Schema.normalize(@raw_prefix)
+  @claims_table if @prefix,
+                  do: ~s("#{@prefix}"."parapet_action_claims"),
+                  else: "parapet_action_claims"
+  @incidents_table if @prefix,
+                     do: ~s("#{@prefix}"."parapet_incidents"),
+                     else: "parapet_incidents"
+  # DROP INDEX qualifies the index by its schema; CREATE INDEX must leave the index
+  # name bare (it inherits the target table's schema).
+  @lease_index if @prefix,
+                 do: ~s("#{@prefix}"."parapet_action_claims_lease_until_claimed_index"),
+                 else: "parapet_action_claims_lease_until_claimed_index"
+
   # Backfill migration under test.
   @migration_version 20_260_528_010_000
   @migration_module Parapet.Repo.Migrations.AddLeaseUntilToParapetActionClaims
@@ -101,39 +122,39 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
       #    when the column is already NOT NULL.
       Postgrex.query!(
         conn,
-        "ALTER TABLE parapet_action_claims ADD COLUMN IF NOT EXISTS lease_until timestamp(6) without time zone",
+        "ALTER TABLE #{@claims_table} ADD COLUMN IF NOT EXISTS lease_until timestamp(6) without time zone",
         []
       )
 
       Postgrex.query!(
         conn,
-        "UPDATE parapet_action_claims SET lease_until = claimed_at + INTERVAL '5 minutes' WHERE lease_until IS NULL",
+        "UPDATE #{@claims_table} SET lease_until = claimed_at + INTERVAL '5 minutes' WHERE lease_until IS NULL",
         []
       )
 
       Postgrex.query!(
         conn,
-        "ALTER TABLE parapet_action_claims ALTER COLUMN lease_until SET NOT NULL",
+        "ALTER TABLE #{@claims_table} ALTER COLUMN lease_until SET NOT NULL",
         []
       )
 
       # Re-create the partial index if the migration dropped it via rollback.
       Postgrex.query!(
         conn,
-        "CREATE INDEX IF NOT EXISTS parapet_action_claims_lease_until_claimed_index ON parapet_action_claims (lease_until) WHERE status = 'claimed'",
+        "CREATE INDEX IF NOT EXISTS parapet_action_claims_lease_until_claimed_index ON #{@claims_table} (lease_until) WHERE status = 'claimed'",
         []
       )
 
       # Remove test rows so successive runs are deterministic.
       Postgrex.query!(
         conn,
-        "DELETE FROM parapet_action_claims WHERE action_key = 'migration-backfill-test'",
+        "DELETE FROM #{@claims_table} WHERE action_key = 'migration-backfill-test'",
         []
       )
 
       Postgrex.query!(
         conn,
-        "DELETE FROM parapet_incidents WHERE title = 'migration-backfill-verify'",
+        "DELETE FROM #{@incidents_table} WHERE title = 'migration-backfill-verify'",
         []
       )
 
@@ -161,13 +182,13 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
     # -----------------------------------------------------------------------
     Postgrex.query!(
       conn,
-      "DROP INDEX IF EXISTS parapet_action_claims_lease_until_claimed_index",
+      "DROP INDEX IF EXISTS #{@lease_index}",
       []
     )
 
     Postgrex.query!(
       conn,
-      "ALTER TABLE parapet_action_claims DROP COLUMN IF EXISTS lease_until",
+      "ALTER TABLE #{@claims_table} DROP COLUMN IF EXISTS lease_until",
       []
     )
 
@@ -181,7 +202,7 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
 
     Postgrex.query!(
       conn,
-      "INSERT INTO parapet_incidents (id, title, state, runbook_data, inserted_at, updated_at) " <>
+      "INSERT INTO #{@incidents_table} (id, title, state, runbook_data, inserted_at, updated_at) " <>
         "VALUES ($1, 'migration-backfill-verify', 'open', '{}', $2, $2)",
       [Ecto.UUID.dump!(incident_id), now]
     )
@@ -192,7 +213,7 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
 
     Postgrex.query!(
       conn,
-      "INSERT INTO parapet_action_claims " <>
+      "INSERT INTO #{@claims_table} " <>
         "(id, incident_id, action_kind, action_key, status, idempotency_key, " <>
         "attempt_count, claimed_at, error_metadata, inserted_at, updated_at) " <>
         "VALUES ($1, $2, 'operator', 'migration-backfill-test', 'claimed', " <>
@@ -220,7 +241,7 @@ defmodule Parapet.Repo.Migrations.AddLeaseUntilBackfillTest do
     %{rows: [[claimed_at_db, lease_until_db]]} =
       Postgrex.query!(
         conn,
-        "SELECT claimed_at, lease_until FROM parapet_action_claims WHERE id = $1",
+        "SELECT claimed_at, lease_until FROM #{@claims_table} WHERE id = $1",
         [Ecto.UUID.dump!(claim_id)]
       )
 
