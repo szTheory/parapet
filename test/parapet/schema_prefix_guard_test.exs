@@ -66,12 +66,12 @@ defmodule Parapet.SchemaPrefixGuardTest do
   # Private helpers
   # ---------------------------------------------------------------------------
 
-  # Strips a trailing # comment from a line. Handles the common case of a `#`
-  # outside of string delimiters. Not a full Elixir parser — sufficient for the
-  # four fingerprints this guard checks (none of which fire inside strings that
-  # themselves contain #).
+  # Strips a trailing # comment from a line. Only strips content after a bare
+  # `#` (Elixir line comment), preserving string literal content so pattern (d)
+  # can match fragment("parapet_...") violations. Not a full Elixir parser —
+  # sufficient for the four fingerprints this guard checks.
   defp strip_trailing_comment(line) do
-    case Regex.run(~r/^([^#"]*)/, line) do
+    case Regex.run(~r/^([^#]*)/, line) do
       [_, before_hash] -> before_hash
       _ -> line
     end
