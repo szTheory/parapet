@@ -4,9 +4,9 @@ milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 54
 current_phase_name: upgrade-path-doctor
-status: verifying
-stopped_at: Completed Phase 54 Plan 04 — UPG-01 Track A pin + UPG-05 fitness function
-last_updated: "2026-07-01T18:43:57.112Z"
+status: ready_to_plan
+stopped_at: Phase 54 complete (4/4) — ready to discuss Phase 55
+last_updated: 2026-07-01T18:50:22.057Z
 last_activity: 2026-07-01
 progress:
   total_phases: 6
@@ -23,13 +23,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 54 — upgrade-path-doctor
+**Current focus:** Phase 55 — demo app & upgrade docs
 
 ## Current Position
 
-Phase: 54 (upgrade-path-doctor) — EXECUTING
-Plan: 4 of 4
-Status: Phase complete — ready for verification
+Phase: 55
+Plan: Not started
+Status: Ready to plan
 Last activity: 2026-07-01
 
 Progress: [████████░░] 80%
@@ -60,6 +60,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | 51 | 3 | - | - |
 | 52 | 4 | - | - |
 | 53 | 4 | - | - |
+| 54 | 4 | - | - |
 
 **Recent Trend:**
 
