@@ -159,6 +159,8 @@ jobs:
           restore-keys: ${{ runner.os }}-demo-build-${{ matrix.elixir }}-${{ matrix.otp }}-
       - name: Install demo dependencies
         run: cd examples/demo_app && mix deps.get
+      - name: Compile demo (warnings-as-errors, no-optional-deps)
+        run: cd examples/demo_app && mix compile --no-optional-deps --warnings-as-errors
       - name: Create and migrate demo database
         run: cd examples/demo_app && mix ecto.create && mix ecto.migrate
       - name: Seed demo database
