@@ -47,7 +47,7 @@ Full detail: [milestones/v1.6-ROADMAP.md](milestones/v1.6-ROADMAP.md)
 - [x] **Phase 53: Generators & Library Migrations** - A first-ordered `CREATE SCHEMA` migration, prefix-stamped DDL on every table/reference/index, non-clobbering config writes, the `--schema`/`--no-create-schema` hatch, and a shared resolver consumed by `gen.spine`, `gen.archive_indexes`, and `install`. (completed 2026-07-01)
 - [x] **Phase 54: Upgrade Path & Doctor** - `mix parapet.gen.schema.move` emitting a reversible single-transaction `SET SCHEMA` move with pre-flight catalog detection, the documented stay-on-`public` Track A, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check. (completed 2026-07-01)
 - [x] **Phase 55: Demo App & Upgrade Docs** - The demo migrates end-to-end into `parapet` as the real-host smoke proof, plus `docs/upgrade-1.x.md` and deployment/README/migration-v1 deltas that give adopters a copy-paste upgrade story. (completed 2026-07-01)
-- [ ] **Phase 56: Contract & Release Hardening** - Assert the frozen-contract regression gate (`verify.public_api` + telemetry + compile-out all green, no new events), ship the `feat` two-part honest CHANGELOG/release-note framing (additive/semver-minor reassurance for everyone + a distinct action-required line for existing adopters), and close the milestone done-criteria.
+- [x] **Phase 56: Contract & Release Hardening** - Assert the frozen-contract regression gate (`verify.public_api` + telemetry + compile-out all green, no new events), ship the `feat` two-part honest CHANGELOG/release-note framing (additive/semver-minor reassurance for everyone + a distinct action-required line for existing adopters), and close the milestone done-criteria. (completed 2026-07-02)
 
 ## Phase Details
 
@@ -175,7 +175,7 @@ Plans:
   2. The telemetry contract test stays green, no `[:parapet, :schema, …]` event is added, and Ecto query telemetry `:source` (the bare table name) is confirmed unaffected.
   3. A `feat` CHANGELOG entry frames the change as additive (semver minor) with a two-part honest banner — a reassurance true for everyone ("No data is migrated automatically — your evidence tables never move unless you choose") plus a distinct action-required line for existing adopters (add `config :parapet, schema_prefix: nil` and recompile, linking `docs/upgrade-1.x.md`) — plus a matching release-note callout. (Rationale: the unqualified "No action required for existing installs" is factually false for do-nothing upgraders; overridden per Phase-56 CONTEXT D-01/D-02.)
 
-**Plans**: 3/4 plans executed
+**Plans**: 4/4 plans complete
 **Wave 1**
 
 - [x] 56-01-PLAN.md — SAFE-02: behavioral Ecto `:source` bare-name assertion + telemetry contract re-assert (Wave 1)
@@ -184,7 +184,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 56-04-PLAN.md — D-10: record the three done-criteria in 56-VERIFICATION.md / 56-UAT.md (Wave 2)
+- [x] 56-04-PLAN.md — D-10: record the three done-criteria in 56-VERIFICATION.md / 56-UAT.md (Wave 2)
 
 ## Next Milestone
 
@@ -202,4 +202,4 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete    | 2026-07-01 |
-| 56. Contract & Release Hardening | v1.7 | 3/4 | In Progress|  |
+| 56. Contract & Release Hardening | v1.7 | 4/4 | Complete   | 2026-07-02 |
