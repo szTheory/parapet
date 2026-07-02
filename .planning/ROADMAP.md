@@ -202,4 +202,4 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete    | 2026-07-01 |
-| 56. Contract & Release Hardening | v1.7 | 4/4 | Complete   | 2026-07-02 |
+| 56. Contract & Release Hardening | v1.7 | 4/4 | Complete    | 2026-07-02 |
