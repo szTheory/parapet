@@ -13,6 +13,17 @@ For v0.1–v0.9 milestone history, see [`docs/HISTORY.md`](docs/HISTORY.md).
 
 ## Unreleased
 
+### Features
+
+* **schema:** spine tables now live in a dedicated `parapet` Postgres schema by default
+  (semver-minor, additive — public API & telemetry unchanged).
+
+  **No data is migrated automatically — your evidence tables never move unless you choose.**
+
+  Existing adopters: one action is required to keep your tables in `public` — add
+  `config :parapet, schema_prefix: nil` and recompile. See the full Track A / Track B guide
+  in [docs/upgrade-1.x.md](docs/upgrade-1.x.md).
+
 ### Changed
 
 * **archive:** changed the Experimental `Parapet.Evidence.Archiver.archive/3` return shape from `{:ok, :ok}` to structured `{:ok, %Parapet.Evidence.Archiver.Summary{}}` and `{:error, %Parapet.Evidence.Archiver.Failure{}}` tuples; `mix parapet.archive` now prints machine-readable summary JSON on success and raises on archive failure instead of emitting static success JSON.
