@@ -3,17 +3,17 @@ gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
 current_phase: 56
-current_phase_name: Contract & Release Hardening
+current_phase_name: contract-release-hardening
 status: executing
 stopped_at: Phase 56 context gathered (assumptions mode)
-last_updated: "2026-07-02T15:53:02.844Z"
+last_updated: "2026-07-02T16:18:26.626Z"
 last_activity: 2026-07-02
-last_activity_desc: Phase 55 complete, transitioned to Phase 56
+last_activity_desc: Phase 56 execution started
 progress:
   total_phases: 6
   completed_phases: 5
-  total_plans: 17
-  completed_plans: 17
+  total_plans: 21
+  completed_plans: 18
   percent: 83
 ---
 
@@ -24,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 56 — Contract & Release Hardening
+**Current focus:** Phase 56 — contract-release-hardening
 
 ## Current Position
 
-Phase: 56 — Contract & Release Hardening
-Plan: Not started
+Phase: 56 (contract-release-hardening) — EXECUTING
+Plan: 2 of 4
 Status: Ready to execute
-Last activity: 2026-07-02 — Phase 55 complete, transitioned to Phase 56
+Last activity: 2026-07-02 -- Phase 56 execution started
 
 Progress: [████████░░] 83%
 
@@ -84,6 +84,7 @@ Continuing phase numbering from v1.6 (ended at Phase 50). Hard dependency chain:
 | Phase 54 P03 | 3 | 1 tasks | 1 files |
 | Phase 55-demo-app-upgrade-docs P01 | 7 | 3 tasks | 4 files |
 | Phase 55-demo-app-upgrade-docs P02 | 6 | 3 tasks | 5 files |
+| Phase 56 P01 | 3 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -121,6 +122,9 @@ Decisions are logged in PROJECT.md Key Decisions table. v1.7 locked design decis
 - [Phase ?]: Single-source rule (D-05): upgrade-1.x.md is sole home for Track A/B mechanics
 - [Phase ?]: HexDocs double-registration: upgrade-1.x.md added to both mix.exs extras: AND groups_for_extras Guides: (D-08 / Landmine 3)
 - [Phase ?]: migration-v1.md Step 3 is a first-class step (not checklist bullet) so do-nothing upgrader sees schema choice before first spine query fails (D-09 C2-refined)
+- [Phase ?]: test summary
+- [Phase ?]: Bare-source test ordering: attach Ecto telemetry handler AFTER Sandbox.checkout + reset!() to avoid nil-source TRUNCATE events; use schema-module form for all/1 to ensure put_source/2 populates :source
+- [Phase ?]: Use atom form :'Elixir.Ecto.Adapters.SQL.Sandbox' to bypass alias Parapet.Metrics.Ecto shadowing the Ecto name when calling sandbox functions in test modules
 
 ### Pending Todos
 
@@ -151,7 +155,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-02T15:37:35.464Z
+Last session: 2026-07-02T16:17:46.869Z
 Stopped at: Phase 56 context gathered (assumptions mode)
 Resume file: .planning/phases/56-contract-release-hardening/56-CONTEXT.md
 Next step: Discuss Phase 56 with `/gsd-discuss-phase 56` (Contract & Release Hardening) — no CONTEXT.md yet
