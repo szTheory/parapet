@@ -165,6 +165,8 @@ defmodule Parapet.TelemetryContractTest do
     # Group 5: Probe
     [:parapet, :probe, :run] => [:probe, :status],
     # Group 6: Infrastructure (deploy:mark has caller-controlled metadata — NOT fixtured)
+    # :source pins the metadata *key*; the *value* (bare table name, prefix-free) is
+    # proven behaviorally in test/parapet/metrics/ecto_test.exs Test 4 (D-08/D-09).
     [:parapet, :ecto, :query] => [:source],
     [:parapet, :http, :request] => [:route, :method, :status_class],
     [:parapet, :oban, :job] => [:worker, :queue, :state]
