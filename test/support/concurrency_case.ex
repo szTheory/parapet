@@ -12,6 +12,7 @@ defmodule Parapet.TestSupport.ConcurrencyCase do
         only: [
           unboxed_run: 1,
           allow: 2,
+          assert_eventually: 2,
           start_distributed_node_for_peer_canary: 0,
           stop_distributed_node_for_peer_canary: 1
         ]
@@ -38,6 +39,70 @@ defmodule Parapet.TestSupport.ConcurrencyCase do
   def allow(owner, pid), do: Sandbox.allow(ConcurrencyRepo, owner, pid)
 
   def unboxed_run(fun), do: Sandbox.unboxed_run(ConcurrencyRepo, fun)
+
+  @doc false
+  # assert_eventually(fun, opts \\ [])
+  #
+  # Re-invokes fun on a constant interval until it returns a truthy value or
+  # stops raising ExUnit.AssertionError. On success, returns the truthy value
+  # (so callers can bind it). On timeout, re-raises the last real assertion
+  # diff verbatim — never a generic "timed out" message (the #1 prior-art
+  # footgun in hex libs and blog patterns).
+  #
+  # opts:
+  #   :timeout  — total ms budget (default 1_000)
+  #   :interval — constant poll interval in ms, no backoff (default 25)
+  #   :message  — optional string prefix on the falsy-timeout failure message
+  #
+  # CATCH ONLY ExUnit.AssertionError (D-14): a MatchError, DBConnection crash,
+  # or any other exception raised by fun is a real bug and propagates immediately.
+  #
+  # Sandbox contract (D-15, documented, not enforced): poll from the test
+  # process that owns the sandbox connection; a spawned poller needs allow/2.
+  # Use assert_eventually only for no-message DB/state-projection settle cases;
+  # assert_receive remains the idiom for message-passing waits.
+  def assert_eventually(fun, opts \\ []) do
+    timeout = Keyword.get(opts, :timeout, 1_000)
+    interval = Keyword.get(opts, :interval, 25)
+    message = Keyword.get(opts, :message, nil)
+    start = System.monotonic_time(:millisecond)
+    deadline = start + timeout
+
+    do_assert_eventually(fun, deadline, interval, message, start, nil, nil)
+  end
+
+  defp do_assert_eventually(fun, deadline, interval, message, start, last_error, last_falsy) do
+    try do
+      result = fun.()
+
+      if result do
+        result
+      else
+        if System.monotonic_time(:millisecond) >= deadline do
+          elapsed = System.monotonic_time(:millisecond) - start
+          prefix = if message, do: "#{message}\n", else: ""
+
+          raise ExUnit.AssertionError,
+            message:
+              "#{prefix}assert_eventually timed out after #{elapsed}ms. " <>
+                "Last value: #{inspect(last_falsy || result)}."
+        else
+          Process.sleep(interval)
+          do_assert_eventually(fun, deadline, interval, message, start, nil, result)
+        end
+      end
+    rescue
+      err in ExUnit.AssertionError ->
+        st = __STACKTRACE__
+
+        if System.monotonic_time(:millisecond) >= deadline do
+          reraise err, st
+        else
+          Process.sleep(interval)
+          do_assert_eventually(fun, deadline, interval, message, start, {err, st}, last_falsy)
+        end
+    end
+  end
 
   def start_distributed_node_for_peer_canary do
     cond do
