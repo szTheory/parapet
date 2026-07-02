@@ -4,17 +4,17 @@ milestone: v1.8
 milestone_name: CI/CD Performance & DX
 current_phase: 57
 current_phase_name: test-suite-baseline
-status: executing
-stopped_at: Completed 57-01-PLAN.md (TEST-01, TEST-02, TEST-03 closed)
-last_updated: "2026-07-02T21:10:39.666Z"
+status: verifying
+stopped_at: Completed 57-02-PLAN.md (TEST-04, TEST-05 closed)
+last_updated: "2026-07-02T21:19:40.522Z"
 last_activity: 2026-07-02
 last_activity_desc: Phase 57 execution started
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 2
-  completed_plans: 1
-  percent: 0
+  completed_plans: 2
+  percent: 25
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 Phase: 57 (test-suite-baseline) — EXECUTING
 Plan: 2 of 2
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-07-02 — Phase 57 execution started
 
 ```
@@ -84,6 +84,7 @@ Phases continue from v1.7 (ended Phase 56). Dependency chain: green suite first 
 | Phase 56 P03 | 5 | 2 tasks | 1 files |
 | Phase 56 P04 | 10 | 2 tasks | 2 files |
 | Phase 57 P01 | 3 | 2 tasks | 3 files |
+| Phase 57 P02 | 5 | 4 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,10 @@ Config key is `:schema_prefix` (never bare `:prefix`). Mechanism is compile-time
 
 - [Phase ?]: TEST-01/TEST-02: Delete stale doc-drift assertions and atom-count delta block directly — no quarantine infrastructure
 - [Phase ?]: TEST-03: Remove three dead-time Process.sleep(10) calls from exemplar_telemetry_test.exs — :telemetry.execute/3 dispatches synchronously
+- [Phase ?]: D-12/TEST-05: assert_eventually/2 plain def on ConcurrencyCase — re-raises real ExUnit.AssertionError verbatim on timeout, catches ONLY ExUnit.AssertionError
+- [Phase ?]: D-07/D-08/TEST-04: SELECT 1 readiness barrier replaces Process.sleep(200) — self-referential anon fn, 5_000ms deadline, raises DX message on expiry
+- [Phase ?]: D-09/D-10/D-11/TEST-04: per-file @concurrency_hold_ms (75x4, 50x1) + INTENTIONAL HOLD: two-line annotation on all 6 hold sites
+- [Phase ?]: D-17: check_intentional_hold.sh standalone grep guard (not wired to CI); promotion to Credo check deferred to Phase 58/59
 
 ### Pending Todos
 
@@ -135,8 +140,8 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-02T21:10:39.662Z
-Stopped at: Completed 57-01-PLAN.md (TEST-01, TEST-02, TEST-03 closed)
+Last session: 2026-07-02T21:19:40.518Z
+Stopped at: Completed 57-02-PLAN.md (TEST-04, TEST-05 closed)
 Resume file: None
 Next step: `/gsd-plan-phase 57` — Test Suite Baseline
 

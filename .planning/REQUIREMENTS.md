@@ -17,8 +17,8 @@ Closes v1.7 tech-debt #6 by fixing, not quarantining — a bare `mix test` must 
 - [x] **TEST-01**: A bare `mix test` (default env, default `parapet` prefix) passes green — `DocsPhase33Test`'s stale README assertion is fixed (`"make up-auto"` → `"make up"`)
 - [x] **TEST-02**: `Telemetry.RecoveryActionTest` no longer flakes under concurrent `async` tests — the `atom_count` before/after delta check is removed while the load-bearing `String.to_existing_atom/1`-raises guard is retained
 - [x] **TEST-03**: The three spurious `Process.sleep` calls in `exemplar_telemetry_test.exs` are removed (telemetry dispatch is synchronous, so the waits are dead time)
-- [ ] **TEST-04**: The five intentional concurrency-simulation sleeps are annotated (named module attribute + explanatory comment) so they read as deliberate, and the cluster-smoke `Process.sleep(200)` startup race is replaced with a synchronous start barrier
-- [ ] **TEST-05**: A reusable `assert_eventually`/until helper exists for genuinely-async assertions, so future tests have a deterministic alternative to `Process.sleep`
+- [x] **TEST-04**: The five intentional concurrency-simulation sleeps are annotated (named module attribute + explanatory comment) so they read as deliberate, and the cluster-smoke `Process.sleep(200)` startup race is replaced with a synchronous start barrier
+- [x] **TEST-05**: A reusable `assert_eventually`/until helper exists for genuinely-async assertions, so future tests have a deterministic alternative to `Process.sleep`
 
 ### CI Pipeline Performance
 
@@ -75,8 +75,8 @@ Explicitly excluded from v1.8, with reasoning.
 | TEST-01 | Phase 57 | Complete |
 | TEST-02 | Phase 57 | Complete |
 | TEST-03 | Phase 57 | Complete |
-| TEST-04 | Phase 57 | Pending |
-| TEST-05 | Phase 57 | Pending |
+| TEST-04 | Phase 57 | Complete |
+| TEST-05 | Phase 57 | Complete |
 | DX-01 | Phase 58 | Pending |
 | DX-02 | Phase 58 | Pending |
 | DX-03 | Phase 58 | Pending |

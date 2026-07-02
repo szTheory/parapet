@@ -57,7 +57,7 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 
 ### v1.8 CI/CD Performance & DX (Phases 57-60) — Active
 
-- [ ] **Phase 57: Test Suite Baseline** - Fix the two known-red tests and triage all `Process.sleep` calls so bare `mix test` is green
+- [x] **Phase 57: Test Suite Baseline** - Fix the two known-red tests and triage all `Process.sleep` calls so bare `mix test` is green (completed 2026-07-02)
 - [ ] **Phase 58: Local DX — mix ci & CONTRIBUTING** - Add the `mix ci` alias and `mix.exs` PLT-path config; update contributor docs
 - [ ] **Phase 59: CI Caching, Lint-Once & release_gate Hardening** - PLT cache, lint-once job, `concurrency: cancel-in-progress`, hardened `release_gate`, SHA updates
 - [ ] **Phase 60: OTP Matrix Reshape & Nightly Schedule** - Trim PR matrix to 1 cell, full matrix on main+nightly, nightly schedule, D-11 retirement
@@ -77,10 +77,10 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   4. The five intentional concurrency-simulation sleeps are annotated with a `@concurrency_hold_ms` module attribute and an explanatory comment, and the `executor_cluster_smoke_test.exs` startup-race sleep is replaced with a synchronous barrier
   5. A reusable `assert_eventually` / until helper exists in the test support layer so future async assertions have a deterministic alternative to `Process.sleep`
 
-**Plans**: 1/2 plans executed
+**Plans**: 2/2 plans complete
 
 - [x] 57-01-PLAN.md — Fix the two red tests + delete the 3 spurious telemetry sleeps (TEST-01/02/03)
-- [ ] 57-02-PLAN.md — assert_eventually/2 helper, SELECT 1 startup barrier, 6 INTENTIONAL HOLD annotations + grep guard (TEST-04/05)
+- [x] 57-02-PLAN.md — assert_eventually/2 helper, SELECT 1 startup barrier, 6 INTENTIONAL HOLD annotations + grep guard (TEST-04/05)
 
 ---
 
@@ -143,7 +143,7 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete | 2026-07-01 |
 | 56. Contract & Release Hardening | v1.7 | 4/4 | Complete | 2026-07-02 |
-| 57. Test Suite Baseline | v1.8 | 1/2 | In Progress|  |
+| 57. Test Suite Baseline | v1.8 | 2/2 | Complete   | 2026-07-02 |
 | 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 0/TBD | Not started | - |
 | 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 0/TBD | Not started | - |
 | 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
