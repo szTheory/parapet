@@ -22,7 +22,10 @@ defmodule Parapet.MixProject do
       docs: docs(),
       deps: deps(),
       aliases: aliases(),
-      dialyzer: [plt_add_apps: [:mix, :ex_unit]]
+      dialyzer: [
+        plt_add_apps: [:mix, :ex_unit],
+        plt_file: {:no_warn, "priv/plts/project.plt"}
+      ]
     ]
   end
 
@@ -39,8 +42,7 @@ defmodule Parapet.MixProject do
 
   defp package do
     [
-      files:
-        ~w(lib priv priv/static/parapet/fonts/*.woff2 priv/static/parapet/fonts/LICENSE.txt
+      files: ~w(lib priv priv/static/parapet/fonts/*.woff2 priv/static/parapet/fonts/LICENSE.txt
            .formatter.exs mix.exs README* CHANGELOG* CONTRIBUTING* SECURITY* LICENSE* docs),
       licenses: ["MIT"],
       links: %{
@@ -131,6 +133,17 @@ defmodule Parapet.MixProject do
   end
 
   defp aliases do
-    []
+    [
+      ci: [
+        "format --check-formatted",
+        "compile --warnings-as-errors",
+        "compile --no-optional-deps --warnings-as-errors",
+        "credo --strict",
+        "hex.audit",
+        "dialyzer",
+        "test",
+        "verify.public_api"
+      ]
+    ]
   end
 end

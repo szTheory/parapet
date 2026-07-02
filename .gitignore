@@ -32,3 +32,6 @@ test.exs
 # Python bytecode (brandbook logo generator)
 __pycache__/
 *.pyc
+
+# Dialyzer PLT cache (dialyxir writes these to priv/plts/ on first run)
+/priv/plts/*.plt*
