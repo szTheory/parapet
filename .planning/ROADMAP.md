@@ -175,12 +175,12 @@ Plans:
   2. The telemetry contract test stays green, no `[:parapet, :schema, …]` event is added, and Ecto query telemetry `:source` (the bare table name) is confirmed unaffected.
   3. A `feat` CHANGELOG entry frames the change as additive (semver minor) with a two-part honest banner — a reassurance true for everyone ("No data is migrated automatically — your evidence tables never move unless you choose") plus a distinct action-required line for existing adopters (add `config :parapet, schema_prefix: nil` and recompile, linking `docs/upgrade-1.x.md`) — plus a matching release-note callout. (Rationale: the unqualified "No action required for existing installs" is factually false for do-nothing upgraders; overridden per Phase-56 CONTEXT D-01/D-02.)
 
-**Plans**: 2/4 plans executed
+**Plans**: 3/4 plans executed
 **Wave 1**
 
 - [x] 56-01-PLAN.md — SAFE-02: behavioral Ecto `:source` bare-name assertion + telemetry contract re-assert (Wave 1)
 - [x] 56-02-PLAN.md — SAFE-01: `verify.public_api` zero-drift proof + evidence capture (Wave 1)
-- [ ] 56-03-PLAN.md — SAFE-04: two-part honest `feat(schema)` CHANGELOG entry + release-note check (Wave 1)
+- [x] 56-03-PLAN.md — SAFE-04: two-part honest `feat(schema)` CHANGELOG entry + release-note check (Wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -202,4 +202,4 @@ After v1.7 ships, the approved v1.7→v1.9 roadmap continues:
 | 53. Generators & Library Migrations | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete    | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete    | 2026-07-01 |
-| 56. Contract & Release Hardening | v1.7 | 2/4 | In Progress|  |
+| 56. Contract & Release Hardening | v1.7 | 3/4 | In Progress|  |

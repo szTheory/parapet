@@ -59,7 +59,7 @@ Requirements for the v1.7 milestone. Each maps to exactly one roadmap phase. Res
 - [x] **SAFE-01**: `mix verify.public_api` stays green with zero `--write` — the prefix is a module attribute, not an export.
 - [x] **SAFE-02**: The telemetry contract test stays green and no `[:parapet, :schema, …]` event is added; confirm Ecto query telemetry `:source` (bare table name) is unaffected.
 - [x] **SAFE-03**: Compile-out-clean (`--warnings-as-errors`, `--no-optional-deps`) holds, and the demo smoke lane asserts `mix ecto.migrate` lands all six tables in `parapet` and an evidence round-trip carries `Ecto.get_meta(record, :prefix) == "parapet"`.
-- [ ] **SAFE-04**: A `feat` CHANGELOG entry frames the change as additive with a "No action required for existing installs" banner (semver minor) plus a matching release-note callout.
+- [x] **SAFE-04**: A `feat` CHANGELOG entry frames the change as additive with a "No action required for existing installs" banner (semver minor) plus a matching release-note callout.
 
 ## Future Requirements
 
@@ -124,7 +124,7 @@ One phase per requirement. v1.7 phases continue from v1.6 (which ended at Phase 
 | SAFE-03 | Phase 55 | Complete |
 | SAFE-01 | Phase 56 | Complete |
 | SAFE-02 | Phase 56 | Complete |
-| SAFE-04 | Phase 56 | Pending |
+| SAFE-04 | Phase 56 | Complete |
 
 **Coverage:**
 
