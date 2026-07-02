@@ -4,15 +4,23 @@ Thank you for your interest in contributing to Parapet. This guide covers what y
 
 ## Local proof commands
 
-Run all three before pushing:
+Run this before pushing:
 
 ```bash
-mix test
-mix credo
-mix dialyzer
+mix ci
 ```
 
-All three must pass with no errors. CI runs the same checks and will fail the PR if any of them are red.
+`mix ci` runs the full portable gate fail-fast: format --check-formatted, compile --warnings-as-errors, compile without optional deps, credo --strict, hex.audit, dialyzer, tests, and public-API verification. CI's `lint-once` job runs the same `mix ci` alias, so a local green means the portable gate would pass.
+
+## Local vs CI deltas
+
+Three checks run in CI that do not run in `mix ci` locally. If `mix ci` is green locally but CI is red on one of these, it is an expected delta — not a regression:
+
+(a) **Docs build** — CI runs `mix docs --warnings-as-errors` in the `lint-once` job. This step is CI-only and is not part of `mix ci`. A doc-comment or extras reference error can surface in CI but not locally.
+
+(b) **Operator UI manifest drift** — CI runs a diff of the operator-UI screenshot manifest against a baseline. This step is CI-only and is not part of `mix ci`. Drift in the generated manifest will appear in CI but not locally.
+
+(c) **Schema prefix matrix** — CI's `test` job runs an extra leg with `PARAPET_SCHEMA_PREFIX=public` in addition to the default `parapet` prefix. Locally, `mix ci` runs tests against only the `parapet` schema prefix. A prefix-specific failure (for example, an unscoped migration that only breaks under `public`) can appear in the CI test matrix but not locally.
 
 ## Commit conventions
 
@@ -73,7 +81,7 @@ Clone the repository, then:
 
 ```bash
 mix deps.get
-mix test
+mix ci
 ```
 
-If all tests pass, your environment is ready. There is no interactive setup wizard — the library has no application scaffold of its own.
+If `mix ci` passes, your environment is ready. There is no interactive setup wizard — the library has no application scaffold of its own.
