@@ -70,34 +70,32 @@ Explicitly excluded from v1.8, with reasoning.
 
 ## Traceability
 
-Populated during roadmap creation (each requirement maps to exactly one phase).
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| TEST-01 | — | Pending |
-| TEST-02 | — | Pending |
-| TEST-03 | — | Pending |
-| TEST-04 | — | Pending |
-| TEST-05 | — | Pending |
-| CI-01 | — | Pending |
-| CI-02 | — | Pending |
-| CI-03 | — | Pending |
-| CI-04 | — | Pending |
-| CI-05 | — | Pending |
-| CI-06 | — | Pending |
-| MATRIX-01 | — | Pending |
-| MATRIX-02 | — | Pending |
-| MATRIX-03 | — | Pending |
-| MATRIX-04 | — | Pending |
-| DX-01 | — | Pending |
-| DX-02 | — | Pending |
-| DX-03 | — | Pending |
+| TEST-01 | Phase 57 | Pending |
+| TEST-02 | Phase 57 | Pending |
+| TEST-03 | Phase 57 | Pending |
+| TEST-04 | Phase 57 | Pending |
+| TEST-05 | Phase 57 | Pending |
+| DX-01 | Phase 58 | Pending |
+| DX-02 | Phase 58 | Pending |
+| DX-03 | Phase 58 | Pending |
+| CI-01 | Phase 59 | Pending |
+| CI-02 | Phase 59 | Pending |
+| CI-03 | Phase 59 | Pending |
+| CI-04 | Phase 59 | Pending |
+| CI-05 | Phase 59 | Pending |
+| CI-06 | Phase 59 | Pending |
+| MATRIX-01 | Phase 60 | Pending |
+| MATRIX-02 | Phase 60 | Pending |
+| MATRIX-03 | Phase 60 | Pending |
+| MATRIX-04 | Phase 60 | Pending |
 
 **Coverage:**
 - v1.8 requirements: 18 total
-- Mapped to phases: 0 (roadmap pending)
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18 ✓
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-07-02*
-*Last updated: 2026-07-02 after initial definition*
+*Last updated: 2026-07-02 after roadmap creation (v1.8 phases 57-60)*
