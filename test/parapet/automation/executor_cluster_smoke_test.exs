@@ -77,7 +77,42 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
               end
             end)
 
-            Process.sleep(200)
+            # Bounded SELECT 1 readiness barrier (D-07/D-08): poll until a
+            # trivial query succeeds — Process.whereis is true before
+            # DBConnection has any live connections (lazy/async pool), so only
+            # a completing query is an honest readiness signal.
+            # 5_000ms deadline, ~25ms backoff; raises with a DX message on
+            # expiry naming the repo, peer node(), and the relevant DB env vars.
+            ready? = fn ready?, deadline ->
+              try do
+                Ecto.Adapters.SQL.Sandbox.unboxed_run(
+                  Parapet.TestSupport.ConcurrencyRepo,
+                  fn ->
+                    Ecto.Adapters.SQL.query!(
+                      Parapet.TestSupport.ConcurrencyRepo,
+                      "SELECT 1",
+                      []
+                    )
+                  end
+                )
+
+                :ok
+              rescue
+                _ ->
+                  if System.monotonic_time(:millisecond) >= deadline do
+                    raise "Parapet.TestSupport.ConcurrencyRepo readiness check timed out " <>
+                            "on peer node \#{node()}. " <>
+                            "Verify DB reachability and env vars: " <>
+                            "PARAPET_CONCURRENCY_DB_HOST, PARAPET_CONCURRENCY_DB_PORT, " <>
+                            "PARAPET_CONCURRENCY_DB_NAME, PARAPET_CONCURRENCY_DB_USER."
+                  else
+                    Process.sleep(25)
+                    ready?.(ready?, deadline)
+                  end
+              end
+            end
+
+            ready?.(ready?, System.monotonic_time(:millisecond) + 5_000)
             :ok
           end
           """
