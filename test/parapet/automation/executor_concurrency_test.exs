@@ -9,6 +9,8 @@ defmodule Parapet.Automation.ExecutorConcurrencyTest do
   defmodule ConcurrencyRunbook do
     use Parapet.Runbook
 
+    @concurrency_hold_ms 75
+
     step(:auto_step,
       type: :mitigation,
       auto_execute: true
@@ -19,7 +21,9 @@ defmodule Parapet.Automation.ExecutorConcurrencyTest do
         send(pid, {:mitigated, node()})
       end
 
-      Process.sleep(75)
+      # INTENTIONAL HOLD: keeps the winner mid-mitigate so the loser's claim insert races the unique constraint.
+      # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
+      Process.sleep(@concurrency_hold_ms)
       {:ok, :mitigated}
     end
   end

@@ -6,6 +6,8 @@ defmodule Parapet.Automation.ClaimServiceTest do
   alias Parapet.Automation.ClaimService
   alias Parapet.Spine.{ActionClaim, Incident, TimelineEntry, ToolAudit}
 
+  @concurrency_hold_ms 50
+
   @tag :unboxed
   test "one concurrent caller wins the logical claim and the loser is conflicted" do
     Application.put_env(:parapet, :automation, max_executions: 3, within: 3600)
@@ -46,7 +48,9 @@ defmodule Parapet.Automation.ClaimServiceTest do
               breaker_step_id: "step-1",
               idempotency_key: "auto_exec_#{incident.id}_step-1",
               gate: fn _repo, _incident, _claim ->
-                Process.sleep(50)
+                # INTENTIONAL HOLD: keeps the winner mid-gate so the loser's claim insert races the unique constraint.
+                # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
+                Process.sleep(@concurrency_hold_ms)
                 :ok
               end
             )

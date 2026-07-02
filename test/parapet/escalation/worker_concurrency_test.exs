@@ -9,12 +9,16 @@ defmodule Parapet.Escalation.WorkerConcurrencyTest do
   defmodule SuccessPolicy do
     @behaviour Parapet.Escalation.Policy
 
+    @concurrency_hold_ms 75
+
     def escalate(_incident, opts) do
       if pid = Application.get_env(:parapet, :escalation_test_pid) do
         send(pid, {:escalated, node(), opts[:idempotency_key]})
       end
 
-      Process.sleep(75)
+      # INTENTIONAL HOLD: keeps the winner mid-escalate so the loser's claim insert races the unique constraint.
+      # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
+      Process.sleep(@concurrency_hold_ms)
       {:ok, :escalated}
     end
   end

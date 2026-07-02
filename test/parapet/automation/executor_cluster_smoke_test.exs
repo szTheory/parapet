@@ -9,6 +9,8 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
   defmodule ClusterRunbook do
     use Parapet.Runbook
 
+    @concurrency_hold_ms 75
+
     step(:auto_step,
       type: :mitigation,
       auto_execute: true
@@ -19,7 +21,9 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
         send(pid, {:cluster_mitigated, node()})
       end
 
-      Process.sleep(75)
+      # INTENTIONAL HOLD: keeps the winner mid-mitigate so the loser's claim insert races the unique constraint.
+      # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
+      Process.sleep(@concurrency_hold_ms)
       {:ok, :mitigated}
     end
   end
@@ -130,6 +134,11 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
 
           :ok = :erpc.call(node, Application, :put_env, [:parapet, :executor_test_pid, self()])
 
+          # NOTE: The local ClusterRunbook above (~line 22) and this eval'd twin are deliberate
+          # duplicates that must stay in sync: same hold duration and the same intentional-hold
+          # annotation shape. The twin uses a literal Process.sleep(75) because @concurrency_hold_ms
+          # is a compile-time module attribute that does not exist on the fresh peer node where this
+          # string is eval'd (D-11).
           remote_setup = """
           unless Code.ensure_loaded?(#{inspect(ClusterRunbook)}) do
             defmodule #{inspect(ClusterRunbook)} do
@@ -142,6 +151,8 @@ defmodule Parapet.Automation.ExecutorClusterSmokeTest do
                   send(pid, {:cluster_mitigated, node()})
                 end
 
+                # INTENTIONAL HOLD: keeps the winner mid-mitigate so the loser's claim insert races the unique constraint.
+                # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
                 Process.sleep(75)
                 {:ok, :mitigated}
               end

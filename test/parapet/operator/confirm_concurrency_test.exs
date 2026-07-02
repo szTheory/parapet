@@ -25,6 +25,8 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
   alias Parapet.Operator.ActionPayload
   alias Parapet.Spine.{ActionClaim, Incident, TimelineEntry}
 
+  @concurrency_hold_ms 75
+
   defmodule ConcurrencyRunbook do
     @moduledoc false
     # The operator path uses the Recovery capability registered via
@@ -72,9 +74,9 @@ defmodule Parapet.Operator.ConfirmConcurrencyTest do
               send(pid, {:executed, node()})
             end
 
-            # 75ms keeps the race observable: the winner is mid-execute when
-            # the loser's claim_action/1 attempts the unique-constraint insert.
-            Process.sleep(75)
+            # INTENTIONAL HOLD: keeps the winner mid-execute so the loser's claim_action/1 races the unique-constraint insert.
+            # NOT a lazy wait — do not replace with assert_eventually/the start-barrier.
+            Process.sleep(@concurrency_hold_ms)
             {:ok, :executed}
           end
         )
