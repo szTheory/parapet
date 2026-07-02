@@ -65,59 +65,72 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 ## Phase Details
 
 ### Phase 57: Test Suite Baseline
+
 **Goal**: A bare `mix test` exits green — the pre-existing reds are fixed directly and all `Process.sleep` call sites are correctly classified, so the "CI is the enforcement backstop" claim rests on an honest green suite.
 **Depends on**: Nothing (first phase of v1.8; v1.7 shipped)
 **Requirements**: TEST-01, TEST-02, TEST-03, TEST-04, TEST-05
 **Success Criteria** (what must be TRUE):
+
   1. `mix test` (default env, default `parapet` prefix) exits 0 with no failures — `DocsPhase33Test` no longer asserts the stale `"make up-auto"` string
   2. `Telemetry.RecoveryActionTest` passes reliably under concurrent `async: true` runs — the `atom_count` delta check is removed while the `String.to_existing_atom/1`-raises guard is retained
   3. The three `Process.sleep` calls in `exemplar_telemetry_test.exs` are gone — telemetry dispatch is synchronous so no wait is needed
   4. The five intentional concurrency-simulation sleeps are annotated with a `@concurrency_hold_ms` module attribute and an explanatory comment, and the `executor_cluster_smoke_test.exs` startup-race sleep is replaced with a synchronous barrier
   5. A reusable `assert_eventually` / until helper exists in the test support layer so future async assertions have a deterministic alternative to `Process.sleep`
-**Plans**: 2 plans
-- [ ] 57-01-PLAN.md — Fix the two red tests + delete the 3 spurious telemetry sleeps (TEST-01/02/03)
+
+**Plans**: 1/2 plans executed
+
+- [x] 57-01-PLAN.md — Fix the two red tests + delete the 3 spurious telemetry sleeps (TEST-01/02/03)
 - [ ] 57-02-PLAN.md — assert_eventually/2 helper, SELECT 1 startup barrier, 6 INTENTIONAL HOLD annotations + grep guard (TEST-04/05)
 
 ---
 
 ### Phase 58: Local DX — mix ci & CONTRIBUTING
+
 **Goal**: Contributors can run a single `mix ci` command locally that mirrors the CI gate, and `CONTRIBUTING.md` tells them exactly what to run and what the known local-vs-CI deltas are.
 **Depends on**: Phase 57 (green suite is a prerequisite for `mix ci` giving honest signal)
 **Requirements**: DX-01, DX-02, DX-03
 **Note**: This phase also adds `mix.exs` `dialyzer: [plt_file: {:no_warn, "priv/plts/project.plt"}]` and the `/priv/plts/` `.gitignore` entry, which are prerequisites for Phase 59's PLT cache wiring in CI.
 **Success Criteria** (what must be TRUE):
+
   1. `mix ci` exists as a `mix.exs` alias and runs all 8 portable steps in fail-fast order (format, compile, compile --no-optional-deps, credo, hex.audit, dialyzer, test, verify.public_api)
   2. `CONTRIBUTING.md` instructs contributors to run `mix ci` before pushing and documents the three known local-vs-CI deltas (no `mix docs`, no operator UI diff, single `parapet` prefix only)
   3. The `lint-once` CI job calls `mix ci` for its portable subset, so `mix.exs` is the single source of truth and the local alias and CI cannot drift apart (DX-02 anti-drift guarantee)
+
 **Plans**: TBD
 
 ---
 
 ### Phase 59: CI Caching, Lint-Once & release_gate Hardening
+
 **Goal**: The CI pipeline is structurally reshaped — Dialyzer PLT is cached, lint runs once on OTP 28, `release_gate` can never silently pass on an upstream failure, and the v1.7 dual-prefix false-green footgun is demonstrably intact.
 **Depends on**: Phase 58 (PLT path in `mix.exs` + `mix ci` must exist before CI calls them)
 **Requirements**: CI-01, CI-02, CI-03, CI-04, CI-05, CI-06
 **INVARIANT**: The `test` job `_build` cache key retains `${{ matrix.schema_prefix }}` and every test matrix cell retains `mix compile --force`. No change in this phase may touch those two lines. Violation causes a false-green on the `public`-prefix schema leg.
 **Success Criteria** (what must be TRUE):
+
   1. The Dialyzer PLT is cached at `priv/plts/` with a key of `plt-{os}-{otp}-{elixir}-{mix.lock hash}`; a PR that changes only test code does not rebuild the PLT from scratch
   2. A single `lint-once` job (OTP 28, no matrix) runs all quality steps exactly once; no quality step runs per-matrix-cell
   3. PR workflows cancel in-flight runs for the same PR on a new push (`concurrency: cancel-in-progress: true` for pull_request events); pushes to `main` are never cancelled
   4. `release_gate` has `if: always()` and an inline result-check script that exits 1 on any `failure` result — a failing upstream job can no longer cause `release_gate` to be silently skipped
   5. The `test` job `_build` cache key still includes `${{ matrix.schema_prefix }}` and `mix compile --force` is still present in every matrix cell (dual-prefix invariant preserved)
   6. `actions/checkout` and `erlef/setup-beam` are updated to current SHA-pinned releases across all workflow jobs
+
 **Plans**: TBD
 
 ---
 
 ### Phase 60: OTP Matrix Reshape & Nightly Schedule
+
 **Goal**: Pull requests get fast single-cell feedback, pushes to `main` and a nightly cron get full multi-OTP coverage across both schema-prefix legs, and EOL OTP 26 / Elixir 1.19 are retired from CI — with D-11 tech-debt flag formally closed.
 **Depends on**: Phase 59 (lint-once job name and release_gate demo-skipped logic must be in place before the matrix-config job references them)
 **Requirements**: MATRIX-01, MATRIX-02, MATRIX-03, MATRIX-04
 **Success Criteria** (what must be TRUE):
+
   1. A pull-request CI run triggers exactly 1 test cell (OTP 28 · Elixir 1.20.2 · `parapet` prefix), giving contributors fast feedback without running the full matrix
   2. A push to `main` triggers the full 4-cell test matrix — OTP {27, 28, 29} × `parapet` + OTP 28 × `public` — on Elixir 1.20.2, retiring EOL OTP 26 and Elixir 1.19 from CI
   3. The `demo` smoke job is skipped on pull requests and runs on a single OTP-28 cell on main pushes and nightly, eliminating the redundant 3-OTP demo sweep
   4. A nightly scheduled workflow (`cron: '0 3 * * *'`) exercises the full test matrix plus demo, so full multi-version coverage runs even if no push lands that day; the D-11 tech-debt flag in `v1.7-MILESTONE-AUDIT.md` is retired with a dated note
+
 **Plans**: TBD
 
 ## Progress Table
@@ -130,7 +143,7 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 54. Upgrade Path & Doctor | v1.7 | 4/4 | Complete | 2026-07-01 |
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete | 2026-07-01 |
 | 56. Contract & Release Hardening | v1.7 | 4/4 | Complete | 2026-07-02 |
-| 57. Test Suite Baseline | v1.8 | 0/TBD | Not started | - |
+| 57. Test Suite Baseline | v1.8 | 1/2 | In Progress|  |
 | 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 0/TBD | Not started | - |
 | 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 0/TBD | Not started | - |
 | 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
