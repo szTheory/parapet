@@ -175,7 +175,11 @@ Plans:
   2. The telemetry contract test stays green, no `[:parapet, :schema, …]` event is added, and Ecto query telemetry `:source` (the bare table name) is confirmed unaffected.
   3. A `feat` CHANGELOG entry frames the change as additive (semver minor) with a "No action required for existing installs" banner, plus a matching release-note callout.
 
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 56-01-PLAN.md — SAFE-02: behavioral Ecto `:source` bare-name assertion + telemetry contract re-assert (Wave 1)
+- [ ] 56-02-PLAN.md — SAFE-01: `verify.public_api` zero-drift proof + evidence capture (Wave 1)
+- [ ] 56-03-PLAN.md — SAFE-04: two-part honest `feat(schema)` CHANGELOG entry + release-note check (Wave 1)
+- [ ] 56-04-PLAN.md — D-10: record the three done-criteria in 56-VERIFICATION.md / 56-UAT.md (Wave 2)
 
 ## Next Milestone
 
