@@ -118,7 +118,12 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   6. `actions/checkout` and `erlef/setup-beam` are updated to current SHA-pinned releases across all workflow jobs
 
 **Plans**: 2 plans
+**Wave 1**
+
 - [ ] 59-01-PLAN.md — PLT cache in lint-once (CI-01/CI-02), top-level concurrency block (CI-03), release_gate hardening (CI-04); CI-05 invariant held
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 59-02-PLAN.md — SHA-pin refresh across all jobs to D-13 commits with version comments (CI-06); CI-05 invariant re-asserted
 
 ---
