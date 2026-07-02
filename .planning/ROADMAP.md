@@ -117,7 +117,9 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   5. The `test` job `_build` cache key still includes `${{ matrix.schema_prefix }}` and `mix compile --force` is still present in every matrix cell (dual-prefix invariant preserved)
   6. `actions/checkout` and `erlef/setup-beam` are updated to current SHA-pinned releases across all workflow jobs
 
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 59-01-PLAN.md — PLT cache in lint-once (CI-01/CI-02), top-level concurrency block (CI-03), release_gate hardening (CI-04); CI-05 invariant held
+- [ ] 59-02-PLAN.md — SHA-pin refresh across all jobs to D-13 commits with version comments (CI-06); CI-05 invariant re-asserted
 
 ---
 
