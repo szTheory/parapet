@@ -58,7 +58,7 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 ### v1.8 CI/CD Performance & DX (Phases 57-60) — Active
 
 - [x] **Phase 57: Test Suite Baseline** - Fix the two known-red tests and triage all `Process.sleep` calls so bare `mix test` is green (completed 2026-07-02)
-- [ ] **Phase 58: Local DX — mix ci & CONTRIBUTING** - Add the `mix ci` alias and `mix.exs` PLT-path config; update contributor docs
+- [x] **Phase 58: Local DX — mix ci & CONTRIBUTING** - Add the `mix ci` alias and `mix.exs` PLT-path config; update contributor docs (completed 2026-07-02)
 - [ ] **Phase 59: CI Caching, Lint-Once & release_gate Hardening** - PLT cache, lint-once job, `concurrency: cancel-in-progress`, hardened `release_gate`, SHA updates
 - [ ] **Phase 60: OTP Matrix Reshape & Nightly Schedule** - Trim PR matrix to 1 cell, full matrix on main+nightly, nightly schedule, D-11 retirement
 
@@ -96,8 +96,9 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   2. `CONTRIBUTING.md` instructs contributors to run `mix ci` before pushing and documents the three known local-vs-CI deltas (no `mix docs`, no operator UI diff, single `parapet` prefix only)
   3. The `lint-once` CI job calls `mix ci` for its portable subset, so `mix.exs` is the single source of truth and the local alias and CI cannot drift apart (DX-02 anti-drift guarantee)
 
-**Plans**: 1 plan
-- [ ] 58-01-PLAN.md — `mix ci` alias + dialyzer PLT prereqs, `lint-once` CI job wiring, CONTRIBUTING.md rewrite + deltas
+**Plans**: 1/1 plans complete
+
+- [x] 58-01-PLAN.md — `mix ci` alias + dialyzer PLT prereqs, `lint-once` CI job wiring, CONTRIBUTING.md rewrite + deltas
 
 ---
 
@@ -145,6 +146,6 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete | 2026-07-01 |
 | 56. Contract & Release Hardening | v1.7 | 4/4 | Complete | 2026-07-02 |
 | 57. Test Suite Baseline | v1.8 | 2/2 | Complete    | 2026-07-02 |
-| 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 0/TBD | Not started | - |
+| 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 1/1 | Complete   | 2026-07-02 |
 | 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 0/TBD | Not started | - |
 | 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
