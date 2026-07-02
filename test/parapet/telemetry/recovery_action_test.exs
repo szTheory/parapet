@@ -111,13 +111,10 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
     # raise ArgumentError for unknown inputs WITHOUT minting a fresh atom in the
     # global table (which is never garbage-collected and capped at ~1M entries).
     #
-    # We assert this property TWO ways:
-    #
-    # 1. After rejection, the poison string itself MUST NOT exist as an atom
-    #    (the most direct check; not sensitive to test-infrastructure atoms).
-    # 2. After a warm-up pass + measurement, atom_count is stable across
-    #    repeated rejections of FRESH poison strings (proves the helper is the
-    #    non-leaking path).
+    # We assert this directly: after rejection, the poison string itself MUST
+    # NOT exist as an atom (not sensitive to test-infrastructure atoms). This is
+    # the load-bearing check — a prior atom_count-delta measurement was removed
+    # in Phase 57 (TEST-02) as a flaky, indirect proxy for the same property.
     poison = "definitely-not-a-known-atom-#{System.unique_integer([:positive])}"
 
     assert_raise ArgumentError, ~r/Unsupported outcome/, fn ->
