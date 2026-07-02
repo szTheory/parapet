@@ -74,7 +74,9 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   3. The three `Process.sleep` calls in `exemplar_telemetry_test.exs` are gone — telemetry dispatch is synchronous so no wait is needed
   4. The five intentional concurrency-simulation sleeps are annotated with a `@concurrency_hold_ms` module attribute and an explanatory comment, and the `executor_cluster_smoke_test.exs` startup-race sleep is replaced with a synchronous barrier
   5. A reusable `assert_eventually` / until helper exists in the test support layer so future async assertions have a deterministic alternative to `Process.sleep`
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 57-01-PLAN.md — Fix the two red tests + delete the 3 spurious telemetry sleeps (TEST-01/02/03)
+- [ ] 57-02-PLAN.md — assert_eventually/2 helper, SELECT 1 startup barrier, 6 INTENTIONAL HOLD annotations + grep guard (TEST-04/05)
 
 ---
 
