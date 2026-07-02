@@ -166,5 +166,28 @@ jobs:
   release_gate:
     needs: [lint-once, test, demo]
     runs-on: ubuntu-latest
+    if: always()
     steps:
-      - run: echo "All required CI checks passed"
+      - name: Aggregate job results
+        run: |
+          LINT_RESULT="${{ needs.lint-once.result }}"
+          TEST_RESULT="${{ needs.test.result }}"
+          DEMO_RESULT="${{ needs.demo.result }}"
+          FAILED=0
+          if [ "$LINT_RESULT" != "success" ]; then
+            echo "lint-once result: $LINT_RESULT (expected: success)"
+            FAILED=1
+          fi
+          if [ "$TEST_RESULT" != "success" ]; then
+            echo "test result: $TEST_RESULT (expected: success)"
+            FAILED=1
+          fi
+          if [ "$DEMO_RESULT" != "success" ]; then
+            echo "demo result: $DEMO_RESULT (expected: success)"
+            FAILED=1
+          fi
+          if [ "$FAILED" -eq 1 ]; then
+            echo "One or more required CI jobs did not succeed. Blocking merge."
+            exit 1
+          fi
+          echo "All required CI checks passed."
