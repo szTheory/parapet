@@ -19,9 +19,6 @@ defmodule Parapet.Metrics.ExemplarTelemetryTest do
       %{route: "/api", method: "GET", trace_id: "trace-http-123"}
     )
 
-    # Allow async telemetry handlers to run
-    Process.sleep(10)
-
     # Verify ExemplarStore recorded the trace_id
     assert ExemplarStore.get_trace("parapet_http_request_duration_ms", %{
              route: "/api",
@@ -38,8 +35,6 @@ defmodule Parapet.Metrics.ExemplarTelemetryTest do
       %{worker: "MyWorker", queue: "default", state: "success", trace_id: "trace-oban-456"}
     )
 
-    Process.sleep(10)
-
     assert ExemplarStore.get_trace("parapet_oban_job_duration_ms", %{
              worker: "MyWorker",
              queue: "default",
@@ -55,8 +50,6 @@ defmodule Parapet.Metrics.ExemplarTelemetryTest do
       %{duration_ms: 100},
       %{route: "/no-trace", method: "GET"}
     )
-
-    Process.sleep(10)
 
     assert ExemplarStore.get_trace("parapet_http_request_duration_ms", %{
              route: "/no-trace",
