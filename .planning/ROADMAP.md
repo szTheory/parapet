@@ -59,7 +59,7 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 
 - [x] **Phase 57: Test Suite Baseline** - Fix the two known-red tests and triage all `Process.sleep` calls so bare `mix test` is green (completed 2026-07-02)
 - [x] **Phase 58: Local DX — mix ci & CONTRIBUTING** - Add the `mix ci` alias and `mix.exs` PLT-path config; update contributor docs (completed 2026-07-02)
-- [ ] **Phase 59: CI Caching, Lint-Once & release_gate Hardening** - PLT cache, lint-once job, `concurrency: cancel-in-progress`, hardened `release_gate`, SHA updates
+- [x] **Phase 59: CI Caching, Lint-Once & release_gate Hardening** - PLT cache, lint-once job, `concurrency: cancel-in-progress`, hardened `release_gate`, SHA updates (completed 2026-07-02)
 - [ ] **Phase 60: OTP Matrix Reshape & Nightly Schedule** - Trim PR matrix to 1 cell, full matrix on main+nightly, nightly schedule, D-11 retirement
 
 ## Phase Details
@@ -120,11 +120,11 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 **Plans**: 2 plans
 **Wave 1**
 
-- [ ] 59-01-PLAN.md — PLT cache in lint-once (CI-01/CI-02), top-level concurrency block (CI-03), release_gate hardening (CI-04); CI-05 invariant held
+- [x] 59-01-PLAN.md — PLT cache in lint-once (CI-01/CI-02), top-level concurrency block (CI-03), release_gate hardening (CI-04); CI-05 invariant held
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 59-02-PLAN.md — SHA-pin refresh across all jobs to D-13 commits with version comments (CI-06); CI-05 invariant re-asserted
+- [x] 59-02-PLAN.md — SHA-pin refresh across all jobs to D-13 commits with version comments (CI-06); CI-05 invariant re-asserted
 
 ---
 
@@ -154,5 +154,5 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 56. Contract & Release Hardening | v1.7 | 4/4 | Complete | 2026-07-02 |
 | 57. Test Suite Baseline | v1.8 | 2/2 | Complete    | 2026-07-02 |
 | 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 1/1 | Complete    | 2026-07-02 |
-| 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 0/TBD | Not started | - |
+| 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 2/2 | Complete   | 2026-07-02 |
 | 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
