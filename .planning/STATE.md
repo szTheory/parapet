@@ -2,13 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: CI/CD Performance & DX
-current_phase: 60
-current_phase_name: OTP Matrix Reshape & Nightly Schedule
 status: executing
-stopped_at: Phase 59 context gathered (assumptions mode)
-last_updated: "2026-07-02T23:07:54.809Z"
-last_activity: 2026-07-02
-last_activity_desc: Phase 59 complete, transitioned to Phase 60
+stopped_at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
+last_updated: "2026-07-02T23:27:46.162Z"
+last_activity: 2026-07-02 — Phase 59 complete, transitioned to Phase 60
 progress:
   total_phases: 4
   completed_phases: 3
@@ -140,9 +137,9 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-02T23:03:42.427Z
-Stopped at: Phase 59 context gathered (assumptions mode)
-Resume file: None
+Last session: 2026-07-02T23:27:46.156Z
+Stopped at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
+Resume file: .planning/phases/60-otp-matrix-reshape-nightly-schedule/60-CONTEXT.md
 Next step: `/gsd-discuss-phase 58` — Local DX — mix ci & CONTRIBUTING (no CONTEXT.md yet)
 
 ## Operator Next Steps
