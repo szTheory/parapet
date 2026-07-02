@@ -96,7 +96,8 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   2. `CONTRIBUTING.md` instructs contributors to run `mix ci` before pushing and documents the three known local-vs-CI deltas (no `mix docs`, no operator UI diff, single `parapet` prefix only)
   3. The `lint-once` CI job calls `mix ci` for its portable subset, so `mix.exs` is the single source of truth and the local alias and CI cannot drift apart (DX-02 anti-drift guarantee)
 
-**Plans**: TBD
+**Plans**: 1 plan
+- [ ] 58-01-PLAN.md — `mix ci` alias + dialyzer PLT prereqs, `lint-once` CI job wiring, CONTRIBUTING.md rewrite + deltas
 
 ---
 
