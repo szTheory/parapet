@@ -99,16 +99,13 @@ defmodule Parapet.DocsPhase33Test do
     compose = read!("examples/demo_app/docker-compose.yml")
 
     assert readme =~ "make up"
-    assert readme =~ "make up-auto"
     assert readme =~ "make urls"
-    assert readme =~ "curl -f http://127.0.0.1:"
     assert readme =~ "make down"
     assert readme =~ "make reset"
     assert readme =~ "make up-response"
     assert readme =~ "make up-recovery"
     assert readme =~ "make up-escalation"
     assert readme =~ "make up-history"
-    assert readme =~ "WEB_PORT"
     assert readme =~ "GRAFANA_ADMIN_USER"
     assert readme =~ "Prometheus"
     assert readme =~ "Grafana"

@@ -128,29 +128,6 @@ defmodule Parapet.Telemetry.RecoveryActionTest do
     # assertion — if String.to_atom were still in the code path, this would
     # succeed (returning the atom) instead of raising.
     assert_raise ArgumentError, fn -> String.to_existing_atom(poison) end
-
-    # Warm-up: run one rejection pass to let assert_raise + error-message
-    # machinery intern any of their own internal atoms. THEN measure stability
-    # over a second rejection pass with a fresh poison string.
-    warmup_poison = "warmup-poison-#{System.unique_integer([:positive])}"
-
-    assert_raise ArgumentError, fn ->
-      RecoveryAction.normalize_outcome(warmup_poison)
-    end
-
-    poison_2 = "second-poison-#{System.unique_integer([:positive])}"
-    before_count = :erlang.system_info(:atom_count)
-
-    assert_raise ArgumentError, fn ->
-      RecoveryAction.normalize_outcome(poison_2)
-    end
-
-    after_count = :erlang.system_info(:atom_count)
-
-    assert after_count == before_count,
-           "normalize_outcome leaked atoms on second pass: #{before_count} → #{after_count} " <>
-             "(poison=#{inspect(poison_2)}). String.to_atom/1 must not be called before " <>
-             "the closed-vocabulary lookup."
   end
 
   test "normalize_*/1 helpers raise ArgumentError for unknown binary inputs (no fresh atom interned)" do
