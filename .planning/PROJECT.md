@@ -8,27 +8,18 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
-## Current Milestone: v1.7 Postgres Schema Isolation & Upgrade Path
+## Current Milestone: none active
 
-**Goal:** Parapet's six spine tables live in a dedicated, configurable `parapet` Postgres schema by default; existing adopters get a documented, tested, opt-in upgrade path; `public` stays a one-line opt-out. Closes the audited #1 quality weakness (no adopter-facing DB-schema upgrade story).
-
-**Target features:**
-- Compile-time `@schema_prefix` via a shared `use Parapet.Spine.Schema` macro reading `Application.compile_env(:parapet, :schema_prefix, "parapet")` — not a runtime `prefix:` option (avoids the read/write precedence-asymmetry split-brain footgun). `nil`/`"public"` ⇒ unprefixed.
-- Generators emit `CREATE SCHEMA IF NOT EXISTS parapet` (with a `create_schema: false` least-privilege hatch) + `prefix:` on every table/reference/index, and write `config :parapet, :schema_prefix`.
-- Two opt-in upgrade tracks for existing adopters — Track A: stay on `public` (`schema_prefix: nil` + recompile, tables untouched); Track B: a generated reversible `ALTER TABLE … SET SCHEMA` move-migration (all six move as a unit so FKs stay valid). No forced migration on upgrade.
-- Raw-SQL test infra hand-qualified for sites that don't inherit `@schema_prefix`; demo app updated end-to-end as the real-host smoke proof.
-- New `docs/upgrade-1.x.md` (default inversion, `deps.compile --force` recompile note, Track A vs B, rollback) plus deployment/README updates.
-
-**Key context:** Telemetry + public API stay frozen — the prefix is an internal DB detail; `mix verify.public_api` and the telemetry contract test remaining green is a milestone done-criterion. Locked decisions: default schema name `parapet`; existing adopters opt-in only; compile-time `@schema_prefix` (runtime `prefix:` banned); `create_schema: false` escape hatch. Seed design research lives in `.planning/research/V1.7-SCHEMA-ISOLATION.md`. This is the first of the approved v1.7→v1.9 roadmap (v1.8 CI/CD performance & DX, v1.9 quality hardening).
+v1.7 shipped 2026-07-02. The next milestone in the approved v1.7→v1.9 roadmap is **v1.8 CI/CD performance & DX** — define it with `/gsd-new-milestone` (see Next Milestone Goals below).
 
 ## Current State
 
-**In progress:** v1.7 Postgres Schema Isolation & Upgrade Path — **Phase 51 (Prefix Core & Test Seam) complete & verified (2026-06-30, 8/8 must-haves).** Shipped the `Parapet.Spine.Schema` compile-time `@schema_prefix` macro (default `"parapet"`; `nil`/`""`/`"public"` ⇒ unprefixed) adopted by all six spine schemas, the library's first `config/config.exs` env seam (`PARAPET_SCHEMA_PREFIX`, kept out of the Hex `package.files`), the runtime `Evidence.schema_prefix/0` mirror, and hand-qualified `concurrency_bootstrap` DDL so the suite runs under the prefix (596 tests green, SQL confirmed hitting `"parapet"."parapet_*"`). Advisory code review (`51-REVIEW.md`) logged 4 warnings folded into Phase 52 planning (see STATE Blockers). Next: Phase 52 propagation proof, runtime-`prefix:` ban guard, dual-prefix CI matrix.
-
-**Shipped:** v1.6 Operator UI Brand & Design-System Audit (2026-06-29) — Re-skinned the generated, host-owned Operator UI to the v1.5 brand book via values-only edits to `operator_theme_bootstrap/1` (brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings) with zero public-API/telemetry/host-ownership change, vendored five subsetted IBM Plex woff2 faces (52.2 KB), ran a layer-by-layer WCAG 2.2 AA design-system audit fixing real usability bugs, and installed forward-only regression guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest, evidence-binding audit). 7/7 phases, 61/68 requirements (7 shipped+human-verified but not yet ExUnit-pinned); audit passed (see `.planning/milestones/v1.6-MILESTONE-AUDIT.md`).
+**Shipped:** v1.7 Postgres Schema Isolation & Upgrade Path (2026-07-02) — Moved Parapet's six spine tables into a dedicated, configurable `parapet` Postgres schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; `nil`/`""`/`"public"` ⇒ unprefixed; runtime `prefix:` banned by a static guard to avoid split-brain), proved the prefix propagates across every read/write with zero call-site edits, and validated both legs with a dual-prefix CI matrix (prefix-namespaced `_build`, `mix compile --force`). Shipped schema-aware generators + all 8 committed migrations (first-ordered `CREATE SCHEMA` sentinel, `--no-create-schema` DBA hatch), two opt-in upgrade tracks for existing adopters (Track A stay-on-`public`; Track B a reversible single-transaction `SET SCHEMA` move with pre-flight guards + round-trip DB test), a `parapet.doctor` drift/existence check, a real-host demo smoke proof, and `docs/upgrade-1.x.md` closing the audited #1 documentation gap — all with public API + telemetry contracts provably frozen. 6/6 phases, 29/29 requirements; audit `tech_debt` (zero requirement/integration/flow blockers — remaining items are internal hygiene; see `.planning/milestones/v1.7-MILESTONE-AUDIT.md`). Verified closeout.
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.6 Operator UI Brand & Design-System Audit (2026-06-29) — Re-skinned the generated, host-owned Operator UI to the v1.5 brand book via values-only edits to `operator_theme_bootstrap/1` (brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings) with zero public-API/telemetry/host-ownership change, vendored five subsetted IBM Plex woff2 faces (52.2 KB), ran a layer-by-layer WCAG 2.2 AA design-system audit fixing real usability bugs, and installed forward-only regression guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest, evidence-binding audit). 7/7 phases, 61/68 requirements (7 shipped+human-verified but not yet ExUnit-pinned); audit passed (see `.planning/milestones/v1.6-MILESTONE-AUDIT.md`).
 
 **Previously shipped:** v1.5 Brand Book & Logo System (2026-06-24) — Operationalized the brand research into a repo-lean (192 KB) self-contained HTML brand book under `brandbook/`: locked corbelled-tower stacked emblem (Space Grotesk, outlined to paths), CSS+JSON design tokens, a WCAG AA contrast matrix, component/landing/README collateral, and a zero-config swap of the off-brand HexDocs logo + favicon. SVG/HTML/CSS/JSON only — no rasters or font binaries; public API and telemetry contract untouched. 4/4 phases, 13/13 requirements (see `.planning/milestones/v1.5-MILESTONE-AUDIT.md`).
 
@@ -82,7 +73,10 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 
 ### Validated
 
-- ✓ Compile-time schema-prefix core: `use Parapet.Spine.Schema` macro (default `parapet`, `nil`/`""`/`"public"` opt-out) across all six spine schemas + `config/config.exs` env seam + `Evidence.schema_prefix/0` runtime mirror + prefix-qualified test bootstrap — v1.7 Phase 51 (PREFIX-01..04, TEST-01, TEST-02). Propagation/guards/CI-matrix proof still pending (Phase 52).
+- ✓ Compile-time schema-prefix core & propagation — `use Parapet.Spine.Schema` macro (default `parapet`, `nil`/`""`/`"public"` opt-out) across all six spine schemas, `config/config.exs` env seam, `Evidence.schema_prefix/0` runtime mirror, prefix-qualified test bootstrap; the prefix rides every select/join/`insert_all`/Multi with zero call-site edits, runtime `prefix:` banned by a static guard, and a dual-prefix CI matrix (prefix-namespaced `_build` + `mix compile --force`) proves both legs honestly — v1.7 (PREFIX-01..04, PROP-01..03, TEST-01..03)
+- ✓ Schema-aware generators & library migrations — first-ordered `CREATE SCHEMA` sentinel, `prefix:`-stamped DDL across all 8 committed migrations + `gen.spine`/`gen.archive_indexes`, no-clobber `configure_new` config write, `--schema`/`--no-create-schema` least-privilege hatch, one shared resolver — v1.7 (GEN-01..07)
+- ✓ Tested opt-in upgrade path & doctor — Track A stay-on-`public` pin, `mix parapet.gen.schema.move` reversible single-transaction `SET SCHEMA` with pre-flight abort guards + second-move refusal + throwaway-DB round-trip, `parapet.doctor` config↔compiled drift + schema-existence check; upgrading never forces a migration (default flips for new installs only) — v1.7 (UPG-01..05, DOCTOR-01)
+- ✓ Demo real-host proof, upgrade docs & frozen-contract hardening — demo migrates end-to-end into `parapet` (six-table + `get_meta` smoke), `docs/upgrade-1.x.md` single-sources copy-paste Track A/B (closing the audited #1 doc gap), `verify.public_api` zero-drift + telemetry `:source` bare-name assertion prove both contracts frozen, two-part honest `feat(schema)` CHANGELOG — v1.7 (DOC-01..02, SAFE-01..04)
 - ✓ Single `parapet` Hex package with a narrow, explicit public surface and `files:` whitelist — v0.1
 - ✓ Documented telemetry contract treated as public API — redaction-safe, low-cardinality by default — v0.1
 - ✓ Add `lease_until` column to `parapet_action_claims` — v1.1 (FND-01)
@@ -200,12 +194,9 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 
 ### Active
 
-**v1.7 Postgres Schema Isolation & Upgrade Path** (current milestone — see Current Milestone section; detailed REQ-IDs in `.planning/REQUIREMENTS.md`):
+**v1.8 CI/CD performance & DX** (next milestone in the approved v1.7→v1.9 roadmap — define with `/gsd-new-milestone`):
 
-- [ ] Configurable compile-time schema prefix (`PREFIX-CORE`, `PREFIX-PROP`) — shared macro, default `parapet`, `nil`/`public` opt-out, propagation across joins/Multi/`insert_all`, runtime `prefix:` banned.
-- [ ] Schema-aware generators & library migrations (`GEN-MIGRATIONS`) — `CREATE SCHEMA` + `prefix:` + config write + updated fixtures.
-- [ ] Tested opt-in upgrade path (`UPGRADE-PATH`) — Track A stay-on-public + Track B `SET SCHEMA` move-migration with round-trip tests.
-- [ ] Test infra & demo app under prefix (`TEST-INFRA`) + docs (`DOCS`) + frozen-contract regression gate (`CONTRACT-SAFETY`).
+- [ ] `CI-01` — Dialyzer PLT caching, `concurrency: cancel-in-progress` (PR), lint-once, `mix ci` alias, `Process.sleep` removal, 3-OTP matrix → main+nightly. *Note: v1.7's dual-prefix matrix interacts with this pipeline reshape — sequence accordingly. Also fold in v1.7 tech-debt item #6 (quarantine the pre-existing `DocsPhase33Test` + `Telemetry.RecoveryActionTest` reds so bare `mix test` is green).*
 
 **v1.6 automated-coverage gaps** (shipped + human-verified in the live UI; gap is in ExUnit coverage, not the console — close in a future milestone):
 
@@ -247,6 +238,7 @@ Shipped v1.3 Operator UI Polish & Design System adding active-response-first gen
 Shipped v1.4 Trust Hardening & Host-App Compatibility adding durable archive evidence bundles and structured failure context, scoped generated Operator UI routes for host-owned mount paths, and copy-pasteable adoption docs backed by focused guard tests.
 Shipped v1.5 Brand Book & Logo System: a docs/brand-assets-only milestone (no source, public API, or telemetry change) operationalizing the 1,874-line brand research into a self-contained 192 KB `brandbook/` — a locked corbelled-tower stacked emblem (Space Grotesk, outlined to paths) chosen via a 6-round tournament, CSS+JSON design tokens, a WCAG AA matrix, `file://`-openable HTML brand book + collateral, and a zero-config path-stable swap of the off-brand HexDocs logo/favicon. SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. 4 phases / 11 plans over 2 days; audit `passed` 13/13.
 Shipped v1.6 Operator UI Brand & Design-System Audit: applied the v1.5 brand to the generated, host-owned Operator UI — values-only retheme of `operator_theme_bootstrap/1` across all three EEx templates (+ byte-parity demo mirrors), five subsetted IBM Plex woff2 faces (52.2 KB; the only relaxation of v1.5's no-font-binaries rule, scoped to operator fonts), and a layer-by-layer WCAG 2.2 AA usability audit (scrim/modal stacking, focus trap/restore, fake-disabled controls, dark-mode legibility, 390px overflow, designed empty/loading/error states, brand-voice microcopy). Added a demo-only `/parapet/_gallery` stress lab, five `PARAPET_DEMO_SCENARIO` fixtures, and forward-only guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest + CI drift gate, evidence-binding audit). No public-API/telemetry/host-ownership drift. 7 phases / 25 plans over 5 days; audit `passed` 61/68 (7 shipped+human-verified but not yet ExUnit-pinned). Closed `override_closeout` with 3 documented verification overrides.
+Shipped v1.7 Postgres Schema Isolation & Upgrade Path: moved the six spine tables into a configurable `parapet` schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; runtime `prefix:` banned to avoid split-brain), proved propagation across every read/write with zero call-site edits under a dual-prefix CI matrix, shipped schema-aware generators + all 8 committed migrations, two opt-in upgrade tracks (stay-on-`public` / reversible `SET SCHEMA` move with round-trip test), a `parapet.doctor` drift check, a real-host demo smoke, and `docs/upgrade-1.x.md` — public API + telemetry frozen throughout. 47 source files changed (+3,898/−169) across 6 phases / 21 plans over 4 days. Audit `tech_debt`: 29/29 requirements, 7/7 integration seams, 4/4 e2e flows, zero blockers; remaining debt is internal hygiene (Nyquist draft records, frontmatter omissions, an accepted OTP-coverage prune, doc-build warnings, and two pre-existing test reds tracked for v1.8/v1.9). Verified closeout.
 
 ## Constraints
 
@@ -327,6 +319,13 @@ Shipped v1.6 Operator UI Brand & Design-System Audit: applied the v1.5 brand to 
 | Forward-only guardrails over retroactive snapshots (v1.6) | Byte-parity (`Code.format_string!`), a fail-closed off-palette-hex gate sourced live from `tokens.css`, a motion/reduced-motion assertion, and a committed screenshot manifest with a Postgres-free CI drift gate make the re-skin regression-proof going forward without new infra | ✓ Good |
 | Milestone audit binds every requirement to a command/file:line (v1.6) | The GUARD-07 `v1.6-MILESTONE-AUDIT.md` 68-row evidence table + three non-regression proofs (public-API/host-ownership/telemetry) make the "no drift" claim verifiable rather than asserted | ✓ Good |
 | Close v1.6 with documented overrides, not blocking on manual-only checks (v1.6) | TOKEN-04 layout-shift and Phase-48 rendered states are human-verified but ExUnit-unpinnable without browser tooling; recording them as `override_closeout` gaps keeps the shipped UI honest while parking the automated-coverage work for a future milestone | ⚠️ Revisit |
+| Compile-time `@schema_prefix`, not runtime `prefix:` (v1.7) | A runtime `prefix:` option has read/write precedence asymmetry that causes split-brain queries; freezing the prefix at compile time via a shared macro makes it structurally impossible to thread a runtime prefix, enforced by a static guard test | ✓ Good |
+| Config key `:schema_prefix`, never bare `:prefix` (v1.7) | Bare `:prefix` collides with the frozen telemetry "event prefix" contract; `:schema_prefix` keeps the two namespaces distinct | ✓ Good |
+| Existing adopters opt-in only; default flips for new installs (v1.7) | Upgrading never forces a schema migration — do-nothing upgraders set `schema_prefix: nil` (Track A) or run the reversible `SET SCHEMA` move (Track B); avoids a breaking data move on `mix deps.update` | ✓ Good |
+| No `search_path` switching (v1.7) | `search_path` would break `public`-resident extensions (`citext`, `uuid-ossp`, `pg_trgm`); Rails Apartment abandoned it over leak/pooling bugs — compile-time qualification sidesteps this | ✓ Good |
+| Dual-prefix CI matrix with prefix-namespaced `_build` + `mix compile --force` (v1.7) | `@schema_prefix` is compile-time, so TEST-02 can't be proven at runtime; without a per-prefix `_build` cache key the `public` leg silently reuses the `parapet` build and false-greens | ✓ Good |
+| Two-part honest CHANGELOG banner over "no action required" (v1.7) | The unqualified "No action required for existing installs" is factually false for do-nothing upgraders (their first spine query would hit the wrong schema); a distinct action-required line linking `docs/upgrade-1.x.md` is the honest framing (D-01/D-02 override of SAFE-04) | ✓ Good |
+| Complete v1.7 tracking internal debt, not blocking on it (v1.7) | Audit `tech_debt` with 29/29 requirements and zero adopter-facing blockers; the register (Nyquist records, frontmatter, OTP-coverage prune, doc-build warnings, two pre-existing test reds) is internal hygiene routed to v1.8/v1.9 rather than a close blocker | ⚠️ Revisit |
 
 ## Evolution
 
@@ -346,4 +345,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-30 after Phase 51 (Prefix Core & Test Seam) complete*
+*Last updated: 2026-07-02 after v1.7 Postgres Schema Isolation & Upgrade Path milestone*

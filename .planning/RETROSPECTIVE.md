@@ -190,6 +190,43 @@ The v1.5 brand book, applied to the generated, host-owned Operator UI: a values-
 - Sessions: spread across 5 days (2026-06-24 → 2026-06-28).
 - Notable: 137 commits (34 `feat`), 136 files, +23,802/−1,512; font delta 52.2 KB / 262 KB tarball; closed `override_closeout` with 3 documented overrides.
 
+## Milestone: v1.7 — Postgres Schema Isolation & Upgrade Path
+
+**Shipped:** 2026-07-02
+**Phases:** 6 (51–56) | **Plans:** 21
+
+### What Was Built
+Parapet's six spine tables moved into a dedicated, configurable `parapet` Postgres schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; `nil`/`""`/`"public"` ⇒ unprefixed; runtime `prefix:` banned by a static guard). Propagation proven across every read/write with zero call-site edits under a dual-prefix CI matrix; schema-aware generators + all 8 committed migrations (first-ordered `CREATE SCHEMA` sentinel, `--no-create-schema` DBA hatch); two opt-in upgrade tracks (Track A stay-on-`public`, Track B reversible single-transaction `SET SCHEMA` move with throwaway-DB round-trip); a `parapet.doctor` config↔compiled drift + existence check; a real-host demo smoke; and `docs/upgrade-1.x.md` closing the audited #1 doc gap — public API + telemetry frozen throughout.
+
+### What Worked
+- **The dual-prefix CI matrix as the honest proof.** Because `@schema_prefix` is compile-time, no runtime test can prove both legs; namespacing the `_build` cache key by prefix + `mix compile --force` is what stops the `public` leg from silently reusing the `parapet` build and false-greening. Naming that false-green risk up front made TEST-03 the load-bearing artifact.
+- **Static guard from day one (zero offenders).** The PROP-02 fitness function over `lib/` (banning runtime `prefix:`, string-literal-table writes, `search_path`, raw `parapet_` SQL) shipped green immediately, so the "can't be reintroduced" claim is enforced, not asserted.
+- **Pure-subtraction schema switch.** Swapping `use Ecto.Schema` → `use Parapet.Spine.Schema` and deleting duplicated boilerplate (macro re-injects it) kept the six-schema change a trivially-reviewable diff.
+- **Single-source normalization.** One `normalize/1` + `safe_ident!/1` consumed by macro, Evidence, generators, doctor, and resolver meant the prefix semantics couldn't drift between compile-time and runtime sites.
+- **Honest CHANGELOG framing (D-01/D-02).** Catching that "No action required for existing installs" is factually false for do-nothing upgraders, and shipping a two-part banner instead, is exactly the trust-hardening posture this milestone is about.
+
+### What Was Inefficient
+- **Phase-52 SUMMARYs omitted `requirements_completed` frontmatter** (IDs landed in `tags`), so the milestone audit's 3-source cross-check mechanically flagged PROP-01..03/TEST-03 as "partial" and needed manual reconciliation against VERIFICATION.md. A frontmatter lint at phase close would have avoided it.
+- **`init.manager` projected phases 53 & 56 as `stale`** at close (commits landed after their VERIFICATION timestamps), diverging from the authoritative VERIFICATION.md `passed` — forcing a manual ground-truth check. The projection freshness vs. the record is a recurring readiness-check friction.
+- **Nyquist VALIDATION.md records stayed draft** for all six phases despite substantive ExUnit coverage existing — the validate-phase hook was active but no phase reached compliant, leaving the records lagging the tests.
+
+### Patterns Established
+- **Compile-time attribute over runtime option** for cross-cutting DB config, with a static guard fitness function enforcing the ban — the durable answer to "how do we make a footgun structurally impossible."
+- **Prefix-namespaced `_build` cache key** as the general recipe for honestly testing compile-time-parameterized behavior in a CI matrix (no cross-leg false-green).
+- **Sentinel migration at version 0** (`00000000000000_create_parapet_schema`) sorts before all spine migrations; non-cascading `down` prevents silent schema deletion.
+- **Single-source doc literals cross-checked by a test** (`DocsPhase55Test` asserting `upgrade-1.x.md`'s load-bearing strings against real tooling) — docs that can't rot silently.
+
+### Key Lessons
+- When behavior is frozen at compile time, the *only* honest CI proof is one that recompiles per value with an isolated build cache — assert the false-green risk explicitly or the matrix lies.
+- Interrogate reassurance copy for the do-nothing user: "no action required" was false for the exact adopter most likely to skim the changelog. Honesty beat brevity.
+- Keep SUMMARY `requirements_completed` frontmatter populated — the milestone audit's cross-check depends on it, and omission converts a clean pass into manual reconciliation.
+- A same-day milestone audit is the authoritative verification record; treat `init.manager` `stale` projections as a prompt to check VERIFICATION.md, not as a blocker.
+
+### Cost Observations
+- Model mix: predominantly opus (design research on the schema-isolation mechanism, adversarial audit, generator/migration work).
+- Sessions: spread across 4 days (2026-06-29 → 2026-07-02).
+- Notable: 47 source files, +3,898/−169; 121 commits (41 `feat`/`fix`); verified closeout with a 6-item internal tech-debt register (highest: two pre-existing test reds routed to v1.8/v1.9).
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -207,6 +244,7 @@ The v1.5 brand book, applied to the generated, host-owned Operator UI: a values-
 | v1.4 | 3 / 8 | 1 | - | 8 plans / 1 day (trust hardening/docs proof) |
 | v1.5 | 4 / 11 | 2 | - | 11 plans / 2 days (brand/design assets; +4044/−7012, brandbook 192 KB) |
 | v1.6 | 7 / 25 | 5 | - | 25 plans / 5 days (UI re-skin + design-system audit; +23802/−1512, 137 commits, fonts 52.2 KB) |
+| v1.7 | 6 / 21 | 4 | - | 21 plans / 4 days (PG schema isolation + upgrade path; +3898/−169 src, 121 commits, 29/29 reqs) |
 
 ## Milestone: v0.10 — Adopter Success
 

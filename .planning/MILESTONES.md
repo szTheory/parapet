@@ -1,5 +1,42 @@
 # Milestones
 
+## v1.7 Postgres Schema Isolation & Upgrade Path (Shipped: 2026-07-02)
+
+**Delivered:** Parapet's six spine tables now live in a dedicated, configurable `parapet` Postgres schema by default (compile-time `@schema_prefix`, no runtime `prefix:`); existing adopters get a documented, tested, opt-in upgrade path (stay-on-`public` or a reversible `SET SCHEMA` move); and the public API + telemetry contracts stay provably frozen. Closes the audited #1 quality weakness: no adopter-facing DB-schema upgrade story.
+
+**Phases completed:** 6 phases (51–56), 21 plans, 48 tasks
+**Source changes:** 47 files, +3,898 / −169 (lib/priv/test/docs/demo/mix.exs/CHANGELOG)
+**Timeline:** 4 days (2026-06-29 → 2026-07-02) · Git range: v1.6 → v1.7
+**Requirements:** 29/29 satisfied · **Closeout:** verified (audit `tech_debt`; all blockers zero)
+
+**Key accomplishments:**
+
+- **Compile-time `@schema_prefix` core (Phase 51)** — shared `use Parapet.Spine.Schema` macro across all six spine schemas (default `parapet`; `nil`/`""`/`"public"` ⇒ unprefixed), the library's first `config/config.exs` env seam, and prefix-qualified test bootstrap (suite green under the prefix).
+- **Propagation proof + guards + honest CI (Phase 52)** — the prefix rides every select/join/`insert_all`/Multi with zero call-site edits, a static guard bans runtime `prefix:` and string-literal-table writes, and a dual-prefix CI matrix recompiles per leg with a prefix-namespaced `_build` cache (no false-green).
+- **Schema-aware generators & migrations (Phase 53)** — first-ordered `CREATE SCHEMA` sentinel, `prefix:`-stamped DDL across all 8 committed migrations + generators, no-clobber `configure_new` config write, `--no-create-schema` least-privilege DBA hatch, and one shared prefix resolver.
+- **Two-track upgrade path + doctor (Phase 54)** — `mix parapet.gen.schema.move` emits a reversible single-transaction `SET SCHEMA` move with pre-flight abort guards + second-move refusal, plus a Track A stay-on-`public` pin, a throwaway-DB round-trip test, and a `parapet.doctor` config↔compiled drift + schema-existence check.
+- **Real-host demo proof + upgrade docs (Phase 55)** — the demo migrates end-to-end into `parapet` (six-table + `get_meta` round-trip smoke assertions), and `docs/upgrade-1.x.md` single-sources copy-paste Track A/B — closing the audited #1 adopter-documentation gap.
+- **Frozen-contract hardening (Phase 56)** — `mix verify.public_api` zero-drift + a behavioral telemetry `:source` bare-name assertion prove both contracts frozen, plus a two-part honest `feat(schema)` CHANGELOG framing (universal "no data moves automatically" reassurance + a distinct existing-adopter action-required line).
+
+**Verification note:** All 6 phase VERIFICATION.md = `passed` (audit-confirmed 2026-07-02). `init.manager` mechanically projected phases 53 and 56 as `stale` (commits landed after their verification timestamps); the authoritative VERIFICATION.md records and same-day milestone audit both confirm `passed`, so this is a verified closeout.
+
+### Tech Debt Register (tracked, non-adopter-facing)
+
+Carried forward per the "complete now, track debt" close decision — none of these affect an adopter installing or upgrading Parapet. Full detail in `milestones/v1.7-MILESTONE-AUDIT.md`.
+
+| # | Area | Item | Severity |
+|---|------|------|----------|
+| 1 | Nyquist | 5 VALIDATION.md draft/non-compliant + phase-56 missing (tests exist; the *records* are draft) | Low |
+| 2 | Frontmatter | Phase-52 SUMMARYs omit `requirements_completed` (IDs in tags; VERIFICATION authoritative) | Low |
+| 3 | CI coverage | Public/unprefixed leg covers OTP 28.x only; OTP 26/27 under the prefix only (accepted D-11 prune) | Low |
+| 4 | Docs single-source | GRANT copy in `upgrade-1.x.md` asserted by presence, not byte-equal to `schema_move_notice.ex` | Low |
+| 5 | Doc build | Pre-existing `mix docs --warnings-as-errors` reds (demo-app.md unregistered, `__prefix__/0` hidden-fn ref) | Low |
+| 6 | Test suite | Pre-existing reds `DocsPhase33Test` + `Telemetry.RecoveryActionTest` mean bare `mix test` isn't fully green — relevant to the Phase-56 "existing CI is the enforcement backstop" claim | Medium |
+
+**Highest-value follow-up (item #6):** confirm the two known reds (both predate v1.7, on both CI legs) are quarantined/`@tag`-excluded or fixed so the frozen-contract release backstop reflects a green suite. Slated for v1.9 A11Y-01 (ExUnit-pin) / v1.8 CI reshape.
+
+---
+
 ## v1.6 Operator UI Brand & Design-System Audit (Shipped: 2026-06-29)
 
 **Phases completed:** 7 phases (44–50), 25 plans, 50 tasks

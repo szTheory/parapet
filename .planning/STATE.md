@@ -2,38 +2,36 @@
 gsd_state_version: 1.0
 milestone: v1.7
 milestone_name: Postgres Schema Isolation & Upgrade Path
-current_phase: 56
-current_phase_name: contract-release-hardening
-status: milestone_complete
-stopped_at: Milestone complete (Phase 56 was final phase)
-last_updated: 2026-07-02T16:32:17.549Z
+current_phase: 7
+status: Awaiting next milestone
+stopped_at: Completed 56-04-PLAN.md (verification/UAT records; phase complete)
+last_updated: "2026-07-02T17:12:40.403Z"
 last_activity: 2026-07-02
-last_activity_desc: Phase 56 execution started
+last_activity_desc: Milestone v1.7 completed and archived
 progress:
   total_phases: 6
   completed_phases: 6
   total_plans: 21
   completed_plans: 21
   percent: 100
+current_phase_name: contract-release-hardening
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-06-30 after Phase 51)
+See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Milestone complete
+**Current focus:** v1.7 shipped — planning next milestone (v1.8 CI/CD performance & DX). Run `/gsd-new-milestone`.
 
 ## Current Position
 
-Phase: 56
-Plan: Not started
-Status: Milestone complete
-Last activity: 2026-07-02
-
-Progress: [████████░░] 83%
+Phase: Milestone v1.7 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-02 — Milestone v1.7 completed and archived
 
 ## Milestone Roadmap (v1.7)
 
@@ -169,4 +167,4 @@ Next step: Discuss Phase 56 with `/gsd-discuss-phase 56` (Contract & Release Har
 
 ## Operator Next Steps
 
-- Discuss the next v1.7 phase: `/gsd-discuss-phase 56` (then `/gsd-plan-phase 56`)
+- Start the next milestone with /gsd-new-milestone
