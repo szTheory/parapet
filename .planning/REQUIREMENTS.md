@@ -38,9 +38,9 @@ Closes v1.7 tech-debt #6 by fixing, not quarantining — a bare `mix test` must 
 
 ### Local Developer Experience
 
-- [ ] **DX-01**: A `mix ci` alias reproduces the CI gate locally in fail-fast order (the same gated steps as `lint-once` + `test` on the default prefix), so a contributor can prove a change before pushing
-- [ ] **DX-02**: The CI `lint-once` job invokes `mix ci` as its single source of truth for the portable gate steps, so the local alias and CI cannot drift apart
-- [ ] **DX-03**: `CONTRIBUTING.md` is updated to instruct `mix ci` before pushing (replacing the outdated `mix test` / `credo` / `dialyzer` note) and documents the intended local-vs-CI delta (single prefix + trimmed matrix locally; full matrix in CI)
+- [x] **DX-01**: A `mix ci` alias reproduces the CI gate locally in fail-fast order (the same gated steps as `lint-once` + `test` on the default prefix), so a contributor can prove a change before pushing
+- [x] **DX-02**: The CI `lint-once` job invokes `mix ci` as its single source of truth for the portable gate steps, so the local alias and CI cannot drift apart
+- [x] **DX-03**: `CONTRIBUTING.md` is updated to instruct `mix ci` before pushing (replacing the outdated `mix test` / `credo` / `dialyzer` note) and documents the intended local-vs-CI delta (single prefix + trimmed matrix locally; full matrix in CI)
 
 ## Future / Deferred Requirements
 
@@ -77,9 +77,9 @@ Explicitly excluded from v1.8, with reasoning.
 | TEST-03 | Phase 57 | Complete |
 | TEST-04 | Phase 57 | Complete |
 | TEST-05 | Phase 57 | Complete |
-| DX-01 | Phase 58 | Pending |
-| DX-02 | Phase 58 | Pending |
-| DX-03 | Phase 58 | Pending |
+| DX-01 | Phase 58 | Complete |
+| DX-02 | Phase 58 | Complete |
+| DX-03 | Phase 58 | Complete |
 | CI-01 | Phase 59 | Pending |
 | CI-02 | Phase 59 | Pending |
 | CI-03 | Phase 59 | Pending |

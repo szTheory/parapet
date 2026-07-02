@@ -146,6 +146,6 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 55. Demo App & Upgrade Docs | v1.7 | 2/2 | Complete | 2026-07-01 |
 | 56. Contract & Release Hardening | v1.7 | 4/4 | Complete | 2026-07-02 |
 | 57. Test Suite Baseline | v1.8 | 2/2 | Complete    | 2026-07-02 |
-| 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 1/1 | Complete   | 2026-07-02 |
+| 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 1/1 | Complete    | 2026-07-02 |
 | 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 0/TBD | Not started | - |
 | 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
