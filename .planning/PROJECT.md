@@ -8,9 +8,20 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
-## Current Milestone: none active
+## Current Milestone: v1.8 CI/CD Performance & DX
 
-v1.7 shipped 2026-07-02. The next milestone in the approved v1.7→v1.9 roadmap is **v1.8 CI/CD performance & DX** — define it with `/gsd-new-milestone` (see Next Milestone Goals below).
+**Goal:** Make the CI pipeline fast, cheap, and green-by-default — so contributors get quick honest signal and `main` stays a trustworthy release backstop. Pipeline/DX work only; public API + telemetry contracts stay frozen.
+
+**Target features:**
+- Dialyzer PLT caching — stop rebuilding the PLT on every run
+- `concurrency: cancel-in-progress` on PR workflows — kill superseded runs
+- Lint-once — run format/credo/etc. a single time, not per-matrix-cell
+- `mix ci` alias — one local command mirroring the CI gate
+- `Process.sleep` removal — deflake timing-based tests
+- 3-OTP matrix scoped to main + nightly (trimmed PR breadth, full coverage on merge/nightly)
+- Quarantine the two pre-existing test reds (`DocsPhase33Test`, `Telemetry.RecoveryActionTest`) so bare `mix test` is green — closes v1.7 tech-debt #6 and backs the "CI is the enforcement backstop" claim
+
+**Key context:** v1.7's dual-prefix CI matrix interacts with this pipeline reshape — sequence carefully so no leg false-greens. Tech-debt #6 (test-red quarantine) is folded into v1.8 (not v1.9) per the 2026-07-02 milestone-definition decision, since v1.8's green-suite premise depends on it.
 
 ## Current State
 
@@ -345,4 +356,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-02 after v1.7 Postgres Schema Isolation & Upgrade Path milestone*
+*Last updated: 2026-07-02 after starting milestone v1.8 CI/CD Performance & DX*

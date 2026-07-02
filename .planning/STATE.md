@@ -1,20 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.7
-milestone_name: Postgres Schema Isolation & Upgrade Path
-current_phase: 7
-status: Awaiting next milestone
-stopped_at: Completed 56-04-PLAN.md (verification/UAT records; phase complete)
-last_updated: "2026-07-02T17:12:40.403Z"
+milestone: v1.8
+milestone_name: CI/CD Performance & DX
+status: planning
+last_updated: "2026-07-02T17:33:14.586Z"
 last_activity: 2026-07-02
-last_activity_desc: Milestone v1.7 completed and archived
 progress:
-  total_phases: 6
-  completed_phases: 6
-  total_plans: 21
-  completed_plans: 21
-  percent: 100
-current_phase_name: contract-release-hardening
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -28,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 ## Current Position
 
-Phase: Milestone v1.7 complete
+Phase: Not started (defining requirements)
 Plan: —
-Status: Awaiting next milestone
-Last activity: 2026-07-02 — Milestone v1.7 completed and archived
+Status: Defining requirements
+Last activity: 2026-07-02 — Milestone v1.8 started
 
 ## Milestone Roadmap (v1.7)
 
