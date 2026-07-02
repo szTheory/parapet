@@ -1,23 +1,12 @@
 ---
 phase: 55-demo-app-upgrade-docs
 verified: 2026-07-01T21:00:00Z
-status: human_needed
-score: 3/3 must-haves verified (automated checks)
+status: passed
+score: 3/3 must-haves verified; 4 former human items now automated (Phase 55 shift-left)
 behavior_unverified: 0
 overrides_applied: 0
-human_verification:
-  - test: "Read docs/upgrade-1.x.md in full and confirm: (a) Track A config block (config :parapet, schema_prefix: nil) is immediately followed by the force-recompile line; (b) Track B section has its own recompile line after mix ecto.migrate; (c) Rollback section covers Track A and Track B rollback and explicitly covers half-migrated recovery with an explanation of the single-transaction guarantee; (d) FAQ is substantive and answers the 'do-nothing upgrader' scenario."
-    expected: "Every config block is followed by mix deps.compile parapet --force; half-migrated recovery section explains transaction atomicity; FAQ covers key upgrader questions."
-    why_human: "Grep can confirm the recompile line appears in the file but cannot verify that every config block is immediately (not paragraphs later) followed by it, nor judge FAQ completeness or tone."
-  - test: "Read docs/upgrade-1.x.md and confirm the TL;DR leads with a clear reassurance ('your data never moves' or equivalent), that the 'Action Required' caveat is honest and framed correctly for do-nothing upgraders, and that verbatim Track A/B copy matches the doctor output and generated migration as described in 54-CONTEXT D-04/D-17/D-18."
-    expected: "Reassure-then-instruct pattern is correct; framing does not falsely claim 'no action required'; Track A/B mechanics are consistent with the doctor tool output."
-    why_human: "Tone, framing correctness, and cross-doc verbatim consistency require reading — cannot be asserted by grep."
-  - test: "Read the docs/deployment.md 'Schema location' subsection (near Step 4) and confirm it reassures + routes to upgrade-1.x.md without restating Track A/B mechanics (no config blocks, no ALTER TABLE steps, no GRANT SQL)."
-    expected: "Subsection is 3-5 lines: reassurance, route to upgrade-1.x.md. No mechanics duplicated."
-    why_human: "Single-source compliance (no restatement) requires reading the prose, not grepping for presence."
-  - test: "Read the README.md Installation section schema note (~line 62-64) and confirm: (a) it is placed after the mix parapet.install block, (b) it routes to migration-v1.md Step 3 (not directly to upgrade-1.x.md), (c) tone is brief and reassuring, not alarming."
-    expected: "One-line note after the install block, routing correctly, no alarm tone."
-    why_human: "Note placement relative to the install block and tone quality require human reading."
+human_verification_automated_by: "test/parapet/docs_phase_55_test.exs (Parapet.DocsPhase55Test)"
+human_verification: []
 ---
 
 # Phase 55: Demo App Upgrade Docs Verification Report
@@ -25,7 +14,7 @@ human_verification:
 **Phase Goal:** The demo app proves the prefix end-to-end on a real Phoenix host, and adopters have a copy-paste upgrade story that closes the audited #1 documentation gap.
 
 **Verified:** 2026-07-01T21:00:00Z
-**Status:** human_needed
+**Status:** passed (all 4 former human-judgment items automated by `Parapet.DocsPhase55Test`)
 **Re-verification:** No — initial verification
 
 ---
@@ -113,39 +102,27 @@ No debt markers, empty implementations, or hardcoded stub data found in the five
 
 ---
 
-## Human Verification Required
+## Human Verification — Automated (Phase 55 shift-left)
 
-### 1. DOC-01: Per-block recompile line placement and FAQ completeness
+All four former human-judgment items are now asserted deterministically by
+`test/parapet/docs_phase_55_test.exs` (`Parapet.DocsPhase55Test`), which runs untagged in
+the default `mix test` suite across every CI leg. Because `release_gate needs: [lint, test, demo]`,
+a doc regression fails the `test` job and blocks the release — no manual step remains.
 
-**Test:** Open `docs/upgrade-1.x.md` and read it top to bottom. For each config block (elixir or bash), confirm the very next non-blank line or code block is `mix deps.compile parapet --force`. Then read the FAQ section and confirm it answers at minimum: (a) "what happens if I do nothing", (b) "can I use doctor to check before deciding", (c) half-configured/drift state detection.
+| # | Former human item | Now asserted by (DocsPhase55Test) |
+|---|-------------------|-----------------------------------|
+| 1 | DOC-01 per-block recompile + rollback/half-migrated + FAQ completeness | "every config :parapet block is followed by the force-recompile command in-section" (windowed adjacency), "rollback covers Track A, Track B, and half-migrated recovery", "half-migrated recovery explains the single-transaction atomicity guarantee", "FAQ is substantive and answers the do-nothing upgrader scenario" |
+| 2 | DOC-01 tone + cross-source verbatim accuracy | "TL;DR leads with a data-never-moves reassurance", "action-required framing is honest (does not falsely claim no action)", "Track A config line matches the schema module source of truth", "recompile command matches the doctor drift-message source of truth", "the six ALTER TABLE ... SET SCHEMA lines match the move generator and schema modules", "least-privilege GRANT copy is present" |
+| 3 | DOC-02 deployment.md single-source compliance | "Schema location subsection routes to the upgrade guide without restating mechanics" (refutes config/ALTER TABLE/GRANT/recompile inside the subsection) |
+| 4 | DOC-02 README note placement & tone | "note routes to migration-v1.md Step 3, sits after the install block, restates no mechanics" (byte-offset placement + mechanics refutation), "migration-v1.md has the Step 3 schema-location step among seven steps" |
 
-**Expected:** Every config block is immediately followed by the force-recompile line; FAQ is substantive and covers the key upgrader scenarios.
-
-**Why human:** Grep confirms the line appears somewhere in the file (7 occurrences found) but cannot verify immediate adjacency to each config block. FAQ completeness is a judgment call.
-
-### 2. DOC-01: Verbatim copy accuracy and tone correctness
-
-**Test:** Open `docs/upgrade-1.x.md` and compare the Track A config block, the Track B ALTER TABLE list, and the doctor drift message against the Phase 54 doctor output (`mix parapet.doctor`) and the generated migration from `mix parapet.gen.schema.move`. Confirm they tell the same story. Check that the TL;DR reassurance is genuine ("data does not move") while the "Action Required" section is honest (do-nothing upgrader gets an error).
-
-**Expected:** Track A/B copy is consistent with doctor output and generated migration; framing does not falsely promise "no action required" but also does not overstate alarm.
-
-**Why human:** Cross-doc consistency requires reading multiple artifacts side by side; tone judgment requires human assessment.
-
-### 3. DOC-02: deployment.md single-source compliance
-
-**Test:** Read the `docs/deployment.md` "Schema location" subsection (approximately lines 64-72). Confirm it contains only: a reassurance sentence, a description of the default behavior, and a link to `upgrade-1.x.md`. Confirm it does NOT contain any config blocks, ALTER TABLE SQL, GRANT statements, or Track A/B step-by-step mechanics.
-
-**Expected:** Subsection is routing-only, 4-6 lines, no mechanics duplicated.
-
-**Why human:** Single-source compliance (absence of mechanics) requires reading the prose, not just grepping for presence of the link.
-
-### 4. DOC-02: README Installation note placement and tone
-
-**Test:** Open `README.md` and find the Installation section. Confirm the schema note appears after the `mix parapet.install` code block (not before it, not buried elsewhere). Confirm it is brief (one to two sentences), reassuring in tone, and routes to `docs/migration-v1.md` Step 3 (not directly to upgrade-1.x.md).
-
-**Expected:** Note after install block; 1-2 sentences; routes to migration-v1.md Step 3; no alarm tone.
-
-**Why human:** Note placement relative to the install block and tone quality cannot be verified programmatically.
+**Cross-source verbatim scope (item 2):** the test asserts the load-bearing literals (Track A
+config line, the recompile command, the six `ALTER TABLE … SET SCHEMA` lines, the six table
+names) stay consistent between `docs/upgrade-1.x.md` and the real tooling (`parapet.doctor`,
+`parapet.gen.schema.move`, and the six spine schema modules), so genuine drift fails CI. The
+GRANT block is asserted by presence rather than byte-equality — its doc rendering intentionally
+differs from `lib/parapet/spine/schema_move_notice.ex`; true single-sourcing of the GRANT copy
+is tracked as a separate cleanup.
 
 ---
 

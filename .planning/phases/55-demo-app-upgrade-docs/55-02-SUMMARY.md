@@ -52,17 +52,20 @@ coverage:
     description: "docs/upgrade-1.x.md exists with D-07 section order: TL;DR -> action-required -> Track A -> Track B -> GRANTs -> recompile-order -> rollback incl. half-migrated -> FAQ"
     requirement: DOC-01
     verification:
-      - kind: manual_procedural
-        ref: "test -f docs/upgrade-1.x.md — confirmed present"
+      - kind: other
+        ref: "test/parapet/docs_phase_55_test.exs 'upgrade-1.x.md structure (UAT 1)' | mix test test/parapet/docs_phase_55_test.exs"
         status: pass
-    human_judgment: true
-    rationale: "Doc-content quality (verbatim copy accuracy, reassure->instruct tone, FAQ completeness) requires human review; automation only confirms file existence and cross-link integrity"
+    human_judgment: false
+    rationale: "Phase 55 shift-left: rollback (Track A/B + half-migrated), the single-transaction guarantee, a substantive do-nothing FAQ, and per-block recompile are asserted deterministically by Parapet.DocsPhase55Test"
   - id: D2
     description: "Every config block in upgrade-1.x.md is immediately followed by mix deps.compile parapet --force"
     requirement: DOC-01
-    verification: []
-    human_judgment: true
-    rationale: "Requires reading each config block in sequence to verify the recompile line follows — cannot be expressed as a grep without false positives"
+    verification:
+      - kind: other
+        ref: "test/parapet/docs_phase_55_test.exs 'every config :parapet block is followed by the force-recompile command in-section' | mix test test/parapet/docs_phase_55_test.exs"
+        status: pass
+    human_judgment: false
+    rationale: "Phase 55 shift-left: DocsPhase55Test scans each config :parapet block and asserts the force-recompile command follows within the same subsection (windowed, tolerant of the intervening prose line)"
   - id: D3
     description: "upgrade-1.x.md registered in BOTH mix.exs extras: and groups_for_extras Guides: (DOC-01 D-08)"
     requirement: DOC-01
@@ -83,20 +86,20 @@ coverage:
     description: "deployment.md has net-new schema subsection under Step 4 routing to upgrade-1.x.md with no Track A/B mechanics restated"
     requirement: DOC-02
     verification:
-      - kind: manual_procedural
-        ref: "grep -q 'upgrade-1.x.md' docs/deployment.md — confirmed present"
+      - kind: other
+        ref: "test/parapet/docs_phase_55_test.exs 'Schema location subsection routes to the upgrade guide without restating mechanics' | mix test test/parapet/docs_phase_55_test.exs"
         status: pass
-    human_judgment: true
-    rationale: "Single-source compliance (no mechanics restated) requires human review of the subsection prose"
+    human_judgment: false
+    rationale: "Phase 55 shift-left: DocsPhase55Test slices the Schema location subsection and refutes restated mechanics (config :parapet, ALTER TABLE, GRANT, mix deps.compile) while asserting the route to upgrade-1.x.md"
   - id: D6
     description: "README Installation section carries a one-line schema note routing to migration-v1.md Step 3"
     requirement: DOC-02
     verification:
-      - kind: manual_procedural
-        ref: "grep -q 'migration-v1.md' README.md — confirmed present"
+      - kind: other
+        ref: "test/parapet/docs_phase_55_test.exs 'note routes to migration-v1.md Step 3, sits after the install block, restates no mechanics' | mix test test/parapet/docs_phase_55_test.exs"
         status: pass
-    human_judgment: true
-    rationale: "Reassure-then-route tone and correct placement after mix parapet.install block require human review"
+    human_judgment: false
+    rationale: "Phase 55 shift-left: DocsPhase55Test asserts the note routes to migration-v1.md Step 3, sits after the mix parapet.install block (byte-offset), and restates no mechanics"
   - id: D7
     description: "mix docs --warnings-as-errors produces no new warnings from Plan 02 changes (all cross-links from new file resolve)"
     requirement: DOC-02
