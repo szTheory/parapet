@@ -4,8 +4,8 @@ milestone: v1.8
 milestone_name: CI/CD Performance & DX
 current_phase: 58
 current_phase_name: Local DX — mix ci & CONTRIBUTING
-status: verifying
-stopped_at: Completed 57-02-PLAN.md (TEST-04, TEST-05 closed)
+status: ready_to_plan
+stopped_at: Phase 57 complete (TEST-01..05 verified); ready to plan Phase 58
 last_updated: "2026-07-02T21:40:31.121Z"
 last_activity: 2026-07-02
 last_activity_desc: Phase 57 complete, transitioned to Phase 58
@@ -24,24 +24,24 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 57 — test-suite-baseline
+**Current focus:** Phase 58 — Local DX — mix ci & CONTRIBUTING
 
 ## Current Position
 
 Phase: 58 — Local DX — mix ci & CONTRIBUTING
 Plan: Not started
-Status: Phase complete — ready for verification
+Status: Ready to plan
 Last activity: 2026-07-02 — Phase 57 complete, transitioned to Phase 58
 
 ```
-v1.8 Progress: [░░░░░░░░░░░░░░░░░░░░] 0% (0/4 phases)
+v1.8 Progress: [█████░░░░░░░░░░░░░░░░] 25% (1/4 phases)
 ```
 
 ## Milestone Roadmap (v1.8)
 
 Phases continue from v1.7 (ended Phase 56). Dependency chain: green suite first (Phase 57), then local DX + PLT path prereqs (Phase 58), then CI structural reshape (Phase 59), then matrix/triggers (Phase 60).
 
-- [ ] **57 Test Suite Baseline** — TEST-01..05
+- [x] **57 Test Suite Baseline** — TEST-01..05 ✓ (2026-07-02)
 - [ ] **58 Local DX — mix ci & CONTRIBUTING** — DX-01..03
 - [ ] **59 CI Caching, Lint-Once & release_gate Hardening** — CI-01..06
 - [ ] **60 OTP Matrix Reshape & Nightly Schedule** — MATRIX-01..04
@@ -140,10 +140,10 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-02T21:19:40.518Z
-Stopped at: Completed 57-02-PLAN.md (TEST-04, TEST-05 closed)
+Last session: 2026-07-02T21:40:00Z
+Stopped at: Phase 57 complete (TEST-01..05 verified; green enforced by CI gate). Ready to plan Phase 58.
 Resume file: None
-Next step: `/gsd-plan-phase 57` — Test Suite Baseline
+Next step: `/gsd-discuss-phase 58` — Local DX — mix ci & CONTRIBUTING (no CONTEXT.md yet)
 
 ## Operator Next Steps
 

@@ -356,4 +356,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-02 after starting milestone v1.8 CI/CD Performance & DX*
+*Last updated: 2026-07-02 after v1.8 Phase 57 (Test Suite Baseline) — bare `mix test` reds fixed directly and all `Process.sleep` sites classified; TEST-01..05 verified, green enforced by the CI gate*
