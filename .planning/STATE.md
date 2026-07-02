@@ -2,10 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: CI/CD Performance & DX
+current_phase: 60
+current_phase_name: OTP Matrix Reshape & Nightly Schedule
 status: executing
 stopped_at: Phase 59 context gathered (assumptions mode)
-last_updated: "2026-07-02T23:03:42.430Z"
+last_updated: "2026-07-02T23:07:54.809Z"
 last_activity: 2026-07-02
+last_activity_desc: Phase 59 complete, transitioned to Phase 60
 progress:
   total_phases: 4
   completed_phases: 3
@@ -25,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 ## Current Position
 
-Phase: 59 (ci-caching-lint-once-release-gate-hardening) — EXECUTING
-Plan: 2 of 2
+Phase: 60 — OTP Matrix Reshape & Nightly Schedule
+Plan: Not started
 Status: Ready to execute
-Last activity: 2026-07-02
+Last activity: 2026-07-02 — Phase 59 complete, transitioned to Phase 60
 
 ```
 v1.8 Progress: [█████░░░░░░░░░░░░░░░░] 25% (1/4 phases)
@@ -57,7 +60,7 @@ Phases continue from v1.7 (ended Phase 56). Dependency chain: green suite first 
 |-------|-------|-------|----------|
 | 57 | 2 | - | - |
 | 58 | 1 | - | - |
-| 59 | TBD | - | - |
+| 59 | 2 | - | - |
 | 60 | TBD | - | - |
 
 **Recent Trend (v1.7 reference):**

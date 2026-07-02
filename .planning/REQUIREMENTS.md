@@ -22,10 +22,10 @@ Closes v1.7 tech-debt #6 by fixing, not quarantining — a bare `mix test` must 
 
 ### CI Pipeline Performance
 
-- [ ] **CI-01**: The Dialyzer PLT is cached across CI runs — `mix.exs` routes the PLT to `priv/plts` (`plt_file`), `priv/plts` is gitignored, and the cache key is `OTP + Elixir + mix.lock` (prefix-agnostic), so PRs no longer rebuild the PLT from scratch
-- [ ] **CI-02**: Lint/quality steps run **once** in a single OTP-28 `lint-once` job (`format --check-formatted`, `compile --warnings-as-errors` incl. `--no-optional-deps`, `credo --strict`, `hex.audit`, `dialyzer`, `verify.public_api`) rather than repeating per matrix cell
-- [ ] **CI-03**: PR workflows use `concurrency: { group, cancel-in-progress: true }` scoped to pull requests, so superseded PR runs are cancelled (main/nightly runs are never cancelled)
-- [ ] **CI-04**: `release_gate` remains the single stable required check, hardened with `if: always()` + explicit per-job result aggregation so a skipped or failed upstream job can never let `release_gate` silently pass
+- [x] **CI-01**: The Dialyzer PLT is cached across CI runs — `mix.exs` routes the PLT to `priv/plts` (`plt_file`), `priv/plts` is gitignored, and the cache key is `OTP + Elixir + mix.lock` (prefix-agnostic), so PRs no longer rebuild the PLT from scratch
+- [x] **CI-02**: Lint/quality steps run **once** in a single OTP-28 `lint-once` job (`format --check-formatted`, `compile --warnings-as-errors` incl. `--no-optional-deps`, `credo --strict`, `hex.audit`, `dialyzer`, `verify.public_api`) rather than repeating per matrix cell
+- [x] **CI-03**: PR workflows use `concurrency: { group, cancel-in-progress: true }` scoped to pull requests, so superseded PR runs are cancelled (main/nightly runs are never cancelled)
+- [x] **CI-04**: `release_gate` remains the single stable required check, hardened with `if: always()` + explicit per-job result aggregation so a skipped or failed upstream job can never let `release_gate` silently pass
 - [x] **CI-05**: deps/`_build` caching preserves the v1.7 dual-prefix invariant — the `test` job keeps its `${{ matrix.schema_prefix }}`-namespaced `_build` cache key and per-leg `mix compile --force`, so no schema-prefix leg can false-green
 - [x] **CI-06**: SHA-pinned actions are updated to current releases (`actions/checkout`, `erlef/setup-beam`, `actions/cache`), keeping the SHA-pin + Dependabot policy intact
 
@@ -80,10 +80,10 @@ Explicitly excluded from v1.8, with reasoning.
 | DX-01 | Phase 58 | Complete |
 | DX-02 | Phase 58 | Complete |
 | DX-03 | Phase 58 | Complete |
-| CI-01 | Phase 59 | Pending |
-| CI-02 | Phase 59 | Pending |
-| CI-03 | Phase 59 | Pending |
-| CI-04 | Phase 59 | Pending |
+| CI-01 | Phase 59 | Complete |
+| CI-02 | Phase 59 | Complete |
+| CI-03 | Phase 59 | Complete |
+| CI-04 | Phase 59 | Complete |
 | CI-05 | Phase 59 | Complete |
 | CI-06 | Phase 59 | Complete |
 | MATRIX-01 | Phase 60 | Pending |
