@@ -28,13 +28,13 @@ See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 ## Current Position
 
-Phase: 60 — COMPLETE
+Phase: 60 — COMPLETE (last phase of v1.8)
 Plan: 2 of 2
-Status: Phase 60 complete
-Last activity: 2026-07-03 — Phase 60 marked complete
+Status: Phase 60 complete — v1.8 milestone 100% complete
+Last activity: 2026-07-03 — Phase 60 UAT passed (12/12), phase marked complete
 
 ```
-v1.8 Progress: [█████░░░░░░░░░░░░░░░░] 25% (1/4 phases)
+v1.8 Progress: [████████████████████] 100% (4/4 phases)
 ```
 
 ## Milestone Roadmap (v1.8)
@@ -42,9 +42,9 @@ v1.8 Progress: [█████░░░░░░░░░░░░░░░░]
 Phases continue from v1.7 (ended Phase 56). Dependency chain: green suite first (Phase 57), then local DX + PLT path prereqs (Phase 58), then CI structural reshape (Phase 59), then matrix/triggers (Phase 60).
 
 - [x] **57 Test Suite Baseline** — TEST-01..05 ✓ (2026-07-02)
-- [ ] **58 Local DX — mix ci & CONTRIBUTING** — DX-01..03
-- [ ] **59 CI Caching, Lint-Once & release_gate Hardening** — CI-01..06
-- [ ] **60 OTP Matrix Reshape & Nightly Schedule** — MATRIX-01..04
+- [x] **58 Local DX — mix ci & CONTRIBUTING** — DX-01..03 ✓ (2026-07-02)
+- [x] **59 CI Caching, Lint-Once & release_gate Hardening** — CI-01..06 ✓ (2026-07-02)
+- [x] **60 OTP Matrix Reshape & Nightly Schedule** — MATRIX-01..04 ✓ (2026-07-03)
 
 ## Performance Metrics
 
@@ -143,11 +143,11 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-03T00:59:08.601Z
-Stopped at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
-Resume file: .planning/phases/60-otp-matrix-reshape-nightly-schedule/60-CONTEXT.md
-Next step: `/gsd-discuss-phase 58` — Local DX — mix ci & CONTRIBUTING (no CONTEXT.md yet)
+Last session: 2026-07-03T01:16:03Z
+Stopped at: Phase 60 UAT passed (12/12, 0 issues); v1.8 milestone 100% complete
+Resume file: None
+Next step: `/gsd-complete-milestone v1.8` — archive v1.8 and prepare next milestone
 
 ## Operator Next Steps
 
-- Plan Phase 57 with `/gsd-plan-phase 57`
+- Complete the v1.8 milestone with `/gsd-complete-milestone v1.8`
