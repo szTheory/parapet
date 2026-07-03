@@ -28,7 +28,7 @@ Carried forward per the "complete now, track debt" close decision — none of th
 |---|------|------|----------|
 | 1 | Nyquist | 5 VALIDATION.md draft/non-compliant + phase-56 missing (tests exist; the *records* are draft) | Low |
 | 2 | Frontmatter | Phase-52 SUMMARYs omit `requirements_completed` (IDs in tags; VERIFICATION authoritative) | Low |
-| 3 | CI coverage | Public/unprefixed leg covers OTP 28.x only; OTP 26/27 under the prefix only (accepted D-11 prune) | Low |
+| 3 | CI coverage | Public/unprefixed leg covers OTP 28.x only; OTP 26/27 under the prefix only (accepted D-11 prune) — RESOLVED 2026-07-02 (Phase 60); see PROJECT.md Key Decisions | Low |
 | 4 | Docs single-source | GRANT copy in `upgrade-1.x.md` asserted by presence, not byte-equal to `schema_move_notice.ex` | Low |
 | 5 | Doc build | Pre-existing `mix docs --warnings-as-errors` reds (demo-app.md unregistered, `__prefix__/0` hidden-fn ref) | Low |
 | 6 | Test suite | Pre-existing reds `DocsPhase33Test` + `Telemetry.RecoveryActionTest` mean bare `mix test` isn't fully green — relevant to the Phase-56 "existing CI is the enforcement backstop" claim | Medium |
