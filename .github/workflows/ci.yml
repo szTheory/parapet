@@ -179,28 +179,38 @@ jobs:
         run: cd examples/demo_app && mix test --only smoke
 
   release_gate:
-    needs: [lint-once, test, demo]
+    needs: [lint-once, matrix-config, test, demo]
     runs-on: ubuntu-latest
     if: always()
     steps:
       - name: Aggregate job results
         run: |
           LINT_RESULT="${{ needs.lint-once.result }}"
+          MATRIX_RESULT="${{ needs.matrix-config.result }}"
           TEST_RESULT="${{ needs.test.result }}"
           DEMO_RESULT="${{ needs.demo.result }}"
           FAILED=0
+          # matrix-config: strict success (resolver failure = no matrix = nothing ran)
+          if [ "$MATRIX_RESULT" != "success" ]; then
+            echo "matrix-config result: $MATRIX_RESULT (expected: success)"
+            FAILED=1
+          fi
+          # lint-once: strict success allowlist — skipped/failure/cancelled all block
           if [ "$LINT_RESULT" != "success" ]; then
             echo "lint-once result: $LINT_RESULT (expected: success)"
             FAILED=1
           fi
+          # test: strict success allowlist — skipped/failure/cancelled all block
           if [ "$TEST_RESULT" != "success" ]; then
             echo "test result: $TEST_RESULT (expected: success)"
             FAILED=1
           fi
-          if [ "$DEMO_RESULT" != "success" ]; then
-            echo "demo result: $DEMO_RESULT (expected: success)"
-            FAILED=1
-          fi
+          # demo: pass on success or skipped (skipped is the legitimate PR case);
+          # block on failure or cancelled (a naive != failure check leaks cancelled runs)
+          case "$DEMO_RESULT" in
+            success|skipped) : ;;
+            *) echo "demo result: $DEMO_RESULT (expected: success or skipped)"; FAILED=1 ;;
+          esac
           if [ "$FAILED" -eq 1 ]; then
             echo "One or more required CI jobs did not succeed. Blocking merge."
             exit 1
