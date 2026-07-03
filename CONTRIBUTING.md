@@ -22,6 +22,8 @@ Three checks run in CI that do not run in `mix ci` locally. If `mix ci` is green
 
 (c) **Schema prefix matrix** — CI's `test` job runs an extra leg with `PARAPET_SCHEMA_PREFIX=public` in addition to the default `parapet` prefix. Locally, `mix ci` runs tests against only the `parapet` schema prefix. A prefix-specific failure (for example, an unscoped migration that only breaks under `public`) can appear in the CI test matrix but not locally.
 
+(d) **PR vs main multi-OTP breadth** — PRs run a single trimmed cell (OTP 28 × `parapet`); the full matrix (OTP 27, 28, 29 × `parapet` plus OTP 28 × `public`) runs on merge to `main` and nightly. A green PR is not full-matrix proof — `release_gate` on `main` is the real multi-OTP gate.
+
 ## Commit conventions
 
 Parapet uses [Conventional Commits](https://www.conventionalcommits.org/) because Release Please turns commit prefixes into release notes and version decisions. Choose the prefix that matches the work class you are actually shipping:

@@ -24,7 +24,7 @@ components) and how to run several stacks at once without port conflicts.
 | OTP       | 26–28     |
 | Postgres  | 14+       |
 
-CI validates on Elixir 1.19 across OTP 26, 27, and 28.
+CI validates on Elixir 1.20.2 across OTP 27, 28, and 29 (on main + nightly; PRs run a single trimmed cell).
 
 ## Stability & Versioning
 
