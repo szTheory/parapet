@@ -227,6 +227,39 @@ Parapet's six spine tables moved into a dedicated, configurable `parapet` Postgr
 - Sessions: spread across 4 days (2026-06-29 → 2026-07-02).
 - Notable: 47 source files, +3,898/−169; 121 commits (41 `feat`/`fix`); verified closeout with a 6-item internal tech-debt register (highest: two pre-existing test reds routed to v1.8/v1.9).
 
+## Milestone: v1.8 — CI/CD Performance & DX
+
+**Shipped:** 2026-07-03
+**Phases:** 4 (57–60) | **Plans:** 7
+
+### What Was Built
+A pipeline/DX-only milestone (no public-API, telemetry, or runtime change) making CI fast, cheap, and green-by-default. Fixed the two pre-existing reds directly rather than quarantining (`DocsPhase33Test` stale README assertion; `Telemetry.RecoveryActionTest` async-flaky `atom_count` delta removed while the load-bearing `String.to_existing_atom/1` guard stays), deleted three dead-time telemetry sleeps, annotated all six intentional concurrency holds, and added a deterministic sleep vocabulary (`assert_eventually/2`, a bounded `SELECT 1` startup barrier, a grep guard) so bare `mix test` is green. Cached the Dialyzer PLT at `priv/plts`, collapsed quality into a single OTP-28 `lint-once` job, added PR `concurrency: cancel-in-progress`, and hardened `release_gate` (`if: always()` + explicit per-job aggregation). Trimmed PRs to one OTP-28/`parapet` cell while `main` + a `0 3 * * *` nightly cron carry the full OTP {27,28,29} × dual-prefix matrix + single-leg demo, retiring EOL OTP 26 / Elixir 1.19 and the D-11 uneven-coverage carve-out. A `mix ci` alias mirrors the gate locally and is the single source of truth the CI `lint-once` job invokes.
+
+### What Worked
+- **Fix-directly beat quarantine.** Both reds had trivial fixes (a 1-line assertion, a 13-line deletion), so the DP-2 decision to skip quarantine infrastructure kept the green-suite premise honest with zero dead tooling.
+- **`mix ci` as a single source of truth.** Having the CI `lint-once` job invoke the same alias a contributor runs locally makes local/CI drift structurally impossible — the known deltas are documented in `CONTRIBUTING.md` rather than discovered by a surprised contributor.
+- **Preserving the v1.7 dual-prefix invariant through a reshape.** Naming `${{ matrix.schema_prefix }}` in the `_build` key + per-cell `mix compile --force` as untouchable up front meant the pipeline could be restructured without reopening the false-green footgun.
+- **Retire-by-design over fix.** Closing D-11 by moving the full matrix to main+nightly (removing the CI-budget reason for the prune) rather than patching coverage — the cleaner resolution, single-sourced in PROJECT.md with dated pointers.
+
+### What Was Inefficient
+- **Three SUMMARY one-liners were empty** (59-01/59-02/60-01), so the milestone CLI's auto-extracted accomplishment list was incomplete and the MILESTONES.md entry needed a manual rewrite from phase details — the same auto-extraction friction seen in v0.10.
+- **No `v1.8-MILESTONE-AUDIT.md` was produced** before close; readiness rested on the artifact audit + per-phase VERIFICATION (`passed`) instead of a dedicated milestone audit. Acceptable for a small pipeline-only milestone with 18/18 mapped requirements, but a departure from the v1.6/v1.7 audit-first pattern.
+
+### Patterns Established
+- **Local-mirrors-CI via a shared alias** (`mix ci` invoked by both the contributor and the `lint-once` job) — the durable answer to "how do we keep the local gate and CI gate from diverging."
+- **Fast-PR / full-on-merge matrix split** — one representative cell on PRs, full matrix on `main` + a nightly cron, so contributors get quick signal without losing multi-version coverage off the hot path.
+- **Annotated intentional timing + a grep guard** — `INTENTIONAL HOLD:` grammar plus a standalone guard makes deliberate concurrency-widening sleeps legible and keeps new bare `Process.sleep` from creeping back.
+
+### Key Lessons
+- Dropping EOL toolchains from *what CI tests* is not an adopter-facing floor change — keep `mix.exs` `~> 1.19` and defer the published-floor bump to its own decision (VER-01). Conflating the two would have shipped a stealth breaking change.
+- Keep SUMMARY `one_liner` frontmatter populated: three empty ones turned CLI accomplishment extraction into a manual rewrite (recurring lesson — same root cause as the v0.10 note).
+- For a small, fully-mapped pipeline milestone, the per-phase VERIFICATION + artifact audit can stand in for a full milestone audit — but note the departure explicitly at close.
+
+### Cost Observations
+- Model mix: predominantly opus (CI research on PLT caching / matrix strategy / test-deflaking, adversarial decision-fork research).
+- Sessions: 2 days (2026-07-02 → 2026-07-03).
+- Notable: 54 files, +6,705/−216; 53 commits; verified closeout, 18/18 requirements, zero deferred items.
+
 ## Cross-Milestone Trends
 
 | Milestone | Ph / Pl | Days | LOC | Velocity |
@@ -245,6 +278,7 @@ Parapet's six spine tables moved into a dedicated, configurable `parapet` Postgr
 | v1.5 | 4 / 11 | 2 | - | 11 plans / 2 days (brand/design assets; +4044/−7012, brandbook 192 KB) |
 | v1.6 | 7 / 25 | 5 | - | 25 plans / 5 days (UI re-skin + design-system audit; +23802/−1512, 137 commits, fonts 52.2 KB) |
 | v1.7 | 6 / 21 | 4 | - | 21 plans / 4 days (PG schema isolation + upgrade path; +3898/−169 src, 121 commits, 29/29 reqs) |
+| v1.8 | 4 / 7 | 2 | - | 7 plans / 2 days (CI/CD perf + DX; pipeline-only, +6705/−216, 53 commits, 18/18 reqs) |
 
 ## Milestone: v0.10 — Adopter Success
 

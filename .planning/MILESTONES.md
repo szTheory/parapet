@@ -1,5 +1,23 @@
 # Milestones
 
+## v1.8 CI/CD Performance & DX (Shipped: 2026-07-03)
+
+**Delivered:** Reshaped the CI pipeline to be fast, cheap, and green-by-default — a bare `mix test` is now honestly green, PRs get single-cell feedback while `main` + a nightly cron carry the full OTP matrix, and contributors get a single `mix ci` command that mirrors the gate locally. Pipeline/DX only: public API + telemetry contracts stayed frozen. Closes v1.7 tech-debt #6 (two pre-existing reds) and formally retires the v1.7 D-11 uneven-OTP-coverage carve-out.
+
+**Phases completed:** 4 phases (57–60), 7 plans, 15 tasks
+**Source changes:** 54 files, +6,705 / −216 (test/lib/mix.exs/ci.yml/docs/CONTRIBUTING/.planning)
+**Timeline:** 2 days (2026-07-02 → 2026-07-03) · Git range: v1.7 → v1.8
+**Requirements:** 18/18 satisfied · **Closeout:** verified (artifact audit clear; all 4 phases `verification_status: passed`)
+
+**Key accomplishments:**
+
+- **Green baseline (Phase 57)** — fixed the two pre-existing reds directly rather than quarantining (`DocsPhase33Test` stale README assertion; `Telemetry.RecoveryActionTest` async-flaky `atom_count` delta block removed while the load-bearing `String.to_existing_atom/1` guard is retained), deleted three dead-time telemetry sleeps, annotated all six intentional concurrency-hold sites, and established a deterministic sleep vocabulary — `assert_eventually/2`, a bounded `SELECT 1` startup barrier, and a standalone grep guard enforcing the `INTENTIONAL HOLD:` grammar. Bare `mix test` is now green (TEST-01..05).
+- **Local `mix ci` single-source (Phase 58)** — a `mix ci` alias runs the 8 portable gate steps in fail-fast order as the single source of truth shared by local dev and the CI `lint-once` job (so the two can't drift), plus the `mix.exs` Dialyzer `plt_file` path prereq; `CONTRIBUTING.md` documents the three expected local-vs-CI deltas (DX-01..03).
+- **CI structural reshape (Phase 59)** — Dialyzer PLT cached at `priv/plts` on an OTP+Elixir+`mix.lock` key, lint/quality run once in a single OTP-28 `lint-once` job, PR runs cancel superseded in-flight runs (`concurrency: cancel-in-progress`), and `release_gate` hardened with `if: always()` + explicit per-job result aggregation so a skipped/failed upstream can never silently pass — all with SHA-pins refreshed and the v1.7 dual-prefix `_build`/`--force` false-green invariant preserved (CI-01..06).
+- **Matrix reshape + nightly (Phase 60)** — PRs run exactly one cell (OTP 28 · Elixir 1.20.2 · `parapet` prefix); pushes to `main` and a `0 3 * * *` nightly cron run the full OTP {27, 28, 29} × dual-prefix matrix plus a single-leg demo smoke; EOL OTP 26 / Elixir 1.19 retired from CI (`mix.exs` floor unchanged at `~> 1.19`); the v1.7 D-11 uneven-coverage tech-debt flag formally retired-by-design with dated pointers (MATRIX-01..04).
+
+---
+
 ## v1.7 Postgres Schema Isolation & Upgrade Path (Shipped: 2026-07-02)
 
 **Delivered:** Parapet's six spine tables now live in a dedicated, configurable `parapet` Postgres schema by default (compile-time `@schema_prefix`, no runtime `prefix:`); existing adopters get a documented, tested, opt-in upgrade path (stay-on-`public` or a reversible `SET SCHEMA` move); and the public API + telemetry contracts stay provably frozen. Closes the audited #1 quality weakness: no adopter-facing DB-schema upgrade story.

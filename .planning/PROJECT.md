@@ -8,27 +8,14 @@ Parapet is an open-source Phoenix reliability layer for Elixir SaaS teams: an op
 
 A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
 
-## Current Milestone: v1.8 CI/CD Performance & DX
-
-**Goal:** Make the CI pipeline fast, cheap, and green-by-default — so contributors get quick honest signal and `main` stays a trustworthy release backstop. Pipeline/DX work only; public API + telemetry contracts stay frozen.
-
-**Target features:**
-- Dialyzer PLT caching — stop rebuilding the PLT on every run
-- `concurrency: cancel-in-progress` on PR workflows — kill superseded runs
-- Lint-once — run format/credo/etc. a single time, not per-matrix-cell
-- `mix ci` alias — one local command mirroring the CI gate
-- `Process.sleep` removal — deflake timing-based tests
-- 3-OTP matrix scoped to main + nightly (trimmed PR breadth, full coverage on merge/nightly)
-- Quarantine the two pre-existing test reds (`DocsPhase33Test`, `Telemetry.RecoveryActionTest`) so bare `mix test` is green — closes v1.7 tech-debt #6 and backs the "CI is the enforcement backstop" claim
-
-**Key context:** v1.7's dual-prefix CI matrix interacts with this pipeline reshape — sequence carefully so no leg false-greens. Tech-debt #6 (test-red quarantine) is folded into v1.8 (not v1.9) per the 2026-07-02 milestone-definition decision, since v1.8's green-suite premise depends on it.
-
 ## Current State
 
-**Shipped:** v1.7 Postgres Schema Isolation & Upgrade Path (2026-07-02) — Moved Parapet's six spine tables into a dedicated, configurable `parapet` Postgres schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; `nil`/`""`/`"public"` ⇒ unprefixed; runtime `prefix:` banned by a static guard to avoid split-brain), proved the prefix propagates across every read/write with zero call-site edits, and validated both legs with a dual-prefix CI matrix (prefix-namespaced `_build`, `mix compile --force`). Shipped schema-aware generators + all 8 committed migrations (first-ordered `CREATE SCHEMA` sentinel, `--no-create-schema` DBA hatch), two opt-in upgrade tracks for existing adopters (Track A stay-on-`public`; Track B a reversible single-transaction `SET SCHEMA` move with pre-flight guards + round-trip DB test), a `parapet.doctor` drift/existence check, a real-host demo smoke proof, and `docs/upgrade-1.x.md` closing the audited #1 documentation gap — all with public API + telemetry contracts provably frozen. 6/6 phases, 29/29 requirements; audit `tech_debt` (zero requirement/integration/flow blockers — remaining items are internal hygiene; see `.planning/milestones/v1.7-MILESTONE-AUDIT.md`). Verified closeout.
+**Shipped:** v1.8 CI/CD Performance & DX (2026-07-03) — Reshaped the CI pipeline to be fast, cheap, and green-by-default with zero public-API/telemetry change. Fixed the two pre-existing test reds directly (`DocsPhase33Test` stale README assertion; `Telemetry.RecoveryActionTest` async-flaky `atom_count` delta), deleted three dead-time telemetry sleeps, annotated all six intentional concurrency holds, and established a deterministic sleep vocabulary (`assert_eventually/2`, a `SELECT 1` startup barrier, a grep guard) — so bare `mix test` is honestly green, closing v1.7 tech-debt #6. Cached the Dialyzer PLT, collapsed lint/quality into a single OTP-28 `lint-once` job, added PR `concurrency: cancel-in-progress`, and hardened `release_gate` with `if: always()` + explicit per-job aggregation so an upstream failure can never silently pass. Trimmed PRs to a single OTP-28/`parapet` cell while `main` + a nightly cron carry the full OTP {27,28,29} × dual-prefix matrix plus a single-leg demo, retiring EOL OTP 26 / Elixir 1.19 from CI (`mix.exs` floor unchanged at `~> 1.19`) and formally retiring the v1.7 D-11 uneven-coverage carve-out. A `mix ci` alias mirrors the gate locally and is the single source of truth the CI `lint-once` job invokes, with `CONTRIBUTING.md` documenting the local-vs-CI deltas. 4/4 phases (57–60), 18/18 requirements; artifact audit clear, all phases `verification_status: passed`. Verified closeout.
 
 <details>
 <summary><b>Archived State Updates</b></summary>
+
+**Previously shipped:** v1.7 Postgres Schema Isolation & Upgrade Path (2026-07-02) — Moved Parapet's six spine tables into a dedicated, configurable `parapet` Postgres schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; `nil`/`""`/`"public"` ⇒ unprefixed; runtime `prefix:` banned by a static guard to avoid split-brain), proved the prefix propagates across every read/write with zero call-site edits, and validated both legs with a dual-prefix CI matrix (prefix-namespaced `_build`, `mix compile --force`). Shipped schema-aware generators + all 8 committed migrations (first-ordered `CREATE SCHEMA` sentinel, `--no-create-schema` DBA hatch), two opt-in upgrade tracks for existing adopters (Track A stay-on-`public`; Track B a reversible single-transaction `SET SCHEMA` move with pre-flight guards + round-trip DB test), a `parapet.doctor` drift/existence check, a real-host demo smoke proof, and `docs/upgrade-1.x.md` closing the audited #1 documentation gap — all with public API + telemetry contracts provably frozen. 6/6 phases, 29/29 requirements; audit `tech_debt` (zero requirement/integration/flow blockers — remaining items are internal hygiene; see `.planning/milestones/v1.7-MILESTONE-AUDIT.md`). Verified closeout.
 
 **Previously shipped:** v1.6 Operator UI Brand & Design-System Audit (2026-06-29) — Re-skinned the generated, host-owned Operator UI to the v1.5 brand book via values-only edits to `operator_theme_bootstrap/1` (brand neutrals/signals, six status triplets, IBM Plex type scale, 8px grid, radius/shadow/motion tokens, per-surface focus rings) with zero public-API/telemetry/host-ownership change, vendored five subsetted IBM Plex woff2 faces (52.2 KB), ran a layer-by-layer WCAG 2.2 AA design-system audit fixing real usability bugs, and installed forward-only regression guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest, evidence-binding audit). 7/7 phases, 61/68 requirements (7 shipped+human-verified but not yet ExUnit-pinned); audit passed (see `.planning/milestones/v1.6-MILESTONE-AUDIT.md`).
 
@@ -71,14 +58,14 @@ A Phoenix SaaS team can install Parapet and immediately know whether their criti
 
 ## Next Milestone Goals
 
-Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate inputs:
+**v1.9 Quality Hardening** is the next milestone in the approved v1.7→v1.9 roadmap. Not yet defined — define with `/gsd-new-milestone`. Carried-forward candidate inputs (from the v1.8 deferred register):
 
-- **Close the v1.6 automated-coverage gaps:** ExUnit-pin TOKEN-04 (explicit `--radius-*` custom properties) and the Phase-48 FLOW/COPY/A11Y-06 rendered states so the human-verified facts become regression-guarded.
-- **Token → Tailwind/daisyUI theme generator + HEEx snippets** for the generated Operator UI (v1.6 adopted token *values* in-place; the generator is separate-concern scope).
-- **Brand follow-ups deferred from v1.5/v1.6:** raster/OpenGraph exports, animated/motion logo, Figma source-of-truth, multi-page PDF brand book.
-- **Stable telemetry manifest** (`telemetry_stable.json` + drift gate) — the durable WR-01 fix deferred per D-21.
-- Automated browser a11y/interaction testing (Playwright + axe-core) as demo dev-dependencies.
-- Still-open quality-evaluation findings carried from prior milestones; long-tail cross-boundary journey correlation; MCP/recovery extensions after MCP stability improves.
+- **TELEM-01 — Stable telemetry manifest** (`telemetry_stable.json` + drift gate): the durable WR-01 fix deferred per D-21.
+- **REFACTOR-01 — Decompose the `operator.ex` god-module** behind the frozen Stable surface.
+- **A11Y-01 — Playwright + axe-core a11y lane; ExUnit-pin the v1.6 `override_closeout` gaps** (TOKEN-04 explicit `--radius-*` custom properties, and the Phase-48 FLOW/COPY/A11Y-06 rendered states) so the human-verified facts become regression-guarded.
+- **VER-01 (later)** — bump the `mix.exs` Elixir requirement `~> 1.19` → `~> 1.20` once the 1.19 + OTP 27/28 adopter cohort has had time to migrate (revisit in/after v1.9).
+
+Other parked candidates: Token → Tailwind/daisyUI theme generator + HEEx snippets for the generated Operator UI; brand follow-ups from v1.5/v1.6 (raster/OpenGraph exports, animated logo, Figma source-of-truth, multi-page PDF brand book); still-open quality-evaluation findings; long-tail cross-boundary journey correlation; MCP/recovery extensions after MCP stability improves.
 
 ## Requirements
 
@@ -202,12 +189,12 @@ Not yet defined. Define the next milestone with `$gsd-new-milestone`. Candidate 
 - ✓ WCAG 2.2 AA contrast gate re-pinned to brand hexes — six status triplets, dark links `#7FB4C6`, focus rings at the 3:1 UI floor; dark warning button fixed 2.9:1 → 5.62:1 — v1.6 (GUARD-02)
 - ✓ Demo stress fixtures & gallery — `/parapet/_gallery` lab, five `PARAPET_DEMO_SCENARIO` stress scenarios, screenshot capture across desktop+mobile / light+dark with a demo contract test — v1.6 (FIXTURE-01..05, GALLERY-01..02)
 - ✓ Forward-only regression guardrails — template↔demo byte-parity, fail-closed off-palette-hex gate, motion/reduced-motion assertion, committed screenshot baseline manifest + CI drift gate, evidence-binding `v1.6-MILESTONE-AUDIT.md` — v1.6 (GUARD-01, GUARD-03 to GUARD-07)
+- ✓ Green test-suite baseline — the two pre-existing reds fixed directly (`DocsPhase33Test` stale README assertion; `Telemetry.RecoveryActionTest` async-flaky `atom_count` delta removed, `String.to_existing_atom/1` guard kept), three dead-time telemetry sleeps deleted, six intentional concurrency holds annotated, and a deterministic sleep vocabulary added (`assert_eventually/2`, `SELECT 1` startup barrier, grep guard) so bare `mix test` is honestly green — v1.8 (TEST-01..05)
+- ✓ CI pipeline performance & hardening — cached Dialyzer PLT (`priv/plts`, OTP+Elixir+`mix.lock` key), single OTP-28 `lint-once` quality job, PR `concurrency: cancel-in-progress`, `release_gate` hardened with `if: always()` + explicit per-job aggregation, refreshed SHA-pins, and the v1.7 dual-prefix `_build`/`--force` false-green invariant preserved — v1.8 (CI-01..06)
+- ✓ OTP matrix reshape & nightly schedule — PRs run a single OTP-28/`parapet` cell; `main` + a `0 3 * * *` nightly cron run the full OTP {27,28,29} × dual-prefix matrix + single-leg demo; EOL OTP 26 / Elixir 1.19 retired from CI (`mix.exs` floor unchanged); D-11 uneven-coverage carve-out formally retired — v1.8 (MATRIX-01..04)
+- ✓ Local `mix ci` single-source gate — `mix ci` alias runs the 8 portable fail-fast steps as the single source of truth invoked by the CI `lint-once` job (no drift), plus the `mix.exs` PLT-path prereq and a `CONTRIBUTING.md` rewrite documenting the three local-vs-CI deltas — v1.8 (DX-01..03)
 
 ### Active
-
-**v1.8 CI/CD performance & DX** (next milestone in the approved v1.7→v1.9 roadmap — define with `/gsd-new-milestone`):
-
-- [ ] `CI-01` — Dialyzer PLT caching, `concurrency: cancel-in-progress` (PR), lint-once, `mix ci` alias, `Process.sleep` removal, 3-OTP matrix → main+nightly. *Note: v1.7's dual-prefix matrix interacts with this pipeline reshape — sequence accordingly. Also fold in v1.7 tech-debt item #6 (quarantine the pre-existing `DocsPhase33Test` + `Telemetry.RecoveryActionTest` reds so bare `mix test` is green).*
 
 **v1.6 automated-coverage gaps** (shipped + human-verified in the live UI; gap is in ExUnit coverage, not the console — close in a future milestone):
 
@@ -250,6 +237,7 @@ Shipped v1.4 Trust Hardening & Host-App Compatibility adding durable archive evi
 Shipped v1.5 Brand Book & Logo System: a docs/brand-assets-only milestone (no source, public API, or telemetry change) operationalizing the 1,874-line brand research into a self-contained 192 KB `brandbook/` — a locked corbelled-tower stacked emblem (Space Grotesk, outlined to paths) chosen via a 6-round tournament, CSS+JSON design tokens, a WCAG AA matrix, `file://`-openable HTML brand book + collateral, and a zero-config path-stable swap of the off-brand HexDocs logo/favicon. SVG/HTML/CSS/JSON only — zero rasters, zero font binaries. 4 phases / 11 plans over 2 days; audit `passed` 13/13.
 Shipped v1.6 Operator UI Brand & Design-System Audit: applied the v1.5 brand to the generated, host-owned Operator UI — values-only retheme of `operator_theme_bootstrap/1` across all three EEx templates (+ byte-parity demo mirrors), five subsetted IBM Plex woff2 faces (52.2 KB; the only relaxation of v1.5's no-font-binaries rule, scoped to operator fonts), and a layer-by-layer WCAG 2.2 AA usability audit (scrim/modal stacking, focus trap/restore, fake-disabled controls, dark-mode legibility, 390px overflow, designed empty/loading/error states, brand-voice microcopy). Added a demo-only `/parapet/_gallery` stress lab, five `PARAPET_DEMO_SCENARIO` fixtures, and forward-only guardrails (byte-parity, off-palette gate, motion assertion, screenshot manifest + CI drift gate, evidence-binding audit). No public-API/telemetry/host-ownership drift. 7 phases / 25 plans over 5 days; audit `passed` 61/68 (7 shipped+human-verified but not yet ExUnit-pinned). Closed `override_closeout` with 3 documented verification overrides.
 Shipped v1.7 Postgres Schema Isolation & Upgrade Path: moved the six spine tables into a configurable `parapet` schema by default via a compile-time `@schema_prefix` (shared `use Parapet.Spine.Schema` macro; runtime `prefix:` banned to avoid split-brain), proved propagation across every read/write with zero call-site edits under a dual-prefix CI matrix, shipped schema-aware generators + all 8 committed migrations, two opt-in upgrade tracks (stay-on-`public` / reversible `SET SCHEMA` move with round-trip test), a `parapet.doctor` drift check, a real-host demo smoke, and `docs/upgrade-1.x.md` — public API + telemetry frozen throughout. 47 source files changed (+3,898/−169) across 6 phases / 21 plans over 4 days. Audit `tech_debt`: 29/29 requirements, 7/7 integration seams, 4/4 e2e flows, zero blockers; remaining debt is internal hygiene (Nyquist draft records, frontmatter omissions, an accepted OTP-coverage prune, doc-build warnings, and two pre-existing test reds tracked for v1.8/v1.9). Verified closeout.
+Shipped v1.8 CI/CD Performance & DX: a pipeline/DX-only milestone (no public-API, telemetry, or runtime change) making the CI pipeline fast, cheap, and green-by-default. Fixed the two pre-existing reds directly (closing v1.7 tech-debt #6), deleted three dead-time telemetry sleeps, annotated six intentional concurrency holds, and added a deterministic sleep vocabulary (`assert_eventually/2`, `SELECT 1` startup barrier, grep guard) so bare `mix test` is green. Cached the Dialyzer PLT, collapsed quality into a single OTP-28 `lint-once` job, added PR `concurrency: cancel-in-progress`, and hardened `release_gate` (`if: always()` + explicit per-job aggregation). Trimmed PRs to one OTP-28/`parapet` cell while `main` + a nightly cron carry the full OTP {27,28,29} × dual-prefix matrix + single-leg demo, retiring EOL OTP 26 / Elixir 1.19 and the D-11 uneven-coverage carve-out. A `mix ci` alias mirrors the gate locally as the single source of truth the CI job invokes. 54 files changed (+6,705/−216) across 4 phases (57–60) / 7 plans over 2 days. 18/18 requirements; artifact audit clear, all phases `verification_status: passed`. Verified closeout.
 
 ## Constraints
 
@@ -338,6 +326,9 @@ Shipped v1.7 Postgres Schema Isolation & Upgrade Path: moved the six spine table
 | Two-part honest CHANGELOG banner over "no action required" (v1.7) | The unqualified "No action required for existing installs" is factually false for do-nothing upgraders (their first spine query would hit the wrong schema); a distinct action-required line linking `docs/upgrade-1.x.md` is the honest framing (D-01/D-02 override of SAFE-04) | ✓ Good |
 | Complete v1.7 tracking internal debt, not blocking on it (v1.7) | Audit `tech_debt` with 29/29 requirements and zero adopter-facing blockers; the register (Nyquist records, frontmatter, OTP-coverage prune, doc-build warnings, two pre-existing test reds) is internal hygiene routed to v1.8/v1.9 rather than a close blocker. D-11 OTP-coverage-prune item resolved by Phase 60 — see "Retire v1.7 D-11 CI-coverage prune" row below. | ✓ Good |
 | Retire v1.7 D-11 CI-coverage prune (v1.8) | RESOLVED 2026-07-02 (Phase 60 / MATRIX-02): retired by design, not by fix. The full matrix now runs on main + nightly only, so the original solo-maintainer CI-budget reason for the prune is gone. The remaining parapet ×3-OTP / public ×1-OTP asymmetry is intentional — prefix resolution is compile-time and OTP-independent, so one OTP on the public leg is complete signal. | ✓ Good |
+| Fix the two pre-existing reds directly, not quarantine (v1.8) | Both `DocsPhase33Test` and `Telemetry.RecoveryActionTest` had trivial direct fixes (a 1-line assertion update and a 13-line atom-count-delta deletion), so quarantine infrastructure (a nightly non-gating red lane) would be dead weight; a directly-green suite is the honest backing for the "CI is the enforcement backstop" claim (DP-2) | ✓ Good |
+| `mix ci` as the single source of truth for local + CI gate (v1.8) | The `lint-once` CI job invokes the same `mix ci` alias a contributor runs locally, so the portable gate steps structurally cannot drift between local and CI; the known deltas (no `mix docs`/operator-UI diff locally, single `parapet` prefix, trimmed PR matrix) are documented in `CONTRIBUTING.md` rather than silently diverging | ✓ Good |
+| Trim PRs to one cell; full matrix on main + nightly (v1.8) | Contributors get fast single-cell feedback (OTP 28 · `parapet`) while full OTP {27,28,29} × dual-prefix coverage runs on merge and a `0 3 * * *` cron — full signal is preserved off the PR hot path, and the `mix.exs` `~> 1.19` floor stays unchanged (dropping EOL toolchains from CI is not an adopter-facing floor change; that is deferred to VER-01) | ✓ Good |
 
 ## Evolution
 
@@ -357,4 +348,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-07-02 after v1.8 Phase 57 (Test Suite Baseline) — bare `mix test` reds fixed directly and all `Process.sleep` sites classified; TEST-01..05 verified, green enforced by the CI gate*
+*Last updated: 2026-07-03 after v1.8 CI/CD Performance & DX milestone — pipeline reshaped fast/cheap/green-by-default (18/18 reqs, verified closeout); public API + telemetry frozen*

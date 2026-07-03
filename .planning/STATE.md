@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: CI/CD Performance & DX
 current_phase: 60
-status: completed
-stopped_at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
-last_updated: "2026-07-03T01:03:52.994Z"
+status: Awaiting next milestone
+stopped_at: Phase 60 UAT passed (12/12, 0 issues); v1.8 milestone 100% complete
+last_updated: "2026-07-03T02:03:04.856Z"
 last_activity: 2026-07-03
-last_activity_desc: Phase 60 marked complete
+last_activity_desc: Milestone v1.8 completed and archived
 progress:
   total_phases: 4
   completed_phases: 4
@@ -21,21 +21,17 @@ current_phase_name: otp-matrix-reshape-nightly-schedule
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
+See: .planning/PROJECT.md (updated 2026-07-03 after v1.8 milestone)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 60 — otp-matrix-reshape-nightly-schedule
+**Current focus:** Planning next milestone (v1.9 Quality Hardening) — define with `/gsd-new-milestone`
 
 ## Current Position
 
-Phase: 60 — COMPLETE (last phase of v1.8)
-Plan: 2 of 2
-Status: Phase 60 complete — v1.8 milestone 100% complete
-Last activity: 2026-07-03 — Phase 60 UAT passed (12/12), phase marked complete
-
-```
-v1.8 Progress: [████████████████████] 100% (4/4 phases)
-```
+Phase: Milestone v1.8 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-07-03 — Milestone v1.8 completed and archived
 
 ## Milestone Roadmap (v1.8)
 
@@ -143,11 +139,11 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-03T01:16:03Z
-Stopped at: Phase 60 UAT passed (12/12, 0 issues); v1.8 milestone 100% complete
+Last session: 2026-07-03
+Stopped at: v1.8 archived (ROADMAP + REQUIREMENTS → milestones/, PROJECT.md evolved, RETROSPECTIVE appended, tag v1.8 cut)
 Resume file: None
-Next step: `/gsd-complete-milestone v1.8` — archive v1.8 and prepare next milestone
+Next step: `/gsd-new-milestone` — scope v1.9 Quality Hardening (candidates: TELEM-01, REFACTOR-01, A11Y-01, VER-01)
 
 ## Operator Next Steps
 
-- Complete the v1.8 milestone with `/gsd-complete-milestone v1.8`
+- Start the next milestone with /gsd-new-milestone
