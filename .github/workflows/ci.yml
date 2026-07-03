@@ -5,13 +5,37 @@ on:
     branches:
       - main
   pull_request:
+  schedule:
+    - cron: '17 3 * * *'  # nightly at 03:17 UTC (off-the-hour: avoids GitHub top-of-hour queue delay; house :17 convention)
 
-# Cancel superseded PR runs; pushes to main (and future scheduled runs) are never cancelled.
+# Cancel superseded PR runs; pushes to main and nightly schedule runs are never cancelled.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # Matrix is intentionally asymmetric: parapet leg × {27,28,29} OTP, public leg × 28 only.
+  # Do NOT "balance" it by adding OTP cells to the public leg — prefix resolution is
+  # compile-time (@schema_prefix) and OTP-independent, so one OTP is complete signal.
+  # (Retires the v1.7 D-11 coverage-prune; see PROJECT.md Key Decisions.)
+  #
+  # OTP-29 note: OTP 29 requires Elixir >= 1.20. The OTP-29 cell proves forward-compat
+  # under Elixir 1.20.2 — it does NOT imply that a ~> 1.19 adopter can run OTP 29.
+  matrix-config:
+    name: matrix-config (PR=trimmed, main+nightly=full)
+    runs-on: ubuntu-latest
+    outputs:
+      test-matrix: ${{ steps.resolve.outputs.test-matrix }}
+    steps:
+      - id: resolve
+        name: Resolve test matrix
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo 'test-matrix={"include":[{"elixir":"1.20.2","otp":"28.x","schema_prefix":"parapet"}]}' >> "$GITHUB_OUTPUT"
+          else
+            echo 'test-matrix={"include":[{"elixir":"1.20.2","otp":"27.x","schema_prefix":"parapet"},{"elixir":"1.20.2","otp":"28.x","schema_prefix":"parapet"},{"elixir":"1.20.2","otp":"29.x","schema_prefix":"parapet"},{"elixir":"1.20.2","otp":"28.x","schema_prefix":"public"}]}' >> "$GITHUB_OUTPUT"
+          fi
+
   lint-once:
     runs-on: ubuntu-latest
     env:
