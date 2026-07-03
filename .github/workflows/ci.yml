@@ -45,26 +45,26 @@ jobs:
       - name: Setup Elixir
         uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
         with:
-          elixir-version: '1.19.0'
+          elixir-version: '1.20.2'
           otp-version: '28.x'
       - name: Cache dependencies
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: deps
-          key: ${{ runner.os }}-mix-1.19.0-28.x-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-mix-1.19.0-28.x-
+          key: ${{ runner.os }}-mix-1.20.2-28.x-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-1.20.2-28.x-
       - name: Cache _build
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: _build
-          key: ${{ runner.os }}-build-1.19.0-28.x-${{ hashFiles('**/mix.lock') }}
-          restore-keys: ${{ runner.os }}-build-1.19.0-28.x-
+          key: ${{ runner.os }}-build-1.20.2-28.x-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-build-1.20.2-28.x-
       - name: Cache PLT
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: priv/plts
-          key: plt-${{ runner.os }}-28.x-1.19.0-${{ hashFiles('**/mix.lock') }}
-          restore-keys: plt-${{ runner.os }}-28.x-1.19.0-
+          key: plt-${{ runner.os }}-28.x-1.20.2-${{ hashFiles('**/mix.lock') }}
+          restore-keys: plt-${{ runner.os }}-28.x-1.20.2-
       - name: Install dependencies
         run: mix deps.get
       - name: Run mix ci
@@ -81,16 +81,10 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    needs: [matrix-config]
     strategy:
       fail-fast: false
-      matrix:
-        elixir: ['1.19.0']
-        otp: ['26.x', '27.x', '28.x']
-        schema_prefix: ['parapet']
-      include:
-        - elixir: '1.19.0'
-          otp: '28.x'
-          schema_prefix: 'public'
+      matrix: ${{ fromJson(needs.matrix-config.outputs.test-matrix) }}
     env:
       MIX_ENV: test
       PARAPET_SCHEMA_PREFIX: ${{ matrix.schema_prefix }}
@@ -137,10 +131,7 @@ jobs:
   demo:
     runs-on: ubuntu-latest
     needs: [lint-once, test]
-    strategy:
-      matrix:
-        elixir: ['1.19.0']
-        otp: ['26.x', '27.x', '28.x']
+    if: github.event_name != 'pull_request'
     env:
       MIX_ENV: test
     services:
@@ -162,20 +153,20 @@ jobs:
       - name: Setup Elixir
         uses: erlef/setup-beam@54075bcc5e249e4758d363f27d099f55d843f124 # v1.24.1
         with:
-          elixir-version: ${{ matrix.elixir }}
-          otp-version: ${{ matrix.otp }}
+          elixir-version: '1.20.2'
+          otp-version: '28.x'
       - name: Cache demo dependencies
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: examples/demo_app/deps
-          key: ${{ runner.os }}-demo-mix-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('examples/demo_app/mix.lock') }}
-          restore-keys: ${{ runner.os }}-demo-mix-${{ matrix.elixir }}-${{ matrix.otp }}-
+          key: ${{ runner.os }}-demo-mix-1.20.2-28.x-${{ hashFiles('examples/demo_app/mix.lock') }}
+          restore-keys: ${{ runner.os }}-demo-mix-1.20.2-28.x-
       - name: Cache demo _build
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5.1.0
         with:
           path: examples/demo_app/_build
-          key: ${{ runner.os }}-demo-build-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('examples/demo_app/mix.lock') }}
-          restore-keys: ${{ runner.os }}-demo-build-${{ matrix.elixir }}-${{ matrix.otp }}-
+          key: ${{ runner.os }}-demo-build-1.20.2-28.x-${{ hashFiles('examples/demo_app/mix.lock') }}
+          restore-keys: ${{ runner.os }}-demo-build-1.20.2-28.x-
       - name: Install demo dependencies
         run: cd examples/demo_app && mix deps.get
       - name: Compile demo (warnings-as-errors, no-optional-deps)
