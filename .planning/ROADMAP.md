@@ -140,7 +140,9 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   3. The `demo` smoke job is skipped on pull requests and runs on a single OTP-28 cell on main pushes and nightly, eliminating the redundant 3-OTP demo sweep
   4. A nightly scheduled workflow (`cron: '0 3 * * *'`) exercises the full test matrix plus demo, so full multi-version coverage runs even if no push lands that day; the D-11 tech-debt flag in `v1.7-MILESTONE-AUDIT.md` is retired with a dated note
 
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 60-01-PLAN.md — ci.yml reshape: matrix-config resolver, schedule trigger, plain PR-skipped demo, release_gate truth-table hardening, event-scoped concurrency, EOL toolchain retirement (MATRIX-01/02/03/04)
+- [ ] 60-02-PLAN.md — adjacent doc/toolchain edits: release-please pin bump, README CI sentence, CONTRIBUTING delta bullet, D-11 retirement (canonical PROJECT.md + dated pointers) (MATRIX-02/03)
 
 ## Progress Table
 
