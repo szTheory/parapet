@@ -140,8 +140,9 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
   3. The `demo` smoke job is skipped on pull requests and runs on a single OTP-28 cell on main pushes and nightly, eliminating the redundant 3-OTP demo sweep
   4. A nightly scheduled workflow (`cron: '0 3 * * *'`) exercises the full test matrix plus demo, so full multi-version coverage runs even if no push lands that day; the D-11 tech-debt flag in `v1.7-MILESTONE-AUDIT.md` is retired with a dated note
 
-**Plans**: 2 plans
-- [ ] 60-01-PLAN.md — ci.yml reshape: matrix-config resolver, schedule trigger, plain PR-skipped demo, release_gate truth-table hardening, event-scoped concurrency, EOL toolchain retirement (MATRIX-01/02/03/04)
+**Plans**: 1/2 plans executed
+
+- [x] 60-01-PLAN.md — ci.yml reshape: matrix-config resolver, schedule trigger, plain PR-skipped demo, release_gate truth-table hardening, event-scoped concurrency, EOL toolchain retirement (MATRIX-01/02/03/04)
 - [ ] 60-02-PLAN.md — adjacent doc/toolchain edits: release-please pin bump, README CI sentence, CONTRIBUTING delta bullet, D-11 retirement (canonical PROJECT.md + dated pointers) (MATRIX-02/03)
 
 ## Progress Table
@@ -157,4 +158,4 @@ Full detail: [milestones/v1.7-ROADMAP.md](milestones/v1.7-ROADMAP.md) · Audit: 
 | 57. Test Suite Baseline | v1.8 | 2/2 | Complete    | 2026-07-02 |
 | 58. Local DX — mix ci & CONTRIBUTING | v1.8 | 1/1 | Complete    | 2026-07-02 |
 | 59. CI Caching, Lint-Once & release_gate Hardening | v1.8 | 2/2 | Complete    | 2026-07-02 |
-| 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 0/TBD | Not started | - |
+| 60. OTP Matrix Reshape & Nightly Schedule | v1.8 | 1/2 | In Progress|  |

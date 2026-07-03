@@ -31,10 +31,10 @@ Closes v1.7 tech-debt #6 by fixing, not quarantining — a bare `mix test` must 
 
 ### OTP Matrix & Triggers
 
-- [ ] **MATRIX-01**: Pull requests run a trimmed matrix — a single representative cell (OTP 28 · Elixir 1.20.2 · `parapet` prefix) — for fast feedback
-- [ ] **MATRIX-02**: Push-to-`main` and a nightly schedule run the full matrix — OTP {27, 28, 29} on Elixir 1.20.2 across the v1.7 schema-prefix legs — replacing the EOL OTP 26 / Elixir 1.19 pins and retiring the D-11 uneven-coverage carve-out
-- [ ] **MATRIX-03**: The `demo` smoke job is trimmed to a single OTP-28 leg, skipped on PRs and run on main + nightly (its checks are OTP- and prefix-independent)
-- [ ] **MATRIX-04**: A nightly scheduled run (`on: schedule`) exercises the full matrix + demo, so full multi-version coverage is preserved off the PR hot path
+- [x] **MATRIX-01**: Pull requests run a trimmed matrix — a single representative cell (OTP 28 · Elixir 1.20.2 · `parapet` prefix) — for fast feedback
+- [x] **MATRIX-02**: Push-to-`main` and a nightly schedule run the full matrix — OTP {27, 28, 29} on Elixir 1.20.2 across the v1.7 schema-prefix legs — replacing the EOL OTP 26 / Elixir 1.19 pins and retiring the D-11 uneven-coverage carve-out
+- [x] **MATRIX-03**: The `demo` smoke job is trimmed to a single OTP-28 leg, skipped on PRs and run on main + nightly (its checks are OTP- and prefix-independent)
+- [x] **MATRIX-04**: A nightly scheduled run (`on: schedule`) exercises the full matrix + demo, so full multi-version coverage is preserved off the PR hot path
 
 ### Local Developer Experience
 
@@ -86,10 +86,10 @@ Explicitly excluded from v1.8, with reasoning.
 | CI-04 | Phase 59 | Complete |
 | CI-05 | Phase 59 | Complete |
 | CI-06 | Phase 59 | Complete |
-| MATRIX-01 | Phase 60 | Pending |
-| MATRIX-02 | Phase 60 | Pending |
-| MATRIX-03 | Phase 60 | Pending |
-| MATRIX-04 | Phase 60 | Pending |
+| MATRIX-01 | Phase 60 | Complete |
+| MATRIX-02 | Phase 60 | Complete |
+| MATRIX-03 | Phase 60 | Complete |
+| MATRIX-04 | Phase 60 | Complete |
 
 **Coverage:**
 

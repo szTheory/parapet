@@ -2,16 +2,19 @@
 gsd_state_version: 1.0
 milestone: v1.8
 milestone_name: CI/CD Performance & DX
+current_phase: 60
+current_phase_name: otp-matrix-reshape-nightly-schedule
 status: executing
 stopped_at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
-last_updated: "2026-07-03T00:45:08.594Z"
-last_activity: 2026-07-03 -- Phase 60 planning complete
+last_updated: "2026-07-03T00:54:00.307Z"
+last_activity: 2026-07-03
+last_activity_desc: Phase 60 execution started
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 7
-  completed_plans: 5
-  percent: 71
+  completed_plans: 6
+  percent: 75
 ---
 
 # Project State
@@ -21,14 +24,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-07-02 after v1.7 milestone)
 
 **Core value:** A Phoenix SaaS team can install Parapet and immediately know whether their critical user journeys are healthy — with evidence, not just dashboards.
-**Current focus:** Phase 59 — ci-caching-lint-once-release-gate-hardening
+**Current focus:** Phase 60 — otp-matrix-reshape-nightly-schedule
 
 ## Current Position
 
-Phase: 60 — OTP Matrix Reshape & Nightly Schedule
-Plan: Not started
+Phase: 60 (otp-matrix-reshape-nightly-schedule) — EXECUTING
+Plan: 2 of 2
 Status: Ready to execute
-Last activity: 2026-07-03 -- Phase 60 planning complete
+Last activity: 2026-07-03 — Phase 60 execution started
 
 ```
 v1.8 Progress: [█████░░░░░░░░░░░░░░░░] 25% (1/4 phases)
@@ -82,6 +85,7 @@ Phases continue from v1.7 (ended Phase 56). Dependency chain: green suite first 
 | Phase 56 P04 | 10 | 2 tasks | 2 files |
 | Phase 57 P01 | 3 | 2 tasks | 3 files |
 | Phase 57 P02 | 5 | 4 tasks | 7 files |
+| Phase 60 P01 | 10min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -110,6 +114,8 @@ Config key is `:schema_prefix` (never bare `:prefix`). Mechanism is compile-time
 - [Phase ?]: D-07/D-08/TEST-04: SELECT 1 readiness barrier replaces Process.sleep(200) — self-referential anon fn, 5_000ms deadline, raises DX message on expiry
 - [Phase ?]: D-09/D-10/D-11/TEST-04: per-file @concurrency_hold_ms (75x4, 50x1) + INTENTIONAL HOLD: two-line annotation on all 6 hold sites
 - [Phase ?]: D-17: check_intentional_hold.sh standalone grep guard (not wired to CI); promotion to Credo check deferred to Phase 58/59
+- [Phase ?]: .planning/phases/60-otp-matrix-reshape-nightly-schedule/60-01-SUMMARY.md
+- [Phase ?]: .planning/phases/60-otp-matrix-reshape-nightly-schedule/60-01-SUMMARY.md
 
 ### Pending Todos
 
@@ -137,7 +143,7 @@ All three trace to requirements that shipped and were human-verified in the live
 
 ## Session Continuity
 
-Last session: 2026-07-02T23:27:46.156Z
+Last session: 2026-07-03T00:54:00.303Z
 Stopped at: Phase 60 context gathered (assumptions mode + 6-agent decision-fork research)
 Resume file: .planning/phases/60-otp-matrix-reshape-nightly-schedule/60-CONTEXT.md
 Next step: `/gsd-discuss-phase 58` — Local DX — mix ci & CONTRIBUTING (no CONTEXT.md yet)
